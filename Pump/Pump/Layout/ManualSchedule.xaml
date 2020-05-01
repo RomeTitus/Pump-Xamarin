@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.Layout.ManualSchedule"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:local="clr-namespace:EmbeddedImages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="clr-namespace:Pump.Layout.Views"
+    mc:Ignorable="d">
+    <ContentPage.Content>
+
+        <FlexLayout
+            x:Name="LayoutAddController"
+            Margin="20"
+            Direction="Column"
+            JustifyContent="SpaceAround"
+            VerticalOptions="Center">
+
+            <StackLayout>
+                <Label
+                    FontSize="Subtitle"
+                    HorizontalOptions="Center"
+                    Text="Active Now"
+                    TextColor="White"
+                    TextDecorations="Underline" />
+
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand">
+                    <ScrollView HeightRequest="100">
+                        <StackLayout x:Name="ScrollViewScheduleStatus">
+                            <ActivityIndicator
+                                HorizontalOptions="Center"
+                                IsEnabled="true"
+                                IsRunning="True"
+                                IsVisible="True"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+
+                    </ScrollView>
+                </Frame>
+
+            </StackLayout>
+
+            <StackLayout>
+                <Label
+                    FontSize="Subtitle"
+                    HorizontalOptions="Center"
+                    Text="Queued"
+                    TextColor="White"
+                    TextDecorations="Underline" />
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand">
+
+
+                    <ScrollView HeightRequest="100">
+
+                        <StackLayout x:Name="ScrollViewQueueStatus">
+                            <ActivityIndicator
+                                HorizontalOptions="Center"
+                                IsEnabled="true"
+                                IsRunning="True"
+                                IsVisible="True"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+
+                    </ScrollView>
+
+
+                </Frame>
+
+            </StackLayout>
+
+
+            <StackLayout Orientation="Horizontal">
+                <Label
+                    FontSize="Subtitle"
+                    HorizontalOptions="Center"
+                    Text="Duration"
+                    TextColor="White" />
+
+
+                <Switch />
+            </StackLayout>
+        </FlexLayout>
+    </ContentPage.Content>
+</ContentPage>

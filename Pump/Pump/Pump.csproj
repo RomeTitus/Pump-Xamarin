@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\activePump.png" />
+    <None Remove="Icons\FieldSun.png" />
+    <None Remove="Icons\NoConnection.png" />
+    <None Remove="Icons\PressureHigh.png" />
+    <None Remove="Icons\PressureLow.png" />
+    <None Remove="Icons\pump.jpg" />
+    <None Remove="Icons\rain.png" />
+    <None Remove="Icons\setting.png" />
+    <None Remove="Icons\sprinkler.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.2" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.6.292" />
+    <PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.5.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\activePump.png" />
+    <EmbeddedResource Include="Icons\FieldSun.png" />
+    <EmbeddedResource Include="Icons\NoConnection.png" />
+    <EmbeddedResource Include="Icons\PressureHigh.png" />
+    <EmbeddedResource Include="Icons\PressureLow.png" />
+    <EmbeddedResource Include="Icons\pump.jpg" />
+    <EmbeddedResource Include="Icons\rain.png" />
+    <EmbeddedResource Include="Icons\setting.png" />
+    <EmbeddedResource Include="Icons\sprinkler.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Layout\AddController.xaml.cs">
+      <DependentUpon>AddController.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\VerifyConnections.xaml.cs">
+      <DependentUpon>VerifyConnections.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Layout\FloatingScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\HomeScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\ManualSchedule.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\ScheduleStatus.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\SettingPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\VerifyConnections.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewEmptySchedule.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewManualSchedule.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewNoConnection.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewScheduleDetail.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewSensorDetail.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

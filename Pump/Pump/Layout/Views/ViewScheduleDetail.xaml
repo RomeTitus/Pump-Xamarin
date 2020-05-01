@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="Pump.Layout.Views.ViewScheduleDetail"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:localImage="clr-namespace:EmbeddedImages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+
+    <StackLayout Padding="5" HorizontalOptions="Center">
+        <Label
+            x:Name="LabelScheduleName"
+            FontSize="20"
+            HorizontalOptions="Center"
+            Text="Schedule name" />
+
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="0"
+                HeightRequest="30"
+                Orientation="Horizontal">
+                <Image Source="{localImage:ImageResourceExtention Pump.Icons.activePump.png}" />
+                <Label
+                    x:Name="LablePump"
+                    Text="Big Pump"
+                    VerticalOptions="Center" />
+            </StackLayout>
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="1"
+                HeightRequest="30"
+                Orientation="Horizontal">
+                <Image Source="{localImage:ImageResourceExtention Pump.Icons.sprinkler.jpg}" />
+                <Label
+                    x:Name="LableZone"
+                    Text="Garden"
+                    VerticalOptions="Center" />
+            </StackLayout>
+
+            <StackLayout
+                Grid.Row="1"
+                Grid.Column="1"
+                Orientation="Horizontal">
+                <Label
+                    x:Name="LableStartTime"
+                    FontSize="18"
+                    Text="Start: 10:30" />
+                <Label FontSize="18" Text="-" />
+                <Label
+                    x:Name="LableEndTime"
+                    FontSize="18"
+                    Text="End: 11:45" />
+
+            </StackLayout>
+
+        </Grid>
+    </StackLayout>
+
+</ContentView>

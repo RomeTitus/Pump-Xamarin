@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    BackgroundColor="AliceBlue"
+    mc:Ignorable="d">
+
+
+
+    <FlexLayout
+        x:Name="LayoutAddController"
+        Margin="20"
+        Direction="Column"
+        JustifyContent="SpaceAround"
+        VerticalOptions="Center">
+
+        <!--  This rectangle is painted with a diagonal linear gradient.  -->
+
+        <!--  Place new controls here  -->
+        <StackLayout>
+            <Label
+                x:Name="LabelControllerName"
+                HorizontalOptions="Center"
+                Text="Controller Name"
+                TextType="Text"
+                VerticalOptions="Center" />
+
+            <Editor
+                x:Name="TxtControllerName"
+                Margin="0"
+                AutoSize="TextChanges"
+                FlowDirection="MatchParent"
+                HorizontalOptions="Fill"
+                InputTransparent="False"
+                MinimumWidthRequest="-1"
+                Scale="1"
+                VerticalOptions="Center"
+                WidthRequest="-1" />
+        </StackLayout>
+
+
+        <Frame
+            BackgroundColor="White"
+            BorderColor="Black"
+            HorizontalOptions="FillAndExpand">
+
+
+            <StackLayout>
+
+                <Label
+                    x:Name="LabelTxtInternalConnection"
+                    HorizontalOptions="Center"
+                    Text="Internal Connection"
+                    VerticalOptions="Center" />
+
+                <Editor x:Name="TxtInternalConnection" HorizontalOptions="Fill" />
+
+
+                <Label
+                    x:Name="LabelInternalPort"
+                    HorizontalOptions="Center"
+                    Text="Internal Port" />
+
+                <Editor
+                    x:Name="TxtInternalPort"
+                    HorizontalOptions="Fill"
+                    Keyboard="Numeric" />
+
+            </StackLayout>
+        </Frame>
+        <Frame BackgroundColor="White" BorderColor="Black">
+
+            <StackLayout>
+                <Label
+                    x:Name="LabelExternalConnection"
+                    HorizontalOptions="Center"
+                    Text="External Connection"
+                    VerticalOptions="Center" />
+
+                <Editor
+                    x:Name="TxtExternalConnection"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Center" />
+
+
+                <Label
+                    x:Name="LabelExternalPort"
+                    HorizontalOptions="Center"
+                    Text="External Port"
+                    VerticalOptions="Center" />
+
+                <Editor
+                    x:Name="TxtExternalPort"
+                    HorizontalOptions="Fill"
+                    Keyboard="Numeric"
+                    VerticalOptions="Center" />
+            </StackLayout>
+        </Frame>
+
+
+        <Button
+            x:Name="BtnAddController"
+            Clicked="BtnAddController_Clicked"
+            HorizontalOptions="Center"
+            Text="ADD CONTROLLER"
+            VerticalOptions="Center" />
+
+
+    </FlexLayout>
+
+
+
+
+
+
+
+
+</ContentPage>
