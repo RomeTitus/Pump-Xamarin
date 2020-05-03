@@ -3,12 +3,16 @@
     x:Class="Pump.Layout.ManualSchedule"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:control="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
     xmlns:local="clr-namespace:EmbeddedImages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="clr-namespace:Pump.Layout.Views"
     mc:Ignorable="d">
+
     <ContentPage.Content>
+
+
 
         <FlexLayout
             x:Name="LayoutAddController"
@@ -30,14 +34,23 @@
                     BorderColor="Black"
                     HorizontalOptions="FillAndExpand">
                     <ScrollView HeightRequest="100">
-                        <StackLayout x:Name="ScrollViewScheduleStatus">
+                        <FlexLayout
+                            x:Name="ScrollViewManualPump"
+                            JustifyContent="SpaceBetween"
+                            Wrap="Wrap">
+                            <FlexLayout.GestureRecognizers>
+                                <TapGestureRecognizer x:Name="ScrollViewManualPumpTap" Tapped="ScrollViewManualPump_Tapped" />
+                            </FlexLayout.GestureRecognizers>
                             <ActivityIndicator
+                                AutomationId="ActivityIndicatorManualPump"
                                 HorizontalOptions="Center"
                                 IsEnabled="true"
                                 IsRunning="True"
                                 IsVisible="True"
                                 VerticalOptions="Center" />
-                        </StackLayout>
+
+
+                        </FlexLayout>
 
                     </ScrollView>
                 </Frame>
@@ -59,33 +72,72 @@
 
                     <ScrollView HeightRequest="100">
 
-                        <StackLayout x:Name="ScrollViewQueueStatus">
+                        <FlexLayout
+                            x:Name="ScrollViewManualZone"
+                            JustifyContent="SpaceBetween"
+                            Wrap="Wrap">
+                            <FlexLayout.GestureRecognizers>
+                                <TapGestureRecognizer x:Name="ScrollViewManualZoneTap" Tapped="ScrollViewManualZoneTap_Tapped" />
+                            </FlexLayout.GestureRecognizers>
+
                             <ActivityIndicator
+                                AutomationId="ActivityIndicatorManualZone"
                                 HorizontalOptions="Center"
                                 IsEnabled="true"
                                 IsRunning="True"
                                 IsVisible="True"
                                 VerticalOptions="Center" />
-                        </StackLayout>
 
+
+                        </FlexLayout>
                     </ScrollView>
-
-
                 </Frame>
-
             </StackLayout>
 
+            <StackLayout
+                HeightRequest="40"
+                HorizontalOptions="EndAndExpand"
+                Orientation="Horizontal">
 
-            <StackLayout Orientation="Horizontal">
                 <Label
+                    x:Name="LableTimeDuration"
                     FontSize="Subtitle"
-                    HorizontalOptions="Center"
+                    HorizontalOptions="StartAndExpand"
                     Text="Duration"
-                    TextColor="White" />
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <control:MaskedEntry
+                    x:Name="MaskedEntryTime"
+                    HorizontalOptions="StartAndExpand"
+                    Keyboard="Numeric"
+                    Mask="X:XX"
+                    Placeholder="H:MM"
+                    VerticalOptions="Center" />
 
+                <Label
+                    FontSize="Body"
+                    HorizontalOptions="Fill"
+                    Text="Run with Schedule"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Switch
+                    x:Name="SwitchRunWithSchedule"
+                    HorizontalOptions="EndAndExpand"
+                    VerticalOptions="Center" />
 
-                <Switch />
             </StackLayout>
+
+            <StackLayout>
+                <Button
+                    x:Name="ButtonStartManual"
+                    Clicked="ButtonStartManual_Clicked"
+                    Text="Start" />
+                <Button
+                    x:Name="ButtonStopManual"
+                    Clicked="ButtonStopManual_Clicked"
+                    Text="Stop" />
+            </StackLayout>
+
         </FlexLayout>
     </ContentPage.Content>
 </ContentPage>

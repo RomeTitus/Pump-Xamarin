@@ -1,5 +1,4 @@
-﻿using CarouselView.FormsPlugin.Abstractions;
-using Pump.Layout.Views;
+﻿using Pump.Layout.Views;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using System;
@@ -252,7 +251,8 @@ namespace Pump.Layout
         {
             if (oldActiveSchedule == null)
                 return;
-            var FloatingScreen = new FloatingScreen(getScheduleDetailObject(oldActiveSchedule));
+            var FloatingScreen = new FloatingScreen();
+            FloatingScreen.setFloatingScreen(getScheduleDetailObject(oldActiveSchedule));
             PopupNavigation.Instance.PushAsync(FloatingScreen);
 
         }
@@ -261,7 +261,8 @@ namespace Pump.Layout
         {
             if (oldQueueActiveSchedule == null)
                 return;
-            var FloatingScreen = new FloatingScreen(getQueueScheduleDetailObject(oldQueueActiveSchedule));
+            var FloatingScreen = new FloatingScreen();
+            FloatingScreen.setFloatingScreen(getQueueScheduleDetailObject(oldQueueActiveSchedule));
             PopupNavigation.Instance.PushAsync(FloatingScreen);
         }
 
@@ -269,7 +270,8 @@ namespace Pump.Layout
         {
             if (oldActiveSensorStatus == null)
                 return;
-            var FloatingScreen = new FloatingScreen(getSensorStatusObject(oldActiveSensorStatus));
+            var FloatingScreen = new FloatingScreen();
+            FloatingScreen.setFloatingScreen(getSensorStatusObject(oldActiveSensorStatus));
             PopupNavigation.Instance.PushAsync(FloatingScreen);
         }
     }

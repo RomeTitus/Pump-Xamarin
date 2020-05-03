@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,12 +21,13 @@ namespace Pump.Layout.Views
 
         private void setManualText(List<string> manual, bool isManualWithSchedule)
         {
+            ScheduleTime scheduleTime = new ScheduleTime();
             if (isManualWithSchedule)
                 LableManual.Text = "Manual Running with Schedule";
             else
                 LableManual.Text = "Manual Running without Schedule";
             
-            LableManualTime.Text = "Ends at: " + manual[0];
+            LableManualTime.Text = "Duration: " + scheduleTime.TimeDiffNow(manual[0]);
         }
         
     }

@@ -5,7 +5,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Rg.Plugins.Popup.Pages;
-using CarouselView.FormsPlugin.UWP;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -47,10 +46,8 @@ namespace Pump.UWP
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 List<Assembly> assembliesToInclude = new List<Assembly>();
-                assembliesToInclude.Add(typeof(CarouselViewRenderer).GetTypeInfo().Assembly);
                 Xamarin.Forms.Forms.Init(e, assembliesToInclude);
-                
-                
+
                 Rg.Plugins.Popup.Popup.Init();
                 Xamarin.Forms.Forms.Init(e, Rg.Plugins.Popup.Popup.GetExtraAssemblies());
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
@@ -96,9 +93,6 @@ namespace Pump.UWP
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
-        private void InitControls()
-        {
-            CarouselViewRenderer.Init();
-        }
+
     }
 }

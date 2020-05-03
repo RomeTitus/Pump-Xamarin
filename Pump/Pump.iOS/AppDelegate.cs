@@ -1,5 +1,4 @@
 ﻿
-using CarouselView.FormsPlugin.iOS;
 using Foundation;
 using UIKit;
 
@@ -21,16 +20,12 @@ namespace Pump.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             Rg.Plugins.Popup.Popup.Init();
-            InitControls();
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
             
             return base.FinishedLaunching(app, options);
         }
 
-        private void InitControls()
-        {
-            CarouselViewRenderer.Init();
-        }
+
     }
 }

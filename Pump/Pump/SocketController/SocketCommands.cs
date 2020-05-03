@@ -24,6 +24,23 @@ namespace Pump.SocketController
         {
             return "getActiveSensorStatus";
         }
+
+        public string getPumps()
+        {
+            return "getPumps";
+        }
+
+        public string getValves()
+        {
+            return "getValves";
+        }
+
+        public string getManualSchedule()
+        {
+            return "getManualSchedule";
+        }
+
+
     }
 
 

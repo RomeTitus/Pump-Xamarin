@@ -13,14 +13,17 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FloatingScreen : PopupPage
     {
-        public FloatingScreen(List<Object> screens)
+        public FloatingScreen()
         {
             InitializeComponent();
+        }
 
-            foreach (View screen in screens){
+        public void setFloatingScreen(List<Object> screens)
+        {
+            foreach (View screen in screens)
+            {
                 ScrollViewFloatingPage.Children.Add(screen);
             }
-            
         }
     }
 }

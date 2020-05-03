@@ -19,15 +19,6 @@ namespace Pump
             //ScheduleStatusTab.IconImageSource = "Icons/ic_action_pump.png";
         }
 
-        private void carousel_PositionSelected(object sender, CarouselView.FormsPlugin.Abstractions.PositionSelectedEventArgs e)
-        {
-
-        }
-
-        private void carousel_Scrolled(object sender, CarouselView.FormsPlugin.Abstractions.ScrolledEventArgs e)
-        {
-
-        }
 
        
     }
