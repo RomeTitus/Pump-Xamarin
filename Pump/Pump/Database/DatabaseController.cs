@@ -2,6 +2,7 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xamarin.Forms;
 
@@ -10,44 +11,49 @@ namespace Pump.Database
     class DatabaseController
     {
         //used to be thread safe
-        static object locker = new object();
-        SQLiteConnection database;
+        public static readonly object Locker = new object();
+        private readonly SQLiteConnection _database;
 
         public DatabaseController()
         {
             //database = DependencyService.Get<ISQLite>.GetConnection();
             
-            database = DependencyService.Get<ISQLite>().GetConnection();
+            _database = DependencyService.Get<ISQLite>().GetConnection();
 
-            database.CreateTable<PumpConnection>();
+            _database.CreateTable<PumpConnection>();
 
-            database.CreateTable<PumpSelection>();
+            _database.CreateTable<PumpSelection>();
         }
 
-        public PumpConnection getPumpSelection()
+        public PumpConnection GetPumpSelection()
         {
-            lock (locker)
+            lock (Locker)
             {
-                if(database.Table<PumpSelection>().Count() > 0)
+                if(_database.Table<PumpSelection>().Any())
                 {
-                    var pumpSelected = database.Table<PumpSelection>().First();
-                    return database.Table<PumpConnection>().FirstOrDefault(x => x.ID == pumpSelected.PumpConnectionID);
+                    var pumpSelected = _database.Table<PumpSelection>().First();
+                    return _database.Table<PumpConnection>().FirstOrDefault(x => x.ID == pumpSelected.PumpConnectionId);
                 }
                 else
                     return null;
             }
         }
 
-        public void addPumpConnection(PumpConnection pumpConnection)
+        public void AddPumpConnection(PumpConnection pumpConnection)
         {
-            lock (locker)
+            lock (Locker)
             {
-                if (database.Table<PumpSelection>().Count() > 0)
-                    database.DeleteAll<PumpSelection>();
+                if (_database.Table<PumpSelection>().Any())
+                    _database.DeleteAll<PumpSelection>();
 
-                database.Insert(pumpConnection);
-                database.Insert(new PumpSelection(pumpConnection.ID));
+                _database.Insert(pumpConnection);
+                _database.Insert(new PumpSelection(pumpConnection.ID));
             }
+        }
+
+        public void UpdatePumpConnection(PumpConnection pumpConnection)
+        {
+            _database.Update(pumpConnection);
         }
     }
 }

@@ -7,11 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <ContentPage.Content>
-        <StackLayout>
-            <Label
-                HorizontalOptions="CenterAndExpand"
-                Text="Welcome to setting page"
-                VerticalOptions="CenterAndExpand" />
+        <StackLayout VerticalOptions="Center">
+            <Button
+                x:Name="BtnConnectionDetail"
+                Pressed="BtnConnectionDetail_OnPressed"
+                Text="Connection Detail"
+                VerticalOptions="Center" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

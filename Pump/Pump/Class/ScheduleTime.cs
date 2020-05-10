@@ -14,33 +14,22 @@ namespace Pump
             var datetime = Convert.ToDateTime(Time);
 
                 var dateDiff = datetime - DateTime.Now;
-                string hour = (Convert.ToInt32(Math.Floor(Convert.ToDouble(dateDiff.TotalHours.ToString())))).ToString();
+                int hour = (Convert.ToInt32(Math.Floor(Convert.ToDouble(dateDiff.TotalHours.ToString()))));
                 double minute = (Math.Ceiling(Convert.ToDouble(dateDiff.Minutes.ToString())));
                 if (Convert.ToDouble(dateDiff.Seconds.ToString()) > 0)
                 {
                     minute = minute + 1;
                 }
-                if(minute < 10)
-                {
-                    return hour + ":0" + minute;
-                }
-                return hour + ":" + minute;
-            /*
-            if (minute < 0 && hour > 0)
-                {
-                    hour--;
-                    minute = minute + 60;
+                string StringHour = hour.ToString();
+                string StringMinute = minute.ToString();
 
-                }
-                if (minute < 10)
-                {
-                    Time = hour + ":0" + minute;
-                }
-                else
-                {
-                    Time = hour + ":" + minute;
-                }
-                */
+                if(minute < 10)
+                    StringMinute = "0" + minute;
+                
+                if (hour < 10)
+                    StringHour = "0" + hour;
+                
+                return StringHour + ":" + StringMinute;
             }
             catch (Exception e)
             {

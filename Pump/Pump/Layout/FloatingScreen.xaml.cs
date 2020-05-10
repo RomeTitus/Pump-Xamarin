@@ -16,6 +16,7 @@ namespace Pump.Layout
         public FloatingScreen()
         {
             InitializeComponent();
+            
         }
 
         public void setFloatingScreen(List<Object> screens)

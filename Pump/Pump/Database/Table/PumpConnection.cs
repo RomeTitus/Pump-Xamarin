@@ -1,5 +1,6 @@
 ﻿
 
+using System;
 using SQLite;
 
 namespace Pump.Droid.Database.Table

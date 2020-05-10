@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -44,6 +44,11 @@ namespace Pump.Layout
         public void ExternalFailed()
         {
             labelExternalConnection.Text = "External Connection Failed" ;
+        }
+
+        private void Button_OnClicked(object sender, EventArgs e)
+        {
+            PopupNavigation.Instance.PopAsync();
         }
     }
 }

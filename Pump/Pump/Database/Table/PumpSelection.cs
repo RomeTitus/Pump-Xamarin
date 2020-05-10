@@ -10,13 +10,13 @@ namespace Pump.Droid.Database.Table
 
         public PumpSelection(int PumpConnectionID)
         {
-            this.PumpConnectionID = PumpConnectionID;
+            this.PumpConnectionId = PumpConnectionID;
         }
 
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
        
-        public int PumpConnectionID { get; set; }
+        public int PumpConnectionId { get; set; }
 
 
 

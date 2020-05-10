@@ -11,9 +11,6 @@
     mc:Ignorable="d">
 
     <ContentPage.Content>
-
-
-
         <FlexLayout
             x:Name="LayoutAddController"
             Margin="20"
@@ -25,7 +22,7 @@
                 <Label
                     FontSize="Subtitle"
                     HorizontalOptions="Center"
-                    Text="Active Now"
+                    Text="Pump"
                     TextColor="White"
                     TextDecorations="Underline" />
 
@@ -61,7 +58,7 @@
                 <Label
                     FontSize="Subtitle"
                     HorizontalOptions="Center"
-                    Text="Queued"
+                    Text="Zone"
                     TextColor="White"
                     TextDecorations="Underline" />
                 <Frame
@@ -110,8 +107,8 @@
                     x:Name="MaskedEntryTime"
                     HorizontalOptions="StartAndExpand"
                     Keyboard="Numeric"
-                    Mask="X:XX"
-                    Placeholder="H:MM"
+                    Mask="XX:XX"
+                    Placeholder="HH:MM"
                     VerticalOptions="Center" />
 
                 <Label

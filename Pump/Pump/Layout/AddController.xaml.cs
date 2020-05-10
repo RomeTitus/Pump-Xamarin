@@ -15,34 +15,29 @@ namespace Pump
     // Learn more about making custom code visible in the Xamarin.Forms previewer
     // by visiting https://aka.ms/xamarinforms-previewer
     [DesignTimeVisible(false)]
-    public partial class MainPage : ContentPage
+    public partial class AddController : ContentPage
     {
         double width = 0;
         double height = 0;
-        DatabaseController databaseController = new DatabaseController();
-        public MainPage()
+
+        public AddController()
         {
             InitializeComponent();
-
-            if(databaseController.getPumpSelection() != null)
-            {
-                Navigation.PushModalAsync(new HomeScreen());
-            }
         }
 
         private void BtnAddController_Clicked(object sender, EventArgs e)
         {
             //DisplayAlert("Title", "Hellow World", "OK");
-            AddController();
+            AddIrrigationController();
         }
 
-        private void AddController()
+        private void AddIrrigationController()
         {
             int ExternalPort = 0;
             int InternalPort = 0;
 
             if (TxtControllerName.Text == null || (TxtInternalConnection.Text == null || TxtInternalPort.Text== null || !int.TryParse(TxtInternalPort.Text, out InternalPort)) && (TxtExternalConnection.Text == null || TxtExternalPort.Text == null || !int.TryParse(TxtExternalPort.Text, out ExternalPort)))
-                outLineIncorrectFields(InternalPort, ExternalPort);
+                OutLineIncorrectFields(InternalPort, ExternalPort);
                 
             else
             {
@@ -68,17 +63,17 @@ namespace Pump
            
         }
 
-        private void outLineIncorrectFields(int InternalPort, int ExternalPort)
+        private void OutLineIncorrectFields(int internalPort, int externalPort)
         {
             if (TxtControllerName.Text == null)
                 LabelControllerName.TextColor = Color.Red;
             if (TxtInternalConnection.Text == null)
                 LabelTxtInternalConnection.TextColor = Color.Red;
-            if (TxtInternalPort.Text == null || InternalPort == 0)
+            if (TxtInternalPort.Text == null || internalPort == 0)
                 LabelInternalPort.TextColor = Color.Red;
             if (TxtExternalConnection.Text == null)
                 LabelExternalConnection.TextColor = Color.Red;
-            if (TxtExternalPort.Text == null || ExternalPort == 0)
+            if (TxtExternalPort.Text == null || externalPort == 0)
                 LabelExternalPort.TextColor = Color.Red;
         }
         
@@ -165,7 +160,7 @@ namespace Pump
         private void addPumpConnection(PumpConnection pumpConnection)
         {
             DatabaseController databaseController = new DatabaseController();
-            databaseController.addPumpConnection(pumpConnection);
+            databaseController.AddPumpConnection(pumpConnection);
         }
         private string checkConnection(string host, int port)
         {

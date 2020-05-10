@@ -16,5 +16,13 @@ namespace Pump.Layout
         {
             InitializeComponent();
         }
+
+        private void BtnConnectionDetail_OnPressed(object sender, EventArgs e)
+        {
+            
+
+            Navigation.PopAsync();
+            Navigation.PushModalAsync(new ConnectionScreen());
+        }
     }
 }

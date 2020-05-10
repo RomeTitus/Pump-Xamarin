@@ -8,7 +8,7 @@ namespace Pump
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new HomeScreen();
         }
 
         protected override void OnStart()

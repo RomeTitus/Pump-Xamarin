@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.Layout.ConnectionScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:local="clr-namespace:EmbeddedImages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    BackgroundColor="DeepSkyBlue"
+    mc:Ignorable="d">
+    <ContentPage.Content>
+        <StackLayout>
+
+
+            <StackLayout
+                x:Name="ConnectionDetailLayout"
+                Margin="20"
+                IsVisible="False">
+
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand">
+                    <StackLayout>
+                        <Label
+                            x:Name="LabelTxtInternalConnection"
+                            HorizontalOptions="Center"
+                            Text="Internal Connection"
+                            VerticalOptions="Center" />
+                        <Editor x:Name="TxtInternalConnection" HorizontalOptions="Fill" />
+                        <Label
+                            x:Name="LabelInternalPort"
+                            HorizontalOptions="Center"
+                            Text="Internal Port" />
+
+                        <Editor
+                            x:Name="TxtInternalPort"
+                            HorizontalOptions="Fill"
+                            Keyboard="Numeric" />
+
+                    </StackLayout>
+                </Frame>
+                <Frame BackgroundColor="White" BorderColor="Black">
+
+                    <StackLayout>
+                        <Label
+                            x:Name="LabelExternalConnection"
+                            HorizontalOptions="Center"
+                            Text="External Connection"
+                            VerticalOptions="Center" />
+
+                        <Editor
+                            x:Name="TxtExternalConnection"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Center" />
+
+
+                        <Label
+                            x:Name="LabelExternalPort"
+                            HorizontalOptions="Center"
+                            Text="External Port"
+                            VerticalOptions="Center" />
+
+                        <Editor
+                            x:Name="TxtExternalPort"
+                            HorizontalOptions="Fill"
+                            Keyboard="Numeric"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                </Frame>
+                <StackLayout />
+
+                <Button
+                    x:Name="BtnUpdateController"
+                    Clicked="BtnUpdateController_OnClicked"
+                    HorizontalOptions="Center"
+                    Text="Update CONTROLLER"
+                    VerticalOptions="Center" />
+            </StackLayout>
+
+            <StackLayout>
+                <!--<div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
+                <Image
+                    x:Name="ConnectionViewImage"
+                    HeightRequest="68"
+                    Source="{local:ImageResourceExtention Pump.Icons.ConnectionDown.png}" />
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="StackLayoutConnectionView" Tapped="StackLayoutConnectionView_OnTapped" />
+                </StackLayout.GestureRecognizers>
+            </StackLayout>
+
+            <Button
+                x:Name="BtnBackConnectionScreen"
+                Clicked="BtnBackConnectionScreen_OnClicked"
+                HorizontalOptions="Center"
+                Text="Back"
+                VerticalOptions="End" />
+
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

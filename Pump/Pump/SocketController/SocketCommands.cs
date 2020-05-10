@@ -39,8 +39,12 @@ namespace Pump.SocketController
         {
             return "getManualSchedule";
         }
+        
 
-
+        public string StopManualSchedule()
+        {
+            return "StopManualSchedule";
+        }
     }
 
 
