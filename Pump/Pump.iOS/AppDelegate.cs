@@ -1,6 +1,7 @@
 ﻿
 using Foundation;
 using UIKit;
+using Xamarin;
 
 namespace Pump.iOS
 {
@@ -21,6 +22,7 @@ namespace Pump.iOS
         {
             Rg.Plugins.Popup.Popup.Init();
             global::Xamarin.Forms.Forms.Init();
+            IQKeyboardManager.SharedManager.Enable = true;
             LoadApplication(new App());
             
             return base.FinishedLaunching(app, options);

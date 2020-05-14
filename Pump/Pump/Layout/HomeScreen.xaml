@@ -7,6 +7,9 @@
     xmlns:localImage="clr-namespace:EmbeddedImages"
     BackgroundColor="DeepSkyBlue">
 
+
+
+
     <NavigationPage
         x:Name="ScheduleStatusTab"
         Title="Schedule"
@@ -16,15 +19,22 @@
             <local:ScheduleStatus />
         </x:Arguments>
     </NavigationPage>
+
+
     <!--<div>Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
-    <NavigationPage Title="Manual" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.rain.png}">
+    <NavigationPage
+        x:Name="ManualStatusTab"
+        Title="Manual"
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.rain.png}">
         <x:Arguments>
             <local:ManualSchedule />
         </x:Arguments>
     </NavigationPage>
 
-    <NavigationPage Title="Setting" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.setting.png}">
-
+    <NavigationPage
+        x:Name="SettingTab"
+        Title="Setting"
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.setting.png}">
         <x:Arguments>
             <local:SettingPage />
         </x:Arguments>

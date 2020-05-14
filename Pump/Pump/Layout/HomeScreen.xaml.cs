@@ -18,6 +18,14 @@ namespace Pump
         public HomeScreen()
         {
             InitializeComponent();
+            if (Device.RuntimePlatform == Device.iOS)
+            {
+                ScheduleStatusTab.IconImageSource = new FileImageSource();
+                ManualStatusTab.IconImageSource = new FileImageSource();
+                SettingTab.IconImageSource = new FileImageSource();
+            }
+
+
 
             if (databaseController.GetPumpSelection() == null)
             {
