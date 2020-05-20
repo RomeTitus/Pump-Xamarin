@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Pump.Database;
 using Pump.Droid.Database.Table;
 using Rg.Plugins.Popup.Services;
@@ -56,24 +52,32 @@ namespace Pump.Layout
 
         private void BtnUpdateController_OnClicked(object sender, EventArgs e)
         {
-            int ExternalPort = 0;
-            int InternalPort = 0;
-            if ((TxtInternalConnection.Text == null || TxtInternalPort.Text == null ||
-                 !int.TryParse(TxtInternalPort.Text, out InternalPort)) &&
+            int externalPort = 0;
+            int internalPort = 0;
+            if ((string.IsNullOrWhiteSpace(TxtInternalConnection.Text) || string.IsNullOrWhiteSpace(TxtInternalPort.Text)||
+                !int.TryParse(TxtInternalPort.Text, out internalPort)) &&
                 (TxtExternalConnection.Text == null || TxtExternalPort.Text == null ||
-                 !int.TryParse(TxtExternalPort.Text, out ExternalPort)))
-                OutLineIncorrectFields(InternalPort, ExternalPort);
+                 !int.TryParse(TxtExternalPort.Text, out externalPort)))
+                OutLineIncorrectFields(internalPort, externalPort);
 
             else
             {
                 var loadingScreen = new VerifyConnections();
                 PopupNavigation.Instance.PushAsync(loadingScreen);
 
-                if ((TxtInternalConnection.Text != null && TxtInternalPort.Text != null) &&
-                    (TxtExternalConnection.Text != null && TxtExternalPort.Text != null))
-                    new Thread(() => checkConnectionInternalAndExternal(TxtInternalConnection.Text,
+                if ((!string.IsNullOrWhiteSpace(TxtInternalConnection.Text)  && !string.IsNullOrWhiteSpace(TxtInternalPort.Text)) &&
+                     (!string.IsNullOrWhiteSpace(TxtExternalConnection.Text) && !string.IsNullOrWhiteSpace(TxtExternalPort.Text)))
+                    new Thread(() => CheckConnectionInternalAndExternal(TxtInternalConnection.Text,
                         int.Parse(TxtInternalPort.Text),
                         TxtExternalConnection.Text, int.Parse(TxtExternalPort.Text), loadingScreen)).Start();
+                else if((!string.IsNullOrWhiteSpace(TxtInternalConnection.Text) && !string.IsNullOrWhiteSpace(TxtInternalPort.Text)))
+                    new Thread(() => CheckConnection(TxtInternalConnection.Text,
+                        int.Parse(TxtInternalPort.Text),
+                         loadingScreen, true)).Start();
+                else if ((!string.IsNullOrWhiteSpace(TxtExternalConnection.Text) && !string.IsNullOrWhiteSpace(TxtExternalPort.Text)))
+                    new Thread(() => CheckConnection(TxtExternalConnection.Text,
+                        int.Parse(TxtExternalPort.Text),
+                        loadingScreen, false)).Start();
             }
         }
 
@@ -91,7 +95,7 @@ namespace Pump.Layout
 
 
 
-        private void checkConnectionInternalAndExternal(string internalHost, int internalPort, string externalHost, int externalPort, VerifyConnections loadingScreen)
+        private void CheckConnectionInternalAndExternal(string internalHost, int internalPort, string externalHost, int externalPort, VerifyConnections loadingScreen)
         {
 
             string mac = null;
@@ -143,6 +147,57 @@ namespace Pump.Layout
                 //PopupNavigation.Instance.PopAsync();
             });
         }
+
+        private void CheckConnection(string host, int port, VerifyConnections loadingScreen, bool isInternal)
+        {
+
+            if (isInternal)
+            {
+                _connection.InternalPath = host;
+                _connection.InternalPort = port;
+            }
+            else
+            {
+                _connection.ExternalPath = host;
+                _connection.ExternalPort = port;
+            }
+
+            var mac = checkConnection(host, port);
+
+            
+            
+            if (mac != null)
+            {
+                var database = new DatabaseController();
+                database.UpdatePumpConnection(_connection);
+
+            }
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                ConnectionViewImage.Rotation = 0;
+                _showAdvanced = false;
+                ConnectionDetailLayout.IsVisible = false;
+
+                loadingScreen.stopActivityIndicatior();
+
+                if (isInternal)
+                {
+                    if (host != null)
+                        loadingScreen.InternalSuccess();
+                    else
+                        loadingScreen.InternalFailed();
+                }
+                else
+                {
+                    if (host != null)
+                        loadingScreen.ExternalSuccess();
+                    else
+                        loadingScreen.ExternalFailed();
+                }
+            });
+        }
+
 
         private string checkConnection(string host, int port)
         {

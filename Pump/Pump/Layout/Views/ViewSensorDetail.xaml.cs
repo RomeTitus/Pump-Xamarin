@@ -27,17 +27,26 @@ namespace Pump.Layout.Views
             string image = "";
             if (sensorList[1] == "Pressure Sensor")
             {
-                
-                if (sensorList[3] == ("0") || sensorList[3] == ("False"))
+
+                sensorList[3] = sensorList[3].Replace('.', ',');
+                try
+                {
+                    
+                    if (sensorList[3] == ("False") || double.Parse(sensorList[3]) < 2)
+                    {
+                        LableSensorStatus.Text = sensorList[3];
+                        image = "Pump.Icons.PressureLow.png";
+                    }
+                    else
+                    {
+                        LableSensorStatus.Text = sensorList[3];
+                        image = "Pump.Icons.PressureHigh.png";
+                    }
+                }
+                catch
                 {
                     LableSensorStatus.Text = "Low Pressure";
                     image = "Pump.Icons.PressureLow.png";
-                    
-                }
-                else
-                {
-                    LableSensorStatus.Text = "High Pressure";
-                    image = "Pump.Icons.PressureHigh.png";
                 }
                 
             }

@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Pump.Database;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -30,17 +30,55 @@ namespace Pump.Layout
         public ManualSchedule()
         {
             InitializeComponent();
-            ScrollViewManualPump.Children.Clear();
-
-            new Thread(() => getManualSchedule()).Start();
-            new Thread(() => getPumps()).Start();
-            new Thread(() => getZones()).Start();
-            
+            //ScrollViewManualPump.Children.Clear();
+            new Thread(() => ThreadController()).Start();
         }
 
-        private void getManualSchedule()
+        private void ThreadController()
         {
+            var started = false;
+            var databaseController = new DatabaseController();
+
+            Thread manualSchedule = null;
+            Thread pumps = null;
+            Thread zones = null;
+
             while (true)
+            {
+
+                if (started == false && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status)
+                {
+                    //Start the threads
+                    manualSchedule = new Thread(() => getManualSchedule());
+                    pumps = new Thread(() => getPumps());
+                    zones = new Thread(() => getZones());
+
+                    manualSchedule.Start();
+                    pumps.Start();
+                    zones.Start();
+                    started = true;
+                }
+
+                if (manualSchedule != null && pumps != null && zones != null)
+                {
+                    if (started == true && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
+                    {
+                        manualSchedule.Abort();
+                        pumps.Abort();
+                        zones.Abort();
+                        started = false;
+                        //Stop the threads
+                    }
+
+                }
+                Thread.Sleep(2000);
+            }
+        }
+
+
+        private void getManualSchedule()
+        { var running = true;
+            while (running)
             {
                 try
                 {
@@ -114,6 +152,10 @@ namespace Pump.Layout
 
                     });
                 }
+                catch (ThreadAbortException)
+                {
+                    running = false;
+                }
                 catch
                 {
                     
@@ -169,7 +211,8 @@ namespace Pump.Layout
 
         private void getPumps()
         {
-            while (true)
+            var running = true;
+            while (running)
             {
                 try
                 {
@@ -200,6 +243,10 @@ namespace Pump.Layout
                         }
 
                     });
+                }
+                catch (ThreadAbortException)
+                {
+                    running = false;
                 }
                 catch
                 {
@@ -243,7 +290,8 @@ namespace Pump.Layout
 
         private void getZones()
         {
-            while (true)
+            var running = true;
+            while (running)
             {
                 try
                 {
@@ -273,6 +321,10 @@ namespace Pump.Layout
                         }
 
                     });
+                }
+                catch (ThreadAbortException)
+                {
+                    running = false;
                 }
                 catch
                 {

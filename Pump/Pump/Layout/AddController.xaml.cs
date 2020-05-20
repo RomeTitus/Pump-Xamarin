@@ -27,7 +27,6 @@ namespace Pump
 
         private void BtnAddController_Clicked(object sender, EventArgs e)
         {
-            //DisplayAlert("Title", "Hellow World", "OK");
             AddIrrigationController();
         }
 
@@ -42,6 +41,7 @@ namespace Pump
             else
             {
                 var loadingScreen = new VerifyConnections();
+                loadingScreen.CloseWhenBackgroundIsClicked = false;
                 PopupNavigation.Instance.PushAsync(loadingScreen);
 
                 if ((TxtInternalConnection.Text != null && TxtInternalPort.Text != null) && (TxtExternalConnection.Text != null && TxtExternalPort.Text != null))
@@ -129,6 +129,7 @@ namespace Pump
                 loadingScreen.stopActivityIndicatior();
 
                 if (internalConnection != null)
+
                     loadingScreen.InternalSuccess();
                 else
                     loadingScreen.InternalFailed();

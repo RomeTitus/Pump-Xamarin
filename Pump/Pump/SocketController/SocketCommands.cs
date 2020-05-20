@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
@@ -44,6 +45,17 @@ namespace Pump.SocketController
         public string StopManualSchedule()
         {
             return "StopManualSchedule";
+        }
+
+        public string setToken(string token)
+        {
+            var deviceId = Preferences.Get("my_deviceId", string.Empty);
+            if (string.IsNullOrEmpty(deviceId))
+            {
+                deviceId = System.Guid.NewGuid().ToString();
+                Preferences.Set("my_deviceId", deviceId);
+            }
+            return deviceId + "," + token + "$setToken";
         }
     }
 

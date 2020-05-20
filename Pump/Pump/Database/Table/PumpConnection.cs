@@ -5,7 +5,7 @@ using SQLite;
 
 namespace Pump.Droid.Database.Table
 {
-    class PumpConnection
+    public class PumpConnection
     {
         public PumpConnection() { }
         public PumpConnection(string Name, string Mac, string InternalPath, int InternalPort, string ExternalPath, int ExternalPort)

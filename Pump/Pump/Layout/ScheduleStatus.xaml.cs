@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Pump.Database;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -24,23 +24,57 @@ namespace Pump.Layout
         public ScheduleStatus()
         {
             InitializeComponent();
-            startAllThread();
-        
-        
+            new Thread(() => ThreadController()).Start();
+
+
         }
 
 
-        private void startAllThread()
+        private void ThreadController()
         {
-            
-            new Thread(() => getScheduleDetail()).Start();
-            new Thread(() => getQueueScheduleDetail()).Start();
-            new Thread(() => getSensorStatus()).Start();
+            var started = false;
+            var databaseController = new DatabaseController();
 
+            Thread scheduleDetail = null;
+            Thread sensorStatus = null;
+            Thread queueScheduleDetail = null;
+
+            while (true)
+            {
+                
+                if (started == false && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status)
+                {
+                    //Start the threads
+                    scheduleDetail = new Thread(() => getScheduleDetail());
+                    queueScheduleDetail = new Thread(() => getQueueScheduleDetail());
+                    sensorStatus = new Thread(() => getSensorStatus());
+
+                    scheduleDetail.Start();
+                    queueScheduleDetail.Start();
+                    sensorStatus.Start();
+                    started = true;
+                }
+
+                if (scheduleDetail != null && sensorStatus != null && queueScheduleDetail != null)
+                {
+                    if (started == true && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
+                    {
+                        scheduleDetail.Abort();
+                        queueScheduleDetail.Abort();
+                        sensorStatus.Abort();
+                        started = false;
+                        //Stop the threads
+                    }
+
+                }
+                Thread.Sleep(2000);
+            }
         }
+
         private void getScheduleDetail()
         {
-            while (true)
+            bool running = true;
+            while (running)
             {
                 try
                 {
@@ -61,11 +95,15 @@ namespace Pump.Layout
                         }
 
                     });
+                }catch (ThreadAbortException)
+                {
+                    running = false;
                 }
                 catch
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
+                        ScrollViewScheduleStatus.Children.Clear();
                         ScrollViewScheduleStatus.Children.Add(new ViewNoConnection());
                     });
 
@@ -119,7 +157,8 @@ namespace Pump.Layout
 
         private void getQueueScheduleDetail()
         {
-            while (true)
+            bool running = true;
+            while (running)
             {
                 try
                 {
@@ -141,10 +180,15 @@ namespace Pump.Layout
 
                     });
                 }
+                catch (ThreadAbortException)
+                {
+                    running = false;
+                }
                 catch
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
+                        ScrollViewQueueStatus.Children.Clear();
                         ScrollViewQueueStatus.Children.Add(new ViewNoConnection());
                     });
 
@@ -185,7 +229,8 @@ namespace Pump.Layout
 
         private void getSensorStatus()
         {
-            while (true)
+            bool running = true;
+            while (running)
             {
                 try
                 {
@@ -207,15 +252,20 @@ namespace Pump.Layout
 
                     });
                 }
+                catch (ThreadAbortException)
+                {
+                    running = false;
+                }
                 catch
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
+                        ScrollViewSensorStatus.Children.Clear();
                         ScrollViewSensorStatus.Children.Add(new ViewNoConnection());
                     });
 
                 }
-                Thread.Sleep(15000);
+                Thread.Sleep(2000);
             }
         }
 

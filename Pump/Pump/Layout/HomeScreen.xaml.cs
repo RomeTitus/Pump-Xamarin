@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Pump.Database;
+using Pump.Database.Table;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -12,7 +14,7 @@ namespace Pump
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : TabbedPage
     {
-        DatabaseController databaseController = new DatabaseController();
+        private readonly DatabaseController _databaseController = new DatabaseController();
         
         
         public HomeScreen()
@@ -27,11 +29,27 @@ namespace Pump
 
 
 
-            if (databaseController.GetPumpSelection() == null)
+            if (_databaseController.GetPumpSelection() == null)
             {
+                _databaseController.SetActivityStatus(new ActivityStatus(false));
                 Navigation.PushModalAsync(new AddController());
                // Navigation.PopModalAsync();
             }
+            else
+            {
+                try
+                {
+                    new SocketMessage().Message(
+                        new SocketCommands().setToken(
+                            _databaseController.GetNotificationToken().token));
+                }
+                catch
+                {
+
+                }
+            }
+                
+
         }
   
     }

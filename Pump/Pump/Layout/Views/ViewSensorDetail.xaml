@@ -47,6 +47,7 @@
                     Source="{localImage:ImageResourceExtention Pump.Icons.PressureLow.png}" />
                 <Label
                     x:Name="LableSensorStatus"
+                    FontSize="15"
                     HorizontalOptions="Center"
                     Text="Low Pressure" />
             </StackLayout>

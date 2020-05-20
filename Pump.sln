@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pump.Android", "Pump\Pump.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pump.iOS", "Pump\Pump.iOS\Pump.iOS.csproj", "{794A14DE-C13C-45DC-BA6F-E5539858F02D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pump", "Pump\Pump\Pump.csproj", "{499253C0-A547-4A91-B225-92781D0CD7EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pump", "Pump\Pump\Pump.csproj", "{499253C0-A547-4A91-B225-92781D0CD7EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
