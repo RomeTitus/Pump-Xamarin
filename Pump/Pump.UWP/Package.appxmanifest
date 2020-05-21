@@ -8,7 +8,7 @@
 
   <Identity
     Name="723f9108-ea82-4408-945b-a59b49f411f7"
-    Publisher="CN=JamesM2"
+    Publisher="CN=8ebfb22a-a95e-4e5d-a217-5506819d033b"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
@@ -45,8 +45,6 @@
           </uap:ShowNameOnTiles>
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
-        <uap:InitialRotationPreference>
-          <uap:Rotation Preference="landscape"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>
