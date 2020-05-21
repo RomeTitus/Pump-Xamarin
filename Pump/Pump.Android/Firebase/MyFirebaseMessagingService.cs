@@ -18,12 +18,10 @@ namespace Pump.Droid.Firebase
     [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
     public class MyFirebaseMessagingService : FirebaseMessagingService
     {
-        public MyFirebaseMessagingService()
-        {
-
-        }
+       
         public override void OnMessageReceived(RemoteMessage message)
         {
+            base.OnMessageReceived(message);
             Console.WriteLine("[" + this.GetType().FullName + "]\t\t\t\t Push Notification Received! \n\n" + message.GetNotification().Body);
             base.OnMessageReceived(message);
             
