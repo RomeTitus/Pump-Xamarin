@@ -134,5 +134,17 @@ namespace Pump.Database
         {
             _database.Update(pumpConnection);
         }
+
+        public PumpConnection getControllerNameByMac(string bt)
+        {
+            lock (Locker)
+            {
+
+                    //PumpConnection pumpConnection = _database.Table<PumpConnection>().First();
+                    PumpConnection pumpConnection =  _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
+                    return pumpConnection;
+            }
+        }
+
     }
 }

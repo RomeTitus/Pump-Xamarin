@@ -1,6 +1,7 @@
 ﻿
 using Foundation;
 using UIKit;
+using UserNotifications;
 using Xamarin;
 
 namespace Pump.iOS
@@ -23,10 +24,42 @@ namespace Pump.iOS
             Rg.Plugins.Popup.Popup.Init();
             global::Xamarin.Forms.Forms.Init();
             IQKeyboardManager.SharedManager.Enable = true;
+            RegisterForRemoteNotifications();
             LoadApplication(new App());
             
             return base.FinishedLaunching(app, options);
         }
+
+        void RegisterForRemoteNotifications()
+        {
+            // register for remote notifications based on system version
+            if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+            {
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert |
+                                                                      UNAuthorizationOptions.Sound |
+                                                                      UNAuthorizationOptions.Sound,
+                    (granted, error) =>
+                    {
+                        if (granted)
+                            InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+                    });
+            }
+            else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
+            {
+                var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
+                    UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
+                    new NSSet());
+
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
+            }
+            else
+            {
+                UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
+                UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
+            }
+        }
+
 
 
     }
