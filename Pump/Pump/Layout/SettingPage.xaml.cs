@@ -24,5 +24,11 @@ namespace Pump.Layout
             Navigation.PopAsync();
             Navigation.PushModalAsync(new ConnectionScreen());
         }
+
+        private void BtnScheduleDetail_OnPressed(object sender, EventArgs e)
+        {
+            //Navigation.PopAsync();
+            Navigation.PushModalAsync(new ViewScheduleScreen());
+        }
     }
 }

@@ -21,7 +21,7 @@ using Pump.Droid.Database.Table;
 
 namespace Pump.Droid.Firebase
 {
-    [Service]
+    [Service(Exported = true, Name = "com.Varkensvlei.Pump.Droid.Firebase.MyFirebaseMessagingService"), IntentFilter(new[] { "com.google.android.c2dm.intent.RECEIVE" }) ]
     [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
     [IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
     public class MyFirebaseMessagingService : FirebaseMessagingService
@@ -31,6 +31,9 @@ namespace Pump.Droid.Firebase
 
         public override void OnMessageReceived(RemoteMessage message)
         {
+            base.OnMessageReceived(message);
+
+
             Log.Debug(TAG, "From: " + message.From);
             if (message.GetNotification() != null)
             {
@@ -40,7 +43,7 @@ namespace Pump.Droid.Firebase
             else
             {
 
-                // Check if message contains a data payload.
+                //Check if message contains a data payload.
                 if (message.Data.Count >0)
                 {
                     var remoteData = message.Data;
@@ -123,6 +126,8 @@ namespace Pump.Droid.Firebase
 
             Log.Debug(TAG, $"Successful registration of ID {regID}");
         }
+
+        
 
     }
 }

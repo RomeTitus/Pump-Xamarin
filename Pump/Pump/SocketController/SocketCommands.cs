@@ -11,6 +11,10 @@ namespace Pump.SocketController
         {
             return "getActiveSchedule";
         }
+        public string getSchedule()
+        {
+            return "getSchedule";
+        }
         public string getMacAddress()
         {
             return "getMAC";

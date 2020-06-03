@@ -19,7 +19,10 @@
             Grid.Row="0"
             Grid.Column="0"
             HorizontalOptions="Center">
-            <Label FontSize="20" Text="No Schedules" />
+            <Label
+                x:Name="EmptyScheduleLabel"
+                FontSize="20"
+                Text="No Schedules" />
             <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
             <Image HeightRequest="68" Source="{localImage:ImageResourceExtention Pump.Icons.FieldSun.png}" />
         </StackLayout>

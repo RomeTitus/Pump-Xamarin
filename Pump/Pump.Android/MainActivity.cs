@@ -1,11 +1,15 @@
 ﻿
+using System;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Rg.Plugins.Popup.Services;
 using Android.Util;
 using Android.Gms.Common;
+using Pump.Droid.Firebase;
+using Xamarin.Forms;
 
 namespace Pump.Droid
 {
@@ -17,6 +21,7 @@ namespace Pump.Droid
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
+
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
@@ -33,8 +38,10 @@ namespace Pump.Droid
                 }
             }
 
+            //WireUpLongRunningTask();
             IsPlayServicesAvailable();
             CreateNotificationChannel();
+            
             Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
@@ -61,7 +68,7 @@ namespace Pump.Droid
             }
         }
 
-        public bool IsPlayServicesAvailable()
+        private bool IsPlayServicesAvailable()
         {
             int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
             if (resultCode != ConnectionResult.Success)
@@ -100,6 +107,30 @@ namespace Pump.Droid
 
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
             notificationManager.CreateNotificationChannel(channel);
+        }
+
+
+        public void WireUpLongRunningTask()
+        {
+
+            try
+            {
+                var intent = new Intent(this, typeof(MyFirebaseMessagingService));
+                StartForegroundService(intent);
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Kitkat)
+                {
+
+                    PendingIntent pintent = PendingIntent.GetService(this, 0,
+                        new Intent(this, typeof(MyFirebaseMessagingService)), 0);
+                    AlarmManager alarm = (AlarmManager) this.GetSystemService(Context.AlarmService);
+                    alarm.Cancel(pintent);
+                }
+            }
+            catch
+            {
+
+            }
+                
         }
 
     }

@@ -12,9 +12,10 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewEmptySchedule : ContentView
     {
-        public ViewEmptySchedule()
+        public ViewEmptySchedule(string text)
         {
             InitializeComponent();
+            EmptyScheduleLabel.Text = text;
         }
     }
 }

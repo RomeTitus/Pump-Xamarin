@@ -267,7 +267,7 @@ namespace Pump.Layout
             {
                 if (IrrigationPunp == "No Data" || IrrigationPunp == "")
                 {
-                    EquipmentListObject.Add(new ViewEmptySchedule());
+                    EquipmentListObject.Add(new ViewEmptySchedule("No Equipment Found Here"));
                     return EquipmentListObject;
                 }
 

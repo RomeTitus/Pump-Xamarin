@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="Pump.Layout.Views.ViewSchedule"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:localImage="clr-namespace:EmbeddedImages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackLayout
+        x:Name="StackLayoutViewSchedule"
+        Margin="15"
+        HorizontalOptions="Center">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="0"
+                HeightRequest="15"
+                Orientation="Vertical">
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="labelScheduleName"
+                        Text="Schedule Name"
+                        VerticalOptions="Center" />
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="LabelSunday"
+                        IsVisible="False"
+                        Text="S"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelMonday"
+                        IsVisible="False"
+                        Text="M"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelTuesday"
+                        IsVisible="False"
+                        Text="T"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelWednesday"
+                        IsVisible="False"
+                        Text="W"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelThursday"
+                        IsVisible="False"
+                        Text="T"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelFriday"
+                        IsVisible="False"
+                        Text="F"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelSaturday"
+                        IsVisible="False"
+                        Text="S"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="1"
+                HeightRequest="15"
+                Orientation="Vertical">
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="labelScheduleTime"
+                        Text="20:30"
+                        VerticalOptions="Center" />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Image HeightRequest="15" Source="{localImage:ImageResourceExtention Pump.Icons.activePump.png}" />
+                    <Label
+                        x:Name="LabelPumpName"
+                        Text="Big Pump"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="2"
+                HorizontalOptions="FillAndExpand"
+                Orientation="Horizontal">
+                <Switch x:Name="switchScheduleIsActive" VerticalOptions="Center" />
+            </StackLayout>
+
+        </Grid>
+
+    </StackLayout>
+</ContentView>

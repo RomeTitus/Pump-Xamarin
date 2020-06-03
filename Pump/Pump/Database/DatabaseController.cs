@@ -140,8 +140,8 @@ namespace Pump.Database
             lock (Locker)
             {
 
-                    //PumpConnection pumpConnection = _database.Table<PumpConnection>().First();
-                    PumpConnection pumpConnection =  _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
+                    PumpConnection pumpConnection = _database.Table<PumpConnection>().First();
+                    //PumpConnection pumpConnection =  _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
                     return pumpConnection;
             }
         }

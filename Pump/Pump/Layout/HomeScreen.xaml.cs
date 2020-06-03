@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Pump.Database;
 using Pump.Database.Table;
@@ -37,19 +38,26 @@ namespace Pump
             }
             else
             {
-                try
-                {
-                    new SocketMessage().Message(
-                        new SocketCommands().setToken(
-                            _databaseController.GetNotificationToken().token));
-                }
-                catch
-                {
-
-                }
+                Thread sendToken = new Thread(() => SentNotificationToken());
+                sendToken.Start();
+                
             }
                 
 
+        }
+
+        public void SentNotificationToken()
+        {
+            try
+            {
+                new SocketMessage().Message(
+                    new SocketCommands().setToken(
+                        _databaseController.GetNotificationToken().token));
+            }
+            catch
+            {
+
+            }
         }
   
     }

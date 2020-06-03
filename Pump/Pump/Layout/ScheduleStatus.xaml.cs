@@ -120,7 +120,7 @@ namespace Pump.Layout
                 {
                         if (schedules == "No Data" || schedules == "")
                         {
-                            scheduleListObject.Add(new ViewEmptySchedule());
+                            scheduleListObject.Add(new ViewEmptySchedule("No Running Schedules"));
                             return scheduleListObject;
                         }
 
@@ -204,7 +204,7 @@ namespace Pump.Layout
             {
                 if (Queueschedules == "No Data" || Queueschedules == "")
                 {
-                    QueuescheduleListObject.Add(new ViewEmptySchedule());
+                    QueuescheduleListObject.Add(new ViewEmptySchedule("No Queued Schedules"));
                     return QueuescheduleListObject;
                 }
 
@@ -276,7 +276,7 @@ namespace Pump.Layout
             {
                 if (ActiveSensorStatus == "No Data" || ActiveSensorStatus == "")
                 {
-                    SensorListObject.Add(new ViewEmptySchedule());
+                    SensorListObject.Add(new ViewEmptySchedule("No Sensors Found Here"));
                     return SensorListObject;
                 }
 

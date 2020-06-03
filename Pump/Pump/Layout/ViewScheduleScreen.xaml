@@ -1,15 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             x:Class="Pump.Layout.ViewScheduleScreen">
+<ContentPage
+    x:Class="Pump.Layout.ViewScheduleScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    BackgroundColor="DeepSkyBlue"
+    mc:Ignorable="d">
     <ContentPage.Content>
+
         <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+
+            <StackLayout Padding="20" VerticalOptions="FillAndExpand ">
+                <Label
+                    FontSize="Header"
+                    HorizontalOptions="Center"
+                    Text="Schedule"
+                    TextColor="White"
+                    TextDecorations="Underline" />
+
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView>
+                        <StackLayout x:Name="ScrollViewScheduleDetail">
+                            <ActivityIndicator
+                                AutomationId="ActivityIndicatorManualPump"
+                                HorizontalOptions="Center"
+                                IsEnabled="true"
+                                IsRunning="True"
+                                IsVisible="True"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+                    </ScrollView>
+                </Frame>
+
+            </StackLayout>
+
+            <StackLayout VerticalOptions="End">
+                <Button
+                    x:Name="ButtonCreateSchedule"
+                    Clicked="ButtonCreateSchedule_OnClicked"
+                    Text="Create Schedule" />
+                <Button
+                    x:Name="ButtonBack"
+                    Clicked="ButtonBack_OnClicked"
+                    Text="Back" />
+            </StackLayout>
+
         </StackLayout>
+
     </ContentPage.Content>
 </ContentPage>

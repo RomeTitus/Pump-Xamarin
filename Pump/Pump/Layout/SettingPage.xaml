@@ -13,6 +13,13 @@
                 Pressed="BtnConnectionDetail_OnPressed"
                 Text="Connection Detail"
                 VerticalOptions="Center" />
+            <Button
+                x:Name="BtnScheduleDetail"
+                Pressed="BtnScheduleDetail_OnPressed"
+                Text="Schedule Edit/Delete"
+                VerticalOptions="Center" />
+
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
