@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Pump.Layout.Views;
 using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -14,8 +13,8 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleScreen : ContentPage
     {
-        SocketCommands command = new SocketCommands();
-        SocketMessage socket = new SocketMessage();
+        readonly SocketCommands _command = new SocketCommands();
+        readonly SocketMessage _socket = new SocketMessage();
         public ViewScheduleScreen()
         {
             InitializeComponent();
@@ -28,11 +27,11 @@ namespace Pump.Layout
         {
                 try
                 {
-                    string schedules = socket.Message(command.getSchedule());
+                    string schedules = _socket.Message(_command.getSchedule());
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         ScrollViewScheduleDetail.Children.Clear();
-                        var scheduleList = getScheduleObject(schedules);
+                        var scheduleList = GetScheduleObject(schedules);
                         foreach (View view in scheduleList)
                         {
                             ScrollViewScheduleDetail.Children.Add(view);
@@ -49,7 +48,7 @@ namespace Pump.Layout
                 }
         }
 
-        private List<object> getScheduleObject(string schedules)
+        private List<object> GetScheduleObject(string schedules)
         {
             List<object> scheduleListObject = new List<object>();
             try
@@ -61,22 +60,85 @@ namespace Pump.Layout
                 }
 
 
-                List<string> scheduleList = new List<string>();
-                
-                scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                var scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
                 foreach (var schedule in scheduleList)
                 {
-                    scheduleListObject.Add(new ViewSchedule(schedule.Split(',').ToList()));
+                    var viewSchedule = new ViewSchedule(schedule.Split(',').ToList());
+                    scheduleListObject.Add(viewSchedule);
+                    viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                    viewSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                 }
                 return scheduleListObject;
             }
             catch
             {
-                scheduleListObject = new List<object>();
-                scheduleListObject.Add(new ViewNoConnection());
+                scheduleListObject = new List<object> {new ViewNoConnection()};
                 return scheduleListObject;
             }
+        }
+
+        private void ViewScheduleSumary()
+        {
+            var FloatingScreen = new FloatingScreen();
+            var viewScheduleSummary = new ViewScheduleSummary();
+            List<Object> test = new List<object>();
+            test.Add(viewScheduleSummary);
+            FloatingScreen.setFloatingScreen(test);
+            PopupNavigation.Instance.PushAsync(FloatingScreen);
+        }
+
+        private void ViewScheduleScreen_Tapped(object sender, EventArgs e)
+        {
+            ViewScheduleSumary();
+        }
+
+        private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
+        {
+            var scheduleSwitch = (Switch)sender;
+            try
+            {
+                new Thread(() => ChangeScheduleState(scheduleSwitch, Convert.ToInt32(scheduleSwitch.AutomationId))).Start();
+                
+            }
+            catch
+            {
+                DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE", "Understood");
+            }
+            
+        }
+
+        private void ChangeScheduleState(Switch scheduleSwitch, int id)
+        {
+            try
+            {
+                var result = _socket.Message(_command.ChangeSchedule(id));
+                Device.BeginInvokeOnMainThread(() =>
+                {
+
+                    if (result == "success")
+                    {
+
+                    }
+                    else
+                    {
+                        DisplayAlert("Warning!!!", result, "Understood");
+                    }
+                });
+            }
+            catch
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    scheduleSwitch.Toggled -= ScheduleSwitch_Toggled;
+                    scheduleSwitch.IsToggled = !scheduleSwitch.IsToggled;
+                    scheduleSwitch.Toggled += ScheduleSwitch_Toggled;
+                    DisplayAlert("Warning!!!", "Failed to reach the controller \n COULD NOT CHANGE SCHEDULE STATE", "Understood");
+
+                });
+            }
+            
+
         }
 
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)

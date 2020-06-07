@@ -301,7 +301,7 @@ namespace Pump.Layout
         {
             if (oldActiveSchedule == null)
                 return;
-            var FloatingScreen = new FloatingScreen();
+            var FloatingScreen = new FloatingScreenScroll();
             FloatingScreen.setFloatingScreen(getScheduleDetailObject(oldActiveSchedule));
             PopupNavigation.Instance.PushAsync(FloatingScreen);
 
@@ -311,7 +311,7 @@ namespace Pump.Layout
         {
             if (oldQueueActiveSchedule == null)
                 return;
-            var FloatingScreen = new FloatingScreen();
+            var FloatingScreen = new FloatingScreenScroll();
             FloatingScreen.setFloatingScreen(getQueueScheduleDetailObject(oldQueueActiveSchedule));
             PopupNavigation.Instance.PushAsync(FloatingScreen);
         }
@@ -320,7 +320,7 @@ namespace Pump.Layout
         {
             if (oldActiveSensorStatus == null)
                 return;
-            var FloatingScreen = new FloatingScreen();
+            var FloatingScreen = new FloatingScreenScroll();
             FloatingScreen.setFloatingScreen(getSensorStatusObject(oldActiveSensorStatus));
             PopupNavigation.Instance.PushAsync(FloatingScreen);
         }

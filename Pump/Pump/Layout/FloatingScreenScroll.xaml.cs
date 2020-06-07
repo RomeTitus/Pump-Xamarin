@@ -11,19 +11,19 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class FloatingScreen : PopupPage
+    public partial class FloatingScreenScroll : PopupPage
     {
-        public FloatingScreen()
+        public FloatingScreenScroll()
         {
             InitializeComponent();
-
+            
         }
 
         public void setFloatingScreen(List<Object> screens)
         {
             foreach (View screen in screens)
             {
-                ViewFloatingPage.Children.Add(screen);
+                ScrollViewFloatingPage.Children.Add(screen);
             }
         }
     }

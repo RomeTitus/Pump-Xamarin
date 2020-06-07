@@ -48,6 +48,9 @@
     <Compile Update="Layout\AddController.xaml.cs">
       <DependentUpon>AddController.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Layout\FloatingScreenScroll.xaml.cs">
+      <DependentUpon>FloatingScreenScroll.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Layout\VerifyConnections.xaml.cs">
       <DependentUpon>VerifyConnections.xaml</DependentUpon>
     </Compile>
@@ -58,6 +61,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\FloatingScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\FloatingScreenScroll.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\HomeScreen.xaml">
@@ -91,6 +97,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewScheduleDetail.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewScheduleSummary.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewSensorDetail.xaml">

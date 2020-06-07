@@ -51,6 +51,11 @@ namespace Pump.SocketController
             return "StopManualSchedule";
         }
 
+        public string ChangeSchedule(int id)
+        {
+            return id + "$ChangeSchedule";
+        }
+
         public string setToken(string token)
         {
             var deviceId = Preferences.Get("my_deviceId", string.Empty);

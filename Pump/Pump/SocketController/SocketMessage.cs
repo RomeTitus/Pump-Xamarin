@@ -20,8 +20,9 @@ namespace Pump.SocketController
             string SocketResult = "";
             try
             {
+                
                 if(connection.InternalPort != -1)
-                    SocketResult = Send(data, connection.InternalPath, connection.InternalPort);
+                    SocketResult = Send(data, connection.InternalPath, connection.InternalPort,1000);
             }
             catch (Exception e)
             {

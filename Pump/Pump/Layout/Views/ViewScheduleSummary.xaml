@@ -1,26 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentView
-    x:Class="Pump.Layout.Views.ViewSchedule"
+    x:Class="Pump.Layout.Views.ViewScheduleSummary"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-    xmlns:localImage="clr-namespace:EmbeddedImages"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
     <StackLayout
-        x:Name="StackLayoutViewSchedule"
+        x:Name="ViewScheduleSummaryStackLayout"
         Margin="15"
-        HorizontalOptions="Center">
-        <StackLayout.GestureRecognizers>
-            <TapGestureRecognizer x:Name="StackLayoutViewScheduleTapGesture" />
-        </StackLayout.GestureRecognizers>
+        HeightRequest="400">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
@@ -33,6 +28,7 @@
                 <StackLayout Orientation="Horizontal">
                     <Label
                         x:Name="labelScheduleName"
+                        FontSize="Large"
                         Text="Schedule Name"
                         VerticalOptions="Center" />
                 </StackLayout>
@@ -40,36 +36,43 @@
                 <StackLayout Orientation="Horizontal">
                     <Label
                         x:Name="LabelSunday"
+                        FontSize="24"
                         Text="S"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelMonday"
+                        FontSize="24"
                         Text="M"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelTuesday"
+                        FontSize="24"
                         Text="T"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelWednesday"
+                        FontSize="24"
                         Text="W"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelThursday"
+                        FontSize="24"
                         Text="T"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelFriday"
+                        FontSize="24"
                         Text="F"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelSaturday"
+                        FontSize="24"
                         Text="S"
                         TextColor="White"
                         VerticalOptions="Center" />
@@ -79,36 +82,52 @@
             <StackLayout
                 Grid.Row="0"
                 Grid.Column="1"
-                HeightRequest="15"
+                HeightRequest="50"
                 Orientation="Vertical">
                 <StackLayout Orientation="Horizontal">
                     <Label
                         x:Name="labelScheduleTime"
+                        FontSize="Large"
                         Text="20:30"
                         VerticalOptions="Center" />
                 </StackLayout>
+
                 <StackLayout Orientation="Horizontal">
-                    <Image HeightRequest="15" Source="{localImage:ImageResourceExtention Pump.Icons.activePump.png}" />
+                    <Image HeightRequest="30" Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
+                        FontSize="Large"
                         Text="Big Pump"
                         VerticalOptions="Center" />
                 </StackLayout>
             </StackLayout>
-
-
-            <StackLayout
-                Grid.Row="0"
-                Grid.Column="2"
-                HorizontalOptions="End"
-                Orientation="Horizontal">
-                <Switch
-                    x:Name="switchScheduleIsActive"
-                    HorizontalOptions="End"
-                    VerticalOptions="Center" />
-            </StackLayout>
-
         </Grid>
+        <StackLayout Padding="5" VerticalOptions="FillAndExpand">
+            <Frame
+                BackgroundColor="White"
+                BorderColor="Black"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand">
+                <ScrollView>
+                    <StackLayout x:Name="ScrollViewScheduleDetail">
+                        <ActivityIndicator
+                            AutomationId="ActivityIndicatorManualPump"
+                            HorizontalOptions="Center"
+                            IsEnabled="true"
+                            IsRunning="True"
+                            IsVisible="True"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                </ScrollView>
+            </Frame>
+        </StackLayout>
+
+        <StackLayout VerticalOptions="End">
+            <Button x:Name="ButtonDelete" Text="Delete Schedule" />
+            <Button x:Name="ButtonEdit" Text="Edit Schedule" />
+        </StackLayout>
+
+
 
     </StackLayout>
 </ContentView>

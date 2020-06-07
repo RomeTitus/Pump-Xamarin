@@ -20,7 +20,7 @@ namespace Pump.Layout
     {
         SocketCommands command = new SocketCommands();
         SocketMessage socket = new SocketMessage();
-        FloatingScreen FloatingScreen = null;
+        FloatingScreenScroll _floatingScreenScroll = null;
         List<string> ActiveManualScheduleID = null;
         List<string> QueueManualSchedule = new List<string>();
         string oldIrrigationPunp = null;
@@ -107,7 +107,7 @@ namespace Pump.Layout
                             ScheduleTime scheduleTime = new ScheduleTime();
                             MaskedEntryTime.Text = scheduleTime.TimeDiffNow(manualScheduleClass.ScheduleTime);
                             MaskedEntryTime.IsEnabled = buttonEnabledStatus;
-                            if(FloatingScreen != null)
+                            if(_floatingScreenScroll != null)
                             {
                                 try
                                 {
@@ -115,7 +115,7 @@ namespace Pump.Layout
                                 }
                                 finally
                                 {
-                                    FloatingScreen = null;
+                                    _floatingScreenScroll = null;
                                 }
                                 
                             }
@@ -436,12 +436,12 @@ namespace Pump.Layout
 
         private void ButtonStartManual_Clicked(object sender, EventArgs e)
         {
-            new Thread(() => startManualSchedule()).Start();
+            new Thread(StartManualSchedule).Start();
         }
 
         private void ButtonStopManual_Clicked(object sender, EventArgs e)
         {
-            new Thread(() => stopManualSchedule()).Start();
+            new Thread(stopManualSchedule).Start();
         }
 
         private void ScrollViewManualZoneTap_Tapped(object sender, EventArgs e)
@@ -449,7 +449,7 @@ namespace Pump.Layout
             if (oldIrrigationZone == null)
                 return;
 
-            viewTapped(getEquipmentObject(oldIrrigationZone));
+            ViewTapped(getEquipmentObject(oldIrrigationZone));
         }
 
         private void ScrollViewManualPump_Tapped(object sender, EventArgs e)
@@ -457,24 +457,24 @@ namespace Pump.Layout
             if (oldIrrigationZone == null)
                 return;
 
-            viewTapped(getEquipmentObject(oldIrrigationPunp));
+            ViewTapped(getEquipmentObject(oldIrrigationPunp));
             
         }
 
-        private void viewTapped(List<Object> Equipment)
+        private void ViewTapped(List<Object> Equipment)
         {
-            FloatingScreen = new FloatingScreen();
+            _floatingScreenScroll = new FloatingScreenScroll();
             if (setButtonToDisabled(Equipment))
                 Equipment = ButtonSelected(Equipment);
-            FloatingScreen.setFloatingScreen(Equipment);
-            PopupNavigation.Instance.PushAsync(FloatingScreen);
+            _floatingScreenScroll.setFloatingScreen(Equipment);
+            PopupNavigation.Instance.PushAsync(_floatingScreenScroll);
         }
 
         private void stopManualSchedule()
         {
             try
             {
-                string StopeManual = socket.Message(command.StopManualSchedule());
+                var StopeManual = socket.Message(command.StopManualSchedule());
 
                 Device.BeginInvokeOnMainThread(() =>
                 {
@@ -504,34 +504,34 @@ namespace Pump.Layout
 
         }
 
-        private void startManualSchedule()
+        private void StartManualSchedule()
         {
             if(QueueManualSchedule.Count<1 && MaskedEntryTime.Text.Count() < 4)
             {
                 return;
             }
 
-            String send = "";
-            send = send + MaskedEntryTime.Text.ToString();
+            var send = "";
+            send += MaskedEntryTime.Text.ToString();
 
 
             if (SwitchRunWithSchedule.IsToggled)
             {
-                send = send + ",1";
+                send += ",1";
             }
             else
             {
-                send = send + ",0";
+                send += ",0";
             }
 
-            foreach(string queue in QueueManualSchedule)
+            foreach(var queue in QueueManualSchedule)
             {
-                send = send + "," + queue;
+                send += "," + queue;
             }
 
-            send = send + "$MANUALSCHEDULE";
+            send += "$MANUALSCHEDULE";
 
-            string result = socket.Message(send);
+            var result = socket.Message(send);
 
             Device.BeginInvokeOnMainThread(() =>
             {

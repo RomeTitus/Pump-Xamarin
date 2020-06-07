@@ -11,9 +11,9 @@
 
         <StackLayout>
 
-            <StackLayout Padding="20" VerticalOptions="FillAndExpand ">
+            <StackLayout Padding="20" VerticalOptions="FillAndExpand">
                 <Label
-                    FontSize="Header"
+                    FontSize="Title"
                     HorizontalOptions="Center"
                     Text="Schedule"
                     TextColor="White"

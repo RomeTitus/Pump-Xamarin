@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Collections.Generic;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -12,10 +7,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSchedule : ContentView
     {
-        public ViewSchedule(List<string> schedule)
+        public ViewSchedule(IReadOnlyList<string> schedule)
         {
             InitializeComponent();
-
             Populate(schedule[0], schedule[1], schedule[2], schedule[3], schedule[4]);
 
             for (int i = 5; i < schedule.Count; i++)
@@ -35,25 +29,34 @@ namespace Pump.Layout.Views
                 switchScheduleIsActive.IsToggled = false;
             else
                 switchScheduleIsActive.IsToggled = true;
-
         }
 
         private void SetWeek(string week)
         {
             if (week.Contains("SUNDAY"))
-                LabelSunday.IsVisible = true;
+                LabelSunday.TextColor = Color.Black;
             if (week.Contains("MONDAY"))
-                LabelMonday.IsVisible = true;
+                LabelMonday.TextColor = Color.Black;
             if (week.Contains("TUESDAY"))
-                LabelTuesday.IsVisible = true;
+                LabelTuesday.TextColor = Color.Black;
             if (week.Contains("WEDNESDAY"))
-                LabelWednesday.IsVisible = true;
+                LabelWednesday.TextColor = Color.Black;
             if (week.Contains("THURSDAY"))
-                LabelThursday.IsVisible = true;
+                LabelThursday.TextColor = Color.Black;
             if (week.Contains("FRIDAY"))
-                LabelFriday.IsVisible = true;
+                LabelFriday.TextColor = Color.Black;
             if (week.Contains("SATURDAY"))
-                LabelSaturday.IsVisible = true;
+                LabelSaturday.TextColor = Color.Black;
+        }
+
+        public Switch GetSwitch()
+        {
+            return switchScheduleIsActive;
+        }
+
+        public TapGestureRecognizer GetTapGestureRecognizer()
+        {
+           return StackLayoutViewScheduleTapGesture;
         }
     }
 }
