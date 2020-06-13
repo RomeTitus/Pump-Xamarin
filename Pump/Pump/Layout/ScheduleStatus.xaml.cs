@@ -106,7 +106,6 @@ namespace Pump.Layout
                         ScrollViewScheduleStatus.Children.Clear();
                         ScrollViewScheduleStatus.Children.Add(new ViewNoConnection());
                     });
-
                 }
                 Thread.Sleep(15000);
             }

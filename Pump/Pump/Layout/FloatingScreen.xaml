@@ -28,6 +28,14 @@
         HeightRequest="400"
         HorizontalOptions="Center"
         VerticalOptions="Center"
-        WidthRequest="300" />
+        WidthRequest="300">
+        <ActivityIndicator
+            x:Name="ActivityIndicatiorScreen"
+            HorizontalOptions="Center"
+            IsEnabled="true"
+            IsRunning="True"
+            IsVisible="True"
+            VerticalOptions="Center" />
+    </StackLayout>
 
 </pages:PopupPage>

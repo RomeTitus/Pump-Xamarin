@@ -21,8 +21,9 @@ namespace Pump.Layout
 
         public void setFloatingScreen(List<Object> screens)
         {
+            ViewFloatingPage.Children.Clear();
             foreach (View screen in screens)
-            {
+            { 
                 ViewFloatingPage.Children.Add(screen);
             }
         }

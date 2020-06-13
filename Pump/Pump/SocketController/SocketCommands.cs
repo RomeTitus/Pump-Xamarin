@@ -11,6 +11,11 @@ namespace Pump.SocketController
         {
             return "getActiveSchedule";
         }
+        public string getScheduleInfo(int id)
+        {
+            return id +"$getScheduleInfo";
+        }
+
         public string getSchedule()
         {
             return "getSchedule";
