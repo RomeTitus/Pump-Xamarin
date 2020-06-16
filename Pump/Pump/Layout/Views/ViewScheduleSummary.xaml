@@ -46,43 +46,43 @@
                         x:Name="LabelSunday"
                         FontSize="24"
                         Text="S"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelMonday"
                         FontSize="24"
                         Text="M"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelTuesday"
                         FontSize="24"
                         Text="T"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelWednesday"
                         FontSize="24"
                         Text="W"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelThursday"
                         FontSize="24"
                         Text="T"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelFriday"
                         FontSize="24"
                         Text="F"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelSaturday"
                         FontSize="24"
                         Text="S"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                 </StackLayout>
             </StackLayout>
@@ -126,8 +126,11 @@
             </StackLayout>
 
             <StackLayout VerticalOptions="End">
-                <Button x:Name="ButtonDelete" Text="Delete Schedule" />
-                <Button x:Name="ButtonEdit" Text="Edit Schedule" Clicked="ButtonEdit_OnClicked"/>
+                <Button x:Name="ButtonDelete" Text="Delete Schedule" Clicked="ButtonDelete_OnClicked" />
+                <Button
+                    x:Name="ButtonEdit"
+                    Clicked="ButtonEdit_OnClicked"
+                    Text="Edit Schedule" />
             </StackLayout>
         </StackLayout>
 

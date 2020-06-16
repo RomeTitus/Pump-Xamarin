@@ -19,7 +19,7 @@ namespace Pump.Layout
 
         }
 
-        public void setFloatingScreen(List<Object> screens)
+        public void SetFloatingScreen(IEnumerable<object> screens)
         {
             ViewFloatingPage.Children.Clear();
             foreach (View screen in screens)

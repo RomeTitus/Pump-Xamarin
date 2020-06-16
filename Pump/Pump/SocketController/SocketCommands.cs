@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xamarin.Essentials;
+﻿using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
@@ -19,6 +16,19 @@ namespace Pump.SocketController
         public string getSchedule()
         {
             return "getSchedule";
+        }
+
+        public string addSchedule(string schedule)
+        {
+            return schedule + "$SCHEDULE";
+        }
+        public string updateSchedule(int id, string schedule)
+        {
+            return id + "#" +schedule + "$EDITSCHEDULE";
+        }
+        public string deleteSchedule(int id)
+        {
+            return id + "$DeleteSchedule";
         }
         public string getMacAddress()
         {
@@ -56,9 +66,9 @@ namespace Pump.SocketController
             return "StopManualSchedule";
         }
 
-        public string ChangeSchedule(int id)
+        public string ChangeSchedule(int id, int isActive)
         {
-            return id + "$ChangeSchedule";
+            return id + ","+ isActive + "$ChangeSchedule";
         }
 
         public string setToken(string token)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
+using Xamarin.Forms.MaskedEntry;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout.Views
@@ -22,6 +23,17 @@ namespace Pump.Layout.Views
                 LabelZoneTime.Text = zoneAndTimeList[2];
             
         }
+
+        public MaskedEntry getMaskText()
+        {
+            return LabelZoneTime;
+        }
+
+        public Label getZoneNameText()
+        {
+            return LabelZoneName;
+        }
+
 
     }
 }

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="Pump.Layout.Views.ViewDeleteConfirmation"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    xmlns:maskedEntry="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <ContentView.Content>
+        <StackLayout Margin="5" HeightRequest="400">
+            <StackLayout>
+                <Label
+                    CharacterSpacing="1"
+                    FontSize="Large"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="You are about to delete."
+                    TextColor="DarkRed"
+                    VerticalOptions="Center" />
+
+                <Label
+                    x:Name="ScheduleName"
+                    CharacterSpacing="1"
+                    FontSize="Large"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="Schedule Name."
+                    TextColor="DarkRed"
+                    VerticalOptions="Center" />
+
+            </StackLayout>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackLayout
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="0,20,0,0"
+                    HorizontalOptions="Center">
+                    <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
+                    <Image HeightRequest="120" Source="{embeddedImages:ImageResourceExtention Pump.Icons.FieldSun.png}" />
+                </StackLayout>
+            </Grid>
+            <StackLayout VerticalOptions="EndAndExpand">
+                <Button
+                    x:Name="DeleteScheduleButton"
+                    Clicked="DeleteScheduleButton_OnClicked"
+                    Text="Delete Schedule"
+                    TextColor="Red" />
+                <Button
+                    x:Name="ButtonCancel"
+                    Clicked="ButtonCancel_OnClicked"
+                    Text="Cancel" />
+            </StackLayout>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

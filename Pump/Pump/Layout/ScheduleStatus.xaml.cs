@@ -4,9 +4,7 @@ using Rg.Plugins.Popup.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Pump.Database;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -16,19 +14,16 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScheduleStatus : ContentPage
     {
-        string oldActiveSchedule = null;
-        string oldQueueActiveSchedule = null;
-        string oldActiveSensorStatus = null;
-        SocketCommands command = new SocketCommands();
-        SocketMessage socket = new SocketMessage();
+        private string _oldActiveSchedule;
+        private string _oldQueueActiveSchedule;
+        private string _oldActiveSensorStatus;
+        private readonly SocketCommands _command = new SocketCommands();
+        private readonly SocketMessage _socket = new SocketMessage();
         public ScheduleStatus()
         {
             InitializeComponent();
-            new Thread(() => ThreadController()).Start();
-
-
+            new Thread(ThreadController).Start();
         }
-
 
         private void ThreadController()
         {
@@ -45,9 +40,9 @@ namespace Pump.Layout
                 if (started == false && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status)
                 {
                     //Start the threads
-                    scheduleDetail = new Thread(() => getScheduleDetail());
-                    queueScheduleDetail = new Thread(() => getQueueScheduleDetail());
-                    sensorStatus = new Thread(() => getSensorStatus());
+                    scheduleDetail = new Thread(GetScheduleDetail);
+                    queueScheduleDetail = new Thread(GetQueueScheduleDetail);
+                    sensorStatus = new Thread(GetSensorStatus);
 
                     scheduleDetail.Start();
                     queueScheduleDetail.Start();
@@ -55,9 +50,9 @@ namespace Pump.Layout
                     started = true;
                 }
 
-                if (scheduleDetail != null && sensorStatus != null && queueScheduleDetail != null)
+                if (scheduleDetail != null)
                 {
-                    if (started == true && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
+                    if (started && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
                     {
                         scheduleDetail.Abort();
                         queueScheduleDetail.Abort();
@@ -69,26 +64,27 @@ namespace Pump.Layout
                 }
                 Thread.Sleep(2000);
             }
+            // ReSharper disable once FunctionNeverReturns
         }
 
-        private void getScheduleDetail()
+        private void GetScheduleDetail()
         {
             bool running = true;
             while (running)
             {
                 try
                 {
-                    string schedules = socket.Message(command.getActiveSchedule());
+                    string schedules = _socket.Message(_command.getActiveSchedule());
                     Device.BeginInvokeOnMainThread(() =>
                     {
                        
-                        if (oldActiveSchedule == schedules)
+                        if (_oldActiveSchedule == schedules)
                             return;
 
                         ScrollViewScheduleStatus.Children.Clear();
-                        oldActiveSchedule = schedules;
+                        _oldActiveSchedule = schedules;
 
-                        var scheduleList = getScheduleDetailObject(schedules);
+                        var scheduleList = GetScheduleDetailObject(schedules);
                         foreach (View view in scheduleList)
                         {
                             ScrollViewScheduleStatus.Children.Add(view);
@@ -112,7 +108,7 @@ namespace Pump.Layout
             
         }
 
-        private List<object> getScheduleDetailObject(string schedules)
+        private static List<object> GetScheduleDetailObject(string schedules)
         {
             List<object> scheduleListObject = new List<object>();
                 try
@@ -154,25 +150,25 @@ namespace Pump.Layout
                 }
             }
 
-        private void getQueueScheduleDetail()
+        private void GetQueueScheduleDetail()
         {
-            bool running = true;
+            var running = true;
             while (running)
             {
                 try
                 {
-                    string Queueschedules = socket.Message(command.getQueueSchedule());
+                    var queueSchedules = _socket.Message(_command.getQueueSchedule());
                     
                     Device.BeginInvokeOnMainThread(() =>
                     {
 
-                        if (oldQueueActiveSchedule == Queueschedules)
+                        if (_oldQueueActiveSchedule == queueSchedules)
                             return;
                         ScrollViewQueueStatus.Children.Clear();
-                        oldQueueActiveSchedule = Queueschedules;
+                        _oldQueueActiveSchedule = queueSchedules;
 
-                        var QueuescheduleList = getQueueScheduleDetailObject(Queueschedules);
-                        foreach (View view in QueuescheduleList)
+                        var queueScheduleList = GetQueueScheduleDetailObject(queueSchedules);
+                        foreach (View view in queueScheduleList)
                         {
                             ScrollViewQueueStatus.Children.Add(view);
                         }
@@ -196,55 +192,51 @@ namespace Pump.Layout
             }
         }
 
-        private List<object> getQueueScheduleDetailObject(string Queueschedules)
+        private static List<object> GetQueueScheduleDetailObject(string queueSchedules)
         {
-            List<object> QueuescheduleListObject = new List<object>();
+            var queueScheduleListObject = new List<object>();
             try
             {
-                if (Queueschedules == "No Data" || Queueschedules == "")
+                if (queueSchedules == "No Data" || queueSchedules == "")
                 {
-                    QueuescheduleListObject.Add(new ViewEmptySchedule("No Queued Schedules"));
-                    return QueuescheduleListObject;
+                    queueScheduleListObject.Add(new ViewEmptySchedule("No Queued Schedules"));
+                    return queueScheduleListObject;
                 }
 
 
-                List<string> QueuescheduleList = new List<string>();
-                QueuescheduleList = Queueschedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                var queueScheduleList = queueSchedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-                foreach (var schedule in QueuescheduleList)
-                {
-                    QueuescheduleListObject.Add(new ViewScheduleDetail(schedule.Split(',').ToList()));
-                }
+                queueScheduleListObject.AddRange(queueScheduleList.Select(schedule => new ViewScheduleDetail(schedule.Split(',').ToList())));
 
-                return QueuescheduleListObject;  
+                return queueScheduleListObject;  
             }
             catch
             {
-                QueuescheduleListObject.Add(new ViewNoConnection());
-                return QueuescheduleListObject;
+                queueScheduleListObject.Add(new ViewNoConnection());
+                return queueScheduleListObject;
             }
                
         }
 
-        private void getSensorStatus()
+        private void GetSensorStatus()
         {
-            bool running = true;
+            var running = true;
             while (running)
             {
                 try
                 {
-                    string ActiveSensorStatus = socket.Message(command.getActiveSensorStatus());
+                    var activeSensorStatus = _socket.Message(_command.getActiveSensorStatus());
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
 
-                        if (oldActiveSensorStatus == ActiveSensorStatus)
+                        if (_oldActiveSensorStatus == activeSensorStatus)
                             return;
                         ScrollViewSensorStatus.Children.Clear();
-                        oldActiveSensorStatus = ActiveSensorStatus;
+                        _oldActiveSensorStatus = activeSensorStatus;
 
-                        var SensorListObject = getSensorStatusObject(ActiveSensorStatus);
-                        foreach (View view in SensorListObject)
+                        var sensorListObject = GetSensorStatusObject(activeSensorStatus);
+                        foreach (View view in sensorListObject)
                         {
                             ScrollViewSensorStatus.Children.Add(view);
                         }
@@ -268,60 +260,57 @@ namespace Pump.Layout
             }
         }
 
-        private List<object> getSensorStatusObject(string ActiveSensorStatus)
+        private static List<object> GetSensorStatusObject(string activeSensorStatus)
         {
-            List<object> SensorListObject = new List<object>();
+            var sensorListObject = new List<object>();
             try
             {
-                if (ActiveSensorStatus == "No Data" || ActiveSensorStatus == "")
+                if (activeSensorStatus == "No Data" || activeSensorStatus == "")
                 {
-                    SensorListObject.Add(new ViewEmptySchedule("No Sensors Found Here"));
-                    return SensorListObject;
+                    sensorListObject.Add(new ViewEmptySchedule("No Sensors Found Here"));
+                    return sensorListObject;
                 }
 
-                var SensorList = ActiveSensorStatus.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                var sensorList = activeSensorStatus.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-                foreach (var Sensor in SensorList)
-                {
-                    SensorListObject.Add(new ViewSensorDetail(Sensor.Split(',').ToList()));
-                }
+                sensorListObject.AddRange(sensorList.Select(sensor => new ViewSensorDetail(sensor.Split(',').ToList())));
 
-                return SensorListObject;
+                return sensorListObject;
             }
             catch
             {
-                SensorListObject.Add(new ViewNoConnection());
-                return SensorListObject;
+                sensorListObject.Add(new ViewNoConnection());
+                return sensorListObject;
             }
 
         }
 
         private void ScrollViewScheduleStatusTap_Tapped(object sender, EventArgs e)
         {
-            if (oldActiveSchedule == null)
+            if (_oldActiveSchedule == null)
                 return;
-            var FloatingScreen = new FloatingScreenScroll();
-            FloatingScreen.setFloatingScreen(getScheduleDetailObject(oldActiveSchedule));
-            PopupNavigation.Instance.PushAsync(FloatingScreen);
+            var floatingScreen = new FloatingScreenScroll();
+            floatingScreen.setFloatingScreen(GetScheduleDetailObject(_oldActiveSchedule));
+            PopupNavigation.Instance.PushAsync(floatingScreen);
 
         }
 
         private void ScrollViewQueueStatusTap_Tapped(object sender, EventArgs e)
         {
-            if (oldQueueActiveSchedule == null)
+            if (_oldQueueActiveSchedule == null)
                 return;
-            var FloatingScreen = new FloatingScreenScroll();
-            FloatingScreen.setFloatingScreen(getQueueScheduleDetailObject(oldQueueActiveSchedule));
-            PopupNavigation.Instance.PushAsync(FloatingScreen);
+            var floatingScreen = new FloatingScreenScroll();
+            floatingScreen.setFloatingScreen(GetQueueScheduleDetailObject(_oldQueueActiveSchedule));
+            PopupNavigation.Instance.PushAsync(floatingScreen);
         }
 
         private void ScrollViewSensorStatusTap_Tapped(object sender, EventArgs e)
         {
-            if (oldActiveSensorStatus == null)
+            if (_oldActiveSensorStatus == null)
                 return;
-            var FloatingScreen = new FloatingScreenScroll();
-            FloatingScreen.setFloatingScreen(getSensorStatusObject(oldActiveSensorStatus));
-            PopupNavigation.Instance.PushAsync(FloatingScreen);
+            var floatingScreen = new FloatingScreenScroll();
+            floatingScreen.setFloatingScreen(GetSensorStatusObject(_oldActiveSensorStatus));
+            PopupNavigation.Instance.PushAsync(floatingScreen);
         }
     }
 }

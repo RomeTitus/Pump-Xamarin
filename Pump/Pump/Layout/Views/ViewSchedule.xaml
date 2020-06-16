@@ -41,37 +41,37 @@
                     <Label
                         x:Name="LabelSunday"
                         Text="S"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelMonday"
                         Text="M"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelTuesday"
                         Text="T"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelWednesday"
                         Text="W"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelThursday"
                         Text="T"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelFriday"
                         Text="F"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                     <Label
                         x:Name="LabelSaturday"
                         Text="S"
-                        TextColor="White"
+                        TextColor="Gray"
                         VerticalOptions="Center" />
                 </StackLayout>
             </StackLayout>

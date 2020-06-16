@@ -34,19 +34,53 @@ namespace Pump.Layout.Views
         private void SetWeek(string week)
         {
             if (week.Contains("SUNDAY"))
+            {
                 LabelSunday.TextColor = Color.Black;
+                LabelSunday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
+
             if (week.Contains("MONDAY"))
+            {
                 LabelMonday.TextColor = Color.Black;
+                LabelMonday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
+
             if (week.Contains("TUESDAY"))
+            {
                 LabelTuesday.TextColor = Color.Black;
+                LabelTuesday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
+
             if (week.Contains("WEDNESDAY"))
+            {
                 LabelWednesday.TextColor = Color.Black;
+                LabelWednesday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
             if (week.Contains("THURSDAY"))
+            {
                 LabelThursday.TextColor = Color.Black;
+                LabelThursday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
+
             if (week.Contains("FRIDAY"))
+            {
                 LabelFriday.TextColor = Color.Black;
+                LabelFriday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
+
             if (week.Contains("SATURDAY"))
+            {
                 LabelSaturday.TextColor = Color.Black;
+                LabelSaturday.Font = Font.SystemFontOfSize(12)
+                    .WithAttributes(FontAttributes.Bold);
+            }
+
         }
 
         public Switch GetSwitch()

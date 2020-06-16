@@ -17,10 +17,10 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
 
-            populateSchedule(schedule);
+            PopulateSchedule(schedule);
         }
 
-        private void populateSchedule(List<string> schedule)
+        private void PopulateSchedule(IReadOnlyList<string> schedule)
         {
             LabelScheduleName.Text = schedule[1];
             LablePump.Text = schedule[2];

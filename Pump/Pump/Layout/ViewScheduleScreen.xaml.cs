@@ -87,25 +87,25 @@ namespace Pump.Layout
             var floatingScreen = new FloatingScreen();
             PopupNavigation.Instance.PushAsync(floatingScreen);
             new Thread(() => GetScheduleSummary(id, floatingScreen)).Start();
-            
+
         }
 
-        public void GetScheduleSummary(int id, FloatingScreen floatingScreen)
+        private void GetScheduleSummary(int id, FloatingScreen floatingScreen)
         {
             try
             {
                 string schedulesSummary = _socket.Message(_command.getScheduleInfo(id));
-                var scheduleList = GetScheduleSummaryObject(schedulesSummary);
+                var scheduleList = GetScheduleSummaryObject(schedulesSummary, floatingScreen);
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     try
                     { 
-                        floatingScreen.setFloatingScreen(scheduleList);
+                        floatingScreen.SetFloatingScreen(scheduleList);
                     }
                     catch
                     {
                         var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
-                        floatingScreen.setFloatingScreen(scheduleSummaryListObject);
+                        floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                     }
 
                 });
@@ -115,15 +115,15 @@ namespace Pump.Layout
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
-                    floatingScreen.setFloatingScreen(scheduleSummaryListObject);
+                    floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                 });
             }
         }
 
-        private List<object> GetScheduleSummaryObject(string schedulesSummary)
+        private List<object> GetScheduleSummaryObject(string schedulesSummary, FloatingScreen floatingScreen)
         {
 
-            List<object> scheduleSummaryListObject = new List<object>();
+            var scheduleSummaryListObject = new List<object>();
             try
             {
                 if (schedulesSummary == "No Data" || schedulesSummary == "")
@@ -136,7 +136,7 @@ namespace Pump.Layout
                 var scheduleList = schedulesSummary.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
 
-                var viewSchedule = new ViewScheduleSummary(scheduleList);
+                var viewSchedule = new ViewScheduleSummary(scheduleList, floatingScreen);
                 scheduleSummaryListObject.Add(viewSchedule);
 
 
@@ -174,7 +174,7 @@ namespace Pump.Layout
         {
             try
             {
-                var result = _socket.Message(_command.ChangeSchedule(id));
+                var result = _socket.Message(_command.ChangeSchedule(id, Convert.ToInt32(scheduleSwitch.IsToggled)));
                 Device.BeginInvokeOnMainThread(() =>
                 {
 
