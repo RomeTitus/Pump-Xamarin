@@ -18,6 +18,11 @@
                 Pressed="BtnScheduleDetail_OnPressed"
                 Text="Schedule Edit/Delete"
                 VerticalOptions="Center" />
+            <Button
+                x:Name="BtnGraphSummary"
+                Pressed="BtnGraphSummary_OnPressed"
+                Text="View Graphs"
+                VerticalOptions="Center" />
 
 
         </StackLayout>

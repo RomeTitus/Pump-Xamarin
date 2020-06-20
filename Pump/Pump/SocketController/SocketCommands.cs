@@ -71,6 +71,11 @@ namespace Pump.SocketController
             return id + ","+ isActive + "$ChangeSchedule";
         }
 
+        public string getEquipmentLastUsed()
+        {
+            return "getEquipmentLastUsedHistoryReading";
+        }
+
         public string setToken(string token)
         {
             var deviceId = Preferences.Get("my_deviceId", string.Empty);

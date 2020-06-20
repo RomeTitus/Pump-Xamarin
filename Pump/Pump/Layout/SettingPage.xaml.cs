@@ -30,5 +30,10 @@ namespace Pump.Layout
             //Navigation.PopAsync();
             Navigation.PushModalAsync(new ViewScheduleScreen());
         }
+
+        private void BtnGraphSummary_OnPressed(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(new ViewGraphSummaryScreen());
+        }
     }
 }
