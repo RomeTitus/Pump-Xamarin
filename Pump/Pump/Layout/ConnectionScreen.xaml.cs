@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using Pump.Database;
 using Pump.Droid.Database.Table;
@@ -11,8 +12,11 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ConnectionScreen : ContentPage
     {
-        private bool _showAdvanced = false;
+        private string _internalConnection;
+        private string _externalConnection;
+        private bool _showAdvanced;
         private PumpConnection _connection;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
         public ConnectionScreen()
         {
             InitializeComponent();
@@ -97,24 +101,36 @@ namespace Pump.Layout
 
         private void CheckConnectionInternalAndExternal(string internalHost, int internalPort, string externalHost, int externalPort, VerifyConnections loadingScreen)
         {
+            var internalThread = new Thread(() => CheckConnection(internalHost, internalPort, true));
+            var externalThread = new Thread(() => CheckConnection(externalHost, externalPort, false));
+            internalThread.Start();
+            externalThread.Start();
+            _stopwatch.Start();
+            var aliveConnection = true;
+            while (aliveConnection)
+            {
+                if (!internalThread.IsAlive && !externalThread.IsAlive)
+                    aliveConnection = false;
+                if (_stopwatch.Elapsed > TimeSpan.FromSeconds(5))
+                    aliveConnection = false;
+                //just waiting for the threads to finish
+            }
+            _stopwatch.Stop();
+            Thread.Sleep(500);
 
             string mac = null;
 
-            var internalConnection = checkConnection(internalHost, internalPort);
-
-            var externalConnection = checkConnection(externalHost, externalPort);
-
-            if (internalConnection != null)
+            if (_internalConnection != null)
             {
-                mac = internalConnection;
+                mac = _internalConnection;
                 _connection.InternalPath = internalHost;
                 _connection.InternalPort = internalPort;
             }
 
 
-            if (externalConnection != null)
+            if (_externalConnection != null)
             {
-                mac = externalConnection;
+                mac = _externalConnection;
                 _connection.ExternalPath = externalHost;
                 _connection.ExternalPort = externalPort;
             }
@@ -135,16 +151,14 @@ namespace Pump.Layout
 
                 loadingScreen.stopActivityIndicatior();
 
-                if (internalConnection != null)
+                if (_internalConnection != null)
                     loadingScreen.InternalSuccess();
                 else
                     loadingScreen.InternalFailed();
-                if (externalConnection != null)
+                if (_externalConnection != null)
                     loadingScreen.ExternalSuccess();
                 else
                     loadingScreen.ExternalFailed();
-
-                //PopupNavigation.Instance.PopAsync();
             });
         }
 
@@ -162,9 +176,16 @@ namespace Pump.Layout
                 _connection.ExternalPort = port;
             }
 
-            var mac = checkConnection(host, port);
-
-            
+            CheckConnection(host, port, isInternal);
+            string mac;
+            if (isInternal)
+            {
+                mac = _internalConnection;
+            }
+            else
+            {
+                mac = _externalConnection;
+            }
             
             if (mac != null)
             {
@@ -199,19 +220,32 @@ namespace Pump.Layout
         }
 
 
-        private string checkConnection(string host, int port)
+        private void CheckConnection(string host, int port, bool isInternal)
         {
             var socket = new SocketController.SocketVerify(host, port);
             try
             {
                 var result = socket.verifyConnection();
-                return result != "getMAC" ? result : null;
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    if (isInternal)
+                    {
+                        if (result != "getMAC")
+                            _internalConnection = result;
+
+                    }
+                    else
+                    {
+                        if (result != "getMAC")
+                            _externalConnection = result;
+                    }
+                });
             }
             catch
             {
-                return null;
+                // ignored
             }
-
+            
         }
 
 

@@ -1,8 +1,11 @@
 ﻿using Pump.Database;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
@@ -20,9 +23,12 @@ namespace Pump.SocketController
             string SocketResult = "";
             try
             {
-                
-                if(connection.InternalPort != -1)
-                    SocketResult = Send(data, connection.InternalPath, connection.InternalPort,1000);
+                if (connection.InternalPort != -1)
+                {
+                    var profiles = Connectivity.ConnectionProfiles;
+                    if (profiles.Contains(ConnectionProfile.WiFi))
+                        SocketResult = Send(data, connection.InternalPath, connection.InternalPort);
+                }
             }
             catch (Exception e)
             {

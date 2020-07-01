@@ -3,6 +3,7 @@ using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Pump.Database;
@@ -69,12 +70,15 @@ namespace Pump.Layout
 
         private void GetScheduleDetail()
         {
-            bool running = true;
+            var running = true; 
+            var stopwatch = new Stopwatch();
             while (running)
             {
+                stopwatch.Start();
                 try
                 {
-                    string schedules = _socket.Message(_command.getActiveSchedule());
+                    
+                    var schedules = _socket.Message(_command.getActiveSchedule());
                     Device.BeginInvokeOnMainThread(() =>
                     {
                        
@@ -99,62 +103,71 @@ namespace Pump.Layout
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
+                        _oldActiveSensorStatus = null;
                         ScrollViewScheduleStatus.Children.Clear();
                         ScrollViewScheduleStatus.Children.Add(new ViewNoConnection());
                     });
                 }
-                Thread.Sleep(15000);
+
+                stopwatch.Stop();
+                var timeLeft = stopwatch.Elapsed.Seconds - 5;
+                stopwatch.Reset();
+                if(timeLeft<0)
+                    Thread.Sleep(timeLeft * -1000);
+                
             }
             
         }
 
         private static List<object> GetScheduleDetailObject(string schedules)
         {
-            List<object> scheduleListObject = new List<object>();
-                try
-                {
-                        if (schedules == "No Data" || schedules == "")
+            var scheduleListObject = new List<object>();
+            try
+            {
+                    if (schedules == "No Data" || schedules == "")
+                    {
+                        scheduleListObject.Add(new ViewEmptySchedule("No Running Schedules"));
+                        return scheduleListObject;
+                    }
+
+
+                    var scheduleList = new List<string>();
+                    if (schedules.Contains("$"))
+                    {
+                        var scheduleWithManual = schedules.Split('$').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+
+                        if (scheduleWithManual.Count > 1)
                         {
-                            scheduleListObject.Add(new ViewEmptySchedule("No Running Schedules"));
-                            return scheduleListObject;
-                        }
-
-
-                        List<string> scheduleList = new List<string>();
-                        if (schedules.Contains("$"))
-                        {
-                            List<string> schedulewithManual = schedules.Split('$').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                            if (schedulewithManual.Count > 1)
-                            {
-                                scheduleListObject.Add(new ViewManualSchedule(schedulewithManual[0].Split(',').ToList(), true));
-                                scheduleList = schedulewithManual[(schedulewithManual.Count - 1)].Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                            }
-                            else
-                                scheduleListObject.Add(new ViewManualSchedule(schedulewithManual[0].Split(',').ToList(), false));
+                            scheduleListObject.Add(new ViewManualSchedule(scheduleWithManual[0].Split(',').ToList(), true));
+                            scheduleList = scheduleWithManual[(scheduleWithManual.Count - 1)].Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                         }
                         else
-                            scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                            scheduleListObject.Add(new ViewManualSchedule(scheduleWithManual[0].Split(',').ToList(), false));
+                    }
+                    else
+                        scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-                        foreach (var schedule in scheduleList)
-                        {
-                            scheduleListObject.Add(new ViewScheduleDetail(schedule.Split(',').ToList()));
-                        }
-                return scheduleListObject;
-                }
-                catch
-                {
+                    foreach (var schedule in scheduleList)
+                    {
+                        scheduleListObject.Add(new ViewScheduleDetail(schedule.Split(',').ToList()));
+                    }
+                    return scheduleListObject;
+            }
+            catch
+            {
                 scheduleListObject = new List<object>();
                 scheduleListObject.Add(new ViewNoConnection());
                 return scheduleListObject;
-                }
             }
+        }
 
         private void GetQueueScheduleDetail()
         {
+            var stopwatch = new Stopwatch();
             var running = true;
             while (running)
             {
+                stopwatch.Start();
                 try
                 {
                     var queueSchedules = _socket.Message(_command.getQueueSchedule());
@@ -183,12 +196,18 @@ namespace Pump.Layout
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
+                        _oldQueueActiveSchedule = null;
                         ScrollViewQueueStatus.Children.Clear();
                         ScrollViewQueueStatus.Children.Add(new ViewNoConnection());
                     });
 
                 }
-                Thread.Sleep(15000);
+
+                stopwatch.Stop();
+                var timeLeft = stopwatch.Elapsed.Seconds - 5;
+                stopwatch.Reset();
+                if (timeLeft < 0)
+                    Thread.Sleep(timeLeft * -1000);
             }
         }
 
@@ -220,9 +239,11 @@ namespace Pump.Layout
 
         private void GetSensorStatus()
         {
+            var stopwatch = new Stopwatch();
             var running = true;
             while (running)
             {
+                stopwatch.Start();
                 try
                 {
                     var activeSensorStatus = _socket.Message(_command.getActiveSensorStatus());
@@ -251,12 +272,17 @@ namespace Pump.Layout
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
+                        _oldActiveSensorStatus = null;
                         ScrollViewSensorStatus.Children.Clear();
                         ScrollViewSensorStatus.Children.Add(new ViewNoConnection());
                     });
 
                 }
-                Thread.Sleep(2000);
+                stopwatch.Stop();
+                var timeLeft = stopwatch.Elapsed.Seconds - 2;
+                stopwatch.Reset();
+                if (timeLeft < 0)
+                    Thread.Sleep(timeLeft * -1000);
             }
         }
 
