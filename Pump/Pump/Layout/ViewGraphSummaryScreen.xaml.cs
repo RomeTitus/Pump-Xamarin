@@ -14,7 +14,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewGraphSummaryScreen : ContentPage
     {
-        private readonly SocketCommands _command = new SocketCommands();
+        private readonly IrrigationCommands _command = new IrrigationCommands();
         private readonly SocketMessage _socket = new SocketMessage();
         public ViewGraphSummaryScreen()
         {

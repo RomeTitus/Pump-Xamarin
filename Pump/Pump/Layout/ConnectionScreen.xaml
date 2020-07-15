@@ -89,6 +89,21 @@
                 </StackLayout.GestureRecognizers>
             </StackLayout>
 
+            <StackLayout Margin="15" Orientation="Horizontal">
+                <Label
+                    FontAttributes="Italic"
+                    FontSize="Large"
+                    HorizontalOptions="Fill"
+                    Text="Use Real Time Database"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Switch
+                    x:Name="SwitchRealTimeDatabase"
+                    HorizontalOptions="EndAndExpand"
+                    Toggled="SwitchRealTimeDatabase_OnToggled"
+                    VerticalOptions="Center" />
+            </StackLayout>
+
             <Button
                 x:Name="BtnBackConnectionScreen"
                 Clicked="BtnBackConnectionScreen_OnClicked"

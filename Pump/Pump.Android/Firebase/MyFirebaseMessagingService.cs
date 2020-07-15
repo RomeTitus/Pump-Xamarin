@@ -77,7 +77,7 @@ namespace Pump.Droid.Firebase
                         var ngrokConnectionInfo = intent.GetStringExtra("Ngrok");
                         pumpConnection.ExternalPort = Convert.ToInt32(ngrokConnectionInfo.Split(":").Last().Replace("\n", ""));
                         pumpConnection.ExternalPath = ngrokConnectionInfo.Split("//").Last().Split(":").First();
-                        controller.UpdatePumpConnection(pumpConnection);
+                        controller.UpdatePump(pumpConnection);
                         SendNotification(ngrokConnectionInfo, "Connection Updated", pumpConnection);
                     }
                     else
@@ -113,7 +113,7 @@ namespace Pump.Droid.Firebase
 
 
 
-                        PumpConnection pumpConnection = controller.getControllerNameByMac(remoteData["Bluetooth"]);
+                        PumpConnection pumpConnection = controller.GetControllerNameByMac(remoteData["Bluetooth"]);
                         if (pumpConnection != null)
                         {
                             bool ngrokExist;
@@ -131,7 +131,7 @@ namespace Pump.Droid.Firebase
                                 var ngrokConnectionInfo = remoteData["Ngrok"];
                                 pumpConnection.ExternalPort = Convert.ToInt32(ngrokConnectionInfo.Split(":").Last().Replace("\n", ""));
                                 pumpConnection.ExternalPath = ngrokConnectionInfo.Split("//").Last().Split(":").First();
-                                controller.UpdatePumpConnection(pumpConnection);
+                                controller.UpdatePump(pumpConnection);
                                 SendNotification(ngrokConnectionInfo, "Connection Updated", pumpConnection);
                             }
                             else

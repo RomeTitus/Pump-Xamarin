@@ -44,7 +44,7 @@ namespace Pump.Droid
             LoadApplication(new App());
             IsPlayServicesAvailable();
             var intent = new Intent(this, typeof(MyFirebaseMessagingService));
-            StartService(intent);
+// StartService(intent);
             //CreateNotificationChannel();
 
         }

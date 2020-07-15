@@ -26,6 +26,7 @@ namespace Pump.Droid.Database.Table
         public int InternalPort { get; set; }
         public string ExternalPath { get; set; }
         public int ExternalPort { get; set; }
+        public bool? RealTimeDatabase { get; set; }
 
 
     }

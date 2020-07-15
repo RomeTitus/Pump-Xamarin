@@ -18,7 +18,7 @@ namespace Pump.Layout
         private string _oldActiveSchedule;
         private string _oldQueueActiveSchedule;
         private string _oldActiveSensorStatus;
-        private readonly SocketCommands _command = new SocketCommands();
+        private readonly IrrigationCommands _command = new IrrigationCommands();
         private readonly SocketMessage _socket = new SocketMessage();
         public ScheduleStatus()
         {

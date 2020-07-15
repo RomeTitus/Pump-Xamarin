@@ -17,7 +17,7 @@ namespace Pump.Layout
         private readonly List<string> _pumpIdList = new List<string>();
 
         private ViewSchedulePumpTime _pumpSelectedTime;
-        private readonly SocketCommands _command = new SocketCommands();
+        private readonly IrrigationCommands _command = new IrrigationCommands();
         private readonly SocketMessage _socket = new SocketMessage();
         private readonly int? id = null;
         public UpdateSchedule()

@@ -50,13 +50,7 @@ namespace Pump.Database
             {
                 try
                 {
-                    if (_database.Table<ActivityStatus>().Any())
-                    {
-                        var activityStatus = _database.Table<ActivityStatus>().First();
-                        return _database.Table<ActivityStatus>().First();
-                    }
-                    else
-                        return null;
+                    return _database.Table<ActivityStatus>().Any() ? _database.Table<ActivityStatus>().First() : null;
                 }
                 catch
                 {
@@ -101,7 +95,7 @@ namespace Pump.Database
             }
         }
 
-        public void setNotificationToken(NotificationToken notificationToken)
+        public void SetNotificationToken(NotificationToken notificationToken)
         {
             lock (Locker)
             {
@@ -130,18 +124,19 @@ namespace Pump.Database
             }
         }
 
-        public void UpdatePumpConnection(PumpConnection pumpConnection)
-        {
-            _database.Update(pumpConnection);
-        }
-
-        public PumpConnection getControllerNameByMac(string bt)
+        public void UpdatePump(PumpConnection pumpConnection)
         {
             lock (Locker)
             {
+                _database.Update(pumpConnection);
+            }
+        }
 
-                    PumpConnection pumpConnection = _database.Table<PumpConnection>().First();
-                    //PumpConnection pumpConnection =  _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
+        public PumpConnection GetControllerNameByMac(string bt)
+        {
+            lock (Locker)
+            {
+                    PumpConnection pumpConnection =  _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
                     return pumpConnection;
             }
         }

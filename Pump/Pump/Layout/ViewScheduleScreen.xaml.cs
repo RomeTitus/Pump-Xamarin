@@ -13,7 +13,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleScreen : ContentPage
     {
-        readonly SocketCommands _command = new SocketCommands();
+        readonly IrrigationCommands _command = new IrrigationCommands();
         readonly SocketMessage _socket = new SocketMessage();
         public ViewScheduleScreen()
         {

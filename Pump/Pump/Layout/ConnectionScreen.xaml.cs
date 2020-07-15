@@ -6,6 +6,7 @@ using Pump.Droid.Database.Table;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Switch = Xamarin.Forms.Switch;
 
 namespace Pump.Layout
 {
@@ -52,6 +53,11 @@ namespace Pump.Layout
             TxtExternalConnection.Text = _connection.ExternalPath;
             if(_connection.ExternalPort != -1)
                 TxtExternalPort.Text = _connection.ExternalPort.ToString();
+
+            if (_connection.RealTimeDatabase == null) return;
+            SwitchRealTimeDatabase.Toggled -= SwitchRealTimeDatabase_OnToggled;
+            SwitchRealTimeDatabase.IsToggled = (bool) _connection.RealTimeDatabase;
+            SwitchRealTimeDatabase.Toggled += SwitchRealTimeDatabase_OnToggled;
         }
 
         private void BtnUpdateController_OnClicked(object sender, EventArgs e)
@@ -139,7 +145,7 @@ namespace Pump.Layout
             if (mac != null)
             {
                 var database = new DatabaseController();
-                database.UpdatePumpConnection(_connection);
+                database.UpdatePump(_connection);
 
             }
 
@@ -190,7 +196,7 @@ namespace Pump.Layout
             if (mac != null)
             {
                 var database = new DatabaseController();
-                database.UpdatePumpConnection(_connection);
+                database.UpdatePump(_connection);
 
             }
 
@@ -254,6 +260,16 @@ namespace Pump.Layout
             Navigation.PopModalAsync();
             //Navigation.PushModalAsync(new HomeScreen());
             
+        }
+
+        private void SwitchRealTimeDatabase_OnToggled(object sender, ToggledEventArgs e)
+        {
+            var toggleRealTimeDatabase = (Switch) sender;
+            var controller = new DatabaseController();
+            var pumpConnection = controller.GetPumpSelection();
+            if (pumpConnection == null) return;
+            pumpConnection.RealTimeDatabase = toggleRealTimeDatabase.IsToggled;
+            controller.UpdatePump(pumpConnection);
         }
     }
 }

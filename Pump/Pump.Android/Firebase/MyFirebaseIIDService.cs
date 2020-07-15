@@ -30,7 +30,7 @@ namespace Pump.Droid.Firebase
             // Register with Notification Hubs
             var notificationToken = new NotificationToken();
             notificationToken.token = token;
-            new DatabaseController().setNotificationToken(notificationToken);
+            new DatabaseController().SetNotificationToken(notificationToken);
             hub = new NotificationHub(Constants.NotificationHubName,
                 Constants.ListenConnectionString, this);
 
