@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pump.FirebaseDatabase
+namespace Pump.IrrigationController
 {
     internal class Sensor
     {

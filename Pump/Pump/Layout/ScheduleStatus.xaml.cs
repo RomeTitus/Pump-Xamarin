@@ -36,7 +36,7 @@ namespace Pump.Layout
         }
 
 
-        private protected virtual async void GetScheduleReadingFirebase(DatabaseController databaseController)
+        private void GetScheduleReadingFirebase(DatabaseController databaseController)
         {
             var auth = new Authentication();
             _schedulesList = Task.Run(() => auth.GetAllSchedules()).Result;
@@ -88,6 +88,8 @@ namespace Pump.Layout
                 var activeScheduleObjects = GetScheduleDetailObject(activeScheduleString);
                 if (oldActiveScheduleString != activeScheduleString)
                 {
+
+                    _oldActiveSchedule = activeScheduleString;
                     oldActiveScheduleString = activeScheduleString;
                     Device.BeginInvokeOnMainThread(() =>
                     {
@@ -103,6 +105,7 @@ namespace Pump.Layout
                 var queScheduleObjects = GetQueueScheduleDetailObject(queScheduleString);
                 if (oldQueScheduleString != queScheduleString)
                 {
+                    _oldQueueActiveSchedule = queScheduleString;
                     oldQueScheduleString = queScheduleString;
                     Device.BeginInvokeOnMainThread(() =>
                     {
@@ -114,10 +117,9 @@ namespace Pump.Layout
                 Thread.Sleep(2000);
             }
 
-            //auth = null;
         }
 
-        private void GetSensorReadingFirebase()
+        private void GetSensorReadingFirebase(DatabaseController databaseController)
         {
             var auth = new Authentication();
             _sensorList = Task.Run(() => auth.GetAllSensors()).Result;
@@ -128,7 +130,7 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    if (!new DatabaseController().isRealtimeFirebaseSelected()) return;
+                    if (!databaseController.isRealtimeFirebaseSelected()) return;
                     var sensor = auth.GetJsonSensorToObjectList(x.Object, x.Key);
                     _sensorList.RemoveAll(y => y.ID == sensor.ID);
                     _sensorList.Add(sensor);
@@ -143,10 +145,11 @@ namespace Pump.Layout
                 (current, sensor) =>
                     current + (sensor.ID + ',' + sensor.TYPE + ',' + sensor.NAME + ',' + sensor.LastReading + '#'));
 
+            _oldActiveSensorStatus = sensorDetailString;
             var sensorStatusObject = GetSensorStatusObject(sensorDetailString);
             Device.BeginInvokeOnMainThread(() =>
             {
-                ScrollViewScheduleStatus.Children.Clear();
+                ScrollViewSensorStatus.Children.Clear();
                 foreach (View view in sensorStatusObject) ScrollViewSensorStatus.Children.Add(view);
             });
         }
@@ -154,6 +157,7 @@ namespace Pump.Layout
         private void ThreadController()
         {
             var started = false;
+            var firebaseStarted = false;
             var databaseController = new DatabaseController();
             Thread scheduleDetail = null;
             Thread sensorStatus = null;
@@ -163,12 +167,19 @@ namespace Pump.Layout
             {
                 if (databaseController.isRealtimeFirebaseSelected())
                 {
-                    GetScheduleReadingFirebase(databaseController);
+                    if (firebaseStarted == false)
+                    {
+                        firebaseStarted = true;
+                        new Thread(() => GetScheduleReadingFirebase(databaseController)).Start();
+                        GetSensorReadingFirebase(databaseController);
+                    }
                 }
                 else
                 {
+                    firebaseStarted = false;
                     _schedulesList.Clear();
                     _equipmentList.Clear();
+                    _sensorList.Clear();
                     if (started == false && databaseController.GetActivityStatus() != null &&
                         databaseController.GetActivityStatus().status)
                     {

@@ -23,7 +23,7 @@ namespace Pump.Droid.Firebase
         public override void OnTokenRefresh()
         {
             var refreshedToken = FirebaseInstanceId.Instance.Token;
-            SendRegistrationToServer(refreshedToken);
+            //SendRegistrationToServer(refreshedToken);
         }
         void SendRegistrationToServer(string token)
         {

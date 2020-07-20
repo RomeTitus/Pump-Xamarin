@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Pump.FirebaseDatabase
+namespace Pump.IrrigationController
 {
     internal class Schedule
     {
