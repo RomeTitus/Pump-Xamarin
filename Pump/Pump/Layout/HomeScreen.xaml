@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <TabbedPage
     x:Class="Pump.HomeScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -6,8 +7,6 @@
     xmlns:local="clr-namespace:Pump.Layout"
     xmlns:localImage="clr-namespace:EmbeddedImages"
     BackgroundColor="DeepSkyBlue">
-
-
 
 
     <NavigationPage

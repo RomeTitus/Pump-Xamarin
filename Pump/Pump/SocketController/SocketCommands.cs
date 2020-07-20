@@ -1,16 +1,18 @@
-﻿using Xamarin.Essentials;
+﻿using System;
+using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
-    class SocketCommands
+    internal class SocketCommands
     {
         public string getActiveSchedule()
         {
             return "getActiveSchedule";
         }
+
         public string getScheduleInfo(int id)
         {
-            return id +"$getScheduleInfo";
+            return id + "$getScheduleInfo";
         }
 
         public string getSchedule()
@@ -22,14 +24,17 @@ namespace Pump.SocketController
         {
             return schedule + "$SCHEDULE";
         }
+
         public string updateSchedule(int id, string schedule)
         {
-            return id + "#" +schedule + "$EDITSCHEDULE";
+            return id + "#" + schedule + "$EDITSCHEDULE";
         }
+
         public string deleteSchedule(int id)
         {
             return id + "$DeleteSchedule";
         }
+
         public string getMacAddress()
         {
             return "getMAC";
@@ -59,7 +64,7 @@ namespace Pump.SocketController
         {
             return "getManualSchedule";
         }
-        
+
 
         public string StopManualSchedule()
         {
@@ -68,7 +73,7 @@ namespace Pump.SocketController
 
         public string ChangeSchedule(int id, int isActive)
         {
-            return id + ","+ isActive + "$ChangeSchedule";
+            return id + "," + isActive + "$ChangeSchedule";
         }
 
         public string getEquipmentLastUsed()
@@ -81,12 +86,11 @@ namespace Pump.SocketController
             var deviceId = Preferences.Get("my_deviceId", string.Empty);
             if (string.IsNullOrEmpty(deviceId))
             {
-                deviceId = System.Guid.NewGuid().ToString();
+                deviceId = Guid.NewGuid().ToString();
                 Preferences.Set("my_deviceId", deviceId);
             }
+
             return deviceId + "," + token + "$setToken";
         }
     }
-
-
 }

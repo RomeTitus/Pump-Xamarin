@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Collections.Generic;
 using Xamarin.Forms;
 using Xamarin.Forms.MaskedEntry;
 using Xamarin.Forms.Xaml;
@@ -21,7 +16,6 @@ namespace Pump.Layout.Views
             LabelZoneName.Text = zoneAndTimeList[1];
             if (isTimeSet)
                 LabelZoneTime.Text = zoneAndTimeList[2];
-            
         }
 
         public MaskedEntry getMaskText()
@@ -33,7 +27,5 @@ namespace Pump.Layout.Views
         {
             return LabelZoneName;
         }
-
-
     }
 }

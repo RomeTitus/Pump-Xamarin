@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
 namespace Pump.SocketController
 {
-    class SocketConnection
+    internal class SocketConnection
     {
         protected string Send(string message, string host, int port)
         {
-            
-
             try
             {
-                Socket sender = new Socket(AddressFamily.InterNetwork,
-                                SocketType.Stream,
-                                ProtocolType.Tcp);
+                var sender = new Socket(AddressFamily.InterNetwork,
+                    SocketType.Stream,
+                    ProtocolType.Tcp);
                 // Connect the socket to the remote endpoint. Catch any errors.    
                 try
                 {
@@ -23,20 +20,19 @@ namespace Pump.SocketController
                 }
                 catch (ArgumentNullException ane)
                 {
-                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                    Console.WriteLine("ArgumentNullException : {0}", ane);
                     throw new Exception(ane.ToString());
                 }
                 catch (SocketException se)
                 {
-                    Console.WriteLine("SocketException : {0}", se.ToString());
+                    Console.WriteLine("SocketException : {0}", se);
                     throw new Exception(se.ToString());
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    Console.WriteLine("Unexpected exception : {0}", e);
                     throw new Exception(e.ToString());
                 }
-
             }
             catch (Exception e)
             {
@@ -47,11 +43,9 @@ namespace Pump.SocketController
 
         protected string Send(string message, string host, int port, int timeout)
         {
-
-
             try
             {
-                Socket sender = new Socket(AddressFamily.InterNetwork,
+                var sender = new Socket(AddressFamily.InterNetwork,
                     SocketType.Stream,
                     ProtocolType.Tcp);
                 sender.SendTimeout = timeout;
@@ -62,20 +56,19 @@ namespace Pump.SocketController
                 }
                 catch (ArgumentNullException ane)
                 {
-                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                    Console.WriteLine("ArgumentNullException : {0}", ane);
                     throw new Exception(ane.ToString());
                 }
                 catch (SocketException se)
                 {
-                    Console.WriteLine("SocketException : {0}", se.ToString());
+                    Console.WriteLine("SocketException : {0}", se);
                     throw new Exception(se.ToString());
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    Console.WriteLine("Unexpected exception : {0}", e);
                     throw new Exception(e.ToString());
                 }
-
             }
             catch (Exception e)
             {
@@ -84,9 +77,9 @@ namespace Pump.SocketController
             }
         }
 
-        private string sendSocket(Socket sender,string message, string host, int port)
+        private string sendSocket(Socket sender, string message, string host, int port)
         {
-            byte[] bytes = new byte[1024];
+            var bytes = new byte[1024];
             // Connect to Remote EndPoint  
             sender.Connect(host, port);
 
@@ -95,12 +88,12 @@ namespace Pump.SocketController
 
             // Encode the data string into a byte array.
             //byte[] msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
-            byte[] msg = Encoding.ASCII.GetBytes(message);
+            var msg = Encoding.ASCII.GetBytes(message);
             // Send the data through the socket.
-            int bytesSent = sender.Send(msg);
+            var bytesSent = sender.Send(msg);
 
             // Receive the response from the remote device.
-            int bytesRec = sender.Receive(bytes);
+            var bytesRec = sender.Receive(bytes);
             //Console.WriteLine("Echoed test = {0}",
             //    Encoding.ASCII.GetString(bytes, 0, bytesRec));
 
@@ -109,7 +102,6 @@ namespace Pump.SocketController
             sender.Close();
 
             return Encoding.ASCII.GetString(bytes, 0, bytesRec);
-
         }
     }
 }

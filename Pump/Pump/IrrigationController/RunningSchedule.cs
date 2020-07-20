@@ -1,26 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Pump.FirebaseDatabase;
 
 namespace Pump.IrrigationController
 {
-    class RunningSchedule
+    internal class RunningSchedule
     {
         public List<ActiveSchedule> GetActiveSchedule(List<Schedule> scheduleList, List<Equipment> EquipmentList)
         {
-            
             var activeScheduleList = new List<ActiveSchedule>();
-
 
 
             foreach (var schedule in scheduleList)
             {
-                if(schedule.isActive == "0")
+                if (schedule.isActive == "0")
                     continue;
-                
+
 
                 var hour = schedule.TIME.Split(':').First();
                 var minute = schedule.TIME.Split(':').Last();
@@ -28,7 +24,8 @@ namespace Pump.IrrigationController
                 foreach (var startTime in weekCalc)
                 {
                     var startTimeDateTime = startTime;
-                    startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(hour)) + TimeSpan.FromMinutes(Convert.ToInt32(minute));
+                    startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(hour)) +
+                                         TimeSpan.FromMinutes(Convert.ToInt32(minute));
 
                     foreach (var scheduleDetails in schedule.ScheduleDetails)
                     {
@@ -39,12 +36,14 @@ namespace Pump.IrrigationController
                         activeSchedule.name_Equipment =
                             EquipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
                         activeSchedule.id_Pump = schedule.id_Pump;
-                        activeSchedule.name_Pump = EquipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
+                        activeSchedule.name_Pump =
+                            EquipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
                         activeSchedule.WEEK = schedule.WEEK;
                         var durationHour = scheduleDetails.DURATION.Split(':').First();
                         var durationMinute = scheduleDetails.DURATION.Split(':').Last();
-                        startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(durationHour)) + TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                        startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                             TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
                         activeSchedule.EndTime = startTimeDateTime;
                         activeScheduleList.Add(activeSchedule);
                     }
@@ -88,14 +87,13 @@ namespace Pump.IrrigationController
 
         public List<ActiveSchedule> GetRunningSchedule(List<ActiveSchedule> activeScheduleList)
         {
-            return activeScheduleList.Where(activeSchedule => 
+            return activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
         }
 
         public List<ActiveSchedule> GetQueSchedule(List<ActiveSchedule> activeScheduleList)
         {
-
-            return activeScheduleList.Where(activeSchedule => 
+            return activeScheduleList.Where(activeSchedule =>
                 activeSchedule.EndTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(1)).ToList();
         }
     }

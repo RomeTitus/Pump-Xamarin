@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="Pump.Layout.ConnectionScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -85,7 +86,8 @@
                     HeightRequest="68"
                     Source="{local:ImageResourceExtention Pump.Icons.ConnectionDown.png}" />
                 <StackLayout.GestureRecognizers>
-                    <TapGestureRecognizer x:Name="StackLayoutConnectionView" Tapped="StackLayoutConnectionView_OnTapped" />
+                    <TapGestureRecognizer x:Name="StackLayoutConnectionView"
+                                          Tapped="StackLayoutConnectionView_OnTapped" />
                 </StackLayout.GestureRecognizers>
             </StackLayout>
 

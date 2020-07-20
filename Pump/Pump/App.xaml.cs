@@ -6,7 +6,8 @@ namespace Pump
 {
     public partial class App : Application
     {
-        DatabaseController databaseController = new DatabaseController();
+        private readonly DatabaseController databaseController = new DatabaseController();
+
         public App()
         {
             InitializeComponent();
@@ -17,7 +18,6 @@ namespace Pump
         protected override void OnStart()
         {
             databaseController.SetActivityStatus(new ActivityStatus(true));
-           
         }
 
         protected override void OnSleep()

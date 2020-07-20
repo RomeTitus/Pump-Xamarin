@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="Pump.Layout.ScheduleStatus"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -33,7 +34,8 @@
                     <ScrollView HeightRequest="100">
                         <StackLayout x:Name="ScrollViewScheduleStatus">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" Tapped="ScrollViewScheduleStatusTap_Tapped" />
+                                <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap"
+                                                      Tapped="ScrollViewScheduleStatusTap_Tapped" />
                             </StackLayout.GestureRecognizers>
                             <ActivityIndicator
                                 HorizontalOptions="Center"
@@ -65,7 +67,8 @@
 
                         <StackLayout x:Name="ScrollViewQueueStatus">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" Tapped="ScrollViewQueueStatusTap_Tapped" />
+                                <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap"
+                                                      Tapped="ScrollViewQueueStatusTap_Tapped" />
                             </StackLayout.GestureRecognizers>
                             <ActivityIndicator
                                 HorizontalOptions="Center"
@@ -92,7 +95,8 @@
                     <ScrollView HeightRequest="100">
                         <StackLayout x:Name="ScrollViewSensorStatus">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" Tapped="ScrollViewSensorStatusTap_Tapped" />
+                                <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap"
+                                                      Tapped="ScrollViewSensorStatusTap_Tapped" />
                             </StackLayout.GestureRecognizers>
                             <ActivityIndicator
                                 HorizontalOptions="Center"

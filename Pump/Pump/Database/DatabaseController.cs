@@ -1,10 +1,7 @@
-﻿using Pump.Droid.Database.Table;
-using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Pump.Database.Table;
+using Pump.Droid.Database.Table;
+using SQLite;
 using Xamarin.Forms;
 
 namespace Pump.Database
@@ -18,7 +15,7 @@ namespace Pump.Database
         public DatabaseController()
         {
             //database = DependencyService.Get<ISQLite>.GetConnection();
-            
+
             _database = DependencyService.Get<ISQLite>().GetConnection();
 
             _database.CreateTable<PumpConnection>();
@@ -34,13 +31,13 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-                if(_database.Table<PumpSelection>().Any())
+                if (_database.Table<PumpSelection>().Any())
                 {
                     var pumpSelected = _database.Table<PumpSelection>().First();
                     return _database.Table<PumpConnection>().FirstOrDefault(x => x.ID == pumpSelected.PumpConnectionId);
                 }
-                else
-                    return null;
+
+                return null;
             }
         }
 
@@ -56,7 +53,6 @@ namespace Pump.Database
                 {
                     return new ActivityStatus(true);
                 }
-                
             }
         }
 
@@ -74,9 +70,6 @@ namespace Pump.Database
                 {
                     _database.Insert(activityStatus);
                 }
-                
-                
-                
             }
         }
 
@@ -84,14 +77,9 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-
                 if (_database.Table<NotificationToken>().Any())
-                {
-
                     return _database.Table<NotificationToken>().First();
-                }
-                else
-                    return null;
+                return null;
             }
         }
 
@@ -136,18 +124,15 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-                    PumpConnection pumpConnection =  _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
-                    return pumpConnection;
+                var pumpConnection = _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
+                return pumpConnection;
             }
         }
 
         public bool isRealtimeFirebaseSelected()
         {
             var selectedPump = GetPumpSelection();
-            if (selectedPump?.RealTimeDatabase != null)
-            {
-                return (bool) selectedPump.RealTimeDatabase;
-            }
+            if (selectedPump?.RealTimeDatabase != null) return (bool) selectedPump.RealTimeDatabase;
 
             return false;
         }

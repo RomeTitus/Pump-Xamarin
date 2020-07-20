@@ -1,10 +1,5 @@
-﻿using Rg.Plugins.Popup.Pages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Collections.Generic;
+using Rg.Plugins.Popup.Pages;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,15 +11,11 @@ namespace Pump.Layout
         public FloatingScreenScroll()
         {
             InitializeComponent();
-            
         }
 
-        public void setFloatingScreen(List<Object> screens)
+        public void setFloatingScreen(List<object> screens)
         {
-            foreach (View screen in screens)
-            {
-                ScrollViewFloatingPage.Children.Add(screen);
-            }
+            foreach (View screen in screens) ScrollViewFloatingPage.Children.Add(screen);
         }
     }
 }

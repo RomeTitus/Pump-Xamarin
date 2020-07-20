@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Pump.IrrigationController
 {
-    class ActiveSchedule
+    internal class ActiveSchedule
     {
         public string ID { get; set; }
         public string NAME { get; set; }
@@ -16,5 +14,4 @@ namespace Pump.IrrigationController
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
     }
-
 }

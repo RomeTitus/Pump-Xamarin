@@ -1,14 +1,15 @@
-﻿
-
-using System;
-using SQLite;
+﻿using SQLite;
 
 namespace Pump.Droid.Database.Table
 {
     public class PumpConnection
     {
-        public PumpConnection() { }
-        public PumpConnection(string Name, string Mac, string InternalPath, int InternalPort, string ExternalPath, int ExternalPort)
+        public PumpConnection()
+        {
+        }
+
+        public PumpConnection(string Name, string Mac, string InternalPath, int InternalPort, string ExternalPath,
+            int ExternalPort)
         {
             this.Name = Name;
             this.Mac = Mac;
@@ -18,8 +19,8 @@ namespace Pump.Droid.Database.Table
             this.ExternalPort = ExternalPort;
         }
 
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        [PrimaryKey] [AutoIncrement] public int ID { get; set; }
+
         public string Name { get; set; }
         public string Mac { get; set; }
         public string InternalPath { get; set; }
@@ -27,7 +28,5 @@ namespace Pump.Droid.Database.Table
         public string ExternalPath { get; set; }
         public int ExternalPort { get; set; }
         public bool? RealTimeDatabase { get; set; }
-
-
     }
 }

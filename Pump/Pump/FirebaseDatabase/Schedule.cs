@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Pump.FirebaseDatabase
 {
-    class Schedule
+    internal class Schedule
     {
         public string ID { get; set; }
         public string NAME { get; set; }
@@ -13,11 +11,11 @@ namespace Pump.FirebaseDatabase
         public string id_Pump { get; set; }
         public string isActive { get; set; }
 
-        
+
         public List<ScheduleDetail> ScheduleDetails { get; set; }
     }
 
-    class ScheduleDetail
+    internal class ScheduleDetail
     {
         public string ID { get; set; }
         public string DURATION { get; set; }

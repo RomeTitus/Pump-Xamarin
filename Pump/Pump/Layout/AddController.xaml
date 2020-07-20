@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="Pump.AddController"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -107,12 +108,6 @@
             VerticalOptions="Center" />
 
     </FlexLayout>
-
-
-
-
-
-
 
 
 </ContentPage>

@@ -1,17 +1,14 @@
-﻿using Pump.Database;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.Linq;
-using System.Net.Mail;
-using System.Text;
+using Pump.Database;
 using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
-    class SocketMessage : SocketConnection
+    internal class SocketMessage : SocketConnection
     {
-        Exception exception;
+        private Exception exception;
+
         public string Message(string data)
         {
             var database = new DatabaseController();
@@ -20,7 +17,7 @@ namespace Pump.SocketController
 
             if (connection == null)
                 return null;
-            string SocketResult = "";
+            var SocketResult = "";
             try
             {
                 if (connection.InternalPort != -1)
@@ -37,7 +34,7 @@ namespace Pump.SocketController
 
             if (SocketResult != "")
                 return SocketResult;
-            
+
             try
             {
                 if (connection.ExternalPort != -1)
@@ -47,14 +44,11 @@ namespace Pump.SocketController
             {
                 exception = e;
             }
+
             if (SocketResult != "")
                 return SocketResult;
 
             throw new Exception("No Connection");
         }
-
     }
 }
-
-    
-

@@ -1,17 +1,16 @@
-﻿using Pump.Layout.Views;
-using Pump.SocketController;
-using Rg.Plugins.Popup.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Firebase.Database.Streaming;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Pump.Layout.Views;
+using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -20,27 +19,30 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScheduleStatus : ContentPage
     {
-        private List<Schedule> _schedulesList = new List<Schedule>();
+        private readonly SocketCommands _command = new SocketCommands();
+        private readonly SocketMessage _socket = new SocketMessage();
         private List<Equipment> _equipmentList = new List<Equipment>();
 
         private string _oldActiveSchedule;
-        private string _oldQueueActiveSchedule;
         private string _oldActiveSensorStatus;
-        private readonly SocketCommands _command = new SocketCommands();
-        private readonly SocketMessage _socket = new SocketMessage();
+        private string _oldQueueActiveSchedule;
+        private List<Schedule> _schedulesList = new List<Schedule>();
+        private List<Sensor> _sensorList = new List<Sensor>();
+
         public ScheduleStatus()
         {
             InitializeComponent();
             new Thread(ThreadController).Start();
         }
 
-        private void SubscribeToFirebase(DatabaseController databaseController)
+
+        private protected virtual async void GetScheduleReadingFirebase(DatabaseController databaseController)
         {
             var auth = new Authentication();
             _schedulesList = Task.Run(() => auth.GetAllSchedules()).Result;
 
 
-            auth.FirebaseClient
+            auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Schedule")
                 .AsObservable<JObject>()
                 .Subscribe(x =>
@@ -51,21 +53,9 @@ namespace Pump.Layout
                 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
             _equipmentList = Task.Run(() => auth.GetAllEquipment()).Result;
 
-            auth.FirebaseClient
+            auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Equipment")
                 .AsObservable<JObject>()
                 .Subscribe(x =>
@@ -81,14 +71,19 @@ namespace Pump.Layout
 
             while (databaseController.isRealtimeFirebaseSelected())
             {
-               var runningSchedule = new RunningSchedule();
+                var runningSchedule = new RunningSchedule();
 
                 var queSchedules =
                     runningSchedule.GetQueSchedule(runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
-                var activeSchedule = runningSchedule.GetRunningSchedule(runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
+                var activeSchedule =
+                    runningSchedule.GetRunningSchedule(
+                        runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
 
-                
-                var activeScheduleString = activeSchedule.Aggregate("", (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump + ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' + schedule.EndTime + '#'));
+
+                var activeScheduleString = activeSchedule.Aggregate("",
+                    (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump +
+                                                      ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' +
+                                                      schedule.EndTime + '#'));
 
                 var activeScheduleObjects = GetScheduleDetailObject(activeScheduleString);
                 if (oldActiveScheduleString != activeScheduleString)
@@ -97,15 +92,14 @@ namespace Pump.Layout
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         ScrollViewScheduleStatus.Children.Clear();
-                        foreach (View view in activeScheduleObjects)
-                        {
-                            ScrollViewScheduleStatus.Children.Add(view);
-                        }
+                        foreach (View view in activeScheduleObjects) ScrollViewScheduleStatus.Children.Add(view);
                     });
-                    
                 }
 
-                var queScheduleString = queSchedules.Aggregate("", (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump + ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' + schedule.EndTime + '#'));
+                var queScheduleString = queSchedules.Aggregate("",
+                    (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump +
+                                                      ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' +
+                                                      schedule.EndTime + '#'));
                 var queScheduleObjects = GetQueueScheduleDetailObject(queScheduleString);
                 if (oldQueScheduleString != queScheduleString)
                 {
@@ -113,17 +107,48 @@ namespace Pump.Layout
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         ScrollViewQueueStatus.Children.Clear();
-                        foreach (View view in queScheduleObjects)
-                        {
-                            ScrollViewQueueStatus.Children.Add(view);
-                        }
+                        foreach (View view in queScheduleObjects) ScrollViewQueueStatus.Children.Add(view);
                     });
-                    
                 }
+
                 Thread.Sleep(2000);
             }
 
             //auth = null;
+        }
+
+        private void GetSensorReadingFirebase()
+        {
+            var auth = new Authentication();
+            _sensorList = Task.Run(() => auth.GetAllSensors()).Result;
+
+
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi() + "/Sensor")
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    if (!new DatabaseController().isRealtimeFirebaseSelected()) return;
+                    var sensor = auth.GetJsonSensorToObjectList(x.Object, x.Key);
+                    _sensorList.RemoveAll(y => y.ID == sensor.ID);
+                    _sensorList.Add(sensor);
+                    UpdateSensorReading();
+                });
+            UpdateSensorReading();
+        }
+
+        private void UpdateSensorReading()
+        {
+            var sensorDetailString = _sensorList.Aggregate("",
+                (current, sensor) =>
+                    current + (sensor.ID + ',' + sensor.TYPE + ',' + sensor.NAME + ',' + sensor.LastReading + '#'));
+
+            var sensorStatusObject = GetSensorStatusObject(sensorDetailString);
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                ScrollViewScheduleStatus.Children.Clear();
+                foreach (View view in sensorStatusObject) ScrollViewSensorStatus.Children.Add(view);
+            });
         }
 
         private void ThreadController()
@@ -138,13 +163,14 @@ namespace Pump.Layout
             {
                 if (databaseController.isRealtimeFirebaseSelected())
                 {
-                    SubscribeToFirebase(databaseController);
+                    GetScheduleReadingFirebase(databaseController);
                 }
                 else
                 {
                     _schedulesList.Clear();
                     _equipmentList.Clear();
-                    if (started == false && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status)
+                    if (started == false && databaseController.GetActivityStatus() != null &&
+                        databaseController.GetActivityStatus().status)
                     {
                         //Start the threads
                         scheduleDetail = new Thread(GetScheduleDetail);
@@ -158,8 +184,8 @@ namespace Pump.Layout
                     }
 
                     if (scheduleDetail != null)
-                    {
-                        if (started && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
+                        if (started && databaseController.GetActivityStatus() != null &&
+                            databaseController.GetActivityStatus().status == false)
                         {
                             scheduleDetail.Abort();
                             queueScheduleDetail.Abort();
@@ -167,30 +193,27 @@ namespace Pump.Layout
                             started = false;
                             //Stop the threads
                         }
-
-                    }
                 }
-                
-                
+
+
                 Thread.Sleep(2000);
             }
+
             // ReSharper disable once FunctionNeverReturns
         }
 
         private void GetScheduleDetail()
         {
-            var running = true; 
+            var running = true;
             var stopwatch = new Stopwatch();
             while (running)
             {
                 stopwatch.Start();
                 try
                 {
-                    
                     var schedules = _socket.Message(_command.getActiveSchedule());
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                       
                         if (_oldActiveSchedule == schedules)
                             return;
 
@@ -198,13 +221,10 @@ namespace Pump.Layout
                         _oldActiveSchedule = schedules;
 
                         var scheduleList = GetScheduleDetailObject(schedules);
-                        foreach (View view in scheduleList)
-                        {
-                            ScrollViewScheduleStatus.Children.Add(view);
-                        }
-
+                        foreach (View view in scheduleList) ScrollViewScheduleStatus.Children.Add(view);
                     });
-                }catch (ThreadAbortException)
+                }
+                catch (ThreadAbortException)
                 {
                     running = false;
                 }
@@ -221,11 +241,9 @@ namespace Pump.Layout
                 stopwatch.Stop();
                 var timeLeft = stopwatch.Elapsed.Seconds - 5;
                 stopwatch.Reset();
-                if(timeLeft<0)
+                if (timeLeft < 0)
                     Thread.Sleep(timeLeft * -1000);
-                
             }
-            
         }
 
         private static List<object> GetScheduleDetailObject(string schedules)
@@ -233,34 +251,38 @@ namespace Pump.Layout
             var scheduleListObject = new List<object>();
             try
             {
-                    if (schedules == "No Data" || schedules == "")
+                if (schedules == "No Data" || schedules == "")
+                {
+                    scheduleListObject.Add(new ViewEmptySchedule("No Running Schedules"));
+                    return scheduleListObject;
+                }
+
+
+                var scheduleList = new List<string>();
+                if (schedules.Contains("$"))
+                {
+                    var scheduleWithManual = schedules.Split('$').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+
+                    if (scheduleWithManual.Count > 1)
                     {
-                        scheduleListObject.Add(new ViewEmptySchedule("No Running Schedules"));
-                        return scheduleListObject;
-                    }
-
-
-                    var scheduleList = new List<string>();
-                    if (schedules.Contains("$"))
-                    {
-                        var scheduleWithManual = schedules.Split('$').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                        if (scheduleWithManual.Count > 1)
-                        {
-                            scheduleListObject.Add(new ViewManualSchedule(scheduleWithManual[0].Split(',').ToList(), true));
-                            scheduleList = scheduleWithManual[(scheduleWithManual.Count - 1)].Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                        }
-                        else
-                            scheduleListObject.Add(new ViewManualSchedule(scheduleWithManual[0].Split(',').ToList(), false));
+                        scheduleListObject.Add(new ViewManualSchedule(scheduleWithManual[0].Split(',').ToList(), true));
+                        scheduleList = scheduleWithManual[scheduleWithManual.Count - 1].Split('#')
+                            .Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                     }
                     else
-                        scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                    foreach (var schedule in scheduleList)
                     {
-                        scheduleListObject.Add(new ViewScheduleDetail(schedule.Split(',').ToList()));
+                        scheduleListObject.Add(new ViewManualSchedule(scheduleWithManual[0].Split(',').ToList(),
+                            false));
                     }
-                    return scheduleListObject;
+                }
+                else
+                {
+                    scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                }
+
+                foreach (var schedule in scheduleList)
+                    scheduleListObject.Add(new ViewScheduleDetail(schedule.Split(',').ToList()));
+                return scheduleListObject;
             }
             catch
             {
@@ -280,21 +302,16 @@ namespace Pump.Layout
                 try
                 {
                     var queueSchedules = _socket.Message(_command.getQueueSchedule());
-                    
+
                     Device.BeginInvokeOnMainThread(() =>
                     {
-
                         if (_oldQueueActiveSchedule == queueSchedules)
                             return;
                         ScrollViewQueueStatus.Children.Clear();
                         _oldQueueActiveSchedule = queueSchedules;
 
                         var queueScheduleList = GetQueueScheduleDetailObject(queueSchedules);
-                        foreach (View view in queueScheduleList)
-                        {
-                            ScrollViewQueueStatus.Children.Add(view);
-                        }
-
+                        foreach (View view in queueScheduleList) ScrollViewQueueStatus.Children.Add(view);
                     });
                 }
                 catch (ThreadAbortException)
@@ -309,7 +326,6 @@ namespace Pump.Layout
                         ScrollViewQueueStatus.Children.Clear();
                         ScrollViewQueueStatus.Children.Add(new ViewNoConnection());
                     });
-
                 }
 
                 stopwatch.Stop();
@@ -334,16 +350,16 @@ namespace Pump.Layout
 
                 var queueScheduleList = queueSchedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-                queueScheduleListObject.AddRange(queueScheduleList.Select(schedule => new ViewScheduleDetail(schedule.Split(',').ToList())));
+                queueScheduleListObject.AddRange(queueScheduleList.Select(schedule =>
+                    new ViewScheduleDetail(schedule.Split(',').ToList())));
 
-                return queueScheduleListObject;  
+                return queueScheduleListObject;
             }
             catch
             {
                 queueScheduleListObject.Add(new ViewNoConnection());
                 return queueScheduleListObject;
             }
-               
         }
 
         private void GetSensorStatus()
@@ -359,18 +375,13 @@ namespace Pump.Layout
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-
                         if (_oldActiveSensorStatus == activeSensorStatus)
                             return;
                         ScrollViewSensorStatus.Children.Clear();
                         _oldActiveSensorStatus = activeSensorStatus;
 
                         var sensorListObject = GetSensorStatusObject(activeSensorStatus);
-                        foreach (View view in sensorListObject)
-                        {
-                            ScrollViewSensorStatus.Children.Add(view);
-                        }
-
+                        foreach (View view in sensorListObject) ScrollViewSensorStatus.Children.Add(view);
                     });
                 }
                 catch (ThreadAbortException)
@@ -385,8 +396,8 @@ namespace Pump.Layout
                         ScrollViewSensorStatus.Children.Clear();
                         ScrollViewSensorStatus.Children.Add(new ViewNoConnection());
                     });
-
                 }
+
                 stopwatch.Stop();
                 var timeLeft = stopwatch.Elapsed.Seconds - 2;
                 stopwatch.Reset();
@@ -408,7 +419,8 @@ namespace Pump.Layout
 
                 var sensorList = activeSensorStatus.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-                sensorListObject.AddRange(sensorList.Select(sensor => new ViewSensorDetail(sensor.Split(',').ToList())));
+                sensorListObject.AddRange(sensorList.Select(sensor =>
+                    new ViewSensorDetail(sensor.Split(',').ToList())));
 
                 return sensorListObject;
             }
@@ -417,7 +429,6 @@ namespace Pump.Layout
                 sensorListObject.Add(new ViewNoConnection());
                 return sensorListObject;
             }
-
         }
 
         private void ScrollViewScheduleStatusTap_Tapped(object sender, EventArgs e)
@@ -427,7 +438,6 @@ namespace Pump.Layout
             var floatingScreen = new FloatingScreenScroll();
             floatingScreen.setFloatingScreen(GetScheduleDetailObject(_oldActiveSchedule));
             PopupNavigation.Instance.PushAsync(floatingScreen);
-
         }
 
         private void ScrollViewQueueStatusTap_Tapped(object sender, EventArgs e)

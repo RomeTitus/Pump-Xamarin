@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using EmbeddedImages;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -29,13 +26,12 @@ namespace Pump.Layout.Views
 
         private static string SetTime(int time)
         {
-            if(time<60)
+            if (time < 60)
                 return time + "min";
 
             var hour = 0;
             var stillDivide = true;
             while (stillDivide)
-            {
                 if (time - 60 >= 0)
                 {
                     time -= 60;
@@ -45,15 +41,11 @@ namespace Pump.Layout.Views
                 {
                     stillDivide = false;
                 }
-            }
 
             if (time == 0)
                 return hour + "h";
-                
+
             return hour + "h" + time + "min";
-                
         }
-
-
     }
 }

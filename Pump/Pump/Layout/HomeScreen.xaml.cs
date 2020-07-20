@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.SocketController;
@@ -16,8 +11,8 @@ namespace Pump
     public partial class HomeScreen : TabbedPage
     {
         private readonly DatabaseController _databaseController = new DatabaseController();
-        
-        
+
+
         public HomeScreen()
         {
             InitializeComponent();
@@ -29,21 +24,17 @@ namespace Pump
             }
 
 
-
             if (_databaseController.GetPumpSelection() == null)
             {
                 _databaseController.SetActivityStatus(new ActivityStatus(false));
                 Navigation.PushModalAsync(new AddController());
-               // Navigation.PopModalAsync();
+                // Navigation.PopModalAsync();
             }
             else
             {
-                Thread sendToken = new Thread(() => SentNotificationToken());
+                var sendToken = new Thread(() => SentNotificationToken());
                 sendToken.Start();
-                
             }
-                
-
         }
 
         public void SentNotificationToken()
@@ -56,9 +47,7 @@ namespace Pump
             }
             catch
             {
-
             }
         }
-  
     }
 }

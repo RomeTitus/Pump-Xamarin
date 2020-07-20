@@ -13,44 +13,42 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleScreen : ContentPage
     {
-        readonly SocketCommands _command = new SocketCommands();
-        readonly SocketMessage _socket = new SocketMessage();
+        private readonly SocketCommands _command = new SocketCommands();
+        private readonly SocketMessage _socket = new SocketMessage();
+
         public ViewScheduleScreen()
         {
             InitializeComponent();
 
-            
+
             new Thread(GetSchedules).Start();
         }
 
         public void GetSchedules()
         {
-                try
+            try
+            {
+                var schedules = _socket.Message(_command.getSchedule());
+                Device.BeginInvokeOnMainThread(() =>
                 {
-                    string schedules = _socket.Message(_command.getSchedule());
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        ScrollViewScheduleDetail.Children.Clear();
-                        var scheduleList = GetScheduleObject(schedules);
-                        foreach (View view in scheduleList)
-                        {
-                            ScrollViewScheduleDetail.Children.Add(view);
-                        }
-                    });
-                }
-                catch
+                    ScrollViewScheduleDetail.Children.Clear();
+                    var scheduleList = GetScheduleObject(schedules);
+                    foreach (View view in scheduleList) ScrollViewScheduleDetail.Children.Add(view);
+                });
+            }
+            catch
+            {
+                Device.BeginInvokeOnMainThread(() =>
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        ScrollViewScheduleDetail.Children.Clear();
-                        ScrollViewScheduleDetail.Children.Add(new ViewNoConnection());
-                    });
-                }
+                    ScrollViewScheduleDetail.Children.Clear();
+                    ScrollViewScheduleDetail.Children.Add(new ViewNoConnection());
+                });
+            }
         }
 
         private List<object> GetScheduleObject(string schedules)
         {
-            List<object> scheduleListObject = new List<object>();
+            var scheduleListObject = new List<object>();
             try
             {
                 if (schedules == "No Data" || schedules == "")
@@ -69,6 +67,7 @@ namespace Pump.Layout
                     viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
                     viewSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                 }
+
                 return scheduleListObject;
             }
             catch
@@ -79,27 +78,23 @@ namespace Pump.Layout
         }
 
 
-
-
         private void ViewScheduleSummary(int id)
         {
-            
             var floatingScreen = new FloatingScreen();
             PopupNavigation.Instance.PushAsync(floatingScreen);
             new Thread(() => GetScheduleSummary(id, floatingScreen)).Start();
-
         }
 
         private void GetScheduleSummary(int id, FloatingScreen floatingScreen)
         {
             try
             {
-                string schedulesSummary = _socket.Message(_command.getScheduleInfo(id));
+                var schedulesSummary = _socket.Message(_command.getScheduleInfo(id));
                 var scheduleList = GetScheduleSummaryObject(schedulesSummary, floatingScreen);
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     try
-                    { 
+                    {
                         floatingScreen.SetFloatingScreen(scheduleList);
                     }
                     catch
@@ -107,7 +102,6 @@ namespace Pump.Layout
                         var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
                         floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                     }
-
                 });
             }
             catch
@@ -122,7 +116,6 @@ namespace Pump.Layout
 
         private List<object> GetScheduleSummaryObject(string schedulesSummary, FloatingScreen floatingScreen)
         {
-
             var scheduleSummaryListObject = new List<object>();
             try
             {
@@ -144,30 +137,30 @@ namespace Pump.Layout
             }
             catch
             {
-                scheduleSummaryListObject = new List<object> { new ViewNoConnection() };
+                scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
                 return scheduleSummaryListObject;
             }
         }
 
         private void ViewScheduleScreen_Tapped(object sender, EventArgs e)
         {
-            var scheduleSwitch = (View)sender;
+            var scheduleSwitch = (View) sender;
             ViewScheduleSummary(Convert.ToInt32(scheduleSwitch.AutomationId));
         }
 
         private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
         {
-            var scheduleSwitch = (Switch)sender;
+            var scheduleSwitch = (Switch) sender;
             try
             {
-                new Thread(() => ChangeScheduleState(scheduleSwitch, Convert.ToInt32(scheduleSwitch.AutomationId))).Start();
-                
+                new Thread(() => ChangeScheduleState(scheduleSwitch, Convert.ToInt32(scheduleSwitch.AutomationId)))
+                    .Start();
             }
             catch
             {
-                DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE", "Understood");
+                DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE",
+                    "Understood");
             }
-            
         }
 
         private void ChangeScheduleState(Switch scheduleSwitch, int id)
@@ -177,10 +170,8 @@ namespace Pump.Layout
                 var result = _socket.Message(_command.ChangeSchedule(id, Convert.ToInt32(scheduleSwitch.IsToggled)));
                 Device.BeginInvokeOnMainThread(() =>
                 {
-
                     if (result == "success")
                     {
-
                     }
                     else
                     {
@@ -195,12 +186,10 @@ namespace Pump.Layout
                     scheduleSwitch.Toggled -= ScheduleSwitch_Toggled;
                     scheduleSwitch.IsToggled = !scheduleSwitch.IsToggled;
                     scheduleSwitch.Toggled += ScheduleSwitch_Toggled;
-                    DisplayAlert("Warning!!!", "Failed to reach the controller \n COULD NOT CHANGE SCHEDULE STATE", "Understood");
-
+                    DisplayAlert("Warning!!!", "Failed to reach the controller \n COULD NOT CHANGE SCHEDULE STATE",
+                        "Understood");
                 });
             }
-            
-
         }
 
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)

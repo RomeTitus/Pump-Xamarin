@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="Pump.Layout.ManualSchedule"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -35,7 +36,8 @@
                             JustifyContent="SpaceBetween"
                             Wrap="Wrap">
                             <FlexLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewManualPumpTap" Tapped="ScrollViewManualPump_Tapped" />
+                                <TapGestureRecognizer x:Name="ScrollViewManualPumpTap"
+                                                      Tapped="ScrollViewManualPump_Tapped" />
                             </FlexLayout.GestureRecognizers>
                             <ActivityIndicator
                                 AutomationId="ActivityIndicatorManualPump"
@@ -73,7 +75,8 @@
                             JustifyContent="SpaceBetween"
                             Wrap="Wrap">
                             <FlexLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewManualZoneTap" Tapped="ScrollViewManualZoneTap_Tapped" />
+                                <TapGestureRecognizer x:Name="ScrollViewManualZoneTap"
+                                                      Tapped="ScrollViewManualZoneTap_Tapped" />
                             </FlexLayout.GestureRecognizers>
 
                             <ActivityIndicator

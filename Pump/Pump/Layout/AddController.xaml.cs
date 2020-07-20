@@ -1,14 +1,12 @@
-﻿using Pump.Database;
+﻿using System;
+using System.ComponentModel;
+using System.Threading;
+using Pump.Database;
 using Pump.Droid.Database.Table;
 using Pump.Layout;
+using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
-using System;
-using System.ComponentModel;
-using System.Security.Cryptography;
-using System.Threading;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-
 
 namespace Pump
 {
@@ -17,8 +15,8 @@ namespace Pump
     [DesignTimeVisible(false)]
     public partial class AddController : ContentPage
     {
-        double width = 0;
-        double height = 0;
+        private double height;
+        private double width;
 
         public AddController()
         {
@@ -32,35 +30,42 @@ namespace Pump
 
         private void AddIrrigationController()
         {
-            int ExternalPort = 0;
-            int InternalPort = 0;
+            var ExternalPort = 0;
+            var InternalPort = 0;
 
-            if (TxtControllerName.Text == null || (TxtInternalConnection.Text == null || TxtInternalPort.Text== null || !int.TryParse(TxtInternalPort.Text, out InternalPort)) && (TxtExternalConnection.Text == null || TxtExternalPort.Text == null || !int.TryParse(TxtExternalPort.Text, out ExternalPort)))
+            if (TxtControllerName.Text == null ||
+                (TxtInternalConnection.Text == null || TxtInternalPort.Text == null ||
+                 !int.TryParse(TxtInternalPort.Text, out InternalPort)) &&
+                (TxtExternalConnection.Text == null || TxtExternalPort.Text == null ||
+                 !int.TryParse(TxtExternalPort.Text, out ExternalPort)))
+            {
                 OutLineIncorrectFields(InternalPort, ExternalPort);
-                
+            }
+
             else
             {
                 var loadingScreen = new VerifyConnections();
                 loadingScreen.CloseWhenBackgroundIsClicked = false;
                 PopupNavigation.Instance.PushAsync(loadingScreen);
 
-                if ((TxtInternalConnection.Text != null && TxtInternalPort.Text != null) && (TxtExternalConnection.Text != null && TxtExternalPort.Text != null))
-                    new Thread(() => checkConnectionInternalAndExternal(TxtControllerName.Text, TxtInternalConnection.Text, int.Parse(TxtInternalPort.Text), 
+                if (TxtInternalConnection.Text != null && TxtInternalPort.Text != null &&
+                    TxtExternalConnection.Text != null && TxtExternalPort.Text != null)
+                    new Thread(() => checkConnectionInternalAndExternal(TxtControllerName.Text,
+                        TxtInternalConnection.Text, int.Parse(TxtInternalPort.Text),
                         TxtExternalConnection.Text, int.Parse(TxtExternalPort.Text), loadingScreen)).Start();
-                
+
 
                 else if (TxtInternalConnection.Text != null && TxtInternalPort.Text != null)
-                    new Thread(() => checkConnectionInternal(TxtControllerName.Text, TxtInternalConnection.Text, int.Parse(TxtInternalPort.Text),
+                    new Thread(() => checkConnectionInternal(TxtControllerName.Text, TxtInternalConnection.Text,
+                        int.Parse(TxtInternalPort.Text),
                         loadingScreen)).Start();
 
 
                 else if (TxtExternalConnection.Text != null && TxtExternalPort.Text != null)
-                    new Thread(() => checkConnectionExternal(TxtControllerName.Text, TxtExternalConnection.Text, int.Parse(TxtExternalPort.Text),
+                    new Thread(() => checkConnectionExternal(TxtControllerName.Text, TxtExternalConnection.Text,
+                        int.Parse(TxtExternalPort.Text),
                         loadingScreen)).Start();
-
             }
-
-           
         }
 
         private void OutLineIncorrectFields(int internalPort, int externalPort)
@@ -76,14 +81,14 @@ namespace Pump
             if (TxtExternalPort.Text == null || externalPort == 0)
                 LabelExternalPort.TextColor = Color.Red;
         }
-        
-        private void checkConnectionInternalAndExternal(string name, string internalHost, int internalPort, string externalHost, int externalPort, VerifyConnections loadingScreen)
-        {
 
+        private void checkConnectionInternalAndExternal(string name, string internalHost, int internalPort,
+            string externalHost, int externalPort, VerifyConnections loadingScreen)
+        {
             string mac = null;
             string internalConnection;
             string externalConnection;
-            
+
             internalConnection = checkConnection(internalHost, internalPort);
 
             externalConnection = checkConnection(externalHost, externalPort);
@@ -94,9 +99,10 @@ namespace Pump
             if (externalConnection != null)
                 mac = externalConnection;
 
-            if(mac != null)
-                addPumpConnection(new PumpConnection(name, mac, internalHost, internalPort, externalHost, externalPort));
-            
+            if (mac != null)
+                addPumpConnection(new PumpConnection(name, mac, internalHost, internalPort, externalHost,
+                    externalPort));
+
             Device.BeginInvokeOnMainThread(() =>
             {
                 loadingScreen.stopActivityIndicatior();
@@ -113,7 +119,6 @@ namespace Pump
                 //PopupNavigation.Instance.PopAsync();
             });
         }
-
 
 
         private void checkConnectionInternal(string name, string host, int port, VerifyConnections loadingScreen)
@@ -160,25 +165,24 @@ namespace Pump
 
         private void addPumpConnection(PumpConnection pumpConnection)
         {
-            DatabaseController databaseController = new DatabaseController();
+            var databaseController = new DatabaseController();
             databaseController.AddPumpConnection(pumpConnection);
         }
+
         private string checkConnection(string host, int port)
         {
-            SocketController.SocketVerify socket = new SocketController.SocketVerify(host, port);
+            var socket = new SocketVerify(host, port);
             try
             {
-                string responce = socket.verifyConnection();
+                var responce = socket.verifyConnection();
                 if (responce != "getMAC")
                     return responce;
-                else
-                    return null;
+                return null;
             }
             catch
             {
                 return null;
             }
-            
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -202,6 +206,5 @@ namespace Pump
                 }
             }
         }
-
     }
 }

@@ -12,10 +12,7 @@ namespace Pump.Layout.Views
             InitializeComponent();
             Populate(schedule[0], schedule[1], schedule[2], schedule[3], schedule[4]);
 
-            for (int i = 5; i < schedule.Count; i++)
-            {
-                SetWeek(schedule[i]);
-            }
+            for (var i = 5; i < schedule.Count; i++) SetWeek(schedule[i]);
         }
 
         private void Populate(string id, string name, string time, string isActive, string pump)
@@ -60,6 +57,7 @@ namespace Pump.Layout.Views
                 LabelWednesday.Font = Font.SystemFontOfSize(12)
                     .WithAttributes(FontAttributes.Bold);
             }
+
             if (week.Contains("THURSDAY"))
             {
                 LabelThursday.TextColor = Color.Black;
@@ -80,7 +78,6 @@ namespace Pump.Layout.Views
                 LabelSaturday.Font = Font.SystemFontOfSize(12)
                     .WithAttributes(FontAttributes.Bold);
             }
-
         }
 
         public Switch GetSwitch()
@@ -90,7 +87,7 @@ namespace Pump.Layout.Views
 
         public TapGestureRecognizer GetTapGestureRecognizer()
         {
-           return StackLayoutViewScheduleTapGesture;
+            return StackLayoutViewScheduleTapGesture;
         }
     }
 }

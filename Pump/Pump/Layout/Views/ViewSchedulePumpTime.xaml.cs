@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.MaskedEntry;
@@ -22,8 +18,6 @@ namespace Pump.Layout.Views
                 ButtonEditSchedulePump.Text = "EDIT SCHEDULE";
             else
                 ButtonEditSchedulePump.Text = "CREATE SCHEDULE";
-
-            
         }
 
         private void ButtonCancel_OnClicked(object sender, EventArgs e)

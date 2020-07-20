@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,8 +14,6 @@ namespace Pump.Layout
 
         private void BtnConnectionDetail_OnPressed(object sender, EventArgs e)
         {
-            
-
             Navigation.PopAsync();
             Navigation.PushModalAsync(new ConnectionScreen());
         }
