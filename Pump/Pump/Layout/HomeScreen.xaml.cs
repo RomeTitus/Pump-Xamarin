@@ -51,7 +51,7 @@ namespace Pump
             try
             {
                 new SocketMessage().Message(
-                    new IrrigationCommands().setToken(
+                    new SocketCommands().setToken(
                         _databaseController.GetNotificationToken().token));
             }
             catch

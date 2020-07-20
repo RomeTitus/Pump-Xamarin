@@ -21,7 +21,7 @@ namespace Pump.SocketController
        
         public string verifyConnection()
         {
-            var commands = new IrrigationCommands();
+            var commands = new SocketCommands();
             return Send(commands.getMacAddress(), this.host, this.port);
         }
     }

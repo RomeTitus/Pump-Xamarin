@@ -6,7 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Firebase.Database.Streaming;
+using Newtonsoft.Json.Linq;
 using Pump.Database;
+using Pump.FirebaseDatabase;
+using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,10 +20,13 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScheduleStatus : ContentPage
     {
+        private List<Schedule> _schedulesList = new List<Schedule>();
+        private List<Equipment> _equipmentList = new List<Equipment>();
+
         private string _oldActiveSchedule;
         private string _oldQueueActiveSchedule;
         private string _oldActiveSensorStatus;
-        private readonly IrrigationCommands _command = new IrrigationCommands();
+        private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
         public ScheduleStatus()
         {
@@ -26,43 +34,144 @@ namespace Pump.Layout
             new Thread(ThreadController).Start();
         }
 
+        private void SubscribeToFirebase(DatabaseController databaseController)
+        {
+            var auth = new Authentication();
+            _schedulesList = Task.Run(() => auth.GetAllSchedules()).Result;
+
+
+            auth.FirebaseClient
+                .Child(auth.getConnectedPi() + "/Schedule")
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
+                    _schedulesList.RemoveAll(y => y.ID == schedule.ID);
+                    _schedulesList.Add(schedule);
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            _equipmentList = Task.Run(() => auth.GetAllEquipment()).Result;
+
+            auth.FirebaseClient
+                .Child(auth.getConnectedPi() + "/Equipment")
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
+                    _equipmentList.RemoveAll(y => y.ID == equipment.ID);
+                    _equipmentList.Add(equipment);
+                });
+
+
+            var oldActiveScheduleString = "-999";
+            var oldQueScheduleString = "-999";
+
+            while (databaseController.isRealtimeFirebaseSelected())
+            {
+               var runningSchedule = new RunningSchedule();
+
+                var queSchedules =
+                    runningSchedule.GetQueSchedule(runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
+                var activeSchedule = runningSchedule.GetRunningSchedule(runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
+
+                
+                var activeScheduleString = activeSchedule.Aggregate("", (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump + ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' + schedule.EndTime + '#'));
+
+                var activeScheduleObjects = GetScheduleDetailObject(activeScheduleString);
+                if (oldActiveScheduleString != activeScheduleString)
+                {
+                    oldActiveScheduleString = activeScheduleString;
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        ScrollViewScheduleStatus.Children.Clear();
+                        foreach (View view in activeScheduleObjects)
+                        {
+                            ScrollViewScheduleStatus.Children.Add(view);
+                        }
+                    });
+                    
+                }
+
+                var queScheduleString = queSchedules.Aggregate("", (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump + ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' + schedule.EndTime + '#'));
+                var queScheduleObjects = GetQueueScheduleDetailObject(queScheduleString);
+                if (oldQueScheduleString != queScheduleString)
+                {
+                    oldQueScheduleString = queScheduleString;
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        ScrollViewQueueStatus.Children.Clear();
+                        foreach (View view in queScheduleObjects)
+                        {
+                            ScrollViewQueueStatus.Children.Add(view);
+                        }
+                    });
+                    
+                }
+                Thread.Sleep(2000);
+            }
+
+            //auth = null;
+        }
+
         private void ThreadController()
         {
             var started = false;
             var databaseController = new DatabaseController();
-
             Thread scheduleDetail = null;
             Thread sensorStatus = null;
             Thread queueScheduleDetail = null;
 
             while (true)
             {
-                
-                if (started == false && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status)
+                if (databaseController.isRealtimeFirebaseSelected())
                 {
-                    //Start the threads
-                    scheduleDetail = new Thread(GetScheduleDetail);
-                    queueScheduleDetail = new Thread(GetQueueScheduleDetail);
-                    sensorStatus = new Thread(GetSensorStatus);
-
-                    scheduleDetail.Start();
-                    queueScheduleDetail.Start();
-                    sensorStatus.Start();
-                    started = true;
+                    SubscribeToFirebase(databaseController);
                 }
-
-                if (scheduleDetail != null)
+                else
                 {
-                    if (started && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
+                    _schedulesList.Clear();
+                    _equipmentList.Clear();
+                    if (started == false && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status)
                     {
-                        scheduleDetail.Abort();
-                        queueScheduleDetail.Abort();
-                        sensorStatus.Abort();
-                        started = false;
-                        //Stop the threads
+                        //Start the threads
+                        scheduleDetail = new Thread(GetScheduleDetail);
+                        queueScheduleDetail = new Thread(GetQueueScheduleDetail);
+                        sensorStatus = new Thread(GetSensorStatus);
+
+                        scheduleDetail.Start();
+                        queueScheduleDetail.Start();
+                        sensorStatus.Start();
+                        started = true;
                     }
 
+                    if (scheduleDetail != null)
+                    {
+                        if (started && databaseController.GetActivityStatus() != null && databaseController.GetActivityStatus().status == false)
+                        {
+                            scheduleDetail.Abort();
+                            queueScheduleDetail.Abort();
+                            sensorStatus.Abort();
+                            started = false;
+                            //Stop the threads
+                        }
+
+                    }
                 }
+                
+                
                 Thread.Sleep(2000);
             }
             // ReSharper disable once FunctionNeverReturns

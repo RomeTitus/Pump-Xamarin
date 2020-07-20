@@ -53,17 +53,24 @@
 
             <StackLayout
                 Grid.Row="1"
-                Grid.Column="1"
+                Grid.Column="0"
                 Orientation="Horizontal">
                 <Label
                     x:Name="LableStartTime"
-                    FontSize="18"
-                    Text="Start: 10:30" />
-                <Label FontSize="18" Text="-" />
+                    FontSize="16"
+                    Text="Start: 10:30"
+                    WidthRequest="100" />
+            </StackLayout>
+
+            <StackLayout
+                Grid.Row="1"
+                Grid.Column="1"
+                Orientation="Horizontal">
                 <Label
                     x:Name="LableEndTime"
-                    FontSize="18"
-                    Text="End: 11:45" />
+                    FontSize="16"
+                    Text="End: 11:45"
+                    WidthRequest="100" />
 
             </StackLayout>
 

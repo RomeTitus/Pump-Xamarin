@@ -15,7 +15,7 @@ namespace Pump.Layout.Views
     public partial class ViewDeleteConfirmation : ContentView
     {
         private readonly IReadOnlyList<string> _schedule;
-        private readonly IrrigationCommands _command = new IrrigationCommands();
+        private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
         public ViewDeleteConfirmation(IReadOnlyList<string> _schedule)
         {

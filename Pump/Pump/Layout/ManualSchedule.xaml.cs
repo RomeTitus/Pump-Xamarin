@@ -15,7 +15,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ManualSchedule : ContentPage
     {
-        readonly IrrigationCommands _command = new IrrigationCommands();
+        readonly SocketCommands _command = new SocketCommands();
         readonly SocketMessage _socket = new SocketMessage();
         FloatingScreenScroll _floatingScreenScroll = null;
         List<string> _activeManualScheduleId = null;

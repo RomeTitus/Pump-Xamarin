@@ -141,5 +141,15 @@ namespace Pump.Database
             }
         }
 
+        public bool isRealtimeFirebaseSelected()
+        {
+            var selectedPump = GetPumpSelection();
+            if (selectedPump?.RealTimeDatabase != null)
+            {
+                return (bool) selectedPump.RealTimeDatabase;
+            }
+
+            return false;
+        }
     }
 }
