@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pump.IrrigationController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -10,6 +11,7 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleSummary : ContentView
     {
+        private readonly List<Equipment> _equipmentList = null;
         private readonly FloatingScreen _floatingScreen;
         private readonly IReadOnlyList<string> _scheduleDetail;
 
@@ -18,19 +20,31 @@ namespace Pump.Layout.Views
             InitializeComponent();
             _floatingScreen = floatingScreen;
             _scheduleDetail = schedule;
-            foreach (var week in schedule[0].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList())
-                SetWeek(week);
-
-            labelScheduleTime.Text = schedule[1];
-            LabelPumpName.Text = schedule[2];
-            labelScheduleName.Text = schedule[5];
-
-            for (var i = 6; i < schedule.Count; i++)
-                ScrollViewZoneDetail.Children.Add(
-                    new ViewZoneAndTimeGrid(schedule[i].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList(),
-                        true));
+            SetScheduleSummary();
+        }
+        public ViewScheduleSummary(IReadOnlyList<string> schedule, FloatingScreen floatingScreen, List<Equipment> equipmentList)
+        {
+            InitializeComponent();
+            _floatingScreen = floatingScreen;
+            _scheduleDetail = schedule;
+            _equipmentList = equipmentList;
+            SetScheduleSummary();
         }
 
+        private void SetScheduleSummary()
+        {
+            foreach (var week in _scheduleDetail[0].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList())
+                SetWeek(week);
+
+            labelScheduleTime.Text = _scheduleDetail[1];
+            LabelPumpName.Text = _scheduleDetail[2];
+            labelScheduleName.Text = _scheduleDetail[5];
+
+            for (var i = 6; i < _scheduleDetail.Count; i++)
+                ScrollViewZoneDetail.Children.Add(
+                    new ViewZoneAndTimeGrid(_scheduleDetail[i].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList(),
+                        true));
+        }
         private void SetWeek(string week)
         {
             if (week.Contains("SUNDAY"))
@@ -86,7 +100,9 @@ namespace Pump.Layout.Views
 
         private void ButtonEdit_OnClicked(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new UpdateSchedule(_scheduleDetail));
+            Navigation.PushModalAsync(_equipmentList != null
+                ? new UpdateSchedule(_scheduleDetail, _equipmentList)
+                : new UpdateSchedule(_scheduleDetail));
             PopupNavigation.Instance.PopAsync();
         }
 

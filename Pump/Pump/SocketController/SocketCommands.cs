@@ -10,7 +10,7 @@ namespace Pump.SocketController
             return "getActiveSchedule";
         }
 
-        public string getScheduleInfo(int id)
+        public string getScheduleInfo(string id)
         {
             return id + "$getScheduleInfo";
         }
@@ -71,7 +71,7 @@ namespace Pump.SocketController
             return "StopManualSchedule";
         }
 
-        public string ChangeSchedule(int id, int isActive)
+        public string ChangeSchedule(string id, int isActive)
         {
             return id + "," + isActive + "$ChangeSchedule";
         }

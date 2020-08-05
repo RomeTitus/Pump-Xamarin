@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Database;
+using Firebase.Database.Offline;
+using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.IrrigationController;
@@ -29,7 +32,8 @@ namespace Pump.FirebaseDatabase
             var firebaseScheduleDetail = await _FirebaseClient
                 .Child(getConnectedPi() + "/Schedule")
                 .OnceAsync<JObject>();
-
+            if (firebaseScheduleDetail.Count == 0)
+                return new List<Schedule>();
             return firebaseScheduleDetail.Select(scheduleInfoDetail =>
                 GetJsonSchedulesToObjectList(scheduleInfoDetail.Object, scheduleInfoDetail.Key)).ToList();
         }
@@ -62,12 +66,107 @@ namespace Pump.FirebaseDatabase
             return schedule;
         }
 
+        public async Task<string> SetScheduleIsActive(Schedule schedule)
+        {
+            
+            var scheduleJObject = new JObject
+            {
+                {"NAME", schedule.NAME}, {"TIME", schedule.TIME}, {"WEEK", schedule.WEEK}, {"id_Pump", schedule.id_Pump}, {"isActive", schedule.isActive}
+            };
+
+            scheduleJObject["ScheduleDetails"] = new JObject();
+            foreach (var scheduleDetails in schedule.ScheduleDetails)
+            {
+
+                scheduleJObject["ScheduleDetails"][scheduleDetails.ID] = new JObject { {"id_Equipment", scheduleDetails.id_Equipment}, { "DURATION", scheduleDetails.DURATION }};
+            }
+            
+            await _FirebaseClient
+                .Child(getConnectedPi() + "/Schedule/" + schedule.ID)
+                .PutAsync(scheduleJObject);
+            return schedule.ID;
+        }
+
+        public async Task<List<ManualSchedule>> GetManualSchedule()
+        {
+            var firebaseManualScheduleDetail = await _FirebaseClient
+                .Child(getConnectedPi() + "/ManualSchedule")
+                .OnceAsync<JObject>();
+
+            if (firebaseManualScheduleDetail.Count == 0)
+                return new List<ManualSchedule>();
+            return firebaseManualScheduleDetail.Select(scheduleInfoDetail =>
+                GetJsonManualSchedulesToObjectList(scheduleInfoDetail.Object, scheduleInfoDetail.Key)).ToList();
+        }
+
+        public ManualSchedule GetJsonManualSchedulesToObjectList(JObject scheduleDetailObject, string key)
+        {
+            var manualSchedule = new ManualSchedule()
+            {
+                DURATION = scheduleDetailObject["DURATION"].ToString(),
+                EndTime = long.Parse(scheduleDetailObject["EndTime"].ToString()),
+                RunWithSchedule = scheduleDetailObject["RunWithSchedule"].ToString() == "1"
+            };
+
+            var manualScheduleDetailList = new List<ManualScheduleEquipment>();
+            foreach (var scheduleDuration in (JObject) scheduleDetailObject["ManualDetails"])
+            {
+                manualScheduleDetailList.Add(
+                    new ManualScheduleEquipment
+                    {
+                        ID = scheduleDetailObject["ManualDetails"][scheduleDuration.Key]["id_Equipment"].ToString()
+                    });
+            }
+               
+            manualSchedule.equipmentIdList = manualScheduleDetailList;
+            return manualSchedule;
+        }
+
+        public async Task<string> SetManualSchedule(IrrigationController.ManualSchedule manual)
+        {
+            
+            
+            var manualJObject = new JObject
+            {
+                {"EndTime", manual.EndTime},{"DURATION", manual.DURATION}, {"RunWithSchedule", manual.RunWithSchedule ? "1" : "0"}
+            };
+            manualJObject["ManualDetails"] = new JObject();
+            foreach (var equipment in manual.equipmentIdList)
+            {
+                var key = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                manualJObject["ManualDetails"][key] = new JObject { ["id_Equipment"] = equipment.ID };
+            }
+
+            var result = await _FirebaseClient
+                .Child(getConnectedPi() + "/ManualSchedule")
+                .PostAsync(manualJObject);
+            return result.Key;
+        }
+
+        public async Task<string> DeleteManualSchedule()
+        {
+            var firebaseManualScheduleDetail = await _FirebaseClient
+                .Child(getConnectedPi() + "/ManualSchedule")
+                .OnceAsync<JObject>();
+            
+            var keyList = firebaseManualScheduleDetail.Select(scheduleInfoDetail =>
+            scheduleInfoDetail.Key).ToList();
+
+            await _FirebaseClient
+                .Child(getConnectedPi() + "/ManualSchedule")
+                .DeleteAsync();
+            
+            return keyList[0];
+        }
+
         public async Task<List<Equipment>> GetAllEquipment()
         {
             var firebaseEquipmentDetail = await _FirebaseClient
                 .Child(getConnectedPi() + "/Equipment")
                 .OnceAsync<JObject>();
 
+            if (firebaseEquipmentDetail.Count == 0)
+                return new List<Equipment>();
             return firebaseEquipmentDetail.Select(equipmentInfoDetail =>
                 GetJsonEquipmentToObjectList(equipmentInfoDetail.Object, equipmentInfoDetail.Key)).ToList();
         }
@@ -94,6 +193,8 @@ namespace Pump.FirebaseDatabase
                 .Child(getConnectedPi() + "/Sensor")
                 .OnceAsync<JObject>();
 
+            if (firebaseScheduleDetail.Count == 0)
+                return new List<Sensor>();
             return firebaseScheduleDetail.Select(sensorInfoDetail =>
                 GetJsonSensorToObjectList(sensorInfoDetail.Object, sensorInfoDetail.Key)).ToList();
         }
@@ -113,5 +214,19 @@ namespace Pump.FirebaseDatabase
                 sensor.setSensorReading(sensorDetailObject["LastReading"].ToString());
             return sensor;
         }
+
+        public ControllerStatus GetJsonStatusToObjectList(JObject sensorDetailObject, string key)
+        {
+            var status = new ControllerStatus
+            {
+                ID = key,
+                Code = sensorDetailObject["Code"].ToString(),
+                Operation = sensorDetailObject["Operation"].ToString()
+            };
+
+
+            return status;
+        }
+
     }
 }

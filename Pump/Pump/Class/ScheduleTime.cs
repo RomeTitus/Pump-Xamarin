@@ -8,6 +8,7 @@ namespace Pump
         {
             try
             {
+
                 var datetime = Convert.ToDateTime(Time);
 
                 var dateDiff = datetime - DateTime.Now;
@@ -29,6 +30,21 @@ namespace Pump
             {
                 return Time;
             }
+        }
+
+        public string convertDateTimeToString(TimeSpan timeSpan)
+        {
+            string hour;
+            if (timeSpan.Hours > 9)
+                hour = timeSpan.Hours.ToString();
+            else
+                hour = "0" + timeSpan.Hours;
+            string minute;
+            if (timeSpan.Minutes > 9)
+                minute = timeSpan.Minutes.ToString();
+            else
+                minute = "0" + timeSpan.Minutes;
+            return hour + ":" + minute;
         }
     }
 }

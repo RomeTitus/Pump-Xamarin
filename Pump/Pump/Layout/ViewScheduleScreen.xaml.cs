@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using Pump.Database;
+using Pump.FirebaseDatabase;
+using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Switch = Xamarin.Forms.Switch;
 
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleScreen : ContentPage
     {
+        private readonly List<Equipment> _equipmentList = new List<Equipment>();
+        private readonly List<Schedule> _schedulesList = new List<Schedule>();
+        private string _oldAllSchedule = "";
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
 
@@ -20,11 +30,79 @@ namespace Pump.Layout
         {
             InitializeComponent();
 
-
-            new Thread(GetSchedules).Start();
+            if (new DatabaseController().isRealtimeFirebaseSelected())
+                new Thread(() => GetScheduleAndEquipmentFirebase(new DatabaseController())).Start();
+            else
+                new Thread(GetSchedules).Start();
         }
 
-        public void GetSchedules()
+        private void GetScheduleAndEquipmentFirebase(DatabaseController databaseController)
+        {
+            var auth = new Authentication();
+
+
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi() + "/Schedule")
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
+                    _schedulesList.RemoveAll(y => y.ID == schedule.ID);
+                    _schedulesList.Add(schedule);
+                });
+
+
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi() + "/Equipment")
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
+                    _equipmentList.RemoveAll(y => y.ID == equipment.ID);
+                    _equipmentList.Add(equipment);
+                });
+
+            
+            while (databaseController.isRealtimeFirebaseSelected())
+            {
+                try
+                {
+                    var allSchedule = "";
+                    foreach (var schedule in _schedulesList)
+                    {
+                        var pumpEquipment = _equipmentList.First(x => x.ID == schedule.id_Pump);
+                        allSchedule += schedule.ID + ',' + schedule.NAME + ',' + schedule.TIME + ',' +
+                                       schedule.isActive + ',' + pumpEquipment.NAME + ',' + schedule.WEEK + '#';
+                    }
+
+
+                    if (_oldAllSchedule != allSchedule && string.IsNullOrWhiteSpace(_oldAllSchedule))
+                    {
+                        _oldAllSchedule = allSchedule;
+
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            ScrollViewScheduleDetail.Children.Clear();
+                            var allScheduleList = GetScheduleObject(allSchedule);
+                            foreach (View view in allScheduleList) ScrollViewScheduleDetail.Children.Add(view);
+                        });
+                    }
+                }
+                catch
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        ScrollViewScheduleDetail.Children.Clear();
+                        ScrollViewScheduleDetail.Children.Add(new ViewNoConnection());
+                    });
+                }
+                Thread.Sleep(2000);
+            }
+
+        }
+
+
+        private void GetSchedules()
         {
             try
             {
@@ -43,6 +121,7 @@ namespace Pump.Layout
                     ScrollViewScheduleDetail.Children.Clear();
                     ScrollViewScheduleDetail.Children.Add(new ViewNoConnection());
                 });
+
             }
         }
 
@@ -78,19 +157,30 @@ namespace Pump.Layout
         }
 
 
-        private void ViewScheduleSummary(int id)
+        private void ViewScheduleSummary(string id)
         {
             var floatingScreen = new FloatingScreen();
             PopupNavigation.Instance.PushAsync(floatingScreen);
             new Thread(() => GetScheduleSummary(id, floatingScreen)).Start();
         }
 
-        private void GetScheduleSummary(int id, FloatingScreen floatingScreen)
+        private void GetScheduleSummary(string id, FloatingScreen floatingScreen)
         {
-            try
+            if (new DatabaseController().isRealtimeFirebaseSelected())
             {
-                var schedulesSummary = _socket.Message(_command.getScheduleInfo(id));
+                
+                var schedule = _schedulesList.First(x => x.ID == id);
+                var pump = _equipmentList.First(x => x.ID == schedule.id_Pump);
+                var schedulesSummary = "";
+                schedulesSummary += schedule.WEEK + '#' + schedule.TIME + '#' + pump.NAME + '#' + schedule.ID + '#' + pump.ID + '#'+ schedule.NAME;
+                foreach (var scheduleDetail in schedule.ScheduleDetails)
+                {
+                    var equipment = _equipmentList.First(x => x.ID == scheduleDetail.id_Equipment);
+                    schedulesSummary += '#' + scheduleDetail.id_Equipment + ',' + equipment.NAME + ',' + scheduleDetail.DURATION ;
+                }
+
                 var scheduleList = GetScheduleSummaryObject(schedulesSummary, floatingScreen);
+
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     try
@@ -99,18 +189,38 @@ namespace Pump.Layout
                     }
                     catch
                     {
-                        var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
+                        var scheduleSummaryListObject = new List<object> { new ViewNoConnection() };
                         floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                     }
                 });
             }
-            catch
+            else
             {
-                Device.BeginInvokeOnMainThread(() =>
+                try
                 {
-                    var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
-                    floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
-                });
+                    var schedulesSummary = _socket.Message(_command.getScheduleInfo(id));
+                    var scheduleList = GetScheduleSummaryObject(schedulesSummary, floatingScreen);
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        try
+                        {
+                            floatingScreen.SetFloatingScreen(scheduleList);
+                        }
+                        catch
+                        {
+                            var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
+                            floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
+                        }
+                    });
+                }
+                catch
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
+                        floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
+                    });
+                }
             }
         }
 
@@ -127,9 +237,11 @@ namespace Pump.Layout
 
 
                 var scheduleList = schedulesSummary.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-
-                var viewSchedule = new ViewScheduleSummary(scheduleList, floatingScreen);
+                
+                ViewScheduleSummary viewSchedule = null;
+                viewSchedule = new DatabaseController().isRealtimeFirebaseSelected() ? new ViewScheduleSummary(scheduleList, floatingScreen, _equipmentList) : 
+                    new ViewScheduleSummary(scheduleList, floatingScreen);
+                
                 scheduleSummaryListObject.Add(viewSchedule);
 
 
@@ -145,7 +257,7 @@ namespace Pump.Layout
         private void ViewScheduleScreen_Tapped(object sender, EventArgs e)
         {
             var scheduleSwitch = (View) sender;
-            ViewScheduleSummary(Convert.ToInt32(scheduleSwitch.AutomationId));
+            ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
 
         private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
@@ -153,7 +265,7 @@ namespace Pump.Layout
             var scheduleSwitch = (Switch) sender;
             try
             {
-                new Thread(() => ChangeScheduleState(scheduleSwitch, Convert.ToInt32(scheduleSwitch.AutomationId)))
+                new Thread(() => ChangeScheduleState(scheduleSwitch, scheduleSwitch.AutomationId))
                     .Start();
             }
             catch
@@ -163,38 +275,59 @@ namespace Pump.Layout
             }
         }
 
-        private void ChangeScheduleState(Switch scheduleSwitch, int id)
+        private void ChangeScheduleState(Switch scheduleSwitch, string id)
         {
-            try
+            if (new DatabaseController().isRealtimeFirebaseSelected())
             {
-                var result = _socket.Message(_command.ChangeSchedule(id, Convert.ToInt32(scheduleSwitch.IsToggled)));
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    if (result == "success")
-                    {
-                    }
-                    else
-                    {
-                        DisplayAlert("Warning!!!", result, "Understood");
-                    }
-                });
+                var schedule = _schedulesList.First(x => x.ID == id.ToString());
+                schedule.isActive = Convert.ToInt32(scheduleSwitch.IsToggled).ToString();
+                var key = Task.Run(() => new Authentication().SetScheduleIsActive(schedule)).Result;
+                
             }
-            catch
+            else
             {
-                Device.BeginInvokeOnMainThread(() =>
+                try
                 {
-                    scheduleSwitch.Toggled -= ScheduleSwitch_Toggled;
-                    scheduleSwitch.IsToggled = !scheduleSwitch.IsToggled;
-                    scheduleSwitch.Toggled += ScheduleSwitch_Toggled;
-                    DisplayAlert("Warning!!!", "Failed to reach the controller \n COULD NOT CHANGE SCHEDULE STATE",
-                        "Understood");
-                });
+                    var result = _socket.Message(_command.ChangeSchedule(id, Convert.ToInt32(scheduleSwitch.IsToggled)));
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        if (result == "success")
+                        {
+                        }
+                        else
+                        {
+                            DisplayAlert("Warning!!!", result, "Understood");
+                        }
+                    });
+                }
+                catch
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        scheduleSwitch.Toggled -= ScheduleSwitch_Toggled;
+                        scheduleSwitch.IsToggled = !scheduleSwitch.IsToggled;
+                        scheduleSwitch.Toggled += ScheduleSwitch_Toggled;
+                        DisplayAlert("Warning!!!", "Failed to reach the controller \n COULD NOT CHANGE SCHEDULE STATE",
+                            "Understood");
+                    });
+                }
+
             }
+
         }
 
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new UpdateSchedule());
+            if (new DatabaseController().isRealtimeFirebaseSelected())
+            {
+                if (_equipmentList.Count > 0)
+                    Navigation.PushModalAsync(new UpdateSchedule(_equipmentList));
+                else
+                    DisplayAlert("Cannot Create a Schedule", "You are missing the equipment that is needed to create a schedule", "Understood");
+                
+            }
+            else
+                Navigation.PushModalAsync(new UpdateSchedule());
         }
 
         private void ButtonBack_OnClicked(object sender, EventArgs e)

@@ -17,7 +17,6 @@ namespace Pump.Layout
             InitializeComponent();
         }
 
-
         public void stopActivityIndicatior()
         {
             staclLayoutConnectionInfo.IsVisible = true;

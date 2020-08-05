@@ -1,6 +1,6 @@
 ﻿namespace Pump.IrrigationController
 {
-    internal class Equipment
+    public class Equipment
     {
         public string ID { get; set; }
         public string AttachedPiController { get; set; }

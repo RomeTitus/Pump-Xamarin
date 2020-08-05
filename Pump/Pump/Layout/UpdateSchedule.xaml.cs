@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Pump.Database;
+using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
@@ -13,10 +15,12 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class UpdateSchedule : ContentPage
     {
+        private readonly List<Equipment> _equipmentList = new List<Equipment>();
         private readonly SocketCommands _command = new SocketCommands();
         private readonly List<string> _pumpIdList = new List<string>();
+        private readonly List<string> _zoneDetailList = new List<string>();
         private readonly SocketMessage _socket = new SocketMessage();
-        private readonly int? id;
+        private readonly string _id;
 
         private ViewSchedulePumpTime _pumpSelectedTime;
         private List<string> _weekdayList = new List<string>();
@@ -27,15 +31,78 @@ namespace Pump.Layout
             new Thread(ThreadController).Start();
         }
 
+        
+
         public UpdateSchedule(IReadOnlyList<string> scheduleDetailList)
         {
             InitializeComponent();
             ButtonCreateSchedule.Text = "EDIT SCHEDULE";
-            id = Convert.ToInt32(scheduleDetailList[3]);
+            _id = scheduleDetailList[3];
             ScheduleName.Text = scheduleDetailList[5];
             MaskedEntryTime.Text = scheduleDetailList[1];
             new Thread(() => ThreadController(scheduleDetailList)).Start();
         }
+
+        public UpdateSchedule(List<Equipment> equipmentList)
+        {
+            InitializeComponent();
+            _equipmentList = equipmentList;
+            new Thread(SetUpWeekDays).Start();
+            
+            PopulateEquipment();
+            ButtonCreateSchedule.IsEnabled = true;
+            PumpPicker.IsEnabled = true;
+        }
+
+        public UpdateSchedule(IReadOnlyList<string> scheduleDetailList, List<Equipment> equipmentList)
+        {
+            InitializeComponent();
+            _equipmentList = equipmentList;
+
+            var selectWeekThread = new Thread(() =>
+                SetSelectedWeek(scheduleDetailList[0].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()));
+            selectWeekThread.Start();
+
+
+            for (var i = 6; i < scheduleDetailList.Count; i++) _zoneDetailList.Add(scheduleDetailList[i]);
+            PopulateEquipment();
+            ButtonCreateSchedule.Text = "EDIT SCHEDULE";
+            _id = scheduleDetailList[3];
+            ScheduleName.Text = scheduleDetailList[5];
+            MaskedEntryTime.Text = scheduleDetailList[1];
+            ButtonCreateSchedule.IsEnabled = true;
+
+        }
+
+        private void PopulateEquipment()
+        {
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump))
+            {
+                PumpPicker.Items.Add(equipment.NAME);
+                _pumpIdList.Add(equipment.ID);
+            }
+
+            if (PumpPicker.Items.Count > 0)
+                PumpPicker.SelectedIndex = 0;
+
+            ScrollViewZoneDetail.Children.Clear();
+
+            var zone = "";
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false))
+            {
+                zone += equipment.ID + ',' + equipment.NAME + ',' + equipment.GPIO;
+                if (equipment.AttachedPiController == null)
+                    zone +=  ",0#";
+                else
+                    zone += "," + equipment.AttachedPiController + "#";
+            }
+
+            var zoneDetailObject = _zoneDetailList.Count<1 ? getZoneDetailObject(zone) : getZoneDetailObject(zone, _zoneDetailList);
+            foreach (View view in zoneDetailObject) ScrollViewZoneDetail.Children.Add(view);
+
+        }
+
+       
 
         private void ThreadController(IReadOnlyList<string> scheduleDetailList)
         {
@@ -509,7 +576,7 @@ namespace Pump.Layout
         {
             var floatingScreen = new FloatingScreen();
             PopupNavigation.Instance.PushAsync(floatingScreen);
-            _pumpSelectedTime = new ViewSchedulePumpTime(PumpPicker.Items[PumpPicker.SelectedIndex], id != null);
+            _pumpSelectedTime = new ViewSchedulePumpTime(PumpPicker.Items[PumpPicker.SelectedIndex], _id != null);
             var scheduleSummaryListObject = new List<object> {_pumpSelectedTime};
             _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
             floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
@@ -558,9 +625,9 @@ namespace Pump.Layout
 
         private void SendScheduleSocket(string schedule)
         {
-            var result = _socket.Message(id == null
+            var result = _socket.Message(_id == null
                 ? _command.addSchedule(schedule)
-                : _command.updateSchedule(Convert.ToInt32(id), schedule));
+                : _command.updateSchedule(Convert.ToInt32(_id), schedule));
 
             Device.BeginInvokeOnMainThread(() =>
             {

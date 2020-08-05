@@ -21,12 +21,12 @@ namespace Pump.Layout
     {
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
-        private List<Equipment> _equipmentList = new List<Equipment>();
-
+        private readonly List<Equipment> _equipmentList = new List<Equipment>();
+        private readonly List<IrrigationController.ManualSchedule> _manualScheduleList = new List<IrrigationController.ManualSchedule>();
         private string _oldActiveSchedule;
         private string _oldActiveSensorStatus;
         private string _oldQueueActiveSchedule;
-        private List<Schedule> _schedulesList = new List<Schedule>();
+        private readonly List<Schedule> _schedulesList = new List<Schedule>();
         private List<Sensor> _sensorList = new List<Sensor>();
 
         public ScheduleStatus()
@@ -39,7 +39,7 @@ namespace Pump.Layout
         private void GetScheduleReadingFirebase(DatabaseController databaseController)
         {
             var auth = new Authentication();
-            _schedulesList = Task.Run(() => auth.GetAllSchedules()).Result;
+            //_schedulesList = Task.Run(() => auth.GetAllSchedules()).Result;
 
 
             auth._FirebaseClient
@@ -53,7 +53,7 @@ namespace Pump.Layout
                 });
 
 
-            _equipmentList = Task.Run(() => auth.GetAllEquipment()).Result;
+            //_equipmentList = Task.Run(() => auth.GetAllEquipment()).Result;
 
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Equipment")
@@ -65,6 +65,26 @@ namespace Pump.Layout
                     _equipmentList.Add(equipment);
                 });
 
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi() + "/ManualSchedule")
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        if (x.Object != null)
+                        {
+                            var manualSchedule = auth.GetJsonManualSchedulesToObjectList(x.Object, x.Key);
+                            _manualScheduleList.Clear();
+                            _manualScheduleList.Add(manualSchedule);
+                        }
+                        else
+                        {
+                            _manualScheduleList.Clear();
+                        }
+
+                    });
+                });
 
             var oldActiveScheduleString = "-999";
             var oldQueScheduleString = "-999";
@@ -85,7 +105,11 @@ namespace Pump.Layout
                                                       ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' +
                                                       schedule.EndTime + '#'));
 
+                if (_manualScheduleList.Count > 0)
+                    activeScheduleString = _manualScheduleList[0].DURATION + ',' + _manualScheduleList[0].RunWithSchedule + '$' + activeScheduleString;
                 var activeScheduleObjects = GetScheduleDetailObject(activeScheduleString);
+
+
                 if (oldActiveScheduleString != activeScheduleString)
                 {
 

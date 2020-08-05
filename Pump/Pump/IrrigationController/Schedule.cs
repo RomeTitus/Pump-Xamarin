@@ -2,7 +2,7 @@
 
 namespace Pump.IrrigationController
 {
-    internal class Schedule
+    public class Schedule
     {
         public string ID { get; set; }
         public string NAME { get; set; }
@@ -15,7 +15,7 @@ namespace Pump.IrrigationController
         public List<ScheduleDetail> ScheduleDetails { get; set; }
     }
 
-    internal class ScheduleDetail
+    public class ScheduleDetail
     {
         public string ID { get; set; }
         public string DURATION { get; set; }
