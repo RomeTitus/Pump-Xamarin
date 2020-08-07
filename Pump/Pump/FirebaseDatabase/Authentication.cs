@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Database;
-using Firebase.Database.Offline;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
@@ -66,21 +65,31 @@ namespace Pump.FirebaseDatabase
             return schedule;
         }
 
-        public async Task<string> SetScheduleIsActive(Schedule schedule)
+        public async Task<string> SetSchedule(Schedule schedule)
         {
-            
             var scheduleJObject = new JObject
             {
-                {"NAME", schedule.NAME}, {"TIME", schedule.TIME}, {"WEEK", schedule.WEEK}, {"id_Pump", schedule.id_Pump}, {"isActive", schedule.isActive}
+                {"NAME", schedule.NAME}, {"TIME", schedule.TIME}, {"WEEK", schedule.WEEK},
+                {"id_Pump", schedule.id_Pump}, {"isActive", schedule.isActive}
             };
 
             scheduleJObject["ScheduleDetails"] = new JObject();
             foreach (var scheduleDetails in schedule.ScheduleDetails)
             {
-
-                scheduleJObject["ScheduleDetails"][scheduleDetails.ID] = new JObject { {"id_Equipment", scheduleDetails.id_Equipment}, { "DURATION", scheduleDetails.DURATION }};
+                if (scheduleDetails.ID == null)
+                    scheduleDetails.ID = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                scheduleJObject["ScheduleDetails"][scheduleDetails.ID] = new JObject
+                    {{"id_Equipment", scheduleDetails.id_Equipment}, {"DURATION", scheduleDetails.DURATION}};
             }
-            
+
+            if (schedule.ID == null)
+            {
+                var result = await _FirebaseClient
+                    .Child(getConnectedPi() + "/Schedule")
+                    .PostAsync(scheduleJObject);
+                return result.Key;
+            }
+
             await _FirebaseClient
                 .Child(getConnectedPi() + "/Schedule/" + schedule.ID)
                 .PutAsync(scheduleJObject);

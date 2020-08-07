@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Pump.Database;
+using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
+using SQLitePCL;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -458,23 +461,51 @@ namespace Pump.Layout
             }
             else
             {
-                var schedule = ScheduleName.Text;
-                schedule += "#" + MaskedEntryTime.Text;
-                schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
-                schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
-                var zoneSchedule = GetSelectedZones();
-                if (string.IsNullOrWhiteSpace(zoneSchedule))
+                if (new DatabaseController().isRealtimeFirebaseSelected())
                 {
-                    GetViewSchedulePumpTime();
+                    var schedule = new Schedule
+                    {
+                        ID = _id,
+                        NAME = ScheduleName.Text,
+                        TIME = MaskedEntryTime.Text,
+                        id_Pump = _pumpIdList[PumpPicker.SelectedIndex],
+                        isActive = "1",
+                        WEEK = _weekdayList.Aggregate("", (current, week) => current + (week + ','))
+                    };
+                    var scheduleDetail = GetSelectedZonesList();
+                    if (scheduleDetail.Count > 0)
+                    {
+                        schedule.ScheduleDetails = scheduleDetail;
+                        var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
+                        Navigation.PopModalAsync();
+                        Navigation.PopModalAsync();
+                        Navigation.PushModalAsync(new ViewScheduleScreen());
+                    }
+                    else
+                        GetViewSchedulePumpTime();
                 }
                 else
                 {
-                    schedule += "#" + zoneSchedule;
-                    new Thread(() => SendScheduleSocket(schedule)).Start();
-                    Navigation.PopModalAsync();
-                    Navigation.PopModalAsync();
-                    Navigation.PushModalAsync(new ViewScheduleScreen());
+                    var schedule = ScheduleName.Text;
+                    schedule += "#" + MaskedEntryTime.Text;
+                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
+                    schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
+                    var zoneSchedule = GetSelectedZones();
+                    if (string.IsNullOrWhiteSpace(zoneSchedule))
+                    {
+                        GetViewSchedulePumpTime();
+                    }
+                    else
+                    {
+                        schedule += "#" + zoneSchedule;
+                        new Thread(() => SendScheduleSocket(schedule)).Start();
+                        Navigation.PopModalAsync();
+                        Navigation.PopModalAsync();
+                        Navigation.PushModalAsync(new ViewScheduleScreen());
+                    }
                 }
+
+                
             }
         }
 
@@ -572,6 +603,12 @@ namespace Pump.Layout
             return zoneTime;
         }
 
+        private List<ScheduleDetail> GetSelectedZonesList()
+        {
+            var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.getMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
+
+            return scheduleDetailList;
+        }
         private void GetViewSchedulePumpTime()
         {
             var floatingScreen = new FloatingScreen();
@@ -595,13 +632,31 @@ namespace Pump.Layout
             else
             {
                 PopupNavigation.Instance.PopAsync();
-                var schedule = ScheduleName.Text;
-                schedule += "#" + MaskedEntryTime.Text;
-                schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
-                schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
-                schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "," +
-                            _pumpSelectedTime.getPumpDurationTime().Text;
-                new Thread(() => SendScheduleSocket(schedule)).Start();
+                if (new DatabaseController().isRealtimeFirebaseSelected())
+                {
+                    var schedule = new Schedule
+                    {
+                        ID = _id,
+                        isActive = "1",
+                        NAME = ScheduleName.Text,
+                        TIME = MaskedEntryTime.Text,
+                        id_Pump = _pumpIdList[PumpPicker.SelectedIndex],
+                        WEEK = _weekdayList.Aggregate("", (current, week) => current + (week + ',')),
+                        ScheduleDetails = new List<ScheduleDetail>() { new ScheduleDetail() { id_Equipment = _pumpIdList[PumpPicker.SelectedIndex], DURATION = _pumpSelectedTime.getPumpDurationTime().Text } }
+                    };
+                    var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
+                }
+                else
+                {
+                    var schedule = ScheduleName.Text;
+                    schedule += "#" + MaskedEntryTime.Text;
+                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
+                    schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
+                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "," +
+                                _pumpSelectedTime.getPumpDurationTime().Text;
+                    new Thread(() => SendScheduleSocket(schedule)).Start();
+                }
+
                 Navigation.PopModalAsync();
                 Navigation.PopModalAsync();
                 Navigation.PushModalAsync(new ViewScheduleScreen());

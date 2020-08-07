@@ -279,9 +279,9 @@ namespace Pump.Layout
         {
             if (new DatabaseController().isRealtimeFirebaseSelected())
             {
-                var schedule = _schedulesList.First(x => x.ID == id.ToString());
+                var schedule = _schedulesList.First(x => x.ID == id);
                 schedule.isActive = Convert.ToInt32(scheduleSwitch.IsToggled).ToString();
-                var key = Task.Run(() => new Authentication().SetScheduleIsActive(schedule)).Result;
+                var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
                 
             }
             else
