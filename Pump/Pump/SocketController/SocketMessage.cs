@@ -13,7 +13,7 @@ namespace Pump.SocketController
         {
             var database = new DatabaseController();
 
-            var connection = database.GetPumpSelection();
+            var connection = database.GetControllerConnectionSelection();
 
             if (connection == null)
                 return null;

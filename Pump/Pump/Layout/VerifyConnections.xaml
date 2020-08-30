@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <pages:PopupPage
     x:Class="Pump.Layout.VerifyConnections"
@@ -31,21 +31,27 @@
         VerticalOptions="Center"
         WidthRequest="300">
         <ActivityIndicator
-            x:Name="ActivityIndicatiorScreen"
+            x:Name="ActivityIndicatorScreen"
             HorizontalOptions="Center"
             IsEnabled="true"
             IsRunning="True"
             IsVisible="True"
             VerticalOptions="Center" />
         <StackLayout
-            x:Name="staclLayoutConnectionInfo"
+            x:Name="StackLayoutConnectionInfo"
             HorizontalOptions="FillAndExpand"
             IsVisible="False"
             VerticalOptions="FillAndExpand">
-            <StackLayout Orientation="Horizontal" VerticalOptions="Start">
+            <StackLayout Orientation="Vertical" VerticalOptions="Start">
                 <!--  top controls  -->
                 <Label
-                    x:Name="labelInternalConnection"
+                    x:Name="LabelFirebaseConnection"
+                    FontSize="20"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="No Online Connection was given"
+                    VerticalOptions="Center" />
+                <Label
+                    x:Name="LabelInternalConnection"
                     FontSize="20"
                     HorizontalOptions="CenterAndExpand"
                     Text="No Internal Connection was given"
@@ -53,7 +59,7 @@
             </StackLayout>
             <StackLayout VerticalOptions="CenterAndExpand">
                 <Label
-                    x:Name="labelExternalConnection"
+                    x:Name="LabelExternalConnection"
                     FontSize="20"
                     HorizontalOptions="CenterAndExpand"
                     Text="No Internal Connection was given"

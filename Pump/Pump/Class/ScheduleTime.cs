@@ -26,7 +26,7 @@ namespace Pump
 
                 return StringHour + ":" + StringMinute;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Time;
             }

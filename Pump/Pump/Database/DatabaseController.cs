@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Pump.Database.Table;
 using Pump.Droid.Database.Table;
 using SQLite;
@@ -27,7 +28,7 @@ namespace Pump.Database
             _database.CreateTable<NotificationToken>();
         }
 
-        public PumpConnection GetPumpSelection()
+        public PumpConnection GetControllerConnectionSelection()
         {
             lock (Locker)
             {
@@ -37,7 +38,25 @@ namespace Pump.Database
                     return _database.Table<PumpConnection>().FirstOrDefault(x => x.ID == pumpSelected.PumpConnectionId);
                 }
 
+                if (_database.Table<PumpConnection>().Any())
+                {
+                    _database.DeleteAll<PumpSelection>();
+                    var selectedNewPump = _database.Table<PumpConnection>().FirstOrDefault();
+                    
+                    _database.Insert(new PumpSelection(selectedNewPump.ID));
+
+                    return selectedNewPump;
+                }
+
                 return null;
+            }
+        }
+
+        public List<PumpConnection> GetControllerConnectionList()
+        {
+            lock (Locker)
+            {
+                return _database.Table<PumpConnection>().Any() ? _database.Table<PumpConnection>().ToList() : new List<PumpConnection>();
             }
         }
 
@@ -100,7 +119,7 @@ namespace Pump.Database
         }
 
 
-        public void AddPumpConnection(PumpConnection pumpConnection)
+        public void AddControllerConnection(PumpConnection pumpConnection)
         {
             lock (Locker)
             {
@@ -112,11 +131,33 @@ namespace Pump.Database
             }
         }
 
-        public void UpdatePump(PumpConnection pumpConnection)
+
+        public void DeleteControllerConnection(PumpConnection pumpConnection)
+        {
+            lock (Locker)
+            {
+                _database.DeleteAll<PumpSelection>();
+                _database.Delete(pumpConnection);
+                if (!_database.Table<PumpConnection>().Any()) return;
+                var selectedNewPump = _database.Table<PumpConnection>().FirstOrDefault();
+                _database.Insert(new PumpSelection(selectedNewPump.ID));
+            }
+        }
+
+            public void UpdateControllerConnection(PumpConnection pumpConnection)
         {
             lock (Locker)
             {
                 _database.Update(pumpConnection);
+            }
+        }
+
+            public void setSelectedController(PumpConnection pumpConnection)
+            {
+            lock (Locker)
+            {
+                _database.DeleteAll<PumpSelection>();
+                _database.Insert(new PumpSelection(pumpConnection.ID));
             }
         }
 
@@ -129,9 +170,9 @@ namespace Pump.Database
             }
         }
 
-        public bool isRealtimeFirebaseSelected()
+        public bool IsRealtimeFirebaseSelected()
         {
-            var selectedPump = GetPumpSelection();
+            var selectedPump = GetControllerConnectionSelection();
             if (selectedPump?.RealTimeDatabase != null) return (bool) selectedPump.RealTimeDatabase;
 
             return false;

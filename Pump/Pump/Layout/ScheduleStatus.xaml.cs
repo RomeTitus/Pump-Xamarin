@@ -40,7 +40,7 @@ namespace Pump.Layout
         {
             var auth = new Authentication();
             //_schedulesList = Task.Run(() => auth.GetAllSchedules()).Result;
-
+            
 
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Schedule")
@@ -89,7 +89,7 @@ namespace Pump.Layout
             var oldActiveScheduleString = "-999";
             var oldQueScheduleString = "-999";
 
-            while (databaseController.isRealtimeFirebaseSelected())
+            while (databaseController.IsRealtimeFirebaseSelected())
             {
                 var runningSchedule = new RunningSchedule();
 
@@ -154,13 +154,28 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    if (!databaseController.isRealtimeFirebaseSelected()) return;
-                    var sensor = auth.GetJsonSensorToObjectList(x.Object, x.Key);
-                    _sensorList.RemoveAll(y => y.ID == sensor.ID);
-                    _sensorList.Add(sensor);
-                    UpdateSensorReading();
+                    try
+                    {
+                        var sensor = auth.GetJsonSensorToObjectList(x.Object, x.Key);
+                        
+                        foreach (var oldSensor in _sensorList.Where(oldSensor => oldSensor.ID == x.Key))
+                        {
+                            var tempLastReading = sensor.LastReading;
+                            sensor = oldSensor;
+                            sensor.LastReading = tempLastReading;
+                        }
+
+                        _sensorList.RemoveAll(y => y.ID == sensor.ID);
+                        _sensorList.Add(sensor);
+                        UpdateSensorReading();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 });
-            UpdateSensorReading();
+            //UpdateSensorReading();
         }
 
         private void UpdateSensorReading()
@@ -189,7 +204,7 @@ namespace Pump.Layout
 
             while (true)
             {
-                if (databaseController.isRealtimeFirebaseSelected())
+                if (databaseController.IsRealtimeFirebaseSelected())
                 {
                     if (firebaseStarted == false)
                     {

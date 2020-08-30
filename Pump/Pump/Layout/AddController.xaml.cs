@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 using Pump.Database;
 using Pump.Droid.Database.Table;
+using Pump.FirebaseDatabase;
 using Pump.Layout;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
@@ -15,12 +17,21 @@ namespace Pump
     [DesignTimeVisible(false)]
     public partial class AddController : ContentPage
     {
+
+        bool? _internalConnection = null;
+        bool? _externalConnection = null;
+        bool? _firebaseConnection = null;
+        private String _mac;
+        readonly VerifyConnections _loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+        PumpConnection _pumpConnection = new PumpConnection();
         private double height;
         private double width;
 
-        public AddController()
+        public AddController(bool firstConnection)
         {
             InitializeComponent();
+            if (!firstConnection)
+                BtnBackAddConnectionScreen.IsVisible = true;
         }
 
         private void BtnAddController_Clicked(object sender, EventArgs e)
@@ -30,181 +41,237 @@ namespace Pump
 
         private void AddIrrigationController()
         {
-            var ExternalPort = 0;
-            var InternalPort = 0;
+            var notification = AddControllerValidator();
 
-            if (TxtControllerName.Text == null ||
-                (TxtInternalConnection.Text == null || TxtInternalPort.Text == null ||
-                 !int.TryParse(TxtInternalPort.Text, out InternalPort)) &&
-                (TxtExternalConnection.Text == null || TxtExternalPort.Text == null ||
-                 !int.TryParse(TxtExternalPort.Text, out ExternalPort)))
+            if (!string.IsNullOrWhiteSpace(notification))
             {
-                OutLineIncorrectFields(InternalPort, ExternalPort);
+                DisplayAlert("Incomplete", notification, "Understood");
             }
-
             else
             {
-                var loadingScreen = new VerifyConnections();
-                loadingScreen.CloseWhenBackgroundIsClicked = false;
-                PopupNavigation.Instance.PushAsync(loadingScreen);
+                PopupNavigation.Instance.PushAsync(_loadingScreen);
+                _pumpConnection.Name = TxtControllerName.Text;
+                if (!string.IsNullOrEmpty(TxtInternalConnection.Text) || !string.IsNullOrEmpty(TxtInternalPort.Text))
+                {
+                    _internalConnection = CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
+                    if (_internalConnection != null)
+                    {
+                        if (_internalConnection == true)
+                        {
+                            _loadingScreen.InternalSuccess();
+                            _pumpConnection.InternalPath = TxtInternalConnection.Text;
+                            _pumpConnection.InternalPort = Convert.ToInt32(TxtInternalPort.Text);
+                            _pumpConnection.Mac = _mac;
+                        }
+                            
+                        else
+                            _loadingScreen.InternalFailed();
+                    }
+                }
 
-                if (TxtInternalConnection.Text != null && TxtInternalPort.Text != null &&
-                    TxtExternalConnection.Text != null && TxtExternalPort.Text != null)
-                    new Thread(() => checkConnectionInternalAndExternal(TxtControllerName.Text,
-                        TxtInternalConnection.Text, int.Parse(TxtInternalPort.Text),
-                        TxtExternalConnection.Text, int.Parse(TxtExternalPort.Text), loadingScreen)).Start();
+                if (!string.IsNullOrEmpty(TxtExternalConnection.Text) || !string.IsNullOrEmpty(TxtExternalPort.Text))
+                {
+                    _externalConnection = CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
+                    if (_externalConnection != null)
+                    {
+                        if (_externalConnection == true)
+                        {
+                            _loadingScreen.ExternalSuccess();
+                            _pumpConnection.ExternalPath = TxtExternalConnection.Text;
+                            _pumpConnection.ExternalPort = Convert.ToInt32(TxtExternalPort.Text);
+                            _pumpConnection.Mac = _mac;
+                        }
 
+                        else
+                            _loadingScreen.ExternalFailed();
+                    }
+                }
 
-                else if (TxtInternalConnection.Text != null && TxtInternalPort.Text != null)
-                    new Thread(() => checkConnectionInternal(TxtControllerName.Text, TxtInternalConnection.Text,
-                        int.Parse(TxtInternalPort.Text),
-                        loadingScreen)).Start();
+                if (string.IsNullOrEmpty(TxtControllerCode.Text)) return;
+                try
+                {
+                    _firebaseConnection = Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result.Object;
+                        
+                        
+                }
+                catch
+                {
+                    _firebaseConnection = false;
+                }
 
+                if (_firebaseConnection != null)
+                {
+                    if (_firebaseConnection == true)
+                    {
+                        _loadingScreen.FirebaseSuccess();
+                        _pumpConnection.RealTimeDatabase = true;
+                        _pumpConnection.Mac = TxtControllerCode.Text;
+                    }
 
-                else if (TxtExternalConnection.Text != null && TxtExternalPort.Text != null)
-                    new Thread(() => checkConnectionExternal(TxtControllerName.Text, TxtExternalConnection.Text,
-                        int.Parse(TxtExternalPort.Text),
-                        loadingScreen)).Start();
+                    else
+                        _loadingScreen.FirebaseFailed();
+                }
+
+                _loadingScreen.StopActivityIndicator();
+                if (_firebaseConnection == true || _externalConnection == true || _internalConnection == true)
+                {
+                    addPumpConnection(_pumpConnection);
+                }
             }
         }
 
-        private void OutLineIncorrectFields(int internalPort, int externalPort)
+
+        private string AddControllerValidator()
         {
-            if (TxtControllerName.Text == null)
-                LabelControllerName.TextColor = Color.Red;
-            if (TxtInternalConnection.Text == null)
-                LabelTxtInternalConnection.TextColor = Color.Red;
-            if (TxtInternalPort.Text == null || internalPort == 0)
-                LabelInternalPort.TextColor = Color.Red;
-            if (TxtExternalConnection.Text == null)
-                LabelExternalConnection.TextColor = Color.Red;
-            if (TxtExternalPort.Text == null || externalPort == 0)
-                LabelExternalPort.TextColor = Color.Red;
-        }
+            var notification = "";
+            var code = true;
+            bool? internalConnection = true;
+            bool? externalConnection = true;
 
-        private void checkConnectionInternalAndExternal(string name, string internalHost, int internalPort,
-            string externalHost, int externalPort, VerifyConnections loadingScreen)
-        {
-            string mac = null;
-            string internalConnection;
-            string externalConnection;
-
-            internalConnection = checkConnection(internalHost, internalPort);
-
-            externalConnection = checkConnection(externalHost, externalPort);
-
-            if (internalConnection != null)
-                mac = internalConnection;
-
-            if (externalConnection != null)
-                mac = externalConnection;
-
-            if (mac != null)
-                addPumpConnection(new PumpConnection(name, mac, internalHost, internalPort, externalHost,
-                    externalPort));
-
-            Device.BeginInvokeOnMainThread(() =>
+            if (string.IsNullOrEmpty(TxtControllerName.Text))
             {
-                loadingScreen.stopActivityIndicatior();
-
-                if (internalConnection != null)
-                    loadingScreen.InternalSuccess();
+                if (notification.Length < 1)
+                    notification = "\u2022 Controller name required";
                 else
-                    loadingScreen.InternalFailed();
-                if (externalConnection != null)
-                    loadingScreen.ExternalSuccess();
-                else
-                    loadingScreen.ExternalFailed();
+                    notification += "\n\u2022 Controller name required";
+                LabelControllerName.TextColor = Color.Red; 
+            }
 
-                //PopupNavigation.Instance.PopAsync();
-            });
-        }
+            if (string.IsNullOrEmpty(TxtControllerCode.Text))
+                code = false;
 
-
-        private void checkConnectionInternal(string name, string host, int port, VerifyConnections loadingScreen)
-        {
-            string internalConnection;
-
-            internalConnection = checkConnection(host, port);
-            if (internalConnection != null)
-                addPumpConnection(new PumpConnection(name, internalConnection, host, port, null, -1));
-
-            Device.BeginInvokeOnMainThread(() =>
+            if (string.IsNullOrEmpty(TxtInternalConnection.Text) || string.IsNullOrEmpty(TxtInternalPort.Text))
             {
-                loadingScreen.stopActivityIndicatior();
-
-                if (internalConnection != null)
-
-                    loadingScreen.InternalSuccess();
+                if (string.IsNullOrEmpty(TxtInternalConnection.Text) != string.IsNullOrEmpty(TxtInternalPort.Text))
+                    internalConnection = null;
                 else
-                    loadingScreen.InternalFailed();
-                //PopupNavigation.Instance.PopAsync();
-            });
-        }
+                    internalConnection = false;
+            }
 
-
-        private void checkConnectionExternal(string name, string host, int port, VerifyConnections loadingScreen)
-        {
-            string externalConnection;
-
-            externalConnection = checkConnection(host, port);
-
-            if (externalConnection != null)
-                addPumpConnection(new PumpConnection(name, externalConnection, null, -1, host, port));
-            Device.BeginInvokeOnMainThread(() =>
+            if (string.IsNullOrEmpty(TxtExternalConnection.Text) || string.IsNullOrEmpty(TxtExternalPort.Text))
             {
-                loadingScreen.stopActivityIndicatior();
-
-                if (externalConnection != null)
-                    loadingScreen.ExternalSuccess();
+                if (string.IsNullOrEmpty(TxtExternalConnection.Text) != string.IsNullOrEmpty(TxtExternalPort.Text))
+                    externalConnection = null;
                 else
-                    loadingScreen.ExternalFailed();
-                //PopupNavigation.Instance.PopAsync();
-            });
+                    externalConnection = false;
+            }
+
+            if (externalConnection != null && internalConnection != null &&
+                (code && internalConnection != false && externalConnection != false))
+            {
+                return notification;
+            }
+
+            if (!code && internalConnection == false && externalConnection == false)
+            {
+                if (notification.Length < 1)
+                    notification = "\u2022 Controller Code required";
+                else
+                    notification += "\n\u2022 Controller Code required";
+                LabelControllerCode.TextColor = Color.Red;
+
+            }
+
+            if (internalConnection == null || !code && internalConnection == false && externalConnection == false)
+            {
+                if (string.IsNullOrEmpty(TxtInternalConnection.Text))
+                {
+                    if (notification.Length < 1)
+                        notification = "\u2022 Internal Connection required";
+                    else
+                        notification += "\n\u2022 Internal Connection required";
+                    LabelTxtInternalConnection.TextColor = Color.Red;
+                }
+
+                if (string.IsNullOrEmpty(TxtInternalPort.Text))
+                {
+                    if (notification.Length < 1)
+                        notification = "\u2022 Internal Port required";
+                    else
+                        notification += "\n\u2022 Internal Port required";
+                    LabelInternalPort.TextColor = Color.Red;
+                }
+            }
+
+            if (externalConnection == null || !code && internalConnection == false && externalConnection == false)
+            {
+                if (string.IsNullOrEmpty(TxtExternalConnection.Text))
+                {
+                    if (notification.Length < 1)
+                        notification = "\u2022 External Connection required";
+                    else
+                        notification += "\n\u2022 External Connection required";
+                    LabelExternalConnection.TextColor = Color.Red;
+                }
+
+                if (string.IsNullOrEmpty(TxtExternalPort.Text))
+                {
+                    if (notification.Length < 1)
+                        notification = "\u2022 External Port required";
+                    else
+                        notification += "\n\u2022 External Port required";
+                    LabelExternalPort.TextColor = Color.Red;
+                }
+            }
+
+            return notification;
+
         }
 
-        private void addPumpConnection(PumpConnection pumpConnection)
-        {
-            var databaseController = new DatabaseController();
-            databaseController.AddPumpConnection(pumpConnection);
-        }
-
-        private string checkConnection(string host, int port)
+        private bool CheckSocket(string host, int port)
         {
             var socket = new SocketVerify(host, port);
             try
             {
-                var responce = socket.verifyConnection();
-                if (responce != "getMAC")
-                    return responce;
-                return null;
+                var response = socket.verifyConnection();
+                if (response != "getMAC")
+                {
+                    _mac = response;
+                    return true;
+                }
             }
             catch
             {
-                return null;
+                return false;
             }
+            return false;
         }
+
+
+        private void addPumpConnection(PumpConnection pumpConnection)
+        {
+
+            var databaseController = new DatabaseController();
+            databaseController.AddControllerConnection(pumpConnection);
+
+        }
+
+       
 
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height);
-            if (width != this.width || height != this.height)
+            if (width == this.width && height == this.height) return;
+            this.width = width;
+            this.height = height;
+            if (width > height)
             {
-                this.width = width;
-                this.height = height;
-                if (width > height)
-                {
-                    LayoutAddController.Direction = FlexDirection.Row;
-                    LayoutAddController.HeightRequest = 200;
-                    // landscape
-                }
-                else
-                {
-                    LayoutAddController.Direction = FlexDirection.Column;
-                    LayoutAddController.HeightRequest = -1;
-                    // portrait
-                }
+                LayoutAddController.Direction = FlexDirection.Row;
+                LayoutAddController.HeightRequest = 200;
+                // landscape
             }
+            else
+            {
+                LayoutAddController.Direction = FlexDirection.Column;
+                LayoutAddController.HeightRequest = -1;
+                // portrait
+            }
+        }
+
+        private void BtnBackAddConnectionScreen_OnClicked(object sender, EventArgs e)
+        {
+            Navigation.PopModalAsync();
+            Navigation.PushModalAsync(new ConnectionScreen());
         }
     }
 }

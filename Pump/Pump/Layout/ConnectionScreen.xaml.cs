@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Pump.Database;
@@ -14,6 +15,9 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ConnectionScreen : ContentPage
     {
+
+        private List<PumpConnection> ControllerList = new List<PumpConnection>();
+
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private PumpConnection _connection;
         private string _externalConnection;
@@ -25,6 +29,8 @@ namespace Pump.Layout
             InitializeComponent();
             GetSelectedPumpDetail();
         }
+
+        
 
         private void StackLayoutConnectionView_OnTapped(object sender, EventArgs e)
         {
@@ -46,9 +52,17 @@ namespace Pump.Layout
 
         private void GetSelectedPumpDetail()
         {
-            var controller = new DatabaseController();
-            _connection = controller.GetPumpSelection();
+            PopulateControllerList();
 
+            var controller = new DatabaseController();
+            _connection = controller.GetControllerConnectionSelection();
+            for (var i = 0; i < ControllerList.Count; i++)
+            {
+                if(ControllerList[i].ID == _connection.ID)
+                    ControllerPicker.SelectedIndex = i;
+                continue;
+            }
+            
             TxtInternalConnection.Text = _connection.InternalPath;
             if (_connection.InternalPort != -1)
                 TxtInternalPort.Text = _connection.InternalPort.ToString();
@@ -60,6 +74,31 @@ namespace Pump.Layout
             SwitchRealTimeDatabase.Toggled -= SwitchRealTimeDatabase_OnToggled;
             SwitchRealTimeDatabase.IsToggled = (bool) _connection.RealTimeDatabase;
             SwitchRealTimeDatabase.Toggled += SwitchRealTimeDatabase_OnToggled;
+        }
+
+        private void PopulateControllerList()
+        {
+            ControllerList = new DatabaseController().GetControllerConnectionList();
+            ControllerPicker.Items.Clear();
+            foreach (var equipment in ControllerList)
+            {
+                ControllerPicker.Items.Add(string.IsNullOrEmpty(equipment.Name) ? "Name is missing" : equipment.Name);
+            }
+
+            if (ControllerPicker.Items.Count > 0)
+            { 
+                var selectedController =  new DatabaseController().GetControllerConnectionSelection();
+                for (var i = 0; i < ControllerList.Count; i++)
+                {
+                    if (ControllerList[i].ID != selectedController.ID) continue;
+                    ControllerPicker.SelectedIndex = i;
+                    break;
+
+                }
+               
+            }
+                
+            BtnDeleteSelectedController.IsEnabled = ControllerPicker.Items.Count > 1;
         }
 
         private void BtnUpdateController_OnClicked(object sender, EventArgs e)
@@ -155,7 +194,7 @@ namespace Pump.Layout
             if (mac != null)
             {
                 var database = new DatabaseController();
-                database.UpdatePump(_connection);
+                database.UpdateControllerConnection(_connection);
             }
 
             Device.BeginInvokeOnMainThread(() =>
@@ -164,7 +203,7 @@ namespace Pump.Layout
                 _showAdvanced = false;
                 ConnectionDetailLayout.IsVisible = false;
 
-                loadingScreen.stopActivityIndicatior();
+                loadingScreen.StopActivityIndicator();
 
                 if (_internalConnection != null)
                     loadingScreen.InternalSuccess();
@@ -200,7 +239,7 @@ namespace Pump.Layout
             if (mac != null)
             {
                 var database = new DatabaseController();
-                database.UpdatePump(_connection);
+                database.UpdateControllerConnection(_connection);
             }
 
             Device.BeginInvokeOnMainThread(() =>
@@ -209,7 +248,7 @@ namespace Pump.Layout
                 _showAdvanced = false;
                 ConnectionDetailLayout.IsVisible = false;
 
-                loadingScreen.stopActivityIndicatior();
+                loadingScreen.StopActivityIndicator();
 
                 if (isInternal)
                 {
@@ -259,17 +298,35 @@ namespace Pump.Layout
         private void BtnBackConnectionScreen_OnClicked(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
-            //Navigation.PushModalAsync(new HomeScreen());
         }
 
         private void SwitchRealTimeDatabase_OnToggled(object sender, ToggledEventArgs e)
         {
             var toggleRealTimeDatabase = (Switch) sender;
             var controller = new DatabaseController();
-            var pumpConnection = controller.GetPumpSelection();
+            var pumpConnection = controller.GetControllerConnectionSelection();
             if (pumpConnection == null) return;
             pumpConnection.RealTimeDatabase = toggleRealTimeDatabase.IsToggled;
-            controller.UpdatePump(pumpConnection);
+            controller.UpdateControllerConnection(pumpConnection);
+        }
+
+        private void BtnAddController_OnClicked(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(new AddController(false));
+        }
+
+        private void BtnDeleteSelectedController_OnClicked(object sender, EventArgs e)
+        {
+            new DatabaseController().DeleteControllerConnection(ControllerList[ControllerPicker.SelectedIndex]);
+            PopulateControllerList();
+        }
+
+
+        private void ControllerPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(ControllerPicker.SelectedIndex != -1)
+                new DatabaseController().setSelectedController(ControllerList[ControllerPicker.SelectedIndex]);
+
         }
     }
 }

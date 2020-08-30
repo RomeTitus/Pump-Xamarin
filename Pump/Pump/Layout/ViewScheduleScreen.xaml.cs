@@ -30,7 +30,7 @@ namespace Pump.Layout
         {
             InitializeComponent();
 
-            if (new DatabaseController().isRealtimeFirebaseSelected())
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
                 new Thread(() => GetScheduleAndEquipmentFirebase(new DatabaseController())).Start();
             else
                 new Thread(GetSchedules).Start();
@@ -63,7 +63,7 @@ namespace Pump.Layout
                 });
 
             
-            while (databaseController.isRealtimeFirebaseSelected())
+            while (databaseController.IsRealtimeFirebaseSelected())
             {
                 try
                 {
@@ -166,7 +166,7 @@ namespace Pump.Layout
 
         private void GetScheduleSummary(string id, FloatingScreen floatingScreen)
         {
-            if (new DatabaseController().isRealtimeFirebaseSelected())
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 
                 var schedule = _schedulesList.First(x => x.ID == id);
@@ -239,7 +239,7 @@ namespace Pump.Layout
                 var scheduleList = schedulesSummary.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                 
                 ViewScheduleSummary viewSchedule = null;
-                viewSchedule = new DatabaseController().isRealtimeFirebaseSelected() ? new ViewScheduleSummary(scheduleList, floatingScreen, _equipmentList) : 
+                viewSchedule = new DatabaseController().IsRealtimeFirebaseSelected() ? new ViewScheduleSummary(scheduleList, floatingScreen, _equipmentList) : 
                     new ViewScheduleSummary(scheduleList, floatingScreen);
                 
                 scheduleSummaryListObject.Add(viewSchedule);
@@ -277,7 +277,7 @@ namespace Pump.Layout
 
         private void ChangeScheduleState(Switch scheduleSwitch, string id)
         {
-            if (new DatabaseController().isRealtimeFirebaseSelected())
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 var schedule = _schedulesList.First(x => x.ID == id);
                 schedule.isActive = Convert.ToInt32(scheduleSwitch.IsToggled).ToString();
@@ -318,7 +318,7 @@ namespace Pump.Layout
 
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
         {
-            if (new DatabaseController().isRealtimeFirebaseSelected())
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 if (_equipmentList.Count > 0)
                     Navigation.PushModalAsync(new UpdateSchedule(_equipmentList));

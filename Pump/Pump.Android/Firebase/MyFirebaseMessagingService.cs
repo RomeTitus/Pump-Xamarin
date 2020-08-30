@@ -131,7 +131,7 @@ namespace Pump.Droid.Firebase
                                 var ngrokConnectionInfo = remoteData["Ngrok"];
                                 pumpConnection.ExternalPort = Convert.ToInt32(ngrokConnectionInfo.Split(":").Last().Replace("\n", ""));
                                 pumpConnection.ExternalPath = ngrokConnectionInfo.Split("//").Last().Split(":").First();
-                                controller.UpdatePump(pumpConnection);
+                                controller.UpdateControllerConnection(pumpConnection);
                                 SendNotification(ngrokConnectionInfo, "Connection Updated", pumpConnection);
                             }
                             else

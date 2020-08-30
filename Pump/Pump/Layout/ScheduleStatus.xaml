@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentPage
     x:Class="Pump.Layout.ScheduleStatus"
@@ -10,104 +10,102 @@
     xmlns:views="clr-namespace:Pump.Layout.Views"
     mc:Ignorable="d">
     <ContentPage.Content>
-
-        <FlexLayout
-            x:Name="LayoutAddController"
-            Margin="20"
-            Direction="Column"
-            JustifyContent="SpaceAround"
-            VerticalOptions="Center">
-
-
-            <StackLayout>
-                <Label
-                    FontSize="Subtitle"
-                    HorizontalOptions="Center"
-                    Text="Active Now"
-                    TextColor="White"
-                    TextDecorations="Underline" />
-
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand">
-                    <ScrollView HeightRequest="100">
-                        <StackLayout x:Name="ScrollViewScheduleStatus">
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap"
-                                                      Tapped="ScrollViewScheduleStatusTap_Tapped" />
-                            </StackLayout.GestureRecognizers>
-                            <ActivityIndicator
-                                HorizontalOptions="Center"
-                                IsEnabled="true"
-                                IsRunning="True"
-                                IsVisible="True"
-                                VerticalOptions="Center" />
-                        </StackLayout>
-
-                    </ScrollView>
-                </Frame>
-
-            </StackLayout>
-
-            <StackLayout>
-                <Label
-                    FontSize="Subtitle"
-                    HorizontalOptions="Center"
-                    Text="Queued"
-                    TextColor="White"
-                    TextDecorations="Underline" />
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand">
+        <ScrollView>
+            <FlexLayout
+                x:Name="LayoutAddController"
+                Margin="20"
+                Direction="Column"
+                JustifyContent="SpaceAround"
+                VerticalOptions="Center">
 
 
-                    <ScrollView HeightRequest="100">
+                <StackLayout>
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Active Now"
+                        TextColor="White"
+                        TextDecorations="Underline" />
 
-                        <StackLayout x:Name="ScrollViewQueueStatus">
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap"
-                                                      Tapped="ScrollViewQueueStatusTap_Tapped" />
-                            </StackLayout.GestureRecognizers>
-                            <ActivityIndicator
-                                HorizontalOptions="Center"
-                                IsEnabled="true"
-                                IsRunning="True"
-                                IsVisible="True"
-                                VerticalOptions="Center" />
-                        </StackLayout>
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        HorizontalOptions="FillAndExpand">
+                        <ScrollView HeightRequest="100">
+                            <StackLayout x:Name="ScrollViewScheduleStatus">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" Tapped="ScrollViewScheduleStatusTap_Tapped" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
 
-                    </ScrollView>
+                        </ScrollView>
+                    </Frame>
+
+                </StackLayout>
+
+                <StackLayout>
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Queued"
+                        TextColor="White"
+                        TextDecorations="Underline" />
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        HorizontalOptions="FillAndExpand">
 
 
-                </Frame>
+                        <ScrollView HeightRequest="100">
 
-            </StackLayout>
-            <StackLayout>
-                <Label
-                    FontSize="Subtitle"
-                    HorizontalOptions="Center"
-                    Text="Sensor Status"
-                    TextColor="White"
-                    TextDecorations="Underline" />
-                <Frame BackgroundColor="White" BorderColor="Black">
-                    <ScrollView HeightRequest="100">
-                        <StackLayout x:Name="ScrollViewSensorStatus">
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap"
-                                                      Tapped="ScrollViewSensorStatusTap_Tapped" />
-                            </StackLayout.GestureRecognizers>
-                            <ActivityIndicator
-                                HorizontalOptions="Center"
-                                IsEnabled="true"
-                                IsRunning="True"
-                                IsVisible="True"
-                                VerticalOptions="Center" />
-                        </StackLayout>
-                    </ScrollView>
-                </Frame>
-            </StackLayout>
-        </FlexLayout>
+                            <StackLayout x:Name="ScrollViewQueueStatus">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" Tapped="ScrollViewQueueStatusTap_Tapped" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+
+                        </ScrollView>
+
+
+                    </Frame>
+
+                </StackLayout>
+                <StackLayout>
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Sensor Status"
+                        TextColor="White"
+                        TextDecorations="Underline" />
+                    <Frame BackgroundColor="White" BorderColor="Black">
+                        <ScrollView HeightRequest="100">
+                            <StackLayout x:Name="ScrollViewSensorStatus">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" Tapped="ScrollViewSensorStatusTap_Tapped" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </ScrollView>
+                    </Frame>
+                </StackLayout>
+            </FlexLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

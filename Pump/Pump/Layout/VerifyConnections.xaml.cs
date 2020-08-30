@@ -17,36 +17,47 @@ namespace Pump.Layout
             InitializeComponent();
         }
 
-        public void stopActivityIndicatior()
+        public void StopActivityIndicator()
         {
-            staclLayoutConnectionInfo.IsVisible = true;
-            ActivityIndicatiorScreen.IsEnabled = false;
-            ActivityIndicatiorScreen.IsRunning = false;
-            ActivityIndicatiorScreen.IsVisible = false;
+            StackLayoutConnectionInfo.IsVisible = true;
+            ActivityIndicatorScreen.IsEnabled = false;
+            ActivityIndicatorScreen.IsRunning = false;
+            ActivityIndicatorScreen.IsVisible = false;
         }
 
         public void InternalSuccess()
         {
-            labelInternalConnection.Text = "Internal Connection was successful";
+            LabelInternalConnection.Text = "Internal Connection was successful";
             new DatabaseController().SetActivityStatus(new ActivityStatus(true));
             success = true;
         }
 
         public void ExternalSuccess()
         {
-            labelExternalConnection.Text = "External Connection was successful";
+            LabelExternalConnection.Text = "External Connection was successful";
             new DatabaseController().SetActivityStatus(new ActivityStatus(true));
+            success = true;
+        }
+
+        public void FirebaseSuccess()
+        {
+            LabelFirebaseConnection.Text = "Online Connection was successful";
             success = true;
         }
 
         public void InternalFailed()
         {
-            labelInternalConnection.Text = "Internal Connection Failed";
+            LabelInternalConnection.Text = "Internal Connection Failed";
         }
 
         public void ExternalFailed()
         {
-            labelExternalConnection.Text = "External Connection Failed";
+            LabelExternalConnection.Text = "External Connection Failed";
+        }
+
+        public void FirebaseFailed()
+        {
+            LabelFirebaseConnection.Text = "Online Connection Failed";
         }
 
         private void Button_OnClicked(object sender, EventArgs e)

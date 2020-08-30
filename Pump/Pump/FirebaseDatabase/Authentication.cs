@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Database;
+using Firebase.Database.Offline;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
@@ -14,7 +15,12 @@ namespace Pump.FirebaseDatabase
     {
         public Authentication()
         {
-            _FirebaseClient = new FirebaseClient("https://pump-25eee.firebaseio.com/");
+
+            _FirebaseClient = new FirebaseClient("https://pump-25eee.firebaseio.com/");//, new FirebaseOptions
+            //{
+            //    OfflineDatabaseFactory = (t, s) => new OfflineDatabase(t, s)
+            //});
+
         }
 
         public FirebaseClient _FirebaseClient { get; }
@@ -22,8 +28,30 @@ namespace Pump.FirebaseDatabase
 
         public string getConnectedPi()
         {
-            var pumpDetail = new DatabaseController().GetPumpSelection();
-            return "DC:A6:32:33:63:CA";
+            var pumpDetail = new DatabaseController().GetControllerConnectionSelection();
+            //return "DC:A6:32:33:63:CA";
+            return pumpDetail.Mac;
+        }
+
+
+        public async Task<FirebaseObject<bool>> IrrigationSystemPath(string path)
+        {
+            try
+            {
+                
+                var firebaseExist = await _FirebaseClient
+                    .Child(path + "/MasterStatus")
+                    .OnceAsync<bool>();
+
+               
+                return firebaseExist.Count > 0 ? firebaseExist.FirstOrDefault(o => o.Object) : null;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            
         }
 
         public async Task<List<Schedule>> GetAllSchedules()
@@ -213,9 +241,12 @@ namespace Pump.FirebaseDatabase
             var sensor = new Sensor();
 
             sensor.ID = key;
-            sensor.NAME = sensorDetailObject["NAME"].ToString();
-            sensor.GPIO = sensorDetailObject["GPIO"].ToString();
-            sensor.TYPE = sensorDetailObject["TYPE"].ToString();
+            if (sensorDetailObject.ContainsKey("NAME"))
+                sensor.NAME = sensorDetailObject["NAME"].ToString();
+            if (sensorDetailObject.ContainsKey("GPIO"))
+                sensor.GPIO = sensorDetailObject["GPIO"].ToString();
+            if (sensorDetailObject.ContainsKey("TYPE"))
+                sensor.TYPE = sensorDetailObject["TYPE"].ToString();
 
             if (sensorDetailObject.ContainsKey("AttachedPiController"))
                 sensor.AttachedPiController = sensorDetailObject["AttachedPiController"].ToString();

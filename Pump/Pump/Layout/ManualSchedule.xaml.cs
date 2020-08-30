@@ -191,7 +191,7 @@ namespace Pump.Layout
 
             while (true)
             {
-                if (databaseController.isRealtimeFirebaseSelected())
+                if (databaseController.IsRealtimeFirebaseSelected())
                 {
                     if (firebaseStarted == false)
                     {
@@ -625,7 +625,7 @@ namespace Pump.Layout
 
         private void StopManualSchedule()
         {
-            if (new DatabaseController().isRealtimeFirebaseSelected())
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 _firebaseHasReplied = null;
                 var auth = new Authentication();
@@ -697,7 +697,7 @@ namespace Pump.Layout
 
             Device.BeginInvokeOnMainThread(() => { ButtonStartManual.IsEnabled = false; });
 
-            if (new DatabaseController().isRealtimeFirebaseSelected())
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 var auth = new Authentication();
                 var duration = MaskedEntryTime.Text.Split(':');

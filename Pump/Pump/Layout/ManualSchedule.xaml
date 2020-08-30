@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentPage
     x:Class="Pump.Layout.ManualSchedule"
@@ -12,131 +12,131 @@
     mc:Ignorable="d">
 
     <ContentPage.Content>
-        <FlexLayout
-            Margin="20"
-            Direction="Column"
-            JustifyContent="SpaceAround"
-            VerticalOptions="Center">
+        <ScrollView>
+            <FlexLayout
+                Margin="20"
+                Direction="Column"
+                JustifyContent="SpaceAround"
+                VerticalOptions="Center">
 
-            <StackLayout>
-                <Label
-                    FontSize="Subtitle"
-                    HorizontalOptions="Center"
-                    Text="Pump"
-                    TextColor="White"
-                    TextDecorations="Underline" />
+                <StackLayout>
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Pump"
+                        TextColor="White"
+                        TextDecorations="Underline" />
 
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand">
-                    <ScrollView HeightRequest="100">
-                        <FlexLayout
-                            x:Name="ScrollViewManualPump"
-                            JustifyContent="SpaceBetween"
-                            Wrap="Wrap">
-                            <FlexLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewManualPumpTap"
-                                                      Tapped="ScrollViewManualPump_Tapped" />
-                            </FlexLayout.GestureRecognizers>
-                            <ActivityIndicator
-                                AutomationId="ActivityIndicatorManualPump"
-                                HorizontalOptions="Center"
-                                IsEnabled="true"
-                                IsRunning="True"
-                                IsVisible="True"
-                                VerticalOptions="Center" />
-
-
-                        </FlexLayout>
-
-                    </ScrollView>
-                </Frame>
-
-            </StackLayout>
-
-            <StackLayout>
-                <Label
-                    FontSize="Subtitle"
-                    HorizontalOptions="Center"
-                    Text="Zone"
-                    TextColor="White"
-                    TextDecorations="Underline" />
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand">
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        HorizontalOptions="FillAndExpand">
+                        <ScrollView HeightRequest="100">
+                            <FlexLayout
+                                x:Name="ScrollViewManualPump"
+                                JustifyContent="SpaceBetween"
+                                Wrap="Wrap">
+                                <FlexLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewManualPumpTap" Tapped="ScrollViewManualPump_Tapped" />
+                                </FlexLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorManualPump"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
 
 
-                    <ScrollView HeightRequest="100">
+                            </FlexLayout>
 
-                        <FlexLayout
-                            x:Name="ScrollViewManualZone"
-                            JustifyContent="SpaceBetween"
-                            Wrap="Wrap">
-                            <FlexLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewManualZoneTap"
-                                                      Tapped="ScrollViewManualZoneTap_Tapped" />
-                            </FlexLayout.GestureRecognizers>
+                        </ScrollView>
+                    </Frame>
 
-                            <ActivityIndicator
-                                AutomationId="ActivityIndicatorManualZone"
-                                HorizontalOptions="Center"
-                                IsEnabled="true"
-                                IsRunning="True"
-                                IsVisible="True"
-                                VerticalOptions="Center" />
+                </StackLayout>
+
+                <StackLayout>
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Zone"
+                        TextColor="White"
+                        TextDecorations="Underline" />
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        HorizontalOptions="FillAndExpand">
 
 
-                        </FlexLayout>
-                    </ScrollView>
-                </Frame>
-            </StackLayout>
+                        <ScrollView HeightRequest="100">
 
-            <StackLayout
-                HeightRequest="40"
-                HorizontalOptions="EndAndExpand"
-                Orientation="Horizontal">
+                            <FlexLayout
+                                x:Name="ScrollViewManualZone"
+                                JustifyContent="SpaceBetween"
+                                Wrap="Wrap">
+                                <FlexLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewManualZoneTap" Tapped="ScrollViewManualZoneTap_Tapped" />
+                                </FlexLayout.GestureRecognizers>
 
-                <Label
-                    x:Name="LableTimeDuration"
-                    FontSize="Subtitle"
-                    HorizontalOptions="StartAndExpand"
-                    Text="Duration"
-                    TextColor="White"
-                    VerticalOptions="Center" />
-                <control:MaskedEntry
-                    x:Name="MaskedEntryTime"
-                    HorizontalOptions="StartAndExpand"
-                    Keyboard="Numeric"
-                    Mask="XX:XX"
-                    Placeholder="HH:MM"
-                    VerticalOptions="Center" />
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorManualZone"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
 
-                <Label
-                    FontSize="Body"
-                    HorizontalOptions="Fill"
-                    Text="Run with Schedule"
-                    TextColor="White"
-                    VerticalOptions="Center" />
-                <Switch
-                    x:Name="SwitchRunWithSchedule"
+
+                            </FlexLayout>
+                        </ScrollView>
+                    </Frame>
+                </StackLayout>
+
+                <StackLayout
+                    HeightRequest="40"
                     HorizontalOptions="EndAndExpand"
-                    VerticalOptions="Center" />
+                    Orientation="Horizontal">
 
-            </StackLayout>
+                    <Label
+                        x:Name="LableTimeDuration"
+                        FontSize="Subtitle"
+                        HorizontalOptions="StartAndExpand"
+                        Text="Duration"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <control:MaskedEntry
+                        x:Name="MaskedEntryTime"
+                        HorizontalOptions="StartAndExpand"
+                        Keyboard="Numeric"
+                        Mask="XX:XX"
+                        Placeholder="HH:MM"
+                        VerticalOptions="Center" />
 
-            <StackLayout>
-                <Button
-                    x:Name="ButtonStartManual"
-                    Clicked="ButtonStartManual_Clicked"
-                    Text="Start" />
-                <Button
-                    x:Name="ButtonStopManual"
-                    Clicked="ButtonStopManual_Clicked"
-                    Text="Stop" />
-            </StackLayout>
+                    <Label
+                        FontSize="Body"
+                        HorizontalOptions="Fill"
+                        Text="Run with Schedule"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Switch
+                        x:Name="SwitchRunWithSchedule"
+                        HorizontalOptions="EndAndExpand"
+                        VerticalOptions="Center" />
 
-        </FlexLayout>
+                </StackLayout>
+
+                <StackLayout>
+                    <Button
+                        x:Name="ButtonStartManual"
+                        Clicked="ButtonStartManual_Clicked"
+                        Text="Start" />
+                    <Button
+                        x:Name="ButtonStopManual"
+                        Clicked="ButtonStopManual_Clicked"
+                        Text="Stop" />
+                </StackLayout>
+
+            </FlexLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

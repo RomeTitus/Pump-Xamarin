@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <ContentPage.Content>
+
         <StackLayout VerticalOptions="Center">
             <Button
                 x:Name="BtnConnectionDetail"

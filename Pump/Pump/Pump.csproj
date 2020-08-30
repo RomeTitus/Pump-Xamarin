@@ -21,10 +21,12 @@
     <None Remove="Icons\rain.png" />
     <None Remove="Icons\setting.png" />
     <None Remove="Icons\sprinkler.jpg" />
+    <None Remove="Icons\SwitchController.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FirebaseDatabase.net" Version="4.0.4" />
+    <PackageReference Include="LiteDB" Version="5.0.9" />
     <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.3" />
     <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     <PackageReference Include="Xamarin.Forms" Version="4.7.0.1080" />
@@ -43,6 +45,7 @@
     <EmbeddedResource Include="Icons\rain.png" />
     <EmbeddedResource Include="Icons\setting.png" />
     <EmbeddedResource Include="Icons\sprinkler.jpg" />
+    <EmbeddedResource Include="Icons\SwitchController.png" />
   </ItemGroup>
 
   <ItemGroup>

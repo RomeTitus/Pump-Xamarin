@@ -24,10 +24,10 @@ namespace Pump
             }
 
 
-            if (_databaseController.GetPumpSelection() == null)
+            if (_databaseController.GetControllerConnectionSelection() == null)
             {
                 _databaseController.SetActivityStatus(new ActivityStatus(false));
-                Navigation.PushModalAsync(new AddController());
+                Navigation.PushModalAsync(new AddController(true));
                 // Navigation.PopModalAsync();
             }
             else

@@ -74,6 +74,7 @@ namespace Pump.Layout
             ScheduleName.Text = scheduleDetailList[5];
             MaskedEntryTime.Text = scheduleDetailList[1];
             ButtonCreateSchedule.IsEnabled = true;
+            PumpPicker.IsEnabled = true;
 
         }
 
@@ -461,7 +462,7 @@ namespace Pump.Layout
             }
             else
             {
-                if (new DatabaseController().isRealtimeFirebaseSelected())
+                if (new DatabaseController().IsRealtimeFirebaseSelected())
                 {
                     var schedule = new Schedule
                     {
@@ -632,7 +633,7 @@ namespace Pump.Layout
             else
             {
                 PopupNavigation.Instance.PopAsync();
-                if (new DatabaseController().isRealtimeFirebaseSelected())
+                if (new DatabaseController().IsRealtimeFirebaseSelected())
                 {
                     var schedule = new Schedule
                     {
