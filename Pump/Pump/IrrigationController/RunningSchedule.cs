@@ -49,8 +49,10 @@ namespace Pump.IrrigationController
                     }
                 }
             }
+            List<ActiveSchedule> SortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
+            return SortedList;
 
-            return activeScheduleList;
+
         }
 
         private List<DateTime> weekCalculator(string week)
@@ -94,7 +96,7 @@ namespace Pump.IrrigationController
         public List<ActiveSchedule> GetQueSchedule(List<ActiveSchedule> activeScheduleList)
         {
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.EndTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(1)).ToList();
+                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(1)).ToList();
         }
     }
 }

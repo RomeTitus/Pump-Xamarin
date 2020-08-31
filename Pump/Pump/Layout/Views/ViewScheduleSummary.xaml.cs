@@ -49,7 +49,7 @@ namespace Pump.Layout.Views
         {
             if (week.Contains("SUNDAY"))
             {
-                LabelSunday.TextColor = Color.Black;
+                LabelSunday.TextColor = Color.Aqua;
                 LabelSunday.Font = Font.SystemFontOfSize(24)
                     .WithAttributes(FontAttributes.Bold);
             }

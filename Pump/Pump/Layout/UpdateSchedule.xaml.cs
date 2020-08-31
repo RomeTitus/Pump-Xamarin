@@ -39,7 +39,7 @@ namespace Pump.Layout
         public UpdateSchedule(IReadOnlyList<string> scheduleDetailList)
         {
             InitializeComponent();
-            ButtonCreateSchedule.Text = "EDIT SCHEDULE";
+            ButtonCreateSchedule.Text = "SAVE";
             _id = scheduleDetailList[3];
             ScheduleName.Text = scheduleDetailList[5];
             MaskedEntryTime.Text = scheduleDetailList[1];
@@ -69,7 +69,7 @@ namespace Pump.Layout
 
             for (var i = 6; i < scheduleDetailList.Count; i++) _zoneDetailList.Add(scheduleDetailList[i]);
             PopulateEquipment();
-            ButtonCreateSchedule.Text = "EDIT SCHEDULE";
+            ButtonCreateSchedule.Text = "SAVE";
             _id = scheduleDetailList[3];
             ScheduleName.Text = scheduleDetailList[5];
             MaskedEntryTime.Text = scheduleDetailList[1];
