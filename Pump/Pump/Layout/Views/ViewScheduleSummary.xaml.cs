@@ -49,51 +49,51 @@ namespace Pump.Layout.Views
         {
             if (week.Contains("SUNDAY"))
             {
-                LabelSunday.TextColor = Color.Aqua;
-                LabelSunday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelSunday.TextColor = Color.Black;
+                LabelSunday.FontAttributes = FontAttributes.Bold;
+                LabelSunday.FontSize = 24;
             }
 
             if (week.Contains("MONDAY"))
             {
                 LabelMonday.TextColor = Color.Black;
-                LabelMonday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelMonday.FontAttributes = FontAttributes.Bold;
+                LabelMonday.FontSize = 24;
             }
 
             if (week.Contains("TUESDAY"))
             {
                 LabelTuesday.TextColor = Color.Black;
-                LabelTuesday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelTuesday.FontAttributes = FontAttributes.Bold;
+                LabelTuesday.FontSize = 24;
             }
 
             if (week.Contains("WEDNESDAY"))
             {
                 LabelWednesday.TextColor = Color.Black;
-                LabelWednesday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelWednesday.FontAttributes = FontAttributes.Bold;
+                LabelWednesday.FontSize = 24;
             }
 
             if (week.Contains("THURSDAY"))
             {
                 LabelThursday.TextColor = Color.Black;
-                LabelThursday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelThursday.FontAttributes = FontAttributes.Bold;
+                LabelThursday.FontSize = 24;
             }
 
             if (week.Contains("FRIDAY"))
             {
                 LabelFriday.TextColor = Color.Black;
-                LabelFriday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelFriday.FontAttributes = FontAttributes.Bold;
+                LabelFriday.FontSize = 24;
             }
 
             if (week.Contains("SATURDAY"))
             {
                 LabelSaturday.TextColor = Color.Black;
-                LabelSaturday.Font = Font.SystemFontOfSize(24)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelSaturday.FontAttributes = FontAttributes.Bold;
+                LabelSaturday.FontSize = 24;
             }
         }
 

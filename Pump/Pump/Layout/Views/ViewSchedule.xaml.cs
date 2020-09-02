@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -22,10 +23,7 @@ namespace Pump.Layout.Views
             switchScheduleIsActive.AutomationId = id;
             LabelPumpName.Text = pump;
             StackLayoutViewSchedule.AutomationId = id;
-            if (isActive.Contains("0"))
-                switchScheduleIsActive.IsToggled = false;
-            else
-                switchScheduleIsActive.IsToggled = true;
+            switchScheduleIsActive.IsToggled = !isActive.Contains("0");
         }
 
         private void SetWeek(string week)
@@ -33,50 +31,50 @@ namespace Pump.Layout.Views
             if (week.Contains("SUNDAY"))
             {
                 LabelSunday.TextColor = Color.Black;
-                LabelSunday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelSunday.FontAttributes = FontAttributes.Bold;
+                LabelSunday.FontSize = 12;
             }
 
             if (week.Contains("MONDAY"))
             {
                 LabelMonday.TextColor = Color.Black;
-                LabelMonday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelMonday.FontAttributes = FontAttributes.Bold;
+                LabelMonday.FontSize = 12;
             }
 
             if (week.Contains("TUESDAY"))
             {
                 LabelTuesday.TextColor = Color.Black;
-                LabelTuesday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelTuesday.FontAttributes = FontAttributes.Bold;
+                LabelTuesday.FontSize = 12;
             }
 
             if (week.Contains("WEDNESDAY"))
             {
                 LabelWednesday.TextColor = Color.Black;
-                LabelWednesday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelWednesday.FontAttributes = FontAttributes.Bold;
+                LabelWednesday.FontSize = 12;
             }
 
             if (week.Contains("THURSDAY"))
             {
                 LabelThursday.TextColor = Color.Black;
-                LabelThursday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelThursday.FontAttributes = FontAttributes.Bold;
+                LabelThursday.FontSize = 12;
             }
 
             if (week.Contains("FRIDAY"))
             {
                 LabelFriday.TextColor = Color.Black;
-                LabelFriday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelFriday.FontAttributes = FontAttributes.Bold;
+                LabelFriday.FontSize = 12;
             }
 
             if (week.Contains("SATURDAY"))
             {
                 LabelSaturday.TextColor = Color.Black;
-                LabelSaturday.Font = Font.SystemFontOfSize(12)
-                    .WithAttributes(FontAttributes.Bold);
+                LabelSaturday.FontAttributes = FontAttributes.Bold;
+                LabelSaturday.FontSize = 12;
             }
         }
 
@@ -88,6 +86,11 @@ namespace Pump.Layout.Views
         public TapGestureRecognizer GetTapGestureRecognizer()
         {
             return StackLayoutViewScheduleTapGesture;
+        }
+
+        private void SwitchTapGestureRecognizer(object sender, EventArgs e)
+        {
+            switchScheduleIsActive.IsToggled = !switchScheduleIsActive.IsToggled;
         }
     }
 }
