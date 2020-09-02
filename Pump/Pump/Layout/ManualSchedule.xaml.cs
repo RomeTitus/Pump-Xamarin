@@ -619,6 +619,7 @@ namespace Pump.Layout
             _floatingScreenScroll = new FloatingScreenScroll();
             if (SetButtonToDisabled(equipment))
                 equipment = ButtonSelected(equipment);
+            _floatingScreenScroll.isStackLayout = false;
             _floatingScreenScroll.setFloatingScreen(equipment);
             PopupNavigation.Instance.PushAsync(_floatingScreenScroll);
         }
@@ -747,7 +748,6 @@ namespace Pump.Layout
                     _firebaseHasReplied = false;
                     Task.Run(() => auth.DeleteManualSchedule());
                     Device.BeginInvokeOnMainThread(() =>{DisplayAlert("Reverted", "We never got a reply back", "Understood"); });
-                    //StopManualScheduleScreen();
 
                 }
 

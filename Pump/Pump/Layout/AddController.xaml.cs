@@ -53,7 +53,8 @@ namespace Pump
                 _pumpConnection.Name = TxtControllerName.Text;
                 if (!string.IsNullOrEmpty(TxtInternalConnection.Text) || !string.IsNullOrEmpty(TxtInternalPort.Text))
                 {
-                    _internalConnection = CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
+                    _internalConnection =
+                        CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
                     if (_internalConnection != null)
                     {
                         if (_internalConnection == true)
@@ -63,7 +64,7 @@ namespace Pump
                             _pumpConnection.InternalPort = Convert.ToInt32(TxtInternalPort.Text);
                             _pumpConnection.Mac = _mac;
                         }
-                            
+
                         else
                             _loadingScreen.InternalFailed();
                     }
@@ -71,7 +72,8 @@ namespace Pump
 
                 if (!string.IsNullOrEmpty(TxtExternalConnection.Text) || !string.IsNullOrEmpty(TxtExternalPort.Text))
                 {
-                    _externalConnection = CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
+                    _externalConnection =
+                        CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
                     if (_externalConnection != null)
                     {
                         if (_externalConnection == true)
@@ -87,29 +89,32 @@ namespace Pump
                     }
                 }
 
-                if (string.IsNullOrEmpty(TxtControllerCode.Text)) return;
-                try
+                if (!string.IsNullOrEmpty(TxtControllerCode.Text))
                 {
-                    _firebaseConnection = Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result.Object;
-                        
-                        
-                }
-                catch
-                {
-                    _firebaseConnection = false;
-                }
-
-                if (_firebaseConnection != null)
-                {
-                    if (_firebaseConnection == true)
+                    try
                     {
-                        _loadingScreen.FirebaseSuccess();
-                        _pumpConnection.RealTimeDatabase = true;
-                        _pumpConnection.Mac = TxtControllerCode.Text;
+                        _firebaseConnection =
+                            Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result.Object;
+
+
+                    }
+                    catch
+                    {
+                        _firebaseConnection = false;
                     }
 
-                    else
-                        _loadingScreen.FirebaseFailed();
+                    if (_firebaseConnection != null)
+                    {
+                        if (_firebaseConnection == true)
+                        {
+                            _loadingScreen.FirebaseSuccess();
+                            _pumpConnection.RealTimeDatabase = true;
+                            _pumpConnection.Mac = TxtControllerCode.Text;
+                        }
+
+                        else
+                            _loadingScreen.FirebaseFailed();
+                    }
                 }
 
                 _loadingScreen.StopActivityIndicator();
