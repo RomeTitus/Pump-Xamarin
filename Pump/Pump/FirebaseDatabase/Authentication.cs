@@ -268,5 +268,69 @@ namespace Pump.FirebaseDatabase
             return status;
         }
 
+        public async void SetLastOnRequest()
+        {
+            try
+            {
+                var lastOnJObject = new JObject {{ "RequestedTime", (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds}};
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Alive/Status")
+                    .PutAsync(lastOnJObject);
+            }
+            catch
+            {
+                return;
+            }
+            
+        }
+
+        public async Task<Alive> GetLastOnRequest()
+        {
+            try
+            {
+                var firebaseAlive = await _FirebaseClient
+                    .Child(getConnectedPi() + "/Alive")
+                    .OnceAsync<JObject>();
+                return firebaseAlive.Count > 0 ? GetJsonLastOnRequest(firebaseAlive.FirstOrDefault()?.Object) : null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+        public Alive GetJsonLastOnRequest(JObject aliveObject)
+        {
+            try
+            {
+                var alive = new Alive
+                {
+
+                    RequestedTime = long.Parse(aliveObject["RequestedTime"].ToString()),
+                    ResponseTime = long.Parse(aliveObject["ResponseTime"].ToString())
+                };
+                return alive;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+        public Alive GetJsonLastOnRequest(JObject aliveObject, Alive alive)
+        {
+            try
+            {
+                if (aliveObject.ContainsKey("RequestedTime"))
+                    alive.ResponseTime = long.Parse(aliveObject["RequestedTime"].ToString());
+                if (aliveObject.ContainsKey("ResponseTime"))
+                    alive.ResponseTime = long.Parse(aliveObject["ResponseTime"].ToString());
+                
+                return alive;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
     }
 }
