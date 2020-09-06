@@ -16,7 +16,7 @@ namespace Pump
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : TabbedPage
     {
-        private Alive alive = new Alive();
+        private Alive _alive = new Alive();
         private readonly DatabaseController _databaseController = new DatabaseController();
 
 
@@ -41,13 +41,15 @@ namespace Pump
             {
                 if (new DatabaseController().IsRealtimeFirebaseSelected())
                     new Thread(LastOnline).Start();
-                    
-                var sendToken = new Thread(() => SentNotificationToken());
+                else
+                    TabPageMain.BackgroundColor = Color.DeepSkyBlue;
+
+                var sendToken = new Thread(SentNotificationToken);
                 sendToken.Start();
             }
         }
 
-        public void SentNotificationToken()
+        private void SentNotificationToken()
         {
             try
             {
@@ -63,32 +65,13 @@ namespace Pump
         private void LastOnline()
         {
             var auth = new Authentication();
-            /*
-            alive = Task.Run(() => auth.GetLastOnRequest()).Result;
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                if (alive == null)
-                {
-                    auth.SetLastOnRequest();
-                    TabPageMain.BackgroundColor = Color.Crimson;
-                }
-                else if (alive.ResponseTime > (now - 60))
-                    TabPageMain.BackgroundColor = Color.DeepSkyBlue;
-                else
-                {
-                    auth.SetLastOnRequest();
-                }
-            });
-            oldAlive = alive;
-            */
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Alive")
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
                     if (x.Object != null)
-                        alive = auth.GetJsonLastOnRequest(x.Object, alive);
+                        _alive = auth.GetJsonLastOnRequest(x.Object, _alive);
                 });
 
             MonitorConnectionStatus();
@@ -96,7 +79,6 @@ namespace Pump
 
         private void MonitorConnectionStatus()
         {
-            var firstLoop = true;
             while (new DatabaseController().GetActivityStatus().status)
             {
                 if (!new DatabaseController().IsRealtimeFirebaseSelected())
@@ -106,33 +88,29 @@ namespace Pump
                 {
                     Device.BeginInvokeOnMainThread(() =>
                         {
-                            if (alive != null && alive.ResponseTime != 0)
+                            if (_alive != null && _alive.ResponseTime != 0)
                             {
                                 var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                                if (alive.ResponseTime < (now - 30))
+                                if (_alive.ResponseTime < (now - 30))
                                     new Authentication().SetLastOnRequest();
-                                if (alive.ResponseTime > (now - 45))
+                                if (_alive.ResponseTime > (now - 45))
                                     TabPageMain.BackgroundColor = Color.DeepSkyBlue;
-                                else if (alive.ResponseTime < (now - 60))
+                                else if (_alive.ResponseTime < (now - 60))
                                     TabPageMain.BackgroundColor = Color.Coral;
                                 
                             }
                             else
                             {
                                 new Authentication().SetLastOnRequest();
-                                if (firstLoop)
-                                    TabPageMain.BackgroundColor = Color.Crimson;
+                                TabPageMain.BackgroundColor = Color.Crimson;
                             }
                                 
                         });
                 }
-                
                 catch
                 {
-                    
+                 continue;   
                 }
-
-                firstLoop = false;
                 Thread.Sleep(5000);
             }
         }

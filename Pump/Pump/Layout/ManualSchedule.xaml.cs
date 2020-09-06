@@ -94,10 +94,12 @@ namespace Pump.Layout
             {
                 SwitchRunWithSchedule.IsToggled = _manualScheduleList[0].RunWithSchedule;
                 SwitchRunWithSchedule.IsEnabled = false;
-                var timeLeft = new DateTime(_manualScheduleList[0].EndTime) - DateTime.Now;
+                var scheduleTime = new ScheduleTime();
+                
+                var timeLeft = scheduleTime.FromUnixTimeStamp(_manualScheduleList[0].EndTime) - DateTime.Now;
 
                 MaskedEntryTime.IsEnabled = false;
-                MaskedEntryTime.Text = new ScheduleTime().convertDateTimeToString(timeLeft);
+                MaskedEntryTime.Text = scheduleTime.convertDateTimeToString(timeLeft);
                 ButtonStartManual.IsEnabled = false;
 
             });
@@ -626,6 +628,7 @@ namespace Pump.Layout
 
         private void StopManualSchedule()
         {
+            _queueManualSchedule.Clear();
             if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 _firebaseHasReplied = null;
@@ -638,6 +641,7 @@ namespace Pump.Layout
                     .AsObservable<JObject>()
                     .Subscribe(x =>
                     {
+                       
                         if (x.Key != key || _firebaseHasReplied == false)
                             return;
                         _firebaseHasReplied = true;
@@ -706,11 +710,11 @@ namespace Pump.Layout
                 var manual = new IrrigationController.ManualSchedule
                 {
                     DURATION = MaskedEntryTime.Text,
-                    EndTime = DateTime.Now.AddHours(long.Parse(duration[0])).AddMinutes(long.Parse(duration[1])).Ticks,
+                    EndTime = (Int32) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Add(TimeSpan.FromHours(long.Parse(duration[0]))).Add(TimeSpan.FromMinutes(long.Parse(duration[1]))).TotalSeconds,
                     RunWithSchedule = SwitchRunWithSchedule.IsToggled,
                     equipmentIdList = _queueManualSchedule.Select(queue => new ManualScheduleEquipment { ID = queue }).ToList()
                 };
-
+                
                 var key = Task.Run(() => auth.SetManualSchedule(manual)).Result;
                 auth._FirebaseClient
                     .Child(auth.getConnectedPi()).Child("Status")

@@ -104,9 +104,9 @@ namespace Pump.Layout
                     (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump +
                                                       ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' +
                                                       schedule.EndTime + '#'));
-
+                var scheduleTime = new ScheduleTime();
                 if (_manualScheduleList.Count > 0)
-                    activeScheduleString = _manualScheduleList[0].DURATION + ',' + _manualScheduleList[0].RunWithSchedule + '$' + activeScheduleString;
+                    activeScheduleString = scheduleTime.convertDateTimeToString(scheduleTime.FromUnixTimeStamp(_manualScheduleList[0].EndTime) - DateTime.Now) + ',' + _manualScheduleList[0].RunWithSchedule + '$' + activeScheduleString;
                 var activeScheduleObjects = GetScheduleDetailObject(activeScheduleString);
 
 
@@ -143,11 +143,19 @@ namespace Pump.Layout
 
         }
 
-        private void GetSensorReadingFirebase(DatabaseController databaseController)
+        private void GetSensorReadingFirebase()
         {
             var auth = new Authentication();
-            _sensorList = Task.Run(() => auth.GetAllSensors()).Result;
 
+            try
+            {
+                _sensorList = Task.Run(() => auth.GetAllSensors()).Result;
+            }
+            catch
+            {
+                _sensorList = new List<Sensor>();
+            }
+            
 
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Sensor")
@@ -210,7 +218,7 @@ namespace Pump.Layout
                     {
                         firebaseStarted = true;
                         new Thread(() => GetScheduleReadingFirebase(databaseController)).Start();
-                        GetSensorReadingFirebase(databaseController);
+                        GetSensorReadingFirebase();
                     }
                 }
                 else

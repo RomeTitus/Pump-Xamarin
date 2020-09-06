@@ -46,5 +46,11 @@ namespace Pump
                 minute = "0" + timeSpan.Minutes;
             return hour + ":" + minute;
         }
+
+        public DateTime FromUnixTimeStamp(long unixTimeStamp)
+        {
+            var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp).ToLocalTime();
+        }
     }
 }

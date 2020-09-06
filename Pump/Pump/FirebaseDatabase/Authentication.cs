@@ -146,17 +146,28 @@ namespace Pump.FirebaseDatabase
             };
 
             var manualScheduleDetailList = new List<ManualScheduleEquipment>();
-            foreach (var scheduleDuration in (JObject) scheduleDetailObject["ManualDetails"])
+            if (scheduleDetailObject.ContainsKey("ManualDetails"))
             {
-                manualScheduleDetailList.Add(
-                    new ManualScheduleEquipment
-                    {
-                        ID = scheduleDetailObject["ManualDetails"][scheduleDuration.Key]["id_Equipment"].ToString()
-                    });
+
+
+                foreach (var scheduleDuration in (JObject) scheduleDetailObject["ManualDetails"])
+                {
+                    manualScheduleDetailList.Add(
+                        new ManualScheduleEquipment
+                        {
+                            ID = scheduleDetailObject["ManualDetails"][scheduleDuration.Key]["id_Equipment"].ToString()
+                        });
+                }
+
+                manualSchedule.equipmentIdList = manualScheduleDetailList;
+                return manualSchedule;
             }
-               
-            manualSchedule.equipmentIdList = manualScheduleDetailList;
-            return manualSchedule;
+            else
+            {
+                var result = Task.Run(DeleteManualSchedule).Result;
+                return null;
+            }
+
         }
 
         public async Task<string> SetManualSchedule(IrrigationController.ManualSchedule manual)
@@ -293,7 +304,7 @@ namespace Pump.FirebaseDatabase
                     .OnceAsync<JObject>();
                 return firebaseAlive.Count > 0 ? GetJsonLastOnRequest(firebaseAlive.FirstOrDefault()?.Object) : null;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -310,7 +321,7 @@ namespace Pump.FirebaseDatabase
                 };
                 return alive;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -326,7 +337,7 @@ namespace Pump.FirebaseDatabase
                 
                 return alive;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
