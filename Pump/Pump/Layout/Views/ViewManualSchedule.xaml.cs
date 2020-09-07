@@ -7,21 +7,18 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewManualSchedule : ContentView
     {
-        public ViewManualSchedule(List<string> manual, bool isManualWithSchedule)
+        public ViewManualSchedule(IReadOnlyList<string> manual, bool isManualWithSchedule)
         {
             InitializeComponent();
             setManualText(manual, isManualWithSchedule);
         }
 
-        private void setManualText(List<string> manual, bool isManualWithSchedule)
+        private void setManualText(IReadOnlyList<string> manual, bool isManualWithSchedule)
         {
             var scheduleTime = new ScheduleTime();
-            if (isManualWithSchedule)
-                LableManual.Text = "Manual Running with Schedule";
-            else
-                LableManual.Text = "Manual Running without Schedule";
+            LableManual.Text = isManualWithSchedule ? "Manual Running with Schedule" : "Manual Running without Schedule";
 
-            LableManualTime.Text = "Duration: " + scheduleTime.TimeDiffNow(manual[0]);
+            LableManualTime.Text = "Duration: " + manual[0];
         }
     }
 }
