@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
-using Pump.Layout.Views;
-using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -44,23 +41,10 @@ namespace Pump
                 else
                     TabPageMain.BackgroundColor = Color.DeepSkyBlue;
 
-                var sendToken = new Thread(SentNotificationToken);
-                sendToken.Start();
+              
             }
         }
 
-        private void SentNotificationToken()
-        {
-            try
-            {
-                new SocketMessage().Message(
-                    new SocketCommands().setToken(
-                        _databaseController.GetNotificationToken().token));
-            }
-            catch
-            {
-            }
-        }
 
         private void LastOnline()
         {
@@ -70,8 +54,22 @@ namespace Pump
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    if (x.Object != null)
+                    try
+                    {
+                        if (x.Object == null) return;
                         _alive = auth.GetJsonLastOnRequest(x.Object, _alive);
+
+                        var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            if (_alive.ResponseTime > (now - 45))
+                                TabPageMain.BackgroundColor = Color.DeepSkyBlue;
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 });
 
             MonitorConnectionStatus();
@@ -79,7 +77,7 @@ namespace Pump
 
         private void MonitorConnectionStatus()
         {
-            while (new DatabaseController().GetActivityStatus().status)
+            while (true)
             {
                 if (!new DatabaseController().IsRealtimeFirebaseSelected())
                     continue;
@@ -88,23 +86,19 @@ namespace Pump
                 {
                     Device.BeginInvokeOnMainThread(() =>
                         {
-                            if (_alive != null && _alive.ResponseTime != 0)
-                            {
-                                var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                                if (_alive.ResponseTime < (now - 30))
-                                    new Authentication().SetLastOnRequest();
-                                if (_alive.ResponseTime > (now - 45))
-                                    TabPageMain.BackgroundColor = Color.DeepSkyBlue;
-                                else if (_alive.ResponseTime < (now - 60))
-                                    TabPageMain.BackgroundColor = Color.Coral;
-                                
-                            }
-                            else
+                            if (_alive == null || _alive.ResponseTime == 0)
                             {
                                 new Authentication().SetLastOnRequest();
                                 TabPageMain.BackgroundColor = Color.Crimson;
                             }
-                                
+                            else
+                            {
+                                var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                                if (_alive.ResponseTime < (now - 30))
+                                    new Authentication().SetLastOnRequest();
+                                else if (_alive.ResponseTime < (now - 60))
+                                    TabPageMain.BackgroundColor = Color.Coral;
+                            }
                         });
                 }
                 catch

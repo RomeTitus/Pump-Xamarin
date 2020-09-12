@@ -51,26 +51,34 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    Device.BeginInvokeOnMainThread(() =>
+                    try
                     {
-                        if (x.Object != null)
+                        Device.BeginInvokeOnMainThread(() =>
                         {
-                            _buttonEnabledStatus = false;
-                            var manualSchedule = auth.GetJsonManualSchedulesToObjectList(x.Object, x.Key);
-                            _manualScheduleList.Clear();
-                            _manualScheduleList.Add(manualSchedule);
-                            PopulateManualElements();
-                            SetButtonStatus();
-                        }
-                        else
-                        {
-                            _buttonEnabledStatus = true;
-                            _manualScheduleList.Clear();
-                            _activeManualScheduleId.Clear();
-                            SetButtonStatus();
-                        }
+                            if (x.Object != null)
+                            {
+                                _buttonEnabledStatus = false;
+                                var manualSchedule = auth.GetJsonManualSchedulesToObjectList(x.Object, x.Key);
+                                _manualScheduleList.Clear();
+                                _manualScheduleList.Add(manualSchedule);
+                                PopulateManualElements();
+                                SetButtonStatus();
+                            }
+                            else
+                            {
+                                _buttonEnabledStatus = true;
+                                _manualScheduleList.Clear();
+                                _activeManualScheduleId.Clear();
+                                SetButtonStatus();
+                            }
 
-                    });
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                     
                     
                 });
@@ -116,10 +124,18 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
-                    _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                    _equipmentList.Add(equipment);
-                    PopulateEquipments();
+                    try
+                    {
+                        var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
+                        _equipmentList.RemoveAll(y => y.ID == equipment.ID);
+                        _equipmentList.Add(equipment);
+                        PopulateEquipments();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 });
             //PopulateEquipments();
         }
@@ -641,17 +657,24 @@ namespace Pump.Layout
                     .AsObservable<JObject>()
                     .Subscribe(x =>
                     {
-                       
-                        if (x.Key != key || _firebaseHasReplied == false)
-                            return;
-                        _firebaseHasReplied = true;
-                        
-                        PopupNavigation.Instance.PopAsync();
-                        var result = new Authentication().GetJsonStatusToObjectList(x.Object, x.Key);
-                        if (result.Code == "success") return;
-                        
-                        Device.BeginInvokeOnMainThread(() =>{DisplayAlert(result.Operation, result.Code, "Understood");});
+                        try
+                        {
+                            if (x.Key != key || _firebaseHasReplied == false)
+                                return;
+                            _firebaseHasReplied = true;
 
+                            PopupNavigation.Instance.PopAsync();
+                            var result = new Authentication().GetJsonStatusToObjectList(x.Object, x.Key);
+                            if (result.Code == "success") return;
+
+                            Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                        
                     });
 
                 var stopwatch = new Stopwatch();
@@ -721,14 +744,22 @@ namespace Pump.Layout
                     .AsObservable<JObject>()
                     .Subscribe(x =>
                     {
-                        if(x.Key != key || _firebaseHasReplied == false)
-                            return;
-                        _firebaseHasReplied = true;
-                        
-                        PopupNavigation.Instance.PopAsync();
-                        var result = new Authentication().GetJsonStatusToObjectList(x.Object, x.Key);
+                        try
+                        {
+                            if (x.Key != key || _firebaseHasReplied == false)
+                                return;
+                            _firebaseHasReplied = true;
 
-                        Device.BeginInvokeOnMainThread(() =>{DisplayAlert(result.Operation, result.Code, "Understood");});
+                            PopupNavigation.Instance.PopAsync();
+                            var result = new Authentication().GetJsonStatusToObjectList(x.Object, x.Key);
+
+                            Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
                         //StartManualScheduleScreen();
                     });
                         

@@ -47,9 +47,17 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
-                    _schedulesList.RemoveAll(y => y.ID == schedule.ID);
-                    _schedulesList.Add(schedule);
+                    try
+                    {
+                        var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
+                        _schedulesList.RemoveAll(y => y.ID == schedule.ID);
+                        _schedulesList.Add(schedule);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 });
 
 
@@ -60,9 +68,17 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
-                    _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                    _equipmentList.Add(equipment);
+                    try
+                    {
+                        var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
+                        _equipmentList.RemoveAll(y => y.ID == equipment.ID);
+                        _equipmentList.Add(equipment);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 });
 
             auth._FirebaseClient
@@ -70,20 +86,28 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    Device.BeginInvokeOnMainThread(() =>
+                    try
                     {
-                        if (x.Object != null)
+                        Device.BeginInvokeOnMainThread(() =>
                         {
-                            var manualSchedule = auth.GetJsonManualSchedulesToObjectList(x.Object, x.Key);
-                            _manualScheduleList.Clear();
-                            _manualScheduleList.Add(manualSchedule);
-                        }
-                        else
-                        {
-                            _manualScheduleList.Clear();
-                        }
+                            if (x.Object != null)
+                            {
+                                var manualSchedule = auth.GetJsonManualSchedulesToObjectList(x.Object, x.Key);
+                                _manualScheduleList.Clear();
+                                _manualScheduleList.Add(manualSchedule);
+                            }
+                            else
+                            {
+                                _manualScheduleList.Clear();
+                            }
 
-                    });
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 });
 
             var oldActiveScheduleString = "-999";
