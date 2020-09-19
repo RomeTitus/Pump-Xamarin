@@ -13,7 +13,10 @@
   <ItemGroup>
     <None Remove="Icons\activePump.png" />
     <None Remove="Icons\ConnectionDown.png" />
+    <None Remove="Icons\CustomSchedule.png" />
     <None Remove="Icons\FieldSun.png" />
+    <None Remove="Icons\Home.png" />
+    <None Remove="Icons\ManualSchedule.png" />
     <None Remove="Icons\NoConnection.png" />
     <None Remove="Icons\PressureHigh.png" />
     <None Remove="Icons\PressureLow.png" />
@@ -37,7 +40,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Icons\activePump.png" />
     <EmbeddedResource Include="Icons\ConnectionDown.png" />
+    <EmbeddedResource Include="Icons\CustomSchedule.png" />
     <EmbeddedResource Include="Icons\FieldSun.png" />
+    <EmbeddedResource Include="Icons\Home.png" />
+    <EmbeddedResource Include="Icons\ManualSchedule.png" />
     <EmbeddedResource Include="Icons\NoConnection.png" />
     <EmbeddedResource Include="Icons\PressureHigh.png" />
     <EmbeddedResource Include="Icons\PressureLow.png" />

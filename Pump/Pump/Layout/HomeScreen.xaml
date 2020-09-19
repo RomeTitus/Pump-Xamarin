@@ -13,7 +13,7 @@
     <NavigationPage
         x:Name="ScheduleStatusTab"
         Title="Schedule"
-        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.pump.jpg}">
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.Home.png}">
         <!--  Place new controls here  -->
         <x:Arguments>
             <local:ScheduleStatus />
@@ -25,9 +25,18 @@
     <NavigationPage
         x:Name="ManualStatusTab"
         Title="Manual"
-        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.rain.png}">
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.ManualSchedule.png}">
         <x:Arguments>
             <local:ManualSchedule />
+        </x:Arguments>
+    </NavigationPage>
+
+    <NavigationPage
+        x:Name="CustomScheduleTab"
+        Title="Custom"
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.CustomSchedule.png}">
+        <x:Arguments>
+            <local:ViewScheduleScreen />
         </x:Arguments>
     </NavigationPage>
 
