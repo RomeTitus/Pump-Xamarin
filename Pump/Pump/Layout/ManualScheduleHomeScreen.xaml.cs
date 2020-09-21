@@ -19,7 +19,7 @@ using ManualScheduleClass = Pump.Database.Table.ManualScheduleClass;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ManualSchedule : ContentPage
+    public partial class ManualScheduleHomeScreen : ContentPage
     {
         private readonly List<IrrigationController.ManualSchedule> _manualScheduleList = new List<IrrigationController.ManualSchedule>();
         private readonly List<Equipment> _equipmentList = new List<Equipment>();
@@ -35,7 +35,7 @@ namespace Pump.Layout
         private string _oldManualSchedule;
         private bool? _firebaseHasReplied = false;
 
-        public ManualSchedule()
+        public ManualScheduleHomeScreen()
         {
             InitializeComponent();
             new Thread(ThreadController).Start();

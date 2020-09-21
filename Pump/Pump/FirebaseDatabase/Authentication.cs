@@ -131,7 +131,22 @@ namespace Pump.FirebaseDatabase
             
         }
 
-        
+        public async void DeleteSchedule(Schedule schedule)
+        {
+            try
+            {
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Schedule/" + schedule.ID)
+                    .DeleteAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+
+            }
+        }
+
+
         public ManualSchedule GetJsonManualSchedulesToObjectList(JObject scheduleDetailObject, string key)
         {
             try
@@ -379,7 +394,7 @@ namespace Pump.FirebaseDatabase
             try
             {
                 if (aliveObject.ContainsKey("RequestedTime"))
-                    alive.ResponseTime = long.Parse(aliveObject["RequestedTime"].ToString());
+                    alive.RequestedTime = long.Parse(aliveObject["RequestedTime"].ToString());
                 if (aliveObject.ContainsKey("ResponseTime"))
                     alive.ResponseTime = long.Parse(aliveObject["ResponseTime"].ToString());
                 

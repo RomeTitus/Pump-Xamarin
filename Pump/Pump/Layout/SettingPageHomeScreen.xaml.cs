@@ -5,9 +5,9 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class SettingPage : ContentPage
+    public partial class SettingPageHomeScreen : ContentPage
     {
-        public SettingPage()
+        public SettingPageHomeScreen()
         {
             InitializeComponent();
         }
@@ -21,7 +21,7 @@ namespace Pump.Layout
         private void BtnScheduleDetail_OnPressed(object sender, EventArgs e)
         {
             //Navigation.PopAsync();
-            Navigation.PushModalAsync(new ViewScheduleScreen());
+            Navigation.PushModalAsync(new ViewScheduleHomeScreen());
         }
 
         private void BtnGraphSummary_OnPressed(object sender, EventArgs e)

@@ -61,8 +61,23 @@
     <Compile Update="Layout\FloatingScreenScroll.xaml.cs">
       <DependentUpon>FloatingScreenScroll.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Layout\ManualScheduleHomeScreen.xaml.cs">
+      <DependentUpon>ManualScheduleHomeScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\ScheduleStatusHomeScreen - Copy.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\ScheduleStatusHomeScreen.xaml.cs">
+      <DependentUpon>ScheduleStatusHomeScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\SettingPageHomeScreen.xaml.cs">
+      <DependentUpon>SettingPageHomeScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Layout\VerifyConnections.xaml.cs">
       <DependentUpon>VerifyConnections.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\ViewScheduleHomeScreen.xaml.cs">
+      <DependentUpon>ViewScheduleHomeScreen.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -79,13 +94,16 @@
     <EmbeddedResource Update="Layout\HomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ManualSchedule.xaml">
+    <EmbeddedResource Update="Layout\ManualScheduleHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ScheduleStatus.xaml">
+    <EmbeddedResource Update="Layout\ScheduleStatusHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\SettingPage.xaml">
+    <EmbeddedResource Update="Layout\SettingPageHomeScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\UpdateCustomSchedule.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\UpdateSchedule.xaml">
@@ -94,10 +112,10 @@
     <EmbeddedResource Update="Layout\VerifyConnections.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ViewGraphSummaryScreen.xaml">
+    <EmbeddedResource Update="Layout\ViewCustomScheduleHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ViewScheduleScreen.xaml">
+    <EmbeddedResource Update="Layout\ViewGraphSummaryScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewDeleteConfirmation.xaml">

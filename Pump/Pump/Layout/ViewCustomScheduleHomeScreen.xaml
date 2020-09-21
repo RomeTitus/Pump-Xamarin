@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.Layout.ViewCustomScheduleHomeScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <ContentPage.Content>
+        <StackLayout>
+
+            <StackLayout Padding="20" VerticalOptions="FillAndExpand">
+                <Label
+                    FontSize="Title"
+                    HorizontalOptions="Center"
+                    Text="Custom Schedule"
+                    TextColor="White"
+                    TextDecorations="Underline" />
+
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView>
+                        <StackLayout x:Name="ScrollViewCustomScheduleDetail">
+                            <ActivityIndicator
+                                AutomationId="ActivityIndicator"
+                                HorizontalOptions="Center"
+                                IsEnabled="true"
+                                IsRunning="True"
+                                IsVisible="True"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+                    </ScrollView>
+                </Frame>
+            </StackLayout>
+
+            <StackLayout VerticalOptions="End">
+                <Button
+                    x:Name="ButtonCreateCustomSchedule"
+                    Clicked="ButtonCreateCustomSchedule_OnClicked"
+                    Text="Create Custom Schedule" />
+            </StackLayout>
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

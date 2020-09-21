@@ -12,22 +12,20 @@
 
     <NavigationPage
         x:Name="ScheduleStatusTab"
-        Title="Schedule"
+        Title="Status"
         IconImageSource="{localImage:ImageResourceExtention Pump.Icons.Home.png}">
-        <!--  Place new controls here  -->
         <x:Arguments>
-            <local:ScheduleStatus />
+            <local:ScheduleStatusHomeScreen />
         </x:Arguments>
     </NavigationPage>
 
 
-    <!--<div>Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
     <NavigationPage
         x:Name="ManualStatusTab"
         Title="Manual"
         IconImageSource="{localImage:ImageResourceExtention Pump.Icons.ManualSchedule.png}">
         <x:Arguments>
-            <local:ManualSchedule />
+            <local:ManualScheduleHomeScreen />
         </x:Arguments>
     </NavigationPage>
 
@@ -36,7 +34,16 @@
         Title="Custom"
         IconImageSource="{localImage:ImageResourceExtention Pump.Icons.CustomSchedule.png}">
         <x:Arguments>
-            <local:ViewScheduleScreen />
+            <local:ViewCustomScheduleHomeScreen />
+        </x:Arguments>
+    </NavigationPage>
+
+    <NavigationPage
+        x:Name="ScheduleTab"
+        Title="Schedule"
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.CustomSchedule.png}">
+        <x:Arguments>
+            <local:ViewScheduleHomeScreen />
         </x:Arguments>
     </NavigationPage>
 
@@ -45,7 +52,7 @@
         Title="Setting"
         IconImageSource="{localImage:ImageResourceExtention Pump.Icons.setting.png}">
         <x:Arguments>
-            <local:SettingPage />
+            <local:SettingPageHomeScreen />
         </x:Arguments>
     </NavigationPage>
 

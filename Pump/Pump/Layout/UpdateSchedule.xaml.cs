@@ -480,7 +480,7 @@ namespace Pump.Layout
                         var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
                         Navigation.PopModalAsync();
                         Navigation.PopModalAsync();
-                        Navigation.PushModalAsync(new ViewScheduleScreen());
+                        Navigation.PushModalAsync(new ViewScheduleHomeScreen());
                     }
                     else
                         GetViewSchedulePumpTime();
@@ -502,7 +502,7 @@ namespace Pump.Layout
                         new Thread(() => SendScheduleSocket(schedule)).Start();
                         Navigation.PopModalAsync();
                         Navigation.PopModalAsync();
-                        Navigation.PushModalAsync(new ViewScheduleScreen());
+                        Navigation.PushModalAsync(new ViewScheduleHomeScreen());
                     }
                 }
 
@@ -660,7 +660,7 @@ namespace Pump.Layout
 
                 Navigation.PopModalAsync();
                 Navigation.PopModalAsync();
-                Navigation.PushModalAsync(new ViewScheduleScreen());
+                Navigation.PushModalAsync(new ViewScheduleHomeScreen());
             }
         }
 

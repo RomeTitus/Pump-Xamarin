@@ -18,7 +18,7 @@ using Switch = Xamarin.Forms.Switch;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewScheduleScreen : ContentPage
+    public partial class ViewScheduleHomeScreen : ContentPage
     {
         private readonly List<Equipment> _equipmentList = new List<Equipment>();
         private readonly List<Schedule> _schedulesList = new List<Schedule>();
@@ -26,7 +26,7 @@ namespace Pump.Layout
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
 
-        public ViewScheduleScreen()
+        public ViewScheduleHomeScreen()
         {
             InitializeComponent();
 

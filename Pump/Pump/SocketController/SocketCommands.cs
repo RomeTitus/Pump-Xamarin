@@ -30,7 +30,7 @@ namespace Pump.SocketController
             return id + "#" + schedule + "$EDITSCHEDULE";
         }
 
-        public string deleteSchedule(int id)
+        public string deleteSchedule(string id)
         {
             return id + "$DeleteSchedule";
         }

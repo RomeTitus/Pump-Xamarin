@@ -17,7 +17,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ScheduleStatus : ContentPage
+    public partial class ScheduleStatusHomeScreen : ContentPage
     {
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
@@ -29,7 +29,7 @@ namespace Pump.Layout
         private readonly List<Schedule> _schedulesList = new List<Schedule>();
         private List<Sensor> _sensorList = new List<Sensor>();
 
-        public ScheduleStatus()
+        public ScheduleStatusHomeScreen()
         {
             InitializeComponent();
             new Thread(ThreadController).Start();

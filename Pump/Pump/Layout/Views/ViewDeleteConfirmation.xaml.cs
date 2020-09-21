@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Pump.Database;
+using Pump.FirebaseDatabase;
+using Pump.IrrigationController;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
@@ -28,15 +31,20 @@ namespace Pump.Layout.Views
 
         private void DeleteScheduleButton_OnClicked(object sender, EventArgs e)
         {
-            DeleteSchedule(Convert.ToInt32(_schedule[3]));
+            DeleteSchedule(_schedule[3]);
             PopupNavigation.Instance.PopAsync();
             Navigation.PopModalAsync();
-            Navigation.PushModalAsync(new ViewScheduleScreen());
+            Navigation.PushModalAsync(new ViewScheduleHomeScreen());
         }
 
-        private void DeleteSchedule(int id)
+        private void DeleteSchedule(string id)
         {
-            var result = _socket.Message(_command.deleteSchedule(id));
+            if (!new DatabaseController().IsRealtimeFirebaseSelected())
+                _socket.Message(_command.deleteSchedule(id));
+            else
+            {
+                new Authentication().DeleteSchedule(new Schedule {ID = id});
+            }
         }
     }
 }

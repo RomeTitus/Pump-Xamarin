@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentPage
-    x:Class="Pump.Layout.SettingPage"
+    x:Class="Pump.Layout.SettingPageHomeScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
@@ -17,6 +17,7 @@
                 VerticalOptions="Center" />
             <Button
                 x:Name="BtnScheduleDetail"
+                IsVisible="False"
                 Pressed="BtnScheduleDetail_OnPressed"
                 Text="Schedule Edit/Delete"
                 VerticalOptions="Center" />
