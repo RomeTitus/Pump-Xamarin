@@ -6,7 +6,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    BackgroundColor="DeepSkyBlue"
     mc:Ignorable="d">
     <ContentPage.Content>
 
@@ -45,10 +44,6 @@
                     x:Name="ButtonCreateSchedule"
                     Clicked="ButtonCreateSchedule_OnClicked"
                     Text="Create Schedule" />
-                <Button
-                    x:Name="ButtonBack"
-                    Clicked="ButtonBack_OnClicked"
-                    Text="Back" />
             </StackLayout>
 
         </StackLayout>

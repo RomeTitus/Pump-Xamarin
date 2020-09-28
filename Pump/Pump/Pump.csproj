@@ -16,6 +16,8 @@
     <None Remove="Icons\CustomSchedule.png" />
     <None Remove="Icons\FieldSun.png" />
     <None Remove="Icons\Home.png" />
+    <None Remove="Icons\Logo.jpg" />
+    <None Remove="Icons\Logo.png" />
     <None Remove="Icons\ManualSchedule.png" />
     <None Remove="Icons\NoConnection.png" />
     <None Remove="Icons\PressureHigh.png" />
@@ -43,6 +45,7 @@
     <EmbeddedResource Include="Icons\CustomSchedule.png" />
     <EmbeddedResource Include="Icons\FieldSun.png" />
     <EmbeddedResource Include="Icons\Home.png" />
+    <EmbeddedResource Include="Icons\Logo.png" />
     <EmbeddedResource Include="Icons\ManualSchedule.png" />
     <EmbeddedResource Include="Icons\NoConnection.png" />
     <EmbeddedResource Include="Icons\PressureHigh.png" />
@@ -116,6 +119,12 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\ViewGraphSummaryScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewCustomSchedule.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewCustomScheduleSummary.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewDeleteConfirmation.xaml">

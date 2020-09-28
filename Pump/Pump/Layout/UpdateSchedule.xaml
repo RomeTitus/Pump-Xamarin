@@ -363,7 +363,7 @@
                         </StackLayout>
                     </Frame>
                 </StackLayout>
-                <StackLayout VerticalOptions="End">
+                <StackLayout VerticalOptions="EndAndExpand">
                     <Button
                         x:Name="ButtonCreateSchedule"
                         Clicked="ButtonUpdateSchedule_OnClicked"

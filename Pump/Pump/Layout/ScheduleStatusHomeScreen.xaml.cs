@@ -26,7 +26,7 @@ namespace Pump.Layout
         private string _oldActiveSchedule;
         private string _oldActiveSensorStatus;
         private string _oldQueueActiveSchedule;
-        private readonly List<Schedule> _schedulesList = new List<Schedule>();
+        private List<Schedule> _schedulesList = null;
         private List<Sensor> _sensorList = new List<Sensor>();
 
         public ScheduleStatusHomeScreen()
@@ -49,6 +49,8 @@ namespace Pump.Layout
                 {
                     try
                     {
+                        if(_schedulesList == null)
+                            _schedulesList = new List<Schedule>();
                         var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
                         _schedulesList.RemoveAll(y => y.ID == schedule.ID);
                         _schedulesList.Add(schedule);
@@ -115,6 +117,13 @@ namespace Pump.Layout
 
             while (databaseController.IsRealtimeFirebaseSelected())
             {
+                if (_schedulesList == null)
+                {
+                    Thread.Sleep(2000);
+                    continue;
+                }
+                    
+
                 var runningSchedule = new RunningSchedule();
 
                 var queSchedules =
@@ -248,33 +257,38 @@ namespace Pump.Layout
                 else
                 {
                     firebaseStarted = false;
-                    _schedulesList.Clear();
-                    _equipmentList.Clear();
-                    _sensorList.Clear();
-                    if (started == false && databaseController.GetActivityStatus() != null &&
-                        databaseController.GetActivityStatus().status)
+                    if (_schedulesList != null && _equipmentList != null)
                     {
-                        //Start the threads
-                        scheduleDetail = new Thread(GetScheduleDetail);
-                        queueScheduleDetail = new Thread(GetQueueScheduleDetail);
-                        sensorStatus = new Thread(GetSensorStatus);
-
-                        scheduleDetail.Start();
-                        queueScheduleDetail.Start();
-                        sensorStatus.Start();
-                        started = true;
-                    }
-
-                    if (scheduleDetail != null)
-                        if (started && databaseController.GetActivityStatus() != null &&
-                            databaseController.GetActivityStatus().status == false)
+                        _schedulesList.Clear();
+                        _equipmentList.Clear();
+                        _sensorList.Clear();
+                        if (started == false && databaseController.GetActivityStatus() != null &&
+                            databaseController.GetActivityStatus().status)
                         {
-                            scheduleDetail.Abort();
-                            queueScheduleDetail.Abort();
-                            sensorStatus.Abort();
-                            started = false;
-                            //Stop the threads
+                            //Start the threads
+                            scheduleDetail = new Thread(GetScheduleDetail);
+                            queueScheduleDetail = new Thread(GetQueueScheduleDetail);
+                            sensorStatus = new Thread(GetSensorStatus);
+
+                            scheduleDetail.Start();
+                            queueScheduleDetail.Start();
+                            sensorStatus.Start();
+                            started = true;
                         }
+
+                        if (scheduleDetail != null)
+                            if (started && databaseController.GetActivityStatus() != null &&
+                                databaseController.GetActivityStatus().status == false)
+                            {
+                                scheduleDetail.Abort();
+                                queueScheduleDetail.Abort();
+                                sensorStatus.Abort();
+                                started = false;
+                                //Stop the threads
+                            }
+                    }
+                       
+                    
                 }
 
 

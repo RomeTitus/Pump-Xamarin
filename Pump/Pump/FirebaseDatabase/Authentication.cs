@@ -28,9 +28,17 @@ namespace Pump.FirebaseDatabase
 
         public string getConnectedPi()
         {
-            var pumpDetail = new DatabaseController().GetControllerConnectionSelection();
-            //return "DC:A6:32:33:63:CA";
-            return pumpDetail.Mac;
+            try
+            {
+                var pumpDetail = new DatabaseController().GetControllerConnectionSelection();
+                //return "DC:A6:32:33:63:CA";
+                return pumpDetail.Mac;
+            }
+            catch
+            {
+                return "";
+            }
+           
         }
 
 
@@ -145,6 +153,83 @@ namespace Pump.FirebaseDatabase
 
             }
         }
+
+        public CustomSchedule GetJsonCustomSchedulesToObjectList(JObject customScheduleDetailObject, string key)
+        {
+            try
+            {
+                var schedule = new CustomSchedule
+                {
+                    ID = key,
+                    NAME = customScheduleDetailObject["NAME"].ToString(),
+                    id_Pump = customScheduleDetailObject["id_Pump"].ToString()
+                };
+
+                if (customScheduleDetailObject.ContainsKey("EndTime"))
+                    schedule.StartTime = long.Parse(customScheduleDetailObject["EndTime"].ToString());
+
+                var scheduleDetailList = new List<ScheduleDetail>();
+                foreach (var scheduleDuration in (JObject)customScheduleDetailObject["ScheduleDetails"])
+                    scheduleDetailList.Add(
+                        new ScheduleDetail
+                        {
+                            ID = scheduleDuration.Key,
+                            id_Equipment = customScheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["id_Equipment"]
+                                .ToString(),
+                            DURATION = customScheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["DURATION"]
+                                .ToString()
+                        });
+                schedule.ScheduleDetails = scheduleDetailList;
+                return schedule;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+
+
+        public async Task<string> SetCustomSchedule(CustomSchedule schedule)
+        {
+            try
+            {
+                var scheduleJObject = new JObject
+                {
+                    {"NAME", schedule.NAME},
+                    {"id_Pump", schedule.id_Pump}, {"isActive", schedule.isActive},{"EndTime", schedule.StartTime}
+                };
+
+                scheduleJObject["ScheduleDetails"] = new JObject();
+                foreach (var scheduleDetails in schedule.ScheduleDetails)
+                {
+                    if (scheduleDetails.ID == null)
+                        scheduleDetails.ID = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                    scheduleJObject["ScheduleDetails"][scheduleDetails.ID] = new JObject
+                        {{"id_Equipment", scheduleDetails.id_Equipment}, {"DURATION", scheduleDetails.DURATION}};
+                }
+
+                if (schedule.ID == null)
+                {
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/CustomSchedule")
+                        .PostAsync(scheduleJObject);
+                    return result.Key;
+                }
+
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/CustomSchedule/" + schedule.ID)
+                    .PutAsync(scheduleJObject);
+                return schedule.ID;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+
+        }
+
 
 
         public ManualSchedule GetJsonManualSchedulesToObjectList(JObject scheduleDetailObject, string key)

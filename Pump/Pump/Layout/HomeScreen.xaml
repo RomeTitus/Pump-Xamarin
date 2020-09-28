@@ -41,7 +41,7 @@
     <NavigationPage
         x:Name="ScheduleTab"
         Title="Schedule"
-        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.CustomSchedule.png}">
+        IconImageSource="{localImage:ImageResourceExtention Pump.Icons.FieldSun.png}">
         <x:Arguments>
             <local:ViewScheduleHomeScreen />
         </x:Arguments>
