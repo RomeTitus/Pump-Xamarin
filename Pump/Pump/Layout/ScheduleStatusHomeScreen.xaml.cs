@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Firebase.Database;
+using Firebase.Database.Streaming;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.FirebaseDatabase;
@@ -49,11 +51,14 @@ namespace Pump.Layout
                 {
                     try
                     {
-                        if(_schedulesList == null)
+                        if (_schedulesList == null)
                             _schedulesList = new List<Schedule>();
+                        if (x.Object == null) return;
                         var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
                         _schedulesList.RemoveAll(y => y.ID == schedule.ID);
-                        _schedulesList.Add(schedule);
+                        if (x.EventType != FirebaseEventType.Delete)
+                            _schedulesList.Add(schedule);
+
                     }
                     catch (Exception e)
                     {
@@ -74,7 +79,8 @@ namespace Pump.Layout
                     {
                         var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
                         _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                        _equipmentList.Add(equipment);
+                        if (x.EventType != FirebaseEventType.Delete)
+                            _equipmentList.Add(equipment);
                     }
                     catch (Exception e)
                     {
@@ -96,7 +102,8 @@ namespace Pump.Layout
                             {
                                 var manualSchedule = auth.GetJsonManualSchedulesToObjectList(x.Object, x.Key);
                                 _manualScheduleList.Clear();
-                                _manualScheduleList.Add(manualSchedule);
+                                if (x.EventType != FirebaseEventType.Delete)
+                                    _manualScheduleList.Add(manualSchedule);
                             }
                             else
                             {

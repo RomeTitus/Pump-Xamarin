@@ -22,6 +22,19 @@ namespace Pump.Layout.Views
             InitializeComponent();
             this._schedule = _schedule;
             ScheduleName.Text = _schedule[5];
+            DeleteScheduleButton.Clicked += DeleteScheduleButton_OnClicked;
+        }
+
+        public ViewDeleteConfirmation(CustomSchedule schedule)
+        {
+            InitializeComponent();
+            ScheduleName.Text = schedule.NAME;
+            DeleteScheduleButton.AutomationId = schedule.ID;
+        }
+
+        public Button GetDeleteButton()
+        {
+            return DeleteScheduleButton;
         }
 
         private void ButtonCancel_OnClicked(object sender, EventArgs e)

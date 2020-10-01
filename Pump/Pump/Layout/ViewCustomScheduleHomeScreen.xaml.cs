@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Firebase.Database.Streaming;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.FirebaseDatabase;
@@ -21,6 +22,7 @@ namespace Pump.Layout
         private List<Equipment> _equipmentList = null;
         private List<CustomSchedule> _customSchedulesList = null;
         private List<CustomSchedule> _oldCustomSchedulesList = null;
+        readonly FloatingScreen _floatingScreen = new FloatingScreen();
 
         public ViewCustomScheduleHomeScreen()
         {
@@ -42,7 +44,8 @@ namespace Pump.Layout
                         _customSchedulesList = new List<CustomSchedule>();
                     var schedule = auth.GetJsonCustomSchedulesToObjectList(x.Object, x.Key);
                     _customSchedulesList.RemoveAll(y => y.ID == schedule.ID);
-                    _customSchedulesList.Add(schedule);
+                    if(x.EventType != FirebaseEventType.Delete)
+                        _customSchedulesList.Add(schedule);
                 });
 
 
@@ -55,7 +58,8 @@ namespace Pump.Layout
                         _equipmentList = new List<Equipment>();
                     var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
                     _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                    _equipmentList.Add(equipment);
+                    if (x.EventType != FirebaseEventType.Delete)
+                        _equipmentList.Add(equipment);
                 });
 
             var databaseController = new DatabaseController();
@@ -64,7 +68,7 @@ namespace Pump.Layout
                 try
                 {
                     
-                    if (_equipmentList != null && _customSchedulesList != null && (_oldCustomSchedulesList == null || !_customSchedulesList.All(_oldCustomSchedulesList.Contains)))
+                    if (_equipmentList != null && _customSchedulesList != null && (_oldCustomSchedulesList == null || (!_customSchedulesList.All(_oldCustomSchedulesList.Contains) || _customSchedulesList.Count < _oldCustomSchedulesList.Count)))
                     {
                         if (_oldCustomSchedulesList == null)
                             _oldCustomSchedulesList = new List<CustomSchedule>();
@@ -148,35 +152,35 @@ namespace Pump.Layout
 
         private void ViewScheduleSummary(string id)
         {
-            var floatingScreen = new FloatingScreen();
-            PopupNavigation.Instance.PushAsync(floatingScreen);
-            new Thread(() => GetScheduleSummary(id, floatingScreen)).Start();
+            
+            PopupNavigation.Instance.PushAsync(_floatingScreen);
+            new Thread(() => GetScheduleSummary(id)).Start();
         }
-        private void GetScheduleSummary(string id, FloatingScreen floatingScreen)
+        private void GetScheduleSummary(string id)
         {
             if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
 
                 var schedule = _customSchedulesList.FirstOrDefault(x => x.ID == id);
                 
-                var scheduleList = GetCustomScheduleSummaryObject(schedule, floatingScreen);
+                var scheduleList = GetCustomScheduleSummaryObject(schedule);
 
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     try
                     {
-                        floatingScreen.SetFloatingScreen(scheduleList);
+                        _floatingScreen.SetFloatingScreen(scheduleList);
                     }
                     catch
                     {
                         var scheduleSummaryListObject = new List<object> { new ViewNoConnection() };
-                        floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
+                        _floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                     }
                 });
             }
         }
 
-        private List<object> GetCustomScheduleSummaryObject(CustomSchedule schedule, FloatingScreen floatingScreen)
+        private List<object> GetCustomScheduleSummaryObject(CustomSchedule schedule)
         {
             var customScheduleSummaryListObject = new List<object>();
             try
@@ -188,8 +192,10 @@ namespace Pump.Layout
                 }
 
                 ViewCustomScheduleSummary viewSchedule = null;
-                viewSchedule = new ViewCustomScheduleSummary(schedule, floatingScreen, _equipmentList);
+                viewSchedule = new ViewCustomScheduleSummary(schedule, _floatingScreen, _equipmentList);
 
+                viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
+                viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
                 customScheduleSummaryListObject.Add(viewSchedule);
 
 
@@ -213,6 +219,30 @@ namespace Pump.Layout
                     DisplayAlert("Cannot Create a Schedule",
                         "You are missing the equipment that is needed to create a schedule", "Understood");
             }
+        }
+
+        private void EditButton_Tapped(object sender, EventArgs e)
+        {
+            PopupNavigation.Instance.PopAsync();
+            var edit = (Button) sender;
+            var customSchedule = _customSchedulesList.First(schedule => schedule.ID == edit.AutomationId);
+            Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList, customSchedule));
+        }
+
+        private void DeleteButton_Tapped(object sender, EventArgs e)
+        {
+            var delete = (Button)sender;
+            var customSchedule = _customSchedulesList.First(schedule => schedule.ID == delete.AutomationId);
+            var deleteConfirm = new ViewDeleteConfirmation(customSchedule);
+            _floatingScreen.SetFloatingScreen(new List<object> { deleteConfirm });
+            deleteConfirm.GetDeleteButton().Clicked += DeleteConfirmButton_Tapped;
+        }
+
+        private void DeleteConfirmButton_Tapped(object sender, EventArgs e)
+        {
+            PopupNavigation.Instance.PopAsync();
+            var delete = (Button)sender;
+            new Authentication().DeleteCustomSchedule(new CustomSchedule { ID = delete.AutomationId });
         }
     }
 }

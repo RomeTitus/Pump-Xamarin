@@ -660,7 +660,6 @@ namespace Pump.Layout
 
                 Navigation.PopModalAsync();
                 Navigation.PopModalAsync();
-                Navigation.PushModalAsync(new ViewScheduleHomeScreen());
             }
         }
 

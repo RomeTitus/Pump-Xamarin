@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Firebase.Database.Query;
+using Firebase.Database.Streaming;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.FirebaseDatabase;
@@ -128,7 +129,8 @@ namespace Pump.Layout
                     {
                         var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
                         _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                        _equipmentList.Add(equipment);
+                        if (x.EventType != FirebaseEventType.Delete)
+                            _equipmentList.Add(equipment);
                         PopulateEquipments();
                     }
                     catch (Exception e)

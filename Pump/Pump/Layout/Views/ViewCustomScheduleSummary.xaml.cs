@@ -55,16 +55,16 @@ namespace Pump.Layout.Views
             }
         }
 
-       
-
-        private void ButtonEdit_OnClicked(object sender, EventArgs e)
+        public Button GetButtonEdit()
         {
-            
+            ButtonEdit.AutomationId = schedule.ID;
+            return ButtonEdit;
         }
 
-        private void ButtonDelete_OnClicked(object sender, EventArgs e)
+        public Button GetButtonDelete()
         {
-            
+            ButtonDelete.AutomationId = schedule.ID;
+            return ButtonDelete;
         }
     }
 }

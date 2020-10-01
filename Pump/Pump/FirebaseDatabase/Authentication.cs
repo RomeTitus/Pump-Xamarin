@@ -154,6 +154,20 @@ namespace Pump.FirebaseDatabase
             }
         }
 
+        public async void DeleteCustomSchedule(CustomSchedule schedule)
+        {
+            try
+            {
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/CustomSchedule/" + schedule.ID)
+                    .DeleteAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
         public CustomSchedule GetJsonCustomSchedulesToObjectList(JObject customScheduleDetailObject, string key)
         {
             try
@@ -490,6 +504,5 @@ namespace Pump.FirebaseDatabase
                 return null;
             }
         }
-
     }
 }

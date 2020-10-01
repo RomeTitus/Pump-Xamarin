@@ -16,13 +16,11 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class UpdateCustomSchedule : ContentPage
     {
-        private readonly string _id;
+        private readonly string _id = null;
         private readonly List<Equipment> _equipmentList = new List<Equipment>();
-        private readonly List<CustomSchedule> _customSchedulesList = new List<CustomSchedule>();
+        private readonly CustomSchedule _customSchedule = null;
         private readonly List<string> _pumpIdList = new List<string>();
         private readonly List<string> _zoneDetailList = new List<string>();
-
-
         public UpdateCustomSchedule(List<Equipment> equipmentList)
         {
             InitializeComponent();
@@ -31,6 +29,41 @@ namespace Pump.Layout
             ButtonCreateCustomSchedule.IsEnabled = true;
             CustomPumpPicker.IsEnabled = true;
            
+        }
+
+        public UpdateCustomSchedule(List<Equipment> equipmentList, CustomSchedule schedule)
+        {
+            InitializeComponent();
+            _customSchedule = schedule;
+            _equipmentList = equipmentList;
+            PopulateEquipment();
+            ButtonCreateCustomSchedule.IsEnabled = true;
+            CustomPumpPicker.IsEnabled = true;
+            PopulateCustomSchedule();
+            ButtonCreateCustomSchedule.Text = "SAVE";
+            _id = schedule.ID;
+        }
+
+        private void PopulateCustomSchedule()
+        {
+            ScheduleName.Text = _customSchedule.NAME;
+
+            for (var i = 0; i < _pumpIdList.Count; i++)
+            {
+                if (_pumpIdList[i] != _customSchedule.ID) continue;
+                CustomPumpPicker.SelectedIndex = i;
+                break;
+            }
+
+            foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
+            {
+                var child = (ViewZoneAndTimeGrid)scrollViewZone;
+                
+                var maskTime = child.getMaskText();
+                var equipmentTime = _customSchedule.ScheduleDetails.FirstOrDefault(detail => detail.id_Equipment == maskTime.AutomationId);
+                if (equipmentTime != null)
+                    maskTime.Text = equipmentTime.DURATION;
+            }
         }
 
         private void PopulateEquipment()
@@ -60,7 +93,6 @@ namespace Pump.Layout
             var zoneDetailObject = _zoneDetailList.Count < 1 ? getZoneDetailObject(zone) : getZoneDetailObject(zone, _zoneDetailList);
             foreach (View view in zoneDetailObject) ScrollViewZoneDetail.Children.Add(view);
         }
-
 
         private List<object> getZoneDetailObject(string zone)
         {

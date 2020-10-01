@@ -13,7 +13,7 @@
                         CharacterSpacing="2"
                         FontSize="30"
                         HorizontalTextAlignment="Center"
-                        Text="Create Schedule"
+                        Text="Create Custom Schedule"
                         TextColor="White" />
                 </StackLayout>
 
