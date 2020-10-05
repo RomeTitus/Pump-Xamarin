@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <ContentView
     x:Class="Pump.Layout.Views.ViewZoneAndTimeGrid"
@@ -9,7 +9,13 @@
     xmlns:maskedEntry="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <Grid Margin="0,0,0,5" BackgroundColor="YellowGreen">
+    <Grid
+        x:Name="ZoneAndTimeGrid"
+        Margin="0,0,0,5"
+        BackgroundColor="YellowGreen">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer x:Name="GridViewScheduleTapGesture" />
+        </Grid.GestureRecognizers>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>

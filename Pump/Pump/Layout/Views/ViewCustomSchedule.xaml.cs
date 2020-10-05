@@ -51,7 +51,6 @@ namespace Pump.Layout.Views
             return StackLayoutViewScheduleTapGesture;
         }
 
-
         private void TapGestureRecognizer_OnTapped(object sender, EventArgs e)
         {
             switchScheduleIsActive.IsToggled = !switchScheduleIsActive.IsToggled;

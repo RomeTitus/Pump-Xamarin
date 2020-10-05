@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <ContentView
     x:Class="Pump.Layout.Views.ViewSchedulePumpTime"
@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <ContentView.Content>
-        <StackLayout HeightRequest="400">
+        <StackLayout HeightRequest="600">
             <StackLayout>
                 <Label
                     CharacterSpacing="1"
@@ -60,8 +60,7 @@
                         BackgroundColor="AliceBlue"
                         CornerRadius="30">
                         <StackLayout Orientation="Horizontal">
-                            <Image HeightRequest="18"
-                                   Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                            <Image HeightRequest="18" Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
                             <Picker
                                 x:Name="PumpPicker"
                                 HorizontalOptions="FillAndExpand"

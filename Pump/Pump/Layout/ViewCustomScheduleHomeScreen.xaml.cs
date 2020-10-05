@@ -60,6 +60,7 @@ namespace Pump.Layout
                     _equipmentList.RemoveAll(y => y.ID == equipment.ID);
                     if (x.EventType != FirebaseEventType.Delete)
                         _equipmentList.Add(equipment);
+                    _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
                 });
 
             var databaseController = new DatabaseController();
@@ -197,7 +198,12 @@ namespace Pump.Layout
                 viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
                 viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
                 customScheduleSummaryListObject.Add(viewSchedule);
-
+                var zoneAndTimeTapGesture = viewSchedule.GetZoneAndTimeGestureRecognizers();
+                for (int i = 0; i < zoneAndTimeTapGesture.Count; i++)
+                {
+                    zoneAndTimeTapGesture[i].Tapped += SkipCustomSchedule_Tapped;
+                }
+                
 
                 return customScheduleSummaryListObject;
             }
@@ -243,6 +249,16 @@ namespace Pump.Layout
             PopupNavigation.Instance.PopAsync();
             var delete = (Button)sender;
             new Authentication().DeleteCustomSchedule(new CustomSchedule { ID = delete.AutomationId });
+        }
+
+        private void SkipCustomSchedule_Tapped(object sender, EventArgs e)
+        {
+            var gridEquipmentAndTime = (Grid)sender;
+            var equipment = _equipmentList.FirstOrDefault(x => x.ID == gridEquipmentAndTime.AutomationId);
+            if(equipment == null)
+                return;
+            Device.BeginInvokeOnMainThread(() => { DisplayAlert("Are you sure?", "You have selected " + equipment.NAME +"\nConfirm to skip to this zone ?", "Confirm", "cancel"); });
+
         }
     }
 }

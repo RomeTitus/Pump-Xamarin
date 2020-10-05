@@ -21,7 +21,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleHomeScreen : ContentPage
     {
-        private readonly List<Equipment> _equipmentList = new List<Equipment>();
+        private List<Equipment> _equipmentList = new List<Equipment>();
         private readonly List<Schedule> _schedulesList = new List<Schedule>();
         private string _oldAllSchedule = "";
         private readonly SocketCommands _command = new SocketCommands();
@@ -59,10 +59,19 @@ namespace Pump.Layout
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
-                    _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                    if (x.EventType != FirebaseEventType.Delete)
-                        _equipmentList.Add(equipment);
+                    try
+                    {
+                        var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
+                        _equipmentList.RemoveAll(y => y.ID == equipment.ID);
+                        if (x.EventType != FirebaseEventType.Delete)
+                            _equipmentList.Add(equipment);
+                        _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
                 });
 
             

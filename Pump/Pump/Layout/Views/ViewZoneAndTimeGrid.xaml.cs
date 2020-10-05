@@ -9,10 +9,11 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewZoneAndTimeGrid : ContentView
     {
+        private string Id = "";
         public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet)
         {
             InitializeComponent();
-
+            Id = equipment.ID;
             LabelZoneTime.AutomationId = equipment.ID;
             LabelZoneName.Text = equipment.NAME;
             if (isTimeSet)
@@ -21,7 +22,7 @@ namespace Pump.Layout.Views
         public ViewZoneAndTimeGrid(IReadOnlyList<string> zoneAndTimeList, bool isTimeSet)
         {
             InitializeComponent();
-
+            Id = zoneAndTimeList[0];
             LabelZoneTime.AutomationId = zoneAndTimeList[0];
             LabelZoneName.Text = zoneAndTimeList[1];
             if (isTimeSet)
@@ -36,6 +37,17 @@ namespace Pump.Layout.Views
         public Label getZoneNameText()
         {
             return LabelZoneName;
+        }
+
+        public void SetBackGroundColour(Color colour)
+        {
+            ZoneAndTimeGrid.BackgroundColor = colour;
+        }
+
+        public TapGestureRecognizer GetTapGesture()
+        {
+            ZoneAndTimeGrid.AutomationId = Id;
+            return GridViewScheduleTapGesture;
         }
     }
 }

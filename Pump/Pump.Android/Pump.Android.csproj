@@ -167,7 +167,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionPumpAndroidHideInfoBar="True" XamarinHotReloadWrongLinkerErrorInfoBarPumpAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadWrongLinkerErrorInfoBarPumpAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionPumpAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

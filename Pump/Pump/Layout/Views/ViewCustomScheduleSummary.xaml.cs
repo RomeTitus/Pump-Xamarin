@@ -15,7 +15,7 @@ namespace Pump.Layout.Views
         private readonly List<Equipment> _equipmentList = null;
         private readonly FloatingScreen _floatingScreen;
         private readonly CustomSchedule schedule;
-
+        readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
         public ViewCustomScheduleSummary()
         {
             InitializeComponent();
@@ -36,7 +36,7 @@ namespace Pump.Layout.Views
             if (schedule.StartTime != 0)
             {
                 var timeSpent = DateTime.Now - scheduleTime.FromUnixTimeStamp(schedule.StartTime);
-                labelScheduleTime.Text = "Time Spent: " + scheduleTime.convertDateTimeToString(timeSpent);
+                //labelScheduleTime.Text = "Time Spent: " + scheduleTime.convertDateTimeToString(timeSpent);
             }
 
 
@@ -49,10 +49,21 @@ namespace Pump.Layout.Views
 
             foreach (var scheduleEquipment in schedule.ScheduleDetails)
             {
-                ScrollViewZoneDetail.Children.Add(
-                    new ViewZoneAndTimeGrid(scheduleEquipment, _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
-                        true));
+                var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
+                    _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
+                    true);
+                _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
+
+                scheduleGrid.SetBackGroundColour(Color.Yellow);
+                ScrollViewZoneDetail.Children.Add(scheduleGrid);
+
+
             }
+        }
+
+        public List<TapGestureRecognizer> GetZoneAndTimeGestureRecognizers()
+        {
+            return _zoneAndTimeTapGesture;
         }
 
         public Button GetButtonEdit()

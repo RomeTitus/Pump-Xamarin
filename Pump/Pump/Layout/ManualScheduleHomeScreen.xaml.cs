@@ -23,7 +23,7 @@ namespace Pump.Layout
     public partial class ManualScheduleHomeScreen : ContentPage
     {
         private readonly List<IrrigationController.ManualSchedule> _manualScheduleList = new List<IrrigationController.ManualSchedule>();
-        private readonly List<Equipment> _equipmentList = new List<Equipment>();
+        private List<Equipment> _equipmentList = new List<Equipment>();
 
         private readonly SocketCommands _command = new SocketCommands();
         private readonly List<string> _queueManualSchedule = new List<string>();
@@ -131,7 +131,11 @@ namespace Pump.Layout
                         _equipmentList.RemoveAll(y => y.ID == equipment.ID);
                         if (x.EventType != FirebaseEventType.Delete)
                             _equipmentList.Add(equipment);
-                        PopulateEquipments();
+                        try{_equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();}
+                        finally
+                        {
+                            PopulateEquipments();
+                        }
                     }
                     catch (Exception e)
                     {

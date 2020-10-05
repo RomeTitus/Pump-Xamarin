@@ -23,7 +23,7 @@ namespace Pump.Layout
     {
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
-        private readonly List<Equipment> _equipmentList = new List<Equipment>();
+        private List<Equipment> _equipmentList = new List<Equipment>();
         private readonly List<IrrigationController.ManualSchedule> _manualScheduleList = new List<IrrigationController.ManualSchedule>();
         private string _oldActiveSchedule;
         private string _oldActiveSensorStatus;
@@ -81,6 +81,8 @@ namespace Pump.Layout
                         _equipmentList.RemoveAll(y => y.ID == equipment.ID);
                         if (x.EventType != FirebaseEventType.Delete)
                             _equipmentList.Add(equipment);
+                        _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
+                        
                     }
                     catch (Exception e)
                     {
