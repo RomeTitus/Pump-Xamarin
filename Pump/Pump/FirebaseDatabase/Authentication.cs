@@ -63,72 +63,25 @@ namespace Pump.FirebaseDatabase
         }
 
         
-
-        public Schedule GetJsonSchedulesToObjectList(JObject scheduleDetailObject, string key)
-        {
-            try
-            {
-                var schedule = new Schedule
-                {
-                    ID = key,
-                    NAME = scheduleDetailObject["NAME"].ToString(),
-                    TIME = scheduleDetailObject["TIME"].ToString(),
-                    WEEK = scheduleDetailObject["WEEK"].ToString(),
-                    id_Pump = scheduleDetailObject["id_Pump"].ToString(),
-                    isActive = scheduleDetailObject["isActive"].ToString()
-                };
-
-                var scheduleDetailList = new List<ScheduleDetail>();
-                foreach (var scheduleDuration in (JObject)scheduleDetailObject["ScheduleDetails"])
-                    scheduleDetailList.Add(
-                        new ScheduleDetail
-                        {
-                            ID = scheduleDuration.Key,
-                            id_Equipment = scheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["id_Equipment"]
-                                .ToString(),
-                            DURATION = scheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["DURATION"]
-                                .ToString()
-                        });
-                schedule.ScheduleDetails = scheduleDetailList;
-                return schedule;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-        }
-
+        //Schedule
         public async Task<string> SetSchedule(Schedule schedule)
         {
+            
             try
             {
-                var scheduleJObject = new JObject
-                {
-                    {"NAME", schedule.NAME}, {"TIME", schedule.TIME}, {"WEEK", schedule.WEEK},
-                    {"id_Pump", schedule.id_Pump}, {"isActive", schedule.isActive}
-                };
-
-                scheduleJObject["ScheduleDetails"] = new JObject();
-                foreach (var scheduleDetails in schedule.ScheduleDetails)
-                {
-                    if (scheduleDetails.ID == null)
-                        scheduleDetails.ID = Guid.NewGuid().ToString().GetHashCode().ToString("x");
-                    scheduleJObject["ScheduleDetails"][scheduleDetails.ID] = new JObject
-                        {{"id_Equipment", scheduleDetails.id_Equipment}, {"DURATION", scheduleDetails.DURATION}};
-                }
+                
 
                 if (schedule.ID == null)
                 {
                     var result = await _FirebaseClient
                         .Child(getConnectedPi() + "/Schedule")
-                        .PostAsync(scheduleJObject);
+                        .PostAsync(schedule);
                     return result.Key;
                 }
 
                 await _FirebaseClient
                     .Child(getConnectedPi() + "/Schedule/" + schedule.ID)
-                    .PutAsync(scheduleJObject);
+                    .PutAsync(schedule);
                 return schedule.ID;
             }
             catch (Exception e)
@@ -138,7 +91,6 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-
         public async void DeleteSchedule(Schedule schedule)
         {
             try
@@ -153,7 +105,82 @@ namespace Pump.FirebaseDatabase
 
             }
         }
+        public Schedule GetJsonSchedulesToObjectList(JObject scheduleDetailObject, string key)
+        {
+            try
+            {
+                var schedule = new Schedule
+                {
+                    ID = key,
+                    NAME = scheduleDetailObject["NAME"].ToString(),
+                    TIME = scheduleDetailObject["TIME"].ToString(),
+                    WEEK = scheduleDetailObject["WEEK"].ToString(),
+                    id_Pump = scheduleDetailObject["id_Pump"].ToString(),
+                    isActive = scheduleDetailObject["isActive"].ToString()
+                };
+                try
+                {
+                    var scheduleDetailList = scheduleDetailObject["ScheduleDetails"]
+                        .Select(scheduleDuration => new ScheduleDetail
+                        {
+                            id_Equipment = scheduleDuration["id_Equipment"]
+                                .ToString(),
+                            DURATION = scheduleDuration["DURATION"]
+                                .ToString()
+                        })
+                        .ToList();
+                    schedule.ScheduleDetails = scheduleDetailList;
 
+                }
+                catch
+                {
+                    var scheduleDetailList = new List<ScheduleDetail>();
+                    foreach (var scheduleDuration in (JObject)scheduleDetailObject["ScheduleDetails"])
+                        scheduleDetailList.Add(
+                            new ScheduleDetail
+                            {
+                                ID = scheduleDuration.Key,
+                                id_Equipment = scheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["id_Equipment"]
+                                    .ToString(),
+                                DURATION = scheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["DURATION"]
+                                    .ToString()
+                            });
+                    schedule.ScheduleDetails = scheduleDetailList;
+                }
+                
+                return schedule;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+
+        //CustomSchedule
+        public async Task<string> SetCustomSchedule(CustomSchedule schedule)
+        {
+            try
+            {
+                if (schedule.ID == null)
+                {
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/CustomSchedule")
+                        .PostAsync(schedule);
+                    return result.Key;
+                }
+
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/CustomSchedule/" + schedule.ID)
+                    .PutAsync(schedule);
+                return schedule.ID;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
         public async void DeleteCustomSchedule(CustomSchedule schedule)
         {
             try
@@ -167,7 +194,6 @@ namespace Pump.FirebaseDatabase
                 Console.WriteLine(e);
             }
         }
-
         public CustomSchedule GetJsonCustomSchedulesToObjectList(JObject customScheduleDetailObject, string key)
         {
             try
@@ -179,8 +205,12 @@ namespace Pump.FirebaseDatabase
                     id_Pump = customScheduleDetailObject["id_Pump"].ToString()
                 };
 
-                if (customScheduleDetailObject.ContainsKey("EndTime"))
-                    schedule.StartTime = long.Parse(customScheduleDetailObject["EndTime"].ToString());
+                if (customScheduleDetailObject.ContainsKey("StartTime"))
+                    schedule.StartTime = long.Parse(customScheduleDetailObject["StartTime"].ToString());
+
+                if (customScheduleDetailObject.ContainsKey("isActive"))
+                    schedule.StartTime = long.Parse(customScheduleDetailObject["isActive"].ToString());
+
 
                 var scheduleDetailList = new List<ScheduleDetail>();
                 foreach (var scheduleDuration in (JObject)customScheduleDetailObject["ScheduleDetails"])
@@ -203,49 +233,59 @@ namespace Pump.FirebaseDatabase
             }
         }
 
-
-        public async Task<string> SetCustomSchedule(CustomSchedule schedule)
+        //ManualSchedule
+        public async Task<string> SetManualSchedule(IrrigationController.ManualSchedule manual)
         {
             try
             {
-                var scheduleJObject = new JObject
+                var manualJObject = new JObject
                 {
-                    {"NAME", schedule.NAME},
-                    {"id_Pump", schedule.id_Pump}, {"isActive", schedule.isActive},{"EndTime", schedule.StartTime}
+                    {"EndTime", manual.EndTime},{"DURATION", manual.DURATION}, {"RunWithSchedule", manual.RunWithSchedule ? "1" : "0"}
                 };
-
-                scheduleJObject["ScheduleDetails"] = new JObject();
-                foreach (var scheduleDetails in schedule.ScheduleDetails)
+                manualJObject["ManualDetails"] = new JObject();
+                foreach (var equipment in manual.equipmentIdList)
                 {
-                    if (scheduleDetails.ID == null)
-                        scheduleDetails.ID = Guid.NewGuid().ToString().GetHashCode().ToString("x");
-                    scheduleJObject["ScheduleDetails"][scheduleDetails.ID] = new JObject
-                        {{"id_Equipment", scheduleDetails.id_Equipment}, {"DURATION", scheduleDetails.DURATION}};
+                    var key = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                    manualJObject["ManualDetails"][key] = new JObject { ["id_Equipment"] = equipment.ID };
                 }
 
-                if (schedule.ID == null)
-                {
-                    var result = await _FirebaseClient
-                        .Child(getConnectedPi() + "/CustomSchedule")
-                        .PostAsync(scheduleJObject);
-                    return result.Key;
-                }
-
-                await _FirebaseClient
-                    .Child(getConnectedPi() + "/CustomSchedule/" + schedule.ID)
-                    .PutAsync(scheduleJObject);
-                return schedule.ID;
+                var result = await _FirebaseClient
+                    .Child(getConnectedPi() + "/ManualSchedule")
+                    .PostAsync(manualJObject);
+                return result.Key;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return null;
             }
-
+            
+            
         }
+        public async Task<string> DeleteManualSchedule()
+        {
+            try
+            {
+                var firebaseManualScheduleDetail = await _FirebaseClient
+                    .Child(getConnectedPi() + "/ManualSchedule")
+                    .OnceAsync<JObject>();
 
+                var keyList = firebaseManualScheduleDetail.Select(scheduleInfoDetail =>
+                    scheduleInfoDetail.Key).ToList();
 
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/ManualSchedule")
+                    .DeleteAsync();
 
+                return keyList[0];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            
+        }
         public ManualSchedule GetJsonManualSchedulesToObjectList(JObject scheduleDetailObject, string key)
         {
             try
@@ -285,66 +325,12 @@ namespace Pump.FirebaseDatabase
                 Console.WriteLine(e);
                 return null;
             }
-            
+
 
         }
 
-        public async Task<string> SetManualSchedule(IrrigationController.ManualSchedule manual)
-        {
-            try
-            {
-                var manualJObject = new JObject
-                {
-                    {"EndTime", manual.EndTime},{"DURATION", manual.DURATION}, {"RunWithSchedule", manual.RunWithSchedule ? "1" : "0"}
-                };
-                manualJObject["ManualDetails"] = new JObject();
-                foreach (var equipment in manual.equipmentIdList)
-                {
-                    var key = Guid.NewGuid().ToString().GetHashCode().ToString("x");
-                    manualJObject["ManualDetails"][key] = new JObject { ["id_Equipment"] = equipment.ID };
-                }
 
-                var result = await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule")
-                    .PostAsync(manualJObject);
-                return result.Key;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-            
-            
-        }
-
-        public async Task<string> DeleteManualSchedule()
-        {
-            try
-            {
-                var firebaseManualScheduleDetail = await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule")
-                    .OnceAsync<JObject>();
-
-                var keyList = firebaseManualScheduleDetail.Select(scheduleInfoDetail =>
-                    scheduleInfoDetail.Key).ToList();
-
-                await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule")
-                    .DeleteAsync();
-
-                return keyList[0];
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-            
-        }
-
-        
-
+        //Equipment
         public Equipment GetJsonEquipmentToObjectList(JObject equipmentDetailObject, string key)
         {
             try
@@ -370,6 +356,7 @@ namespace Pump.FirebaseDatabase
             
         }
 
+        //Sensor
         public async Task<List<Sensor>> GetAllSensors()
         {
             try
@@ -390,7 +377,6 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-
         public Sensor GetJsonSensorToObjectList(JObject sensorDetailObject, string key)
         {
             try
@@ -418,7 +404,8 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-
+        
+        //Status
         public ControllerStatus GetJsonStatusToObjectList(JObject sensorDetailObject, string key)
         {
             try
@@ -440,7 +427,6 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-
         public async void SetLastOnRequest()
         {
             try
@@ -448,45 +434,13 @@ namespace Pump.FirebaseDatabase
                 var lastOnJObject = new JObject {{ "RequestedTime", (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds}};
                 await _FirebaseClient
                     .Child(getConnectedPi() + "/Alive/Status")
-                    .PutAsync(lastOnJObject);
+                    .PatchAsync(lastOnJObject);
             }
             catch
             {
                 return;
             }
             
-        }
-
-        public async Task<Alive> GetLastOnRequest()
-        {
-            try
-            {
-                var firebaseAlive = await _FirebaseClient
-                    .Child(getConnectedPi() + "/Alive")
-                    .OnceAsync<JObject>();
-                return firebaseAlive.Count > 0 ? GetJsonLastOnRequest(firebaseAlive.FirstOrDefault()?.Object) : null;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-        public Alive GetJsonLastOnRequest(JObject aliveObject)
-        {
-            try
-            {
-                var alive = new Alive
-                {
-
-                    RequestedTime = long.Parse(aliveObject["RequestedTime"].ToString()),
-                    ResponseTime = long.Parse(aliveObject["ResponseTime"].ToString())
-                };
-                return alive;
-            }
-            catch
-            {
-                return null;
-            }
         }
         public Alive GetJsonLastOnRequest(JObject aliveObject, Alive alive)
         {

@@ -38,6 +38,7 @@ namespace Pump.Layout.Views
                 LabelPumpName.Text = equipment.NAME;
             }
             StackLayoutViewSchedule.AutomationId = schedule.ID;
+
             switchScheduleIsActive.IsToggled = !schedule.isActive.Contains("0");
         }
 

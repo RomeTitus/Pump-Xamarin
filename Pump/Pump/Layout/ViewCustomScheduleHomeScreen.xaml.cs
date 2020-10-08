@@ -37,29 +37,35 @@ namespace Pump.Layout
 
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/CustomSchedule")
-                .AsObservable<JObject>()
+                .AsObservable<CustomSchedule>()
                 .Subscribe(x =>
                 {
                     if(_customSchedulesList == null)
                         _customSchedulesList = new List<CustomSchedule>();
-                    var schedule = auth.GetJsonCustomSchedulesToObjectList(x.Object, x.Key);
-                    _customSchedulesList.RemoveAll(y => y.ID == schedule.ID);
-                    if(x.EventType != FirebaseEventType.Delete)
-                        _customSchedulesList.Add(schedule);
+                    _customSchedulesList.RemoveAll(y => y.ID == x.Key);
+                    if (x.EventType != FirebaseEventType.Delete)
+                    {
+                        x.Object.ID = x.Key;
+                        _customSchedulesList.Add(x.Object);
+                    }
+                        
                 });
 
 
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Equipment")
-                .AsObservable<JObject>()
+                .AsObservable<Equipment>()
                 .Subscribe(x =>
                 {
                     if (_equipmentList == null)
                         _equipmentList = new List<Equipment>();
-                    var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
-                    _equipmentList.RemoveAll(y => y.ID == equipment.ID);
+                    _equipmentList.RemoveAll(y => y.ID == x.Key);
                     if (x.EventType != FirebaseEventType.Delete)
-                        _equipmentList.Add(equipment);
+                    {
+                        x.Object.ID = x.Key;
+                        _equipmentList.Add(x.Object);
+                    }
+                        
                     _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
                 });
 

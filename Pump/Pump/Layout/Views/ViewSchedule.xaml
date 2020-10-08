@@ -29,8 +29,8 @@
             <StackLayout
                 Grid.Row="0"
                 Grid.Column="0"
-                HeightRequest="15"
-                Orientation="Vertical">
+                Orientation="Vertical"
+                VerticalOptions="Start">
                 <StackLayout Orientation="Horizontal">
                     <Label
                         x:Name="labelScheduleName"
@@ -38,7 +38,7 @@
                         VerticalOptions="Center" />
                 </StackLayout>
 
-                <StackLayout Orientation="Horizontal">
+                <StackLayout Orientation="Horizontal" VerticalOptions="EndAndExpand">
                     <Label
                         x:Name="LabelSunday"
                         Text="S"
@@ -80,7 +80,7 @@
             <StackLayout
                 Grid.Row="0"
                 Grid.Column="1"
-                HeightRequest="15"
+                VerticalOptions="Start"
                 Orientation="Vertical">
                 <StackLayout Orientation="Horizontal">
                     <Label

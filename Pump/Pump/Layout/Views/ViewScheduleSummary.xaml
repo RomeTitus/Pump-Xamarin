@@ -10,17 +10,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Margin="5" HeightRequest="600">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+    <StackLayout
+        Margin="5"
+        HeightRequest="600"
+        VerticalOptions="FillAndExpand">
 
-        </Grid.ColumnDefinitions>
-
-        <Grid Grid.Row="0" Grid.Column="0">
+        <Grid VerticalOptions="Start">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -32,8 +27,8 @@
             <StackLayout
                 Grid.Row="0"
                 Grid.Column="0"
-                HeightRequest="15"
-                Orientation="Vertical">
+                Orientation="Vertical"
+                VerticalOptions="Start">
                 <StackLayout Orientation="Horizontal">
                     <Label
                         x:Name="labelScheduleName"
@@ -91,8 +86,8 @@
             <StackLayout
                 Grid.Row="0"
                 Grid.Column="1"
-                HeightRequest="50"
-                Orientation="Vertical">
+                Orientation="Vertical"
+                VerticalOptions="Start">
                 <StackLayout Orientation="Horizontal">
                     <Label
                         x:Name="labelScheduleTime"
@@ -111,9 +106,7 @@
                 </StackLayout>
             </StackLayout>
         </Grid>
-        <StackLayout Grid.Row="1" Grid.Column="0">
-
-
+        <StackLayout VerticalOptions="FillAndExpand">
             <StackLayout VerticalOptions="FillAndExpand">
                 <Frame
                     BackgroundColor="White"
@@ -139,5 +132,5 @@
             </StackLayout>
         </StackLayout>
 
-    </Grid>
+    </StackLayout>
 </ContentView>
