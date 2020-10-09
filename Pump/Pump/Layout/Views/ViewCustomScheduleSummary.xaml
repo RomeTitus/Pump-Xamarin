@@ -38,9 +38,9 @@
 
                 <StackLayout Orientation="Horizontal">
                     <Label
-                        x:Name="text101"
+                        x:Name="LabelCustomSchedule"
                         FontSize="20"
-                        Text="Something Cool Goes Here"
+                        Text=""
                         TextColor="Gray"
                         VerticalOptions="Center" />
                 </StackLayout>

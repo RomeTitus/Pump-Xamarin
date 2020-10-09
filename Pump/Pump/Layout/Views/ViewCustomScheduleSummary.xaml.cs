@@ -33,11 +33,15 @@ namespace Pump.Layout.Views
         private void SetScheduleSummary()
         {
             var scheduleTime = new ScheduleTime();
-            if (schedule.StartTime != 0)
+            var runningCustomSchedule = new RunningCustomSchedule();
+            var runningScheduleDetail = runningCustomSchedule.getCustomScheduleDetailRunning(schedule);
+            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
+            if (endTime != null)
             {
-                var timeSpent = DateTime.Now - scheduleTime.FromUnixTimeStamp(schedule.StartTime);
-                //labelScheduleTime.Text = "Time Spent: " + scheduleTime.convertDateTimeToString(timeSpent);
+                var timeLeft = (TimeSpan)(endTime - scheduleTime.FromUnixTimeStamp(schedule.StartTime));
+                LabelCustomSchedule.Text = "Total Duration: " + scheduleTime.convertDateTimeToString(timeLeft);
             }
+
 
 
             foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == schedule.id_Pump))
@@ -47,14 +51,20 @@ namespace Pump.Layout.Views
 
             labelScheduleName.Text = schedule.NAME;
 
+
             foreach (var scheduleEquipment in schedule.ScheduleDetails)
             {
                 var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
                     _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
                     true);
                 _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
-
                 scheduleGrid.SetBackGroundColour(Color.Yellow);
+                if (runningScheduleDetail != null)
+                {
+                    if(scheduleEquipment == runningScheduleDetail)
+                        scheduleGrid.SetBackGroundColour(Color.YellowGreen);
+                }
+                
                 ScrollViewZoneDetail.Children.Add(scheduleGrid);
 
 

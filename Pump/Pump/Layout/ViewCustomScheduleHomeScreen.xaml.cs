@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Firebase.Database.Streaming;
-using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
@@ -147,14 +144,28 @@ namespace Pump.Layout
             var scheduleSwitch = (Switch)sender;
             try
             {
-                //new Thread(() => ChangeCustomScheduleState(scheduleSwitch, scheduleSwitch.AutomationId))
-                //    .Start();
+                var updateSchedule = _oldCustomSchedulesList.First(x => x.ID == scheduleSwitch.AutomationId);
+
+                if (scheduleSwitch.IsToggled)
+                    updateSchedule.StartTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                else
+                    updateSchedule.StartTime = 0;
+                
+                new Thread(() => ChangeCustomScheduleState(updateSchedule))
+                    .Start();
             }
             catch
             {
                 DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE",
                     "Understood");
             }
+        }
+
+        private void ChangeCustomScheduleState(CustomSchedule schedule)
+        {
+            //updates to start Schedule :)
+            new Authentication().SetCustomSchedule(schedule);
+
         }
 
         private void ViewScheduleSummary(string id)
@@ -205,9 +216,9 @@ namespace Pump.Layout
                 viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
                 customScheduleSummaryListObject.Add(viewSchedule);
                 var zoneAndTimeTapGesture = viewSchedule.GetZoneAndTimeGestureRecognizers();
-                for (int i = 0; i < zoneAndTimeTapGesture.Count; i++)
+                foreach (var t in zoneAndTimeTapGesture)
                 {
-                    zoneAndTimeTapGesture[i].Tapped += SkipCustomSchedule_Tapped;
+                    t.Tapped += SkipCustomSchedule_Tapped;
                 }
                 
 
@@ -266,5 +277,6 @@ namespace Pump.Layout
             Device.BeginInvokeOnMainThread(() => { DisplayAlert("Are you sure?", "You have selected " + equipment.NAME +"\nConfirm to skip to this zone ?", "Confirm", "cancel"); });
 
         }
+
     }
 }

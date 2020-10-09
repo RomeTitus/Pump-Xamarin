@@ -38,8 +38,8 @@
                     Orientation="Vertical">
                     <StackLayout Orientation="Horizontal">
                         <Label
-                            x:Name="labelScheduleTime"
-                            Text="Running From: 20:30"
+                            x:Name="LabelScheduleTime"
+                            Text=""
                             VerticalOptions="Center" />
                     </StackLayout>
                     <StackLayout Orientation="Horizontal">
