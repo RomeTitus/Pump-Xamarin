@@ -6,6 +6,7 @@ using Firebase.Database;
 using Firebase.Database.Offline;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
+using Pump.Class;
 using Pump.Database;
 using Pump.IrrigationController;
 
@@ -431,7 +432,7 @@ namespace Pump.FirebaseDatabase
         {
             try
             {
-                var lastOnJObject = new JObject {{ "RequestedTime", (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds}};
+                var lastOnJObject = new JObject {{ "RequestedTime", ScheduleTime.GetUnixTimeStampUtcNow()}};
                 await _FirebaseClient
                     .Child(getConnectedPi() + "/Alive/Status")
                     .PatchAsync(lastOnJObject);

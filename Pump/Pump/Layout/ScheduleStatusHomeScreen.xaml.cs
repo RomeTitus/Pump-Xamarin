@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Firebase.Database;
 using Firebase.Database.Streaming;
 using Newtonsoft.Json.Linq;
+using Pump.Class;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
@@ -24,11 +24,11 @@ namespace Pump.Layout
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
         private List<Equipment> _equipmentList = new List<Equipment>();
-        private readonly List<IrrigationController.ManualSchedule> _manualScheduleList = new List<IrrigationController.ManualSchedule>();
+        private readonly List<ManualSchedule> _manualScheduleList = new List<ManualSchedule>();
         private string _oldActiveSchedule;
         private string _oldActiveSensorStatus;
         private string _oldQueueActiveSchedule;
-        private List<Schedule> _schedulesList = null;
+        private List<Schedule> _schedulesList;
         private List<Sensor> _sensorList = new List<Sensor>();
 
         public ScheduleStatusHomeScreen()
@@ -133,22 +133,20 @@ namespace Pump.Layout
                 }
                     
 
-                var runningSchedule = new RunningSchedule();
-
                 var queSchedules =
-                    runningSchedule.GetQueSchedule(runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
+                    RunningSchedule.GetQueSchedule(RunningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
                 var activeSchedule =
-                    runningSchedule.GetRunningSchedule(
-                        runningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
+                    RunningSchedule.GetRunningSchedule(
+                        RunningSchedule.GetActiveSchedule(_schedulesList, _equipmentList));
 
 
                 var activeScheduleString = activeSchedule.Aggregate("",
                     (current, schedule) => current + (schedule.ID + ',' + schedule.NAME + ',' + schedule.name_Pump +
                                                       ',' + schedule.name_Equipment + ',' + schedule.StartTime + ',' +
                                                       schedule.EndTime + '#'));
-                var scheduleTime = new ScheduleTime();
+                
                 if (_manualScheduleList.Count > 0)
-                    activeScheduleString = scheduleTime.convertDateTimeToString(scheduleTime.FromUnixTimeStamp(_manualScheduleList[0].EndTime) - DateTime.Now) + ',' + _manualScheduleList[0].RunWithSchedule + '$' + activeScheduleString;
+                    activeScheduleString = ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualScheduleList[0].EndTime) - DateTime.UtcNow) + ',' + _manualScheduleList[0].RunWithSchedule + '$' + activeScheduleString;
                 var activeScheduleObjects = GetScheduleDetailObject(activeScheduleString);
 
 

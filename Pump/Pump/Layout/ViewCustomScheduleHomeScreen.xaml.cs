@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Firebase.Database.Streaming;
+using Pump.Class;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
@@ -16,10 +17,11 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewCustomScheduleHomeScreen : ContentPage
     {
-        private List<Equipment> _equipmentList = null;
-        private List<CustomSchedule> _customSchedulesList = null;
-        private List<CustomSchedule> _oldCustomSchedulesList = null;
-        readonly FloatingScreen _floatingScreen = new FloatingScreen();
+        private List<Equipment> _equipmentList;
+        private List<CustomSchedule> _customSchedulesList;
+        private List<CustomSchedule> _oldCustomSchedulesList;
+        private readonly FloatingScreen _floatingScreen = new FloatingScreen();
+        private ViewCustomScheduleSummary _viewSchedule;
 
         public ViewCustomScheduleHomeScreen()
         {
@@ -76,7 +78,6 @@ namespace Pump.Layout
                     {
                         if (_oldCustomSchedulesList == null)
                             _oldCustomSchedulesList = new List<CustomSchedule>();
-                        var a = _customSchedulesList.All(_oldCustomSchedulesList.Contains) && _customSchedulesList.Count == _oldCustomSchedulesList.Count;
                         _oldCustomSchedulesList.Clear();
                         foreach (var customSchedules in _customSchedulesList)
                         {
@@ -118,11 +119,11 @@ namespace Pump.Layout
 
 
                 
-                foreach (var viewSchedule in _customSchedulesList.Select(schedule => new ViewCustomSchedule(schedule, _equipmentList)))
+                foreach (var viewCustomSchedule in _customSchedulesList.Select(schedule => new ViewCustomSchedule(schedule, _equipmentList)))
                 {
-                    scheduleListObject.Add(viewSchedule);
-                    viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
-                    viewSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
+                    scheduleListObject.Add(viewCustomSchedule);
+                    viewCustomSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                    viewCustomSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                 }
                 return scheduleListObject;
             }
@@ -147,7 +148,7 @@ namespace Pump.Layout
                 var updateSchedule = _oldCustomSchedulesList.First(x => x.ID == scheduleSwitch.AutomationId);
 
                 if (scheduleSwitch.IsToggled)
-                    updateSchedule.StartTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                    updateSchedule.StartTime = ScheduleTime.GetUnixTimeStampUtcNow();
                 else
                     updateSchedule.StartTime = 0;
                 
@@ -163,9 +164,17 @@ namespace Pump.Layout
 
         private void ChangeCustomScheduleState(CustomSchedule schedule)
         {
-            //updates to start Schedule :)
-            new Authentication().SetCustomSchedule(schedule);
+           
+            //new Authentication().SetCustomSchedule(schedule);
 
+            
+            foreach (var view in ScrollViewCustomScheduleDetail.Children)
+            {
+                var viewCustomSchedule = (ViewCustomSchedule) view;
+                if (viewCustomSchedule.Schedule.ID != schedule.ID) continue;
+                viewCustomSchedule.Schedule = schedule;
+                Device.BeginInvokeOnMainThread(() => { viewCustomSchedule.Populate(); });
+            }
         }
 
         private void ViewScheduleSummary(string id)
@@ -209,13 +218,13 @@ namespace Pump.Layout
                     return customScheduleSummaryListObject;
                 }
 
-                ViewCustomScheduleSummary viewSchedule = null;
-                viewSchedule = new ViewCustomScheduleSummary(schedule, _floatingScreen, _equipmentList);
+                
+                _viewSchedule = new ViewCustomScheduleSummary(schedule, _floatingScreen, _equipmentList);
 
-                viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
-                viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
-                customScheduleSummaryListObject.Add(viewSchedule);
-                var zoneAndTimeTapGesture = viewSchedule.GetZoneAndTimeGestureRecognizers();
+                _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
+                _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
+                customScheduleSummaryListObject.Add(_viewSchedule);
+                var zoneAndTimeTapGesture = _viewSchedule.GetZoneAndTimeGestureRecognizers();
                 foreach (var t in zoneAndTimeTapGesture)
                 {
                     t.Tapped += SkipCustomSchedule_Tapped;
@@ -274,7 +283,22 @@ namespace Pump.Layout
             var equipment = _equipmentList.FirstOrDefault(x => x.ID == gridEquipmentAndTime.AutomationId);
             if(equipment == null)
                 return;
-            Device.BeginInvokeOnMainThread(() => { DisplayAlert("Are you sure?", "You have selected " + equipment.NAME +"\nConfirm to skip to this zone ?", "Confirm", "cancel"); });
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                if (!await DisplayAlert("Are you sure?",
+                    "You have selected " + equipment.NAME + "\nConfirm to skip to this zone ?", "Confirm",
+                    "cancel")) return;
+                if(_viewSchedule == null) return;
+                var nullableStartTime = RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.schedule, equipment);
+                if (nullableStartTime != null)
+                {
+                    var startTime = (DateTime) nullableStartTime;
+                    _viewSchedule.schedule.StartTime =
+                        (Int32) (startTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                    _viewSchedule.UpdateScheduleSummary();
+                    ChangeCustomScheduleState(_viewSchedule.schedule);
+                }
+            });
 
         }
 

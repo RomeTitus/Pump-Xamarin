@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Pump.Class;
 
 namespace Pump.IrrigationController
 {
@@ -16,7 +17,7 @@ namespace Pump.IrrigationController
             foreach (var schedule in customScheduleList)
             {
 
-                var startTimeDateTime = new ScheduleTime().FromUnixTimeStamp(schedule.StartTime);
+                var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(schedule.StartTime);
 
                     foreach (var scheduleDetails in schedule.ScheduleDetails)
                     {
@@ -41,18 +42,18 @@ namespace Pump.IrrigationController
                     }
             }
             
-            List<ActiveSchedule> sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
+            var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
             return sortedList;
 
 
         }
 
-        public ScheduleDetail getCustomScheduleDetailRunning(CustomSchedule customScheduleList)
+        public static ScheduleDetail GetCustomScheduleDetailRunning(CustomSchedule customScheduleList)
         {
             try
             {
-                var startTimeDateTime = new ScheduleTime().FromUnixTimeStamp(customScheduleList.StartTime);
-                var currentTime = DateTime.Now;
+                var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
+                var currentTime = DateTime.UtcNow;
                 foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                 {
                     //gets Next Schedule Start Time
@@ -76,7 +77,7 @@ namespace Pump.IrrigationController
         {
             try
             {
-                var startTimeDateTime = new ScheduleTime().FromUnixTimeStamp(customScheduleList.StartTime);
+                var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
                 foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                 {
                     //gets Next Schedule Start Time
@@ -96,16 +97,44 @@ namespace Pump.IrrigationController
             return null;
         }
 
+        public static DateTime? GetCustomScheduleRunningTimeForEquipment(CustomSchedule customScheduleList, Equipment equipment)
+        {
+            try
+            {
+                var startTimeDateTime = DateTime.UtcNow;
+                foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
+                {
+                    if (scheduleDetails.id_Equipment == equipment.ID)
+                    {
+                        return startTimeDateTime;
+                    }
+                    //gets Next Schedule Start Time
+                    var durationHour = scheduleDetails.DURATION.Split(':').First();
+                    var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                    var endTimeDateTime = startTimeDateTime - (TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                          TimeSpan.FromMinutes(Convert.ToInt32(durationMinute)));
+                    startTimeDateTime = endTimeDateTime;
+                    
+                }
+
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+
         public List<ActiveSchedule> GetRunningCustomSchedule(List<ActiveSchedule> activeScheduleList)
         {
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
+                activeSchedule.StartTime < DateTime.UtcNow && activeSchedule.EndTime > DateTime.UtcNow).ToList();
         }
 
         public List<ActiveSchedule> GetQueCustomSchedule(List<ActiveSchedule> activeScheduleList)
         {
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(1)).ToList();
+                activeSchedule.StartTime > DateTime.UtcNow && activeSchedule.StartTime < DateTime.UtcNow.AddDays(1)).ToList();
         }
     }
 }

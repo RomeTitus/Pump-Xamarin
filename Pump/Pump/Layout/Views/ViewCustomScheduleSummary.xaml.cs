@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Pump.Class;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -14,7 +13,7 @@ namespace Pump.Layout.Views
     {
         private readonly List<Equipment> _equipmentList = null;
         private readonly FloatingScreen _floatingScreen;
-        private readonly CustomSchedule schedule;
+        public readonly CustomSchedule schedule;
         readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
         public ViewCustomScheduleSummary()
         {
@@ -30,16 +29,47 @@ namespace Pump.Layout.Views
             SetScheduleSummary();
         }
 
-        private void SetScheduleSummary()
+        public void UpdateScheduleSummary()
         {
             var scheduleTime = new ScheduleTime();
             var runningCustomSchedule = new RunningCustomSchedule();
-            var runningScheduleDetail = runningCustomSchedule.getCustomScheduleDetailRunning(schedule);
+            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(schedule);
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan)(endTime - scheduleTime.FromUnixTimeStamp(schedule.StartTime));
-                LabelCustomSchedule.Text = "Total Duration: " + scheduleTime.convertDateTimeToString(timeLeft);
+                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(schedule.StartTime));
+                LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
+            }
+
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == schedule.id_Pump))
+            {
+                LabelPumpName.Text = equipment.NAME;
+            }
+
+            labelScheduleName.Text = schedule.NAME;
+
+
+            foreach (ViewZoneAndTimeGrid scheduleGrid in ScrollViewZoneDetail.Children)
+            {
+                
+                scheduleGrid.SetBackGroundColour(Color.Yellow);
+                if (runningScheduleDetail != null)
+                {
+                    if (scheduleGrid.Id == runningScheduleDetail.id_Equipment)
+                        scheduleGrid.SetBackGroundColour(Color.YellowGreen);
+                }
+            }
+        }
+        public void SetScheduleSummary()
+        {
+            var scheduleTime = new ScheduleTime();
+            var runningCustomSchedule = new RunningCustomSchedule();
+            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(schedule);
+            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
+            if (endTime != null)
+            {
+                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(schedule.StartTime));
+                LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
 
@@ -51,7 +81,7 @@ namespace Pump.Layout.Views
 
             labelScheduleName.Text = schedule.NAME;
 
-
+            
             foreach (var scheduleEquipment in schedule.ScheduleDetails)
             {
                 var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
@@ -66,8 +96,6 @@ namespace Pump.Layout.Views
                 }
                 
                 ScrollViewZoneDetail.Children.Add(scheduleGrid);
-
-
             }
         }
 
@@ -78,13 +106,15 @@ namespace Pump.Layout.Views
 
         public Button GetButtonEdit()
         {
-            ButtonEdit.AutomationId = schedule.ID;
+            if(ButtonEdit.AutomationId == null)
+                ButtonEdit.AutomationId = schedule.ID;
             return ButtonEdit;
         }
 
         public Button GetButtonDelete()
         {
-            ButtonDelete.AutomationId = schedule.ID;
+            if(ButtonDelete.AutomationId == null)
+                ButtonDelete.AutomationId = schedule.ID;
             return ButtonDelete;
         }
     }

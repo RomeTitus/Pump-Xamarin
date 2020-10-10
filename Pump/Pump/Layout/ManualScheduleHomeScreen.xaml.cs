@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Firebase.Database.Query;
 using Firebase.Database.Streaming;
 using Newtonsoft.Json.Linq;
+using Pump.Class;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
@@ -103,12 +104,11 @@ namespace Pump.Layout
             {
                 SwitchRunWithSchedule.IsToggled = _manualScheduleList[0].RunWithSchedule;
                 SwitchRunWithSchedule.IsEnabled = false;
-                var scheduleTime = new ScheduleTime();
                 
-                var timeLeft = scheduleTime.FromUnixTimeStamp(_manualScheduleList[0].EndTime) - DateTime.Now;
+                var timeLeft = ScheduleTime.FromUnixTimeStampLocal(_manualScheduleList[0].EndTime) - DateTime.Now;
 
                 MaskedEntryTime.IsEnabled = false;
-                MaskedEntryTime.Text = scheduleTime.convertDateTimeToString(timeLeft);
+                MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(timeLeft);
                 ButtonStartManual.IsEnabled = false;
 
             });
@@ -254,8 +254,6 @@ namespace Pump.Layout
                             started = false;
                         }
                 }
-                
-
                 Thread.Sleep(2000);
             }
         }
@@ -293,8 +291,7 @@ namespace Pump.Layout
                                 SwitchRunWithSchedule.IsToggled = manualScheduleClass.RunWithSchedule;
                                 SwitchRunWithSchedule.IsEnabled = _buttonEnabledStatus;
                                 ButtonStartManual.IsEnabled = _buttonEnabledStatus;
-                                var scheduleTime = new ScheduleTime();
-                                MaskedEntryTime.Text = scheduleTime.TimeDiffNow(manualScheduleClass.ScheduleTime);
+                                MaskedEntryTime.Text = ScheduleTime.TimeDiffNow(manualScheduleClass.ScheduleTime);
                                 MaskedEntryTime.IsEnabled = _buttonEnabledStatus;
                                 if (_floatingScreenScroll != null)
                                     try
@@ -332,11 +329,9 @@ namespace Pump.Layout
             var buttonList = ScrollViewManualPump.Children.ToList();
             buttonList.AddRange(ScrollViewManualZone.Children.ToList());
 
-            var isActivityIndicator = false;
-
-            foreach (var button in buttonList.Where(button =>
+            var isActivityIndicator = buttonList.Where(button =>
                 button.AutomationId == "ActivityIndicatorManualZone" ||
-                button.AutomationId == "ActivityIndicatorManualPump")) isActivityIndicator = true;
+                button.AutomationId == "ActivityIndicatorManualPump").ToList().Count > 0;
 
             if (ScrollViewManualPump.Children.Count == 0 || ScrollViewManualZone.Children.Count == 0 ||
                 isActivityIndicator)
@@ -567,7 +562,8 @@ namespace Pump.Layout
             buttonList.AddRange(ScrollViewManualZone.Children.ToList());
             try
             {
-                foreach (Button button in buttonList)
+                foreach (var button in buttonList.Cast<Button>())
+                {
                     try
                     {
                         if (button.AutomationId == id) UpdateSelectedEquipment(button);
@@ -576,6 +572,7 @@ namespace Pump.Layout
                     {
                         // ignored
                     }
+                }
             }
             catch
             {
@@ -736,10 +733,10 @@ namespace Pump.Layout
                 var auth = new Authentication();
                 var duration = MaskedEntryTime.Text.Split(':');
                 _firebaseHasReplied = null;
-                var manual = new IrrigationController.ManualSchedule
+                var manual = new ManualSchedule
                 {
                     DURATION = MaskedEntryTime.Text,
-                    EndTime = (Int32) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Add(TimeSpan.FromHours(long.Parse(duration[0]))).Add(TimeSpan.FromMinutes(long.Parse(duration[1]))).TotalSeconds,
+                    EndTime = ScheduleTime.GetUnixTimeStampUtcNow(TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1]))),
                     RunWithSchedule = SwitchRunWithSchedule.IsToggled,
                     equipmentIdList = _queueManualSchedule.Select(queue => new ManualScheduleEquipment { ID = queue }).ToList()
                 };
@@ -760,7 +757,7 @@ namespace Pump.Layout
                             var result = new Authentication().GetJsonStatusToObjectList(x.Object, x.Key);
 
                             Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-
+                            
                         }
                         catch (Exception e)
                         {

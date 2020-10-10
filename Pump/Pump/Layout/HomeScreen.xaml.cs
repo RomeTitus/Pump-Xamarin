@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.FirebaseDatabase;
@@ -15,7 +16,7 @@ namespace Pump
     {
         private Alive _alive = new Alive();
         private readonly DatabaseController _databaseController = new DatabaseController();
-
+        private readonly ScheduleTime _scheduleTime = new ScheduleTime();
 
         public HomeScreen()
         {
@@ -59,10 +60,10 @@ namespace Pump
                         if (x.Object == null) return;
                         _alive = auth.GetJsonLastOnRequest(x.Object, _alive);
 
-                        var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                        var now = ScheduleTime.GetUnixTimeStampUtcNow();
                         Device.BeginInvokeOnMainThread(() =>
                         {
-                            if (_alive.ResponseTime > (now - 45))
+                            if (_alive.ResponseTime > (now - 100))
                                 TabPageMain.BackgroundColor = Color.DeepSkyBlue;
                         });
                     }
@@ -93,10 +94,10 @@ namespace Pump
                             }
                             else
                             {
-                                var now = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                                if (_alive.ResponseTime < (now - 30))
+                                var now = ScheduleTime.GetUnixTimeStampUtcNow();
+                                if (_alive.ResponseTime < (now - 60))
                                     new Authentication().SetLastOnRequest();
-                                else if (_alive.ResponseTime < (now - 60))
+                                else if (_alive.ResponseTime < (now - 120))
                                     TabPageMain.BackgroundColor = Color.Coral;
                             }
                         });
@@ -105,7 +106,7 @@ namespace Pump
                 {
                  continue;   
                 }
-                Thread.Sleep(5000);
+                Thread.Sleep(50000);
             }
         }
     }

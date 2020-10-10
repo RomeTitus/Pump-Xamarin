@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pump.Class;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -10,43 +11,43 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewCustomSchedule : ContentView
     {
-        private readonly CustomSchedule _schedule;
+        public CustomSchedule Schedule { get; set; }
         private readonly List<Equipment> _equipmentList;
         public ViewCustomSchedule(CustomSchedule schedule, List<Equipment> equipmentList)
         {
             InitializeComponent();
-            _schedule = schedule;
+            Schedule = schedule;
             _equipmentList = equipmentList;
             Populate();
         }
 
 
-        private void Populate()
+        public void Populate()
         {
-            var scheduleTime = new ScheduleTime();
-            var runningCustomSchedule = new RunningCustomSchedule();
-            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(_schedule);
-            switchScheduleIsActive.AutomationId = _schedule.ID;
-            StackLayoutViewSchedule.AutomationId = _schedule.ID;
+            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(Schedule);
+            if(switchScheduleIsActive.AutomationId == null)
+                switchScheduleIsActive.AutomationId = Schedule.ID;
+            if(StackLayoutViewSchedule.AutomationId == null)
+                StackLayoutViewSchedule.AutomationId = Schedule.ID;
             if (endTime != null)
             {
-                if (runningCustomSchedule.getCustomScheduleDetailRunning(_schedule) != null)
+                if (RunningCustomSchedule.GetCustomScheduleDetailRunning(Schedule) != null)
                 {
-                    var timeLeft = (TimeSpan) (endTime - DateTime.Now);
-                    LabelScheduleTime.Text = "Time left: " + scheduleTime.convertDateTimeToString(timeLeft);
+                    var timeLeft = (TimeSpan) (endTime - DateTime.UtcNow);
+                    LabelScheduleTime.Text = "Time left: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
                     switchScheduleIsActive.IsToggled = true;
                 }
                 else
                 {
-                    var timeLeft = (TimeSpan) (endTime - scheduleTime.FromUnixTimeStamp(_schedule.StartTime));
-                    LabelScheduleTime.Text = "Duration: " + scheduleTime.convertDateTimeToString(timeLeft);
+                    var timeLeft = (TimeSpan) (endTime - ScheduleTime.FromUnixTimeStampLocal(Schedule.StartTime));
+                    LabelScheduleTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
                     switchScheduleIsActive.IsToggled = false;
                 }
             }
 
-            labelScheduleName.Text = _schedule.NAME;
+            labelScheduleName.Text = Schedule.NAME;
             
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == _schedule.id_Pump))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == Schedule.id_Pump))
             {
                 LabelPumpName.Text = equipment.NAME;
             }

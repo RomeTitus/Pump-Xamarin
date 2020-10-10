@@ -9,7 +9,7 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewZoneAndTimeGrid : ContentView
     {
-        private string Id = "";
+        public string Id = "";
         public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet)
         {
             InitializeComponent();

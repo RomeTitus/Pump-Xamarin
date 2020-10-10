@@ -19,7 +19,7 @@ namespace Pump.IrrigationController
 
         private string isScheduleRunning()
         {
-            var scheduleDetail = new RunningCustomSchedule().getCustomScheduleDetailRunning(this);
+            var scheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(this);
             return scheduleDetail != null ? "1" : "0";
         }
     }

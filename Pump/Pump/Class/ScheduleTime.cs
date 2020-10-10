@@ -1,38 +1,39 @@
 ﻿using System;
+using System.Globalization;
 
-namespace Pump
+namespace Pump.Class
 {
     internal class ScheduleTime
     {
-        public string TimeDiffNow(string Time)
+        public static string TimeDiffNow(string time)
         {
             try
             {
 
-                var datetime = Convert.ToDateTime(Time);
+                var datetime = Convert.ToDateTime(time);
 
                 var dateDiff = datetime - DateTime.Now;
-                var hour = Convert.ToInt32(Math.Floor(Convert.ToDouble(dateDiff.TotalHours.ToString())));
+                var hour = Convert.ToInt32(Math.Floor(Convert.ToDouble(dateDiff.TotalHours.ToString(CultureInfo.InvariantCulture))));
                 var minute = Math.Ceiling(Convert.ToDouble(dateDiff.Minutes.ToString()));
-                if (Convert.ToDouble(dateDiff.Seconds.ToString()) > 0) minute = minute + 1;
-                var StringHour = hour.ToString();
-                var StringMinute = minute.ToString();
+                if (Convert.ToDouble(dateDiff.Seconds.ToString()) > 0) minute += 1;
+                var stringHour = hour.ToString();
+                var stringMinute = minute.ToString(CultureInfo.InvariantCulture);
 
                 if (minute < 10)
-                    StringMinute = "0" + minute;
+                    stringMinute = "0" + minute;
 
                 if (hour < 10)
-                    StringHour = "0" + hour;
+                    stringHour = "0" + hour;
 
-                return StringHour + ":" + StringMinute;
+                return stringHour + ":" + stringMinute;
             }
             catch (Exception)
             {
-                return Time;
+                return time;
             }
         }
 
-        public string convertDateTimeToString(TimeSpan timeSpan)
+        public static string ConvertTimeSpanToString(TimeSpan timeSpan)
         {
             string hour;
             if (timeSpan.Hours > 9)
@@ -47,10 +48,27 @@ namespace Pump
             return hour + ":" + minute;
         }
 
-        public DateTime FromUnixTimeStamp(long unixTimeStamp)
+        public static DateTime FromUnixTimeStampLocal(long unixTimeStamp)
         {
-            var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp).ToLocalTime();
+            return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp);
+        }
+        public static DateTime FromUnixTimeStampUtc(long unixTimeStamp)
+        {
+            return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp);
+        }
+
+        public int getUnixTimeStampNow()
+        {
+            return (int)(DateTime.Now.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+        public static int GetUnixTimeStampUtcNow()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+        public static int GetUnixTimeStampUtcNow(TimeSpan hours, TimeSpan minutes)
+        {
+            return (int) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Add(hours).Add(minutes).TotalSeconds;
+
         }
     }
 }
