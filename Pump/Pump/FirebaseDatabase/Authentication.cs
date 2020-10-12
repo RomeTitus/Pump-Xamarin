@@ -235,7 +235,7 @@ namespace Pump.FirebaseDatabase
         }
 
         //ManualSchedule
-        public async Task<string> SetManualSchedule(IrrigationController.ManualSchedule manual)
+        public async Task<string> SetManualSchedule(ManualSchedule manual)
         {
             try
             {
@@ -244,15 +244,15 @@ namespace Pump.FirebaseDatabase
                     {"EndTime", manual.EndTime},{"DURATION", manual.DURATION}, {"RunWithSchedule", manual.RunWithSchedule ? "1" : "0"}
                 };
                 manualJObject["ManualDetails"] = new JObject();
-                foreach (var equipment in manual.equipmentIdList)
+                foreach (var equipment in manual.ManualDetails)
                 {
                     var key = Guid.NewGuid().ToString().GetHashCode().ToString("x");
-                    manualJObject["ManualDetails"][key] = new JObject { ["id_Equipment"] = equipment.ID };
+                    manualJObject["ManualDetails"][key] = new JObject { ["id_Equipment"] = equipment.id_Equipment };
                 }
 
                 var result = await _FirebaseClient
                     .Child(getConnectedPi() + "/ManualSchedule")
-                    .PostAsync(manualJObject);
+                    .PostAsync(manual);
                 return result.Key;
             }
             catch (Exception e)
@@ -308,11 +308,11 @@ namespace Pump.FirebaseDatabase
                         manualScheduleDetailList.Add(
                             new ManualScheduleEquipment
                             {
-                                ID = scheduleDetailObject["ManualDetails"][scheduleDuration.Key]["id_Equipment"].ToString()
+                                id_Equipment = scheduleDetailObject["ManualDetails"][scheduleDuration.Key]["id_Equipment"].ToString()
                             });
                     }
 
-                    manualSchedule.equipmentIdList = manualScheduleDetailList;
+                    manualSchedule.ManualDetails = manualScheduleDetailList;
                     return manualSchedule;
                 }
                 else
@@ -357,55 +357,7 @@ namespace Pump.FirebaseDatabase
             
         }
 
-        //Sensor
-        public async Task<List<Sensor>> GetAllSensors()
-        {
-            try
-            {
-                var firebaseScheduleDetail = await _FirebaseClient
-                    .Child(getConnectedPi() + "/Sensor")
-                    .OnceAsync<JObject>();
-
-                if (firebaseScheduleDetail.Count == 0)
-                    return new List<Sensor>();
-                return firebaseScheduleDetail.Select(sensorInfoDetail =>
-                    GetJsonSensorToObjectList(sensorInfoDetail.Object, sensorInfoDetail.Key)).ToList();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-            
-        }
-        public Sensor GetJsonSensorToObjectList(JObject sensorDetailObject, string key)
-        {
-            try
-            {
-                var sensor = new Sensor();
-
-                sensor.ID = key;
-                if (sensorDetailObject.ContainsKey("NAME"))
-                    sensor.NAME = sensorDetailObject["NAME"].ToString();
-                if (sensorDetailObject.ContainsKey("GPIO"))
-                    sensor.GPIO = sensorDetailObject["GPIO"].ToString();
-                if (sensorDetailObject.ContainsKey("TYPE"))
-                    sensor.TYPE = sensorDetailObject["TYPE"].ToString();
-
-                if (sensorDetailObject.ContainsKey("AttachedPiController"))
-                    sensor.AttachedPiController = sensorDetailObject["AttachedPiController"].ToString();
-                if (sensorDetailObject.ContainsKey("LastReading"))
-                    sensor.setSensorReading(sensorDetailObject["LastReading"].ToString());
-                return sensor;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-            
-        }
-        
+         
         //Status
         public ControllerStatus GetJsonStatusToObjectList(JObject sensorDetailObject, string key)
         {
@@ -428,14 +380,13 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-        public async void SetLastOnRequest()
+        public async void SetAlive(Alive alive)
         {
             try
             {
-                var lastOnJObject = new JObject {{ "RequestedTime", ScheduleTime.GetUnixTimeStampUtcNow()}};
                 await _FirebaseClient
                     .Child(getConnectedPi() + "/Alive/Status")
-                    .PatchAsync(lastOnJObject);
+                    .PatchAsync(alive);
             }
             catch
             {

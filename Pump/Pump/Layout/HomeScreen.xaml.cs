@@ -9,15 +9,13 @@ using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump
+namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : TabbedPage
     {
         private Alive _alive = new Alive();
         private readonly DatabaseController _databaseController = new DatabaseController();
-        private readonly ScheduleTime _scheduleTime = new ScheduleTime();
-
         public HomeScreen()
         {
             InitializeComponent();
@@ -52,14 +50,13 @@ namespace Pump
             var auth = new Authentication();
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Alive")
-                .AsObservable<JObject>()
+                .AsObservable<Alive>()
                 .Subscribe(x =>
                 {
                     try
                     {
                         if (x.Object == null) return;
-                        _alive = auth.GetJsonLastOnRequest(x.Object, _alive);
-
+                        _alive = x.Object;
                         var now = ScheduleTime.GetUnixTimeStampUtcNow();
                         Device.BeginInvokeOnMainThread(() =>
                         {
@@ -82,25 +79,25 @@ namespace Pump
             {
                 if (!new DatabaseController().IsRealtimeFirebaseSelected())
                     continue;
-
                 try
                 {
                     Device.BeginInvokeOnMainThread(() =>
-                        {
+                    {
+                            _alive.RequestedTime = ScheduleTime.GetUnixTimeStampUtcNow();
                             if (_alive == null || _alive.ResponseTime == 0)
                             {
-                                new Authentication().SetLastOnRequest();
+                                new Authentication().SetAlive(_alive);
                                 TabPageMain.BackgroundColor = Color.Crimson;
                             }
                             else
                             {
                                 var now = ScheduleTime.GetUnixTimeStampUtcNow();
                                 if (_alive.ResponseTime < (now - 60))
-                                    new Authentication().SetLastOnRequest();
+                                    new Authentication().SetAlive(_alive);
                                 else if (_alive.ResponseTime < (now - 120))
                                     TabPageMain.BackgroundColor = Color.Coral;
                             }
-                        });
+                    });
                 }
                 catch
                 {

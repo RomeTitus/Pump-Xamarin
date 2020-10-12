@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:EmbeddedImages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="clr-namespace:Pump.Layout.Views"
+    Title="Schedule Summary"
     mc:Ignorable="d">
     <ContentPage.Content>
         <ScrollView>
@@ -34,7 +35,7 @@
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewScheduleStatus">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" Tapped="ScrollViewScheduleStatusTap_Tapped" />
+                                    <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" />
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
                                     HorizontalOptions="Center"
@@ -66,7 +67,7 @@
 
                             <StackLayout x:Name="ScrollViewQueueStatus">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" Tapped="ScrollViewQueueStatusTap_Tapped" />
+                                    <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" />
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
                                     HorizontalOptions="Center"
@@ -93,7 +94,7 @@
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewSensorStatus">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" Tapped="ScrollViewSensorStatusTap_Tapped" />
+                                    <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" />
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
                                     HorizontalOptions="Center"

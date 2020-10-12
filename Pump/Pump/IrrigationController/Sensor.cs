@@ -2,8 +2,13 @@
 
 namespace Pump.IrrigationController
 {
-    internal class Sensor
+    public class Sensor
     {
+        public Sensor()
+        {
+            if (TYPE == "Pressure Sensor")
+                setPressureSensorReading();
+        }
         public string ID { get; set; }
         public string LastReading { get; set; }
         public string NAME { get; set; }
@@ -11,9 +16,9 @@ namespace Pump.IrrigationController
         public string GPIO { get; set; }
         public string AttachedPiController { get; set; }
 
-        public void setSensorReading(string data)
+        public void setPressureSensorReading()
         {
-            var reading = Convert.ToDouble(data);
+            var reading = Convert.ToDouble(LastReading);
             //if (TYPE == "Pressure Sensor")
             //{
                 var voltage = reading * 5.0 / 1024.0;
@@ -25,5 +30,12 @@ namespace Pump.IrrigationController
                 LastReading = bars.ToString("0.##").Replace(',', '.'); //for older support
             //}
         }
+
+        public Sensor Clone()
+        {
+            return (Sensor) this.MemberwiseClone();
+        }
+
+       
     }
 }

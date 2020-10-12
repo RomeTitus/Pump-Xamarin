@@ -9,6 +9,7 @@
     xmlns:local="clr-namespace:EmbeddedImages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="clr-namespace:Pump.Layout.Views"
+    Title="Manual Schedule"
     mc:Ignorable="d">
 
     <ContentPage.Content>

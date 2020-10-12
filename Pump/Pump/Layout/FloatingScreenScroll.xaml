@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <pages:PopupPage
     x:Class="Pump.Layout.FloatingScreenScroll"
@@ -26,7 +26,7 @@
         Margin="12"
         Padding="24"
         BackgroundColor="White"
-        HeightRequest="300"
+        HeightRequest="600"
         HorizontalOptions="Center"
         VerticalOptions="Center"
         WidthRequest="300">

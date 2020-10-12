@@ -8,15 +8,15 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FloatingScreenScroll : PopupPage
     {
-        public bool isStackLayout = true;
+        public bool IsStackLayout = true;
         public FloatingScreenScroll()
         {
             InitializeComponent();
         }
 
-        public void setFloatingScreen(List<object> screens)
+        public void SetFloatingScreen(IEnumerable<object> screens)
         {
-            if(isStackLayout)
+            if(IsStackLayout)
                 foreach (View screen in screens) ScrollViewFloatingPage.Children.Add(screen);
             else
             {

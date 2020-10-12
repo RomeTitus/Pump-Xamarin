@@ -9,7 +9,7 @@ namespace Pump.IrrigationController
     class RunningCustomSchedule
     {
 
-        public List<ActiveSchedule> GetActiveCustomSchedule(List<CustomSchedule> customScheduleList, List<Equipment> EquipmentList)
+        public List<ActiveSchedule> GetActiveCustomSchedule(List<CustomSchedule> customScheduleList, List<Equipment> equipmentList)
         {
             var activeScheduleList = new List<ActiveSchedule>();
 
@@ -23,13 +23,13 @@ namespace Pump.IrrigationController
                     {
                         var activeSchedule = new ActiveSchedule
                         {
-                            ID = schedule.ID, NAME = schedule.NAME, id_Equipment = scheduleDetails.id_Equipment
+                            ID = schedule.ID+ scheduleDetails.id_Equipment, NAME = schedule.NAME, id_Equipment = scheduleDetails.id_Equipment
                         };
                         activeSchedule.name_Equipment =
-                            EquipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
+                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
                         activeSchedule.id_Pump = schedule.id_Pump;
                         activeSchedule.name_Pump =
-                            EquipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
+                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
                         
                         //gets Next Schedule Start Time

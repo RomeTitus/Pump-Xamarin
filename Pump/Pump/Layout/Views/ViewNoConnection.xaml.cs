@@ -8,7 +8,10 @@ namespace Pump.Layout.Views
     {
         public ViewNoConnection()
         {
+            ID = "-849";
+            AutomationId = ID;
             InitializeComponent();
         }
+        public string ID { get; private set; }
     }
 }

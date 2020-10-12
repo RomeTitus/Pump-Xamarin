@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <ContentView.Content>
-        <StackLayout Margin="5" HeightRequest="400">
+        <StackLayout Margin="5" HeightRequest="600">
             <StackLayout>
                 <Label
                     CharacterSpacing="1"

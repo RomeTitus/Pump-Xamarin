@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pump.IrrigationController
 {
@@ -13,6 +14,10 @@ namespace Pump.IrrigationController
 
 
         public List<ScheduleDetail> ScheduleDetails { get; set; }
+        public Schedule Clone()
+        {
+            return (Schedule)this.MemberwiseClone();
+        }
     }
 
     public class ScheduleDetail

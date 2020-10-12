@@ -21,81 +21,120 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleHomeScreen : ContentPage
     {
-        private List<Equipment> _equipmentList = new List<Equipment>();
-        private readonly List<Schedule> _schedulesList = new List<Schedule>();
-        private string _oldAllSchedule = "";
-        private readonly SocketCommands _command = new SocketCommands();
-        private readonly SocketMessage _socket = new SocketMessage();
+        private DatabaseController databaseController = new DatabaseController();
+        private List<Equipment> _equipmentList;
+        private List<Equipment> _oldEquipmentList;
+        private List<Schedule> _scheduleList;
+        private List<Schedule> _oldScheduleList;
 
         public ViewScheduleHomeScreen()
         {
             InitializeComponent();
 
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
-                new Thread(() => GetScheduleAndEquipmentFirebase(new DatabaseController())).Start();
-            else
-                new Thread(GetSchedules).Start();
+                new Thread(SubscribeToFirebase).Start();
         }
 
-        private void GetScheduleAndEquipmentFirebase(DatabaseController databaseController)
+        private void SubscribeToFirebase()
         {
             var auth = new Authentication();
 
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Schedule")
-                .AsObservable<JObject>()
-                .Subscribe(x =>
-                {
-                    var schedule = auth.GetJsonSchedulesToObjectList(x.Object, x.Key);
-                    _schedulesList.RemoveAll(y => y.ID == schedule.ID);
-                    if (x.EventType != FirebaseEventType.Delete)
-                        _schedulesList.Add(schedule);
-                });
-
-
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Equipment")
-                .AsObservable<JObject>()
+                .AsObservable<Equipment>()
                 .Subscribe(x =>
                 {
                     try
                     {
-                        var equipment = auth.GetJsonEquipmentToObjectList(x.Object, x.Key);
-                        _equipmentList.RemoveAll(y => y.ID == equipment.ID);
-                        if (x.EventType != FirebaseEventType.Delete)
-                            _equipmentList.Add(equipment);
-                        _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
+                        if (_equipmentList == null)
+                            _equipmentList = new List<Equipment>();
+                        var equipment = x.Object;
+
+                        if (x.EventType == FirebaseEventType.Delete)
+                        {
+                            _equipmentList.RemoveAll(y => y.ID == x.Key);
+                        }
+                        else
+                        {
+                            var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
+                            if (existingEquipment != null)
+                            {
+                                FirebaseMerger.CopyValues(existingEquipment, equipment);
+                            }
+                            else
+                            {
+                                equipment.ID = x.Key;
+                                _equipmentList.Add(equipment);
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
                     }
-
                 });
 
-            
+
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi() + "/Schedule")
+                .AsObservable<Schedule>()
+                .Subscribe(x =>
+                {
+                    try
+                    {
+                        if (_scheduleList == null)
+                            _scheduleList = new List<Schedule>();
+                        var schedule = x.Object;
+
+                        if (x.EventType == FirebaseEventType.Delete)
+                        {
+                            _scheduleList.RemoveAll(y => y.ID == x.Key);
+                        }
+                        else
+                        {
+                            var existingSchedule = _scheduleList.FirstOrDefault(y => y.ID == x.Key);
+                            if (existingSchedule != null)
+                            {
+                                FirebaseMerger.CopyValues(existingSchedule, schedule);
+                            }
+                            else
+                            {
+                                schedule.ID = x.Key;
+                                _scheduleList.Add(schedule);
+                            }
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                });
+
+
+            PopulateScheduleSummary();
+        }
+
+        private void PopulateScheduleSummary()
+        {
             while (databaseController.IsRealtimeFirebaseSelected())
             {
                 try
                 {
-                    var allSchedule = "";
-                    foreach (var schedule in _schedulesList)
-                    {
-                        var pumpEquipment = _equipmentList.First(x => x.ID == schedule.id_Pump);
-                        allSchedule += schedule.ID + ',' + schedule.NAME + ',' + schedule.TIME + ',' +
-                                       schedule.isActive + ',' + pumpEquipment.NAME + ',' + schedule.WEEK + '#';
-                    }
 
-
-                    if (_oldAllSchedule != allSchedule && string.IsNullOrWhiteSpace(_oldAllSchedule))
+                    if (_equipmentList != null && _scheduleList != null && (_oldScheduleList == null || (!_scheduleList.All(_oldScheduleList.Contains) || _scheduleList.Count < _oldScheduleList.Count)))
                     {
-                        _oldAllSchedule = allSchedule;
+                        if (_oldScheduleList == null)
+                            _oldScheduleList = new List<Schedule>();
+                        _oldScheduleList.Clear();
+                        foreach (var schedule in _scheduleList)
+                        {
+                            _oldScheduleList.Add(schedule);
+                        }
 
                         Device.BeginInvokeOnMainThread(() =>
                         {
                             ScrollViewScheduleDetail.Children.Clear();
-                            var allScheduleList = GetScheduleObject(allSchedule);
+                            var allScheduleList = GetScheduleObject();
                             foreach (View view in allScheduleList) ScrollViewScheduleDetail.Children.Add(view);
                         });
                     }
@@ -110,72 +149,43 @@ namespace Pump.Layout
                 }
                 Thread.Sleep(2000);
             }
-
         }
 
 
-        private void GetSchedules()
+        private List<object> GetScheduleObject()
         {
-            try
-            {
-                var schedules = _socket.Message(_command.getSchedule());
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewScheduleDetail.Children.Clear();
-                    var scheduleList = GetScheduleObject(schedules);
-                    foreach (View view in scheduleList) ScrollViewScheduleDetail.Children.Add(view);
-                });
-            }
-            catch
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewScheduleDetail.Children.Clear();
-                    ScrollViewScheduleDetail.Children.Add(new ViewNoConnection());
-                });
 
-            }
-        }
-
-        private List<object> GetScheduleObject(string schedules)
-        {
             var scheduleListObject = new List<object>();
             try
             {
-                if (schedules == "No Data" || schedules == "")
+                if (_scheduleList.Count == 0)
                 {
                     scheduleListObject.Add(new ViewEmptySchedule("No Schedules Made"));
                     return scheduleListObject;
                 }
 
-
-                var scheduleList = schedules.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                foreach (var schedule in scheduleList)
+                foreach (var viewSchedule in _scheduleList.Select(schedule => new ViewScheduleSettingSummary(schedule, _equipmentList.First(x => x.ID == schedule.id_Pump))))
                 {
-                    var viewSchedule = new ViewSchedule(schedule.Split(',').ToList());
                     scheduleListObject.Add(viewSchedule);
-                    viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
-                    viewSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
+                    //viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                    //viewSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                 }
-
                 return scheduleListObject;
             }
             catch
             {
-                scheduleListObject = new List<object> {new ViewNoConnection()};
+                scheduleListObject = new List<object> { new ViewNoConnection() };
                 return scheduleListObject;
             }
         }
 
 
-        private void ViewScheduleSummary(string id)
-        {
-            var floatingScreen = new FloatingScreen();
-            PopupNavigation.Instance.PushAsync(floatingScreen);
-            new Thread(() => GetScheduleSummary(id, floatingScreen)).Start();
-        }
 
+        //Old Stuff
+
+
+
+        /*
         private void GetScheduleSummary(string id, FloatingScreen floatingScreen)
         {
             if (new DatabaseController().IsRealtimeFirebaseSelected())
@@ -346,5 +356,7 @@ namespace Pump.Layout
         {
             Navigation.PopModalAsync();
         }
+    
+        */
     }
 }

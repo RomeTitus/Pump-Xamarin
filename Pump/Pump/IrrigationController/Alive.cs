@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Pump.IrrigationController
 {
-    class Alive
+    internal class Alive
     {
         public long RequestedTime { get; set; }
         public long ResponseTime { get; set; }

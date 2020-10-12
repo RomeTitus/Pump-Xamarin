@@ -41,13 +41,25 @@ namespace Pump.Layout
                 {
                     if(_customSchedulesList == null)
                         _customSchedulesList = new List<CustomSchedule>();
+                    var customSchedule = x.Object;
                     _customSchedulesList.RemoveAll(y => y.ID == x.Key);
-                    if (x.EventType != FirebaseEventType.Delete)
+                    if (x.EventType == FirebaseEventType.Delete)
                     {
-                        x.Object.ID = x.Key;
-                        _customSchedulesList.Add(x.Object);
+                        _customSchedulesList.RemoveAll(y => y.ID == x.Key);
                     }
-                        
+                    else
+                    {
+                        var existingCustomSchedule = _customSchedulesList.FirstOrDefault(y => y.ID == x.Key);
+                        if (existingCustomSchedule != null)
+                        {
+                            FirebaseMerger.CopyValues(existingCustomSchedule, customSchedule);
+                        }
+                        else
+                        {
+                            customSchedule.ID = x.Key;
+                            _customSchedulesList.Add(customSchedule);
+                        }
+                    }
                 });
 
 
@@ -58,17 +70,32 @@ namespace Pump.Layout
                 {
                     if (_equipmentList == null)
                         _equipmentList = new List<Equipment>();
+                    var equipment = x.Object;
                     _equipmentList.RemoveAll(y => y.ID == x.Key);
-                    if (x.EventType != FirebaseEventType.Delete)
+                    if (x.EventType == FirebaseEventType.Delete)
                     {
-                        x.Object.ID = x.Key;
-                        _equipmentList.Add(x.Object);
+                        _equipmentList.RemoveAll(y => y.ID == x.Key);
                     }
-                        
+                    else
+                    {
+                        var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
+                        if (existingEquipment != null)
+                        {
+                            FirebaseMerger.CopyValues(existingEquipment, equipment);
+                        }
+                        else
+                        {
+                            equipment.ID = x.Key;
+                            _equipmentList.Add(equipment);
+                        }
+
+                    }
+
                     _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
                 });
 
             var databaseController = new DatabaseController();
+
             while (databaseController.IsRealtimeFirebaseSelected())
             {
                 try

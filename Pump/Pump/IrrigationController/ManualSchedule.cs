@@ -4,16 +4,21 @@ using System.Text;
 
 namespace Pump.IrrigationController
 {
-    class ManualSchedule
+    public class ManualSchedule
     {
+        public string ID;
         public long EndTime { get; set; }
         public string DURATION { get; set; }
         public bool RunWithSchedule { get; set; }
-        public List<ManualScheduleEquipment> equipmentIdList { get; set; }
+        public List<ManualScheduleEquipment> ManualDetails { get; set; }
+        public ManualSchedule Clone()
+        {
+            return (ManualSchedule)this.MemberwiseClone();
+        }
     }
 
-    class ManualScheduleEquipment
+    public class ManualScheduleEquipment
     {
-        public string ID { get; set; }
+        public string id_Equipment { get; set; }
     }
 }

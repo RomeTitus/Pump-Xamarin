@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using EmbeddedImages;
+using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -9,36 +10,39 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSensorDetail : ContentView
     {
-        public ViewSensorDetail(List<string> sensorList)
+        public Sensor Sensor;
+        public ViewSensorDetail(Sensor sensor)
         {
             InitializeComponent();
-            setSensorType(sensorList);
+            Sensor = sensor;
+            AutomationId = Sensor.ID;
+            PopulateSensor();
         }
 
-        private void setSensorType(List<string> sensorList)
+        public void PopulateSensor()
         {
-            LableSensorType.Text = sensorList[1];
-            LabelSensorName.Text = sensorList[2];
+            LableSensorType.Text = Sensor.TYPE;
+            LabelSensorName.Text = Sensor.NAME;
             var image = "";
-            if (sensorList[1] == "Pressure Sensor")
+            if (Sensor.TYPE == "Pressure Sensor")
             {
-                sensorList[3] = sensorList[3].Replace('.', ',');
+                Sensor.LastReading = Sensor.LastReading.Replace('.', ',');
                 try
                 {
-                    if (sensorList[3] == "False" || double.Parse(sensorList[3]) < 2)
+                    if (double.Parse(Sensor.LastReading) < 2)
                     {
-                        LableSensorStatus.Text = sensorList[3];
+                        LableSensorStatus.Text = Sensor.LastReading;
                         image = "Pump.Icons.PressureLow.png";
                     }
                     else
                     {
-                        LableSensorStatus.Text = sensorList[3];
+                        LableSensorStatus.Text = Sensor.LastReading;
                         image = "Pump.Icons.PressureHigh.png";
                     }
                 }
                 catch
                 {
-                    LableSensorStatus.Text = "Low Pressure";
+                    LableSensorStatus.Text = "Could Not Read Pressure :/";
                     image = "Pump.Icons.PressureLow.png";
                 }
             }

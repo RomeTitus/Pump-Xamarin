@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pump.IrrigationController
 {
@@ -21,6 +22,11 @@ namespace Pump.IrrigationController
         {
             var scheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(this);
             return scheduleDetail != null ? "1" : "0";
+        }
+
+        public CustomSchedule Clone()
+        {
+            return (CustomSchedule)this.MemberwiseClone();
         }
     }
 }

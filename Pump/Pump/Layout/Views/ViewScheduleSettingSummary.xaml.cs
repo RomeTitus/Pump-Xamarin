@@ -1,76 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
+using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewSchedule : ContentView
+    public partial class ViewScheduleSettingSummary : ContentView
     {
-        public ViewSchedule(IReadOnlyList<string> schedule)
+        private readonly Schedule _schedule;
+        private readonly Equipment _equipment;
+        public ViewScheduleSettingSummary(Schedule schedule, Equipment equipment)
         {
             InitializeComponent();
-            Populate(schedule[0], schedule[1], schedule[2], schedule[3], schedule[4]);
-
-            for (var i = 5; i < schedule.Count; i++) SetWeek(schedule[i]);
+            _schedule = schedule;
+            _equipment = equipment;
+            Populate();
         }
 
-        private void Populate(string id, string name, string time, string isActive, string pump)
+        private void Populate()
         {
-            labelScheduleName.Text = name;
-            labelScheduleTime.Text = time;
-            switchScheduleIsActive.AutomationId = id;
-            LabelPumpName.Text = pump;
-            StackLayoutViewSchedule.AutomationId = id;
-            switchScheduleIsActive.IsToggled = !isActive.Contains("0");
+            labelScheduleName.Text = _schedule.NAME;
+            labelScheduleTime.Text = _schedule.TIME;
+            switchScheduleIsActive.AutomationId = _schedule.ID;
+            LabelPumpName.Text = _equipment.NAME;
+            StackLayoutViewSchedule.AutomationId = _schedule.ID;
+            switchScheduleIsActive.IsToggled = !_schedule.isActive.Contains("0");
+            SetWeek();
         }
 
-        private void SetWeek(string week)
+        private void SetWeek()
         {
-            if (week.Contains("SUNDAY"))
+            
+            if (_schedule.WEEK.Contains("SUNDAY"))
             {
                 LabelSunday.TextColor = Color.Black;
                 LabelSunday.FontAttributes = FontAttributes.Bold;
                 LabelSunday.FontSize = 12;
             }
 
-            if (week.Contains("MONDAY"))
+            if (_schedule.WEEK.Contains("MONDAY"))
             {
                 LabelMonday.TextColor = Color.Black;
                 LabelMonday.FontAttributes = FontAttributes.Bold;
                 LabelMonday.FontSize = 12;
             }
 
-            if (week.Contains("TUESDAY"))
+            if (_schedule.WEEK.Contains("TUESDAY"))
             {
                 LabelTuesday.TextColor = Color.Black;
                 LabelTuesday.FontAttributes = FontAttributes.Bold;
                 LabelTuesday.FontSize = 12;
             }
 
-            if (week.Contains("WEDNESDAY"))
+            if (_schedule.WEEK.Contains("WEDNESDAY"))
             {
                 LabelWednesday.TextColor = Color.Black;
                 LabelWednesday.FontAttributes = FontAttributes.Bold;
                 LabelWednesday.FontSize = 12;
             }
 
-            if (week.Contains("THURSDAY"))
+            if (_schedule.WEEK.Contains("THURSDAY"))
             {
                 LabelThursday.TextColor = Color.Black;
                 LabelThursday.FontAttributes = FontAttributes.Bold;
                 LabelThursday.FontSize = 12;
             }
 
-            if (week.Contains("FRIDAY"))
+            if (_schedule.WEEK.Contains("FRIDAY"))
             {
                 LabelFriday.TextColor = Color.Black;
                 LabelFriday.FontAttributes = FontAttributes.Bold;
                 LabelFriday.FontSize = 12;
             }
 
-            if (week.Contains("SATURDAY"))
+            if (_schedule.WEEK.Contains("SATURDAY"))
             {
                 LabelSaturday.TextColor = Color.Black;
                 LabelSaturday.FontAttributes = FontAttributes.Bold;

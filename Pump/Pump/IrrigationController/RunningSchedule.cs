@@ -6,12 +6,20 @@ namespace Pump.IrrigationController
 {
     internal class RunningSchedule
     {
-        public static IEnumerable<ActiveSchedule> GetActiveSchedule(IEnumerable<Schedule> scheduleList, List<Equipment> equipmentList)
+        private readonly IEnumerable<Schedule> _scheduleList;
+        private readonly IEnumerable<Equipment> _equipmentList;
+        public RunningSchedule(IEnumerable<Schedule> scheduleList, IEnumerable<Equipment> equipmentList)
+        {
+            _scheduleList = scheduleList;
+            _equipmentList = equipmentList;
+        }
+        public IEnumerable<ActiveSchedule> GetActiveSchedule()
         {
             var activeScheduleList = new List<ActiveSchedule>();
+            if (_scheduleList == null)
+                return new List<ActiveSchedule>();
 
-
-            foreach (var schedule in scheduleList)
+            foreach (var schedule in _scheduleList)
             {
                 if (schedule.isActive == "0")
                     continue;
@@ -30,13 +38,13 @@ namespace Pump.IrrigationController
                     {
                         var activeSchedule = new ActiveSchedule
                         {
-                            ID = schedule.ID, NAME = schedule.NAME, id_Equipment = scheduleDetails.id_Equipment
+                            ID = schedule.ID + scheduleDetails.id_Equipment, NAME = schedule.NAME, id_Equipment = scheduleDetails.id_Equipment
                         };
                         activeSchedule.name_Equipment =
-                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
+                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
                         activeSchedule.id_Pump = schedule.id_Pump;
                         activeSchedule.name_Pump =
-                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
+                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
                         activeSchedule.WEEK = schedule.WEEK;
                         var durationHour = scheduleDetails.DURATION.Split(':').First();
@@ -86,16 +94,18 @@ namespace Pump.IrrigationController
             return startTimeList;
         }
 
-        public static IEnumerable<ActiveSchedule> GetRunningSchedule(IEnumerable<ActiveSchedule> activeScheduleList)
+        public IEnumerable<ActiveSchedule> GetRunningSchedule()
         {
+            var activeScheduleList = GetActiveSchedule();
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime < DateTime.UtcNow && activeSchedule.EndTime > DateTime.UtcNow).ToList();
+                activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
         }
 
-        public static IEnumerable<ActiveSchedule> GetQueSchedule(IEnumerable<ActiveSchedule> activeScheduleList)
+        public IEnumerable<ActiveSchedule> GetQueSchedule()
         {
+            var activeScheduleList = GetActiveSchedule();
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime > DateTime.UtcNow && activeSchedule.StartTime < DateTime.UtcNow.AddDays(1)).ToList();
+                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(1)).ToList();
         }
     }
 }

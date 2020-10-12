@@ -2,7 +2,7 @@
 
 namespace Pump.IrrigationController
 {
-    internal class ActiveSchedule
+    public class ActiveSchedule
     {
         public string ID { get; set; }
         public string NAME { get; set; }

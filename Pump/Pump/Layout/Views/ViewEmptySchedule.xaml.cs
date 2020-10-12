@@ -8,8 +8,12 @@ namespace Pump.Layout.Views
     {
         public ViewEmptySchedule(string text)
         {
+            ID = "-849";
+            AutomationId = ID;
             InitializeComponent();
             EmptyScheduleLabel.Text = text;
         }
+
+        public string ID { get; private set; }
     }
 }

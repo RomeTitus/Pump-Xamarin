@@ -1,4 +1,6 @@
-﻿namespace Pump.IrrigationController
+﻿using System;
+
+namespace Pump.IrrigationController
 {
     public class Equipment
     {
@@ -8,5 +10,9 @@
         public string GPIO { get; set; }
         public bool isPump { get; set; }
         public string DirectOnlineGPIO { get; set; }
+        public Equipment Clone()
+        {
+            return (Equipment) this.MemberwiseClone();
+        }
     }
 }
