@@ -19,7 +19,6 @@
                 JustifyContent="SpaceAround"
                 VerticalOptions="Center">
 
-
                 <StackLayout>
                     <Label
                         FontSize="Subtitle"
@@ -35,9 +34,10 @@
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewScheduleStatus">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" />
+                                    <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" Tapped="ScrollViewScheduleStatusTap_OnTapped"/>
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
+                                    AutomationId="ActivityIndicatorScheduleStatusLoading"
                                     HorizontalOptions="Center"
                                     IsEnabled="true"
                                     IsRunning="True"
@@ -67,9 +67,10 @@
 
                             <StackLayout x:Name="ScrollViewQueueStatus">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" />
+                                    <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" Tapped="ScrollViewQueueStatusTap_OnTapped"/>
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
+                                    AutomationId="ActivityIndicatorScheduleQueLoading"
                                     HorizontalOptions="Center"
                                     IsEnabled="true"
                                     IsRunning="True"
@@ -94,9 +95,10 @@
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewSensorStatus">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" />
+                                    <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" Tapped="ScrollViewSensorStatusTap_OnTapped"/>
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
+                                    AutomationId="ActivityIndicatorSensorLoading"
                                     HorizontalOptions="Center"
                                     IsEnabled="true"
                                     IsRunning="True"

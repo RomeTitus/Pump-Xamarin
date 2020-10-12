@@ -359,27 +359,6 @@ namespace Pump.FirebaseDatabase
 
          
         //Status
-        public ControllerStatus GetJsonStatusToObjectList(JObject sensorDetailObject, string key)
-        {
-            try
-            {
-                var status = new ControllerStatus
-                {
-                    ID = key,
-                    Code = sensorDetailObject["Code"].ToString(),
-                    Operation = sensorDetailObject["Operation"].ToString()
-                };
-
-
-                return status;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return  null;
-            }
-            
-        }
         public async void SetAlive(Alive alive)
         {
             try

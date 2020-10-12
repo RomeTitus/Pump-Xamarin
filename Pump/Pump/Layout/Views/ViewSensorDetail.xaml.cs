@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using EmbeddedImages;
 using Pump.IrrigationController;
@@ -10,7 +11,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSensorDetail : ContentView
     {
-        public Sensor Sensor;
+        public readonly Sensor Sensor;
+        private string _image = "";
+        private string _oldImage = "";
         public ViewSensorDetail(Sensor sensor)
         {
             InitializeComponent();
@@ -23,33 +26,50 @@ namespace Pump.Layout.Views
         {
             LableSensorType.Text = Sensor.TYPE;
             LabelSensorName.Text = Sensor.NAME;
-            var image = "";
+            
             if (Sensor.TYPE == "Pressure Sensor")
             {
-                Sensor.LastReading = Sensor.LastReading.Replace('.', ',');
-                try
-                {
-                    if (double.Parse(Sensor.LastReading) < 2)
-                    {
-                        LableSensorStatus.Text = Sensor.LastReading;
-                        image = "Pump.Icons.PressureLow.png";
-                    }
-                    else
-                    {
-                        LableSensorStatus.Text = Sensor.LastReading;
-                        image = "Pump.Icons.PressureHigh.png";
-                    }
-                }
-                catch
-                {
-                    LableSensorStatus.Text = "Could Not Read Pressure :/";
-                    image = "Pump.Icons.PressureLow.png";
-                }
+                PressureSensor();
             }
 
-            ImageSensor.Source = ImageSource.FromResource(
-                image,
-                typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+            if (_oldImage != _image)
+            {
+                _oldImage = _image;
+                ImageSensor.Source = ImageSource.FromResource(
+                    _image,
+                    typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+            }
+            
+        }
+
+        private void PressureSensor()
+        {
+            var reading = Convert.ToDouble(Sensor.LastReading);
+            
+            var voltage = reading * 5.0 / 1024.0;
+
+            var pressure_pascal = 3.0 * (voltage - 0.47) * 1000000.0;
+
+            var bars = pressure_pascal / 10e5;
+
+            try
+            {
+                if (bars < 2)
+                {
+                    LableSensorStatus.Text = bars.ToString("0.##");
+                    _image = "Pump.Icons.PressureLow.png";
+                }
+                else
+                {
+                    LableSensorStatus.Text = bars.ToString("0.##");
+                    _image = "Pump.Icons.PressureHigh.png";
+                }
+            }
+            catch
+            {
+                LableSensorStatus.Text = "Could Not Read Pressure :/";
+                _image = "Pump.Icons.PressureLow.png";
+            }
         }
     }
 }
