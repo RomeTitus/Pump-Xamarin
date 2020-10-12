@@ -18,6 +18,21 @@ namespace Pump.Layout.Views
             ActiveSchedule = activeSchedule;
             PopulateSchedule();
         }
+        public ViewActiveScheduleSummary(ActiveSchedule activeSchedule, double size)
+        {
+            InitializeComponent();
+            AutomationId = activeSchedule.ID;
+            ActiveSchedule = activeSchedule;
+
+            this.HeightRequest = 150 * size;
+            LabelScheduleName.FontSize *= size;
+            LablePump.FontSize *= size;
+            LableZone.FontSize *= size;
+            LableStartTime.FontSize *= size;
+            LableEndTime.FontSize *= size;
+
+            PopulateSchedule();
+        }
 
         public void PopulateSchedule()
         {

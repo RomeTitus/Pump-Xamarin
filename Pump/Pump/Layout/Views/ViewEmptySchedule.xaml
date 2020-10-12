@@ -9,12 +9,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackLayout HorizontalOptions="Center">
+    <StackLayout HorizontalOptions="Center" VerticalOptions="CenterAndExpand">
         <Label
             x:Name="EmptyScheduleLabel"
             FontSize="20"
-            Text="No Schedules" />
+            Text="No Schedules"
+            VerticalOptions="CenterAndExpand" />
         <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
-        <Image HeightRequest="68" Source="{localImage:ImageResourceExtention Pump.Icons.FieldSun.png}" />
+        <Image
+            HeightRequest="68"
+            Source="{localImage:ImageResourceExtention Pump.Icons.FieldSun.png}"
+            VerticalOptions="CenterAndExpand" />
     </StackLayout>
 </ContentView>

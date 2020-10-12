@@ -18,6 +18,8 @@ namespace Pump.Layout.Views
             InitializeComponent();
             EmptyScheduleLabel.Text = text;
             EmptyScheduleLabel.FontSize *= size;
+            this.HeightRequest = 150 * size;
+            populate();
         }
         public void populate()
         {

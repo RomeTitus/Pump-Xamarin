@@ -21,6 +21,16 @@ namespace Pump.Layout.Views
             AutomationId = Sensor.ID;
             PopulateSensor();
         }
+        public ViewSensorDetail(Sensor sensor, double size)
+        {
+            InitializeComponent();
+            Sensor = sensor;
+            AutomationId = Sensor.ID;
+            this.HeightRequest = 150 * size;
+            LableSensorType.FontSize *= size;
+            LabelSensorName.FontSize *= size;
+            PopulateSensor();
+        }
 
         public void PopulateSensor()
         {

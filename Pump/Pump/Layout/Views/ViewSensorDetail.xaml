@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentView
     x:Class="Pump.Layout.Views.ViewSensorDetail"
@@ -10,37 +10,30 @@
     mc:Ignorable="d">
 
 
-    <StackLayout Padding="5" HorizontalOptions="Center">
+    <StackLayout Padding="5" HorizontalOptions="FillAndExpand">
         <Label
             x:Name="LabelSensorName"
             FontSize="20"
             HorizontalOptions="Center"
             Text="Sensor Name" />
 
-
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
+        <StackLayout
+            HorizontalOptions="FillAndExpand"
+            Orientation="Horizontal"
+            VerticalOptions="StartAndExpand">
             <Label
                 x:Name="LableSensorType"
-                Grid.Row="0"
-                Grid.Column="0"
+                Margin="10,0,0,0"
                 FontSize="16"
+                HorizontalOptions="Start"
                 Text="Sensor Type"
                 VerticalOptions="CenterAndExpand" />
 
             <StackLayout
-                Grid.Row="0"
-                Grid.Column="1"
-                HeightRequest="30"
-                Orientation="Vertical">
+                Margin="0,0,10,0"
+                HorizontalOptions="EndAndExpand"
+                Orientation="Vertical"
+                VerticalOptions="CenterAndExpand">
                 <!--Icons made by <a href="https://www.flaticon.com/free-icon/pressure_2562337" title="surang">surang</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>-->
                 <Image
                     x:Name="ImageSensor"
@@ -52,7 +45,9 @@
                     HorizontalOptions="Center"
                     Text="Low Pressure" />
             </StackLayout>
-        </Grid>
+        </StackLayout>
+
+
     </StackLayout>
 
 </ContentView>

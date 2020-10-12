@@ -245,13 +245,21 @@ namespace Pump.Layout
         {
             Device.BeginInvokeOnMainThread(ActiveAndQueSchedule);
         }
-        private void ActiveAndQueScheduleAdded()
+        private void ActiveAndQueSchedule()
         {
-                //get All Manual Stuff
-                if (_manualScheduleList.Count > 0)
-                    foreach (var manual in _manualScheduleList)
+            ScreenCleanupForSchedule();
+
+            //get All Manual Stuff
+            if (_manualScheduleList.Count > 0)
+                    foreach (var manual in from manual in _manualScheduleList
+                        let existingManualSchedule =
+                            ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
+                                x.AutomationId == manual.ID)
+                        where existingManualSchedule == null
+                        select manual)
+                    {
                         ScrollViewScheduleStatus.Children.Add(new ViewManualSchedule(manual));
-            
+                    }
                 
                 var runningScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetRunningSchedule().ToList();
                 
@@ -301,72 +309,7 @@ namespace Pump.Layout
                     ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Que Schedules"));
                 }
                 
-                ScreenCleanupForSchedule();
-        }
-
-        private void ActiveAndQueScheduleUpdated()
-        {
-            //get All Manual Stuff
-            if (_manualScheduleList.Count > 0)
-                foreach (var manual in from manual in _manualScheduleList
-                                       let existingManualSchedule =
-                                           ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
-                                               x.AutomationId == manual.ID)
-                                       where existingManualSchedule == null
-                                       select manual)
-                {
-                    ScrollViewScheduleStatus.Children.Add(new ViewManualSchedule(manual));
-                }
-
-            var runningScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetRunningSchedule().ToList();
-
-            if (runningScheduleList.Any())
-                foreach (var runningSchedule in runningScheduleList)
-                {
-                    var viewActiveSchedule = ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
-                            x.AutomationId == runningSchedule.ID);
-                    if (viewActiveSchedule != null)
-                    {
-                        var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
-                        viewActiveScheduleSummary.ActiveSchedule = runningSchedule;
-                        viewActiveScheduleSummary.PopulateSchedule();
-                    }
-                    else
-                    {
-                        ScrollViewScheduleStatus.Children.Add(
-                            new ViewActiveScheduleSummary(runningSchedule));
-                    }
-                }
-            else
-            {
-                ScrollViewScheduleStatus.Children.Add(new ViewEmptySchedule("No Active Schedules"));
-            }
-
-
-            var queScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetQueSchedule().ToList();
-            if (queScheduleList.Any())
-                foreach (var runningSchedule in queScheduleList)
-                {
-                    var viewActiveSchedule = ScrollViewQueueStatus.Children.FirstOrDefault(x =>
-                        x.AutomationId == runningSchedule.ID);
-                    if (viewActiveSchedule != null)
-                    {
-                        var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
-                        viewActiveScheduleSummary.ActiveSchedule = runningSchedule;
-                        viewActiveScheduleSummary.PopulateSchedule();
-                    }
-                    else
-                    {
-                        ScrollViewQueueStatus.Children.Add(
-                            new ViewActiveScheduleSummary(runningSchedule));
-                    }
-                }
-            else
-            {
-                ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Que Schedules"));
-            }
-
-            ScreenCleanupForSchedule();
+                
         }
 
         private void SensorStatusEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -375,6 +318,7 @@ namespace Pump.Layout
         }
         private void SensorStatus()
         {
+            ScreenCleanupForSensor();
             try
             {
                 if (_sensorList.Any())
@@ -406,7 +350,7 @@ namespace Pump.Layout
                 // ignored
             }
 
-            ScreenCleanupForSensor();
+            
         }
 
         private void ScreenCleanupForSchedule()
@@ -499,7 +443,7 @@ namespace Pump.Layout
             if (_scheduleList == null)
                 return;
             var runningStatusViews = new RunningSchedule(_scheduleList, _equipmentList).GetRunningSchedule().ToList()
-                .Select(queue => new ViewActiveScheduleSummary(queue)).Cast<View>().ToList();
+                .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
             if(_manualScheduleList.Count>0)
                 foreach (var manual in _manualScheduleList)
                     runningStatusViews.Insert(0, new ViewManualSchedule(manual));
@@ -521,13 +465,10 @@ namespace Pump.Layout
             if (_scheduleList == null)
                 return;
             var queueStatusViews = new RunningSchedule(_scheduleList, _equipmentList).GetQueSchedule().ToList()
-                .Select(queue => new ViewActiveScheduleSummary(queue)).Cast<View>().ToList();
+                .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
             if (queueStatusViews.Count == 0)
                 queueStatusViews.Add(new ViewEmptySchedule("No Que Schedules", PopUpSize));
-            foreach (var view in queueStatusViews)
-            {
-                view.Scale = PopUpSize;
-            }
+           
             var floatingScreen = new FloatingScreenScroll();
             floatingScreen.SetFloatingScreen(queueStatusViews);
             PopupNavigation.Instance.PushAsync(floatingScreen);
@@ -536,14 +477,9 @@ namespace Pump.Layout
         {
             if (_sensorList == null)
                 return;
-            var sensorStatusViews = _sensorList.Select(sensor => new ViewSensorDetail(sensor)).Cast<View>().ToList();
+            var sensorStatusViews = _sensorList.Select(sensor => new ViewSensorDetail(sensor, PopUpSize)).Cast<View>().ToList();
             if (sensorStatusViews.Count == 0)
                 sensorStatusViews.Add(new ViewEmptySchedule("No Sensors Here", PopUpSize));
-
-            foreach (var view in sensorStatusViews)
-            {
-                view.Scale = PopUpSize;
-            }
 
             var floatingScreen = new FloatingScreenScroll();
             floatingScreen.SetFloatingScreen(sensorStatusViews);
