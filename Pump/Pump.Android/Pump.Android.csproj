@@ -83,7 +83,7 @@
       <Version>5.0.9</Version>
     </PackageReference>
     <PackageReference Include="Rg.Plugins.Popup">
-      <Version>2.0.0.3</Version>
+      <Version>2.0.0.6</Version>
     </PackageReference>
     <PackageReference Include="sqlite-net-pcl">
       <Version>1.7.335</Version>
@@ -103,9 +103,6 @@
     <PackageReference Include="Xamarin.Azure.NotificationHubs.Android">
       <Version>1.1.1</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Firebase.Messaging">
-      <Version>71.1740.1</Version>
-    </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="4.8.0.1269" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.0-pre2" />
     <PackageReference Include="Xamarin.Forms.MaskedEntry">
@@ -121,8 +118,6 @@
   <ItemGroup>
     <Compile Include="Database\SQLite_Android.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="Firebase\MyFirebaseIIDService.cs" />
-    <Compile Include="Firebase\MyFirebaseMessagingService.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -167,7 +162,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionPumpAndroidHideInfoBar="True" XamarinHotReloadWrongLinkerErrorInfoBarPumpAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadWrongLinkerErrorInfoBarPumpAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionPumpAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

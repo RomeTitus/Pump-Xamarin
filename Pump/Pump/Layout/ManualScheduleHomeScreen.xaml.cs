@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -20,12 +21,8 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ManualScheduleHomeScreen : ContentPage
     {
-        private readonly DatabaseController _databaseController= new DatabaseController();
-        private List<ManualSchedule> _manualScheduleList;
-        private List<Equipment> _equipmentList;
-
-        private List<ManualSchedule> _oldManualScheduleList;
-        private List<Equipment> _oldEquipmentList;
+        private ObservableCollection<ManualSchedule> _manualScheduleList;
+        private ObservableCollection<Equipment> _equipmentList;
 
         private FloatingScreenScroll _floatingScreenScroll;
         private bool? _firebaseHasReplied = false;
@@ -46,22 +43,29 @@ namespace Pump.Layout
                 {
                     try
                     {
-                        if(_manualScheduleList == null)
-                            _manualScheduleList = new List<ManualSchedule>();
+                        if (_manualScheduleList == null)
+                            _manualScheduleList = new ObservableCollection<ManualSchedule>();
                         Device.BeginInvokeOnMainThread(() =>
                         {
+
+                            if (x.EventType == FirebaseEventType.Delete)
+                            {
+                                for (var i = 0; i < _manualScheduleList.Count; i++)
+                                {
+                                    if (_manualScheduleList[i].ID == x.Key)
+                                        _manualScheduleList.RemoveAt(i);
+                                }
+                            }
                             if (x.Object != null)
                             {
                                 var manualSchedule = x.Object;
-                                _manualScheduleList.Clear();
+                                manualSchedule.ID = x.Key;
                                 _manualScheduleList.Add(manualSchedule);
                             }
                             else
                             {
                                 _manualScheduleList.Clear();
-
                             }
-
                         });
                     }
                     catch (Exception e)
@@ -78,152 +82,192 @@ namespace Pump.Layout
                     try
                     {
                         if (_equipmentList == null)
-                            _equipmentList = new List<Equipment>();
+                            _equipmentList = new ObservableCollection<Equipment>();
+
                         var equipment = x.Object;
 
-                        _equipmentList.RemoveAll(y => y.ID == x.Key);
-                        if (x.EventType != FirebaseEventType.Delete)
+                        if (x.EventType == FirebaseEventType.Delete)
                         {
-                            equipment.ID = x.Key;
-                            _equipmentList.Add(equipment);
+                            for (int i = 0; i < _equipmentList.Count; i++)
+                            {
+                                if (_equipmentList[i].ID == x.Key)
+                                    _equipmentList.RemoveAt(i);
+                            }
+                        }
+                        else
+                        {
+                            var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
+                            if (existingEquipment != null)
+                            {
+                                FirebaseMerger.CopyValues(existingEquipment, equipment);
+                                Device.InvokeOnMainThreadAsync(PopulateManualElements);
+                            }
+                            else
+                            {
+                                equipment.ID = x.Key;
+                                _equipmentList.Add(equipment);
+                            }
+
                         }
                     }
                     catch (Exception e)
                     {
-                        ScrollViewManualPump.Children.Clear();
-                        ScrollViewManualPump.Children.Add(new ViewNoConnection());
                         Console.WriteLine(e);
                     }
-
                 });
 
-            PopulateManualElements();
+
+            GetManualElementsReady();
         }
 
-        private void PopulateManualElements()
+        private void GetManualElementsReady()
         {
-
-            while (_databaseController.IsRealtimeFirebaseSelected())
+            bool hasSubscribed = false;
+            bool scheduleHasRun = false;
+            while (!hasSubscribed)
             {
                 try
                 {
-                    //Populating 
-                    if (_equipmentList != null && (_oldEquipmentList == null ||
-                                                   (!_equipmentList.All(_oldEquipmentList.Contains) ||
-                                                    _equipmentList.Count < _oldEquipmentList.Count)))
+                    if (_equipmentList != null && _manualScheduleList != null)
                     {
-                        if (_oldEquipmentList == null)
-                        {
-                            _oldEquipmentList = new List<Equipment>();
-                            ScrollViewManualPump.Children.Clear();
-                            ScrollViewManualZone.Children.Clear();
-                        }
+                        hasSubscribed = true;
+                        _manualScheduleList.CollectionChanged += PopulateManualElementsEvent;
+                        Device.InvokeOnMainThreadAsync(PopulateManualElements);
 
-                        _oldEquipmentList.Clear();
-                        foreach (var equipment in _equipmentList)
-                        {
-                            _oldEquipmentList.Add(equipment);
-                        }
-
-                        _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
-
-
-
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            
-
-                            foreach (var pump in _equipmentList.Where(x => x.isPump))
-                            {
-                                var existingButton =
-                                    ScrollViewManualPump.Children.FirstOrDefault(view => view.AutomationId == pump.ID);
-                                if (existingButton == null)
-                                    ScrollViewManualPump.Children.Add(CreateEquipmentButton(pump));
-                                else
-                                    ((Button) existingButton).Text = pump.NAME;
-                            }
-                            if (_equipmentList.Count(x => x.isPump) == 0)
-                            {
-                                ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Equipment Found Here"));
-                            }
-
-                            foreach (var zone in _equipmentList.Where(x => !x.isPump))
-                            {
-                                var existingButton =
-                                    ScrollViewManualZone.Children.FirstOrDefault(view => view.AutomationId == zone.ID);
-                                if (existingButton == null)
-                                    ScrollViewManualZone.Children.Add(CreateEquipmentButton(zone));
-                                else
-                                    ((Button)existingButton).Text = zone.NAME;
-                            }
-                            //don't change :)
-                            if (_equipmentList.Count(x => x.isPump == false) == 0)
-                            {
-                                ScrollViewManualZone.Children.Add(new ViewEmptySchedule("No Equipment Found Here"));
-                            }
-                        });
                     }
-                }
-                catch
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        ScrollViewManualPump.Children.Clear();
-                        ScrollViewManualZone.Children.Clear();
-                        ScrollViewManualPump.Children.Add(new ViewNoConnection());
-                        ScrollViewManualZone.Children.Add(new ViewNoConnection());
-                    });
-                }
 
-                try
-                {
-                    //Making sure we got both Equipments and Manual :/
-                    if (_equipmentList != null && _manualScheduleList != null && (_oldManualScheduleList == null ||
-                        (!_manualScheduleList.All(_oldManualScheduleList.Contains) ||
-                         _manualScheduleList.Count < _oldManualScheduleList.Count)))
+                    if (_equipmentList != null && scheduleHasRun == false)
                     {
-                        if (_oldManualScheduleList == null)
-                            _oldManualScheduleList = new List<ManualSchedule>();
-                        _oldManualScheduleList.Clear();
-                        foreach (var manualSchedules in _manualScheduleList)
-                        {
-                            _oldManualScheduleList.Add(manualSchedules);
-                        }
-
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            //Sorts Out all the button color stuff
-                            SetActiveEquipmentButton();
-                            if (_manualScheduleList.Count == 0)
-                            {
-                                //Clear Manual
-                                MaskedEntryTime.Text = "";
-                                MaskedEntryTime.IsEnabled = true;
-                                ButtonStartManual.IsEnabled = true;
-                                SwitchRunWithSchedule.IsEnabled = true;
-                                SwitchRunWithSchedule.IsToggled = true;
-                            }
-                            else
-                            {
-                                //Populate :/
-                                SwitchRunWithSchedule.IsToggled = _manualScheduleList[0].RunWithSchedule;
-                                SwitchRunWithSchedule.IsEnabled = false;
-                                MaskedEntryTime.IsEnabled = false;
-                                MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualScheduleList[0].EndTime) - DateTime.Now);
-                                ButtonStartManual.IsEnabled = false;
-                            }
-                        });
+                        scheduleHasRun = true;
+                        _equipmentList =
+                            new ObservableCollection<Equipment>(_equipmentList
+                                .OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList());
+                        _equipmentList.CollectionChanged += PopulateManualElementsEvent;
+                        
                     }
                 }
                 catch
                 {
                     // ignored
                 }
-
-                Thread.Sleep(2000);
             }
         }
 
+        private void PopulateManualElementsEvent(object sender,
+            System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Device.BeginInvokeOnMainThread(PopulateManualElements);
+        }
+
+        private void PopulateManualElements()
+        {
+            try
+            {
+                foreach (var pump in _equipmentList.Where(x => x.isPump))
+                {
+                    var existingButton =
+                        ScrollViewManualPump.Children.FirstOrDefault(view => view.AutomationId == pump.ID);
+                    if (existingButton == null)
+                        ScrollViewManualPump.Children.Add(CreateEquipmentButton(pump));
+                    else
+                        ((Button) existingButton).Text = pump.NAME;
+                }
+                if (_equipmentList.Count(x => x.isPump) == 0)
+                {
+                    ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Equipment Found Here"));
+                }
+
+                foreach (var zone in _equipmentList.Where(x => !x.isPump))
+                {
+                    var existingButton =
+                        ScrollViewManualZone.Children.FirstOrDefault(view => view.AutomationId == zone.ID);
+                    if (existingButton == null)
+                        ScrollViewManualZone.Children.Add(CreateEquipmentButton(zone));
+                    else
+                        ((Button)existingButton).Text = zone.NAME;
+                }
+                if (_equipmentList.Count(x => x.isPump == false) == 0)
+                {
+                    ScrollViewManualZone.Children.Add(new ViewEmptySchedule("No Equipment Found Here"));
+                }
+            }
+            catch
+            {
+                ScrollViewManualPump.Children.Add(new ViewNoConnection());
+                ScrollViewManualZone.Children.Add(new ViewNoConnection());
+            }
+
+            try
+            {
+                //Sorts Out all the button color stuff
+                SetActiveEquipmentButton();
+                if (_manualScheduleList.Count == 0)
+                {
+                    //Clear Manual
+                    ButtonStopManual.IsEnabled = false;
+                    MaskedEntryTime.Text = "";
+                    MaskedEntryTime.IsEnabled = true;
+                    ButtonStartManual.IsEnabled = true;
+                    SwitchRunWithSchedule.IsEnabled = true;
+                    SwitchRunWithSchedule.IsToggled = true;
+                }
+                else
+                {
+                    //Populate :/
+                    ButtonStopManual.IsEnabled = true;
+                    SwitchRunWithSchedule.IsToggled = _manualScheduleList[0].RunWithSchedule;
+                    SwitchRunWithSchedule.IsEnabled = false;
+                    MaskedEntryTime.IsEnabled = false;
+                    MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualScheduleList[0].EndTime) - DateTime.UtcNow);
+                    ButtonStartManual.IsEnabled = false;
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            ScreenCleanupForManualScreen();
+        }
+
+        private void ScreenCleanupForManualScreen()
+        {
+            try
+            {
+                if (_equipmentList == null) return;
+                var pumpsThatAreOnDisplay = _equipmentList.Where(x => x.isPump).Select(x => x.ID).ToList();
+                if (pumpsThatAreOnDisplay.Count == 0)
+                    pumpsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+
+
+                for (var index = 0; index < ScrollViewManualPump.Children.Count; index++)
+                {
+                    var existingItems = pumpsThatAreOnDisplay.FirstOrDefault(x =>
+                        x == ScrollViewManualPump.Children[index].AutomationId);
+                    if (existingItems != null) continue;
+                    ScrollViewManualPump.Children.RemoveAt(index);
+                    index--;
+                }
+
+                var zonesThatAreOnDisplay = _equipmentList.Where(x => !x.isPump).Select(x => x.ID).ToList();
+                if (zonesThatAreOnDisplay.Count == 0)
+                    zonesThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+
+
+                for (var index = 0; index < ScrollViewManualZone.Children.Count; index++)
+                {
+                    var existingItems = zonesThatAreOnDisplay.FirstOrDefault(x =>
+                        x == ScrollViewManualZone.Children[index].AutomationId);
+                    if (existingItems != null) continue;
+                    ScrollViewManualZone.Children.RemoveAt(index);
+                    index--;
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
 
         private Button CreateEquipmentButton(Equipment equipment)
         {
@@ -250,8 +294,24 @@ namespace Pump.Layout
             {
                 foreach (var button in equipmentList.Cast<Button>())
                 {
-                    button.BackgroundColor = _manualScheduleList.FirstOrDefault(x =>
-                        x.ManualDetails.Select(y => y.id_Equipment).Contains(button.AutomationId)) != null ? Color.BlueViolet : Color.AliceBlue;
+                    if (_manualScheduleList.Count == 0)
+                    {
+                        button.BackgroundColor = Color.AliceBlue;
+                        button.IsEnabled = true;
+                        continue;
+                    }
+
+                    var existing = _manualScheduleList.FirstOrDefault(x =>
+                        x.ManualDetails.Select(y => y.id_Equipment).Contains(button.AutomationId));
+
+                    if (existing == null)
+                    {
+                        button.BackgroundColor = Color.AliceBlue;
+                        button.IsEnabled = false;
+                    }
+                    else
+                        button.BackgroundColor = Color.BlueViolet;
+                    
                 }
             }
             catch (Exception e)
@@ -411,7 +471,7 @@ namespace Pump.Layout
 
         private void ScrollViewManualZoneTap_Tapped(object sender, EventArgs e)
         {
-            if (_oldEquipmentList == null)
+            if (_equipmentList == null)
                 return;
             var buttonList = new List<Button>();
             foreach (var zone in _equipmentList.Where(x => !x.isPump))
@@ -421,6 +481,7 @@ namespace Pump.Layout
 
                 var zoneButton = ScrollViewManualZone.Children.First(x => x.AutomationId == button.AutomationId);
                 button.BackgroundColor = zoneButton.BackgroundColor;
+                button.IsEnabled = zoneButton.IsEnabled;
                 buttonList.Add(button);
 
             }
@@ -429,7 +490,7 @@ namespace Pump.Layout
 
         private void ScrollViewManualPump_Tapped(object sender, EventArgs e)
         {
-            if (_oldEquipmentList == null)
+            if (_equipmentList == null)
                 return;
             var buttonList = new List<Button>();
             foreach (var zone in _equipmentList.Where(x => x.isPump))
@@ -438,6 +499,7 @@ namespace Pump.Layout
                 button.Scale = 1.25;
                 var pumpButton = ScrollViewManualPump.Children.First(x => x.AutomationId == button.AutomationId);
                 button.BackgroundColor = pumpButton.BackgroundColor;
+                button.IsEnabled = pumpButton.IsEnabled;
                 buttonList.Add(button);
             }
             ViewTapped(buttonList);

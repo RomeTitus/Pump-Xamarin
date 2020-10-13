@@ -32,7 +32,7 @@ namespace Pump.Layout.Views
         {
             LableManual.Text = _manualSchedule.RunWithSchedule ? "Manual Running with Schedule" : "Manual Running without Schedule";
 
-            LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.Now);
+            LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.UtcNow);
         }
 
         private static double GetInterval()
@@ -43,7 +43,7 @@ namespace Pump.Layout.Views
 
         private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.Now);
+            LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.UtcNow);
             _timer.Interval = GetInterval();
             _timer.Start();
         }

@@ -1,17 +1,10 @@
-﻿using System;
-using System.Data.Entity.Infrastructure.Design;
-using Android.App;
-using Android.Content;
+﻿using Android.App;
 using Android.Content.PM;
 using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
 using Rg.Plugins.Popup.Services;
 using Android.Util;
-using Firebase;
-using Firebase.Messaging;
-using Pump.Droid.Firebase;
-
 namespace Pump.Droid
 {
     [Activity(Label = "Pump", Icon = "@drawable/Logo", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
@@ -43,32 +36,7 @@ namespace Pump.Droid
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());
             IsPlayServicesAvailable();
-            var intent = new Intent(this, typeof(MyFirebaseMessagingService));
-// StartService(intent);
-            //CreateNotificationChannel();
-
         }
-
-        private void CreateNotificationChannel()
-        {
-            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
-            {
-                // Notification channels are new in API 26 (and not a part of the
-                // support library). There is no need to create a notification
-                // channel on older versions of Android.
-                return;
-            }
-
-            var channelName = CHANNEL_ID;
-            var channelDescription = String.Empty;
-            var channel = new NotificationChannel(CHANNEL_ID, channelName, NotificationImportance.Default)
-            {
-                Description = channelDescription
-            };
-            var notificationManager = (NotificationManager)GetSystemService(NotificationService);
-            notificationManager.CreateNotificationChannel(channel);
-        }
-
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {

@@ -134,7 +134,8 @@
                     <Button
                         x:Name="ButtonStopManual"
                         Clicked="ButtonStopManual_Clicked"
-                        Text="Stop" />
+                        Text="Stop" 
+                        IsEnabled="False"/>
                 </StackLayout>
 
             </FlexLayout>

@@ -18,8 +18,6 @@ namespace Pump.Layout
     public partial class ScheduleStatusHomeScreen : ContentPage
     {
         private ObservableCollection<Equipment> _equipmentList;
-
-        //Just Check, I think this will be fine :)
         private ObservableCollection<ManualSchedule> _manualScheduleList = new ObservableCollection<ManualSchedule>();
         private ObservableCollection<Schedule> _scheduleList;
         private ObservableCollection<Sensor> _sensorList;
@@ -207,7 +205,6 @@ namespace Pump.Layout
             bool sensorHasRun = false;
             while (!hasSubscribed)
             {
-                Thread.Sleep(2000);
                 try
                 {
                     if (_equipmentList != null && _scheduleList != null && _manualScheduleList != null && _scheduleList != null)
