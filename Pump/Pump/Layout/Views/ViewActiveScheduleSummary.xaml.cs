@@ -24,12 +24,12 @@ namespace Pump.Layout.Views
             AutomationId = activeSchedule.ID;
             ActiveSchedule = activeSchedule;
 
-            this.HeightRequest = 150 * size;
+            this.HeightRequest = 150 * size * 0.7;
             LabelScheduleName.FontSize *= size;
             LablePump.FontSize *= size;
             LableZone.FontSize *= size;
-            LableStartTime.FontSize *= size;
-            LableEndTime.FontSize *= size;
+            LableStartTime.FontSize *= size*0.7;
+            LableEndTime.FontSize *= size * 0.7;
 
             PopulateSchedule();
         }

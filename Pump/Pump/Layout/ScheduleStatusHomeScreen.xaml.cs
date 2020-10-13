@@ -9,6 +9,7 @@ using Pump.Layout.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Rg.Plugins.Popup.Services;
 
 namespace Pump.Layout
@@ -22,12 +23,13 @@ namespace Pump.Layout
         private ObservableCollection<ManualSchedule> _manualScheduleList = new ObservableCollection<ManualSchedule>();
         private ObservableCollection<Schedule> _scheduleList;
         private ObservableCollection<Sensor> _sensorList;
-        private const double PopUpSize = 1.2;
+        private const double PopUpSize = 1.5;
 
         public ScheduleStatusHomeScreen()
         {
             InitializeComponent();
-            new Thread(SubscribeToFirebase).Start();
+            Task.Run(SubscribeToFirebase);
+            //SubscribeToFirebase();
         }
 
         private void SubscribeToFirebase()
@@ -205,6 +207,7 @@ namespace Pump.Layout
             bool sensorHasRun = false;
             while (!hasSubscribed)
             {
+                Thread.Sleep(2000);
                 try
                 {
                     if (_equipmentList != null && _scheduleList != null && _manualScheduleList != null && _scheduleList != null)
@@ -222,13 +225,13 @@ namespace Pump.Layout
                         _equipmentList.CollectionChanged += ActiveAndQueScheduleEvent;
                         _scheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
                         _manualScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
-                        Device.BeginInvokeOnMainThread(ActiveAndQueSchedule);
+                        Device.InvokeOnMainThreadAsync(ActiveAndQueSchedule);
                     }
                     if (_sensorList != null && sensorHasRun == false)
                     {
                         sensorHasRun = true;
                         _sensorList.CollectionChanged += SensorStatusEvent;
-                        Device.BeginInvokeOnMainThread(SensorStatus);
+                        Device.InvokeOnMainThreadAsync(SensorStatus);
                     }
                 }
                 catch
@@ -236,7 +239,7 @@ namespace Pump.Layout
                     // ignored
                 }
 
-                Thread.Sleep(2000);
+                
             }
         }
 
@@ -261,53 +264,53 @@ namespace Pump.Layout
                         ScrollViewScheduleStatus.Children.Add(new ViewManualSchedule(manual));
                     }
                 
-                var runningScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetRunningSchedule().ToList();
+            var runningScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetRunningSchedule().ToList();
                 
-                if (runningScheduleList.Any())
-                    foreach (var runningSchedule in runningScheduleList)
-                    {
-                        var viewActiveSchedule = ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
-                                x.AutomationId == runningSchedule.ID);
-                        if (viewActiveSchedule != null)
-                        {
-                            var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
-                            viewActiveScheduleSummary.ActiveSchedule = runningSchedule;
-                            viewActiveScheduleSummary.PopulateSchedule();
-                        }
-                        else
-                        {
-                            ScrollViewScheduleStatus.Children.Add(
-                                new ViewActiveScheduleSummary(runningSchedule));
-                        }
-                    }
-                else
+            if (runningScheduleList.Any())
+                foreach (var runningSchedule in runningScheduleList)
                 {
-                    ScrollViewScheduleStatus.Children.Add(new ViewEmptySchedule("No Active Schedules"));
-                }
-                
-                
-                var queScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetQueSchedule().ToList();
-                if (queScheduleList.Any())
-                    foreach (var runningSchedule in queScheduleList)
+                    var viewActiveSchedule = ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
+                        x.AutomationId == runningSchedule.ID);
+                    if (viewActiveSchedule != null)
                     {
-                        var viewActiveSchedule = ScrollViewQueueStatus.Children.FirstOrDefault(x =>
-                            x.AutomationId == runningSchedule.ID);
-                        if (viewActiveSchedule != null)
-                        {
-                            var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
-                            viewActiveScheduleSummary.ActiveSchedule = runningSchedule;
-                            viewActiveScheduleSummary.PopulateSchedule();
-                        }
-                        else
-                        {
-                            ScrollViewQueueStatus.Children.Add(
-                                new ViewActiveScheduleSummary(runningSchedule));
-                        }
+                        var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
+                        viewActiveScheduleSummary.ActiveSchedule = runningSchedule;
+                        viewActiveScheduleSummary.PopulateSchedule();
                     }
-                else
-                {
-                    ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Que Schedules"));
+                    else
+                    {
+                        ScrollViewScheduleStatus.Children.Add(
+                            new ViewActiveScheduleSummary(runningSchedule));
+                    }
                 }
+            else
+            {
+                ScrollViewScheduleStatus.Children.Add(new ViewEmptySchedule("No Active Schedules"));
+            }
+                
+                
+            var queScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetQueSchedule().ToList();
+            if (queScheduleList.Any())
+                foreach (var runningSchedule in queScheduleList)
+                {
+                    var viewActiveSchedule = ScrollViewQueueStatus.Children.FirstOrDefault(x =>
+                        x.AutomationId == runningSchedule.ID);
+                    if (viewActiveSchedule != null)
+                    {
+                        var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
+                        viewActiveScheduleSummary.ActiveSchedule = runningSchedule;
+                        viewActiveScheduleSummary.PopulateSchedule();
+                    }
+                    else
+                    {
+                        ScrollViewQueueStatus.Children.Add(
+                            new ViewActiveScheduleSummary(runningSchedule));
+                    }
+                }
+            else
+            {
+                ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Que Schedules"));
+            }
                 
                 
         }
@@ -451,10 +454,6 @@ namespace Pump.Layout
             if (runningStatusViews.Count == 0)
                 runningStatusViews.Add(new ViewEmptySchedule("No Running Schedules", PopUpSize));
 
-            foreach (var view in runningStatusViews)
-            {
-                view.Scale = PopUpSize;
-            }
             var floatingScreen = new FloatingScreenScroll();
             floatingScreen.SetFloatingScreen(runningStatusViews);
             PopupNavigation.Instance.PushAsync(floatingScreen);
