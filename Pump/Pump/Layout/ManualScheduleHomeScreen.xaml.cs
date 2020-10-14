@@ -193,8 +193,8 @@ namespace Pump.Layout
             }
             catch
             {
-                ScrollViewManualPump.Children.Add(new ViewNoConnection());
-                ScrollViewManualZone.Children.Add(new ViewNoConnection());
+                ScrollViewManualPump.Children.Add(new ViewException());
+                ScrollViewManualZone.Children.Add(new ViewException());
             }
 
             try

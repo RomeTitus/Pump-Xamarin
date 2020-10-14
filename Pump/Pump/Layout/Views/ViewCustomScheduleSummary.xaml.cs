@@ -11,8 +11,7 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewCustomScheduleSummary : ContentView
     {
-        private readonly List<Equipment> _equipmentList = null;
-        private readonly FloatingScreen _floatingScreen;
+        private readonly List<Equipment> _equipmentList;
         public readonly CustomSchedule schedule;
         readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
         public ViewCustomScheduleSummary()
@@ -20,10 +19,9 @@ namespace Pump.Layout.Views
             InitializeComponent();
         }
 
-        public ViewCustomScheduleSummary(CustomSchedule schedule, FloatingScreen floatingScreen, List<Equipment> equipmentList)
+        public ViewCustomScheduleSummary(CustomSchedule schedule, List<Equipment> equipmentList)
         {
             InitializeComponent();
-            _floatingScreen = floatingScreen;
             this.schedule = schedule;
             _equipmentList = equipmentList;
             SetScheduleSummary();
@@ -31,8 +29,6 @@ namespace Pump.Layout.Views
 
         public void UpdateScheduleSummary()
         {
-            var scheduleTime = new ScheduleTime();
-            var runningCustomSchedule = new RunningCustomSchedule();
             var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(schedule);
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
             if (endTime != null)
@@ -52,18 +48,16 @@ namespace Pump.Layout.Views
             foreach (ViewZoneAndTimeGrid scheduleGrid in ScrollViewZoneDetail.Children)
             {
                 
-                scheduleGrid.SetBackGroundColour(Color.Yellow);
+                scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
                 {
                     if (scheduleGrid.Id == runningScheduleDetail.id_Equipment)
-                        scheduleGrid.SetBackGroundColour(Color.YellowGreen);
+                        scheduleGrid.SetBackGroundColor(Color.YellowGreen);
                 }
             }
         }
         public void SetScheduleSummary()
         {
-            var scheduleTime = new ScheduleTime();
-            var runningCustomSchedule = new RunningCustomSchedule();
             var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(schedule);
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
             if (endTime != null)
@@ -88,11 +82,11 @@ namespace Pump.Layout.Views
                     _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
                     true);
                 _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
-                scheduleGrid.SetBackGroundColour(Color.Yellow);
+                scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
                 {
                     if(scheduleEquipment == runningScheduleDetail)
-                        scheduleGrid.SetBackGroundColour(Color.YellowGreen);
+                        scheduleGrid.SetBackGroundColor(Color.YellowGreen);
                 }
                 
                 ScrollViewZoneDetail.Children.Add(scheduleGrid);

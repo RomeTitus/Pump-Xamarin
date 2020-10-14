@@ -9,7 +9,6 @@ using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
-using SQLitePCL;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -18,63 +17,32 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class UpdateSchedule : ContentPage
     {
-        private readonly List<Equipment> _equipmentList = new List<Equipment>();
-        private readonly SocketCommands _command = new SocketCommands();
+        private readonly List<Equipment> _equipmentList;
+        private Schedule _schedule;
         private readonly List<string> _pumpIdList = new List<string>();
-        private readonly List<string> _zoneDetailList = new List<string>();
-        private readonly SocketMessage _socket = new SocketMessage();
-        private readonly string _id;
 
-        private ViewSchedulePumpTime _pumpSelectedTime;
-        private List<string> _weekdayList = new List<string>();
+        //private ViewSchedulePumpTime _pumpSelectedTime;
+        //private List<string> _weekdayList = new List<string>();
 
-        public UpdateSchedule()
-        {
-            InitializeComponent();
-            new Thread(ThreadController).Start();
-        }
-
-        
-
-        public UpdateSchedule(IReadOnlyList<string> scheduleDetailList)
-        {
-            InitializeComponent();
-            ButtonCreateSchedule.Text = "SAVE";
-            _id = scheduleDetailList[3];
-            ScheduleName.Text = scheduleDetailList[5];
-            MaskedEntryTime.Text = scheduleDetailList[1];
-            new Thread(() => ThreadController(scheduleDetailList)).Start();
-        }
-
-        public UpdateSchedule(List<Equipment> equipmentList)
+        public UpdateSchedule(List<Equipment> equipmentList, Schedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;
-            new Thread(SetUpWeekDays).Start();
-            
-            PopulateEquipment();
-            ButtonCreateSchedule.IsEnabled = true;
-            PumpPicker.IsEnabled = true;
-        }
+            _schedule = schedule;
 
-        public UpdateSchedule(IReadOnlyList<string> scheduleDetailList, List<Equipment> equipmentList)
-        {
-            InitializeComponent();
-            _equipmentList = equipmentList;
-
-            var selectWeekThread = new Thread(() =>
-                SetSelectedWeek(scheduleDetailList[0].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()));
+            var selectWeekThread = new Thread(SetSelectedWeek);
             selectWeekThread.Start();
 
-
-            for (var i = 6; i < scheduleDetailList.Count; i++) _zoneDetailList.Add(scheduleDetailList[i]);
             PopulateEquipment();
-            ButtonCreateSchedule.Text = "SAVE";
-            _id = scheduleDetailList[3];
-            ScheduleName.Text = scheduleDetailList[5];
-            MaskedEntryTime.Text = scheduleDetailList[1];
             ButtonCreateSchedule.IsEnabled = true;
             PumpPicker.IsEnabled = true;
+
+            if (schedule != null)
+            {
+                ButtonCreateSchedule.Text = "SAVE";
+                ScheduleName.Text = _schedule.NAME;
+                MaskedEntryTime.Text = _schedule.TIME;
+            }
 
         }
 
@@ -84,29 +52,32 @@ namespace Pump.Layout
             {
                 PumpPicker.Items.Add(equipment.NAME);
                 _pumpIdList.Add(equipment.ID);
+                if (_schedule.id_Pump != null && _schedule.id_Pump == equipment.ID)
+                {
+                    PumpPicker.SelectedIndex = (PumpPicker.Items.Count - 1);
+                }
             }
 
-            if (PumpPicker.Items.Count > 0)
-                PumpPicker.SelectedIndex = 0;
-
-            ScrollViewZoneDetail.Children.Clear();
-
-            var zone = "";
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false))
+            try
             {
-                zone += equipment.ID + ',' + equipment.NAME + ',' + equipment.GPIO;
-                if (equipment.AttachedPiController == null)
-                    zone +=  ",0#";
-                else
-                    zone += "," + equipment.AttachedPiController + "#";
+                ScrollViewZoneDetail.Children.Clear();
+                if (_equipmentList.Count(equipment => equipment.isPump == false) == 0)
+                    ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
+                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false))
+                {
+                    var scheduleDetail =
+                        _schedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);
+                    ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail, equipment, true));
+                }
             }
-
-            var zoneDetailObject = _zoneDetailList.Count<1 ? getZoneDetailObject(zone) : getZoneDetailObject(zone, _zoneDetailList);
-            foreach (View view in zoneDetailObject) ScrollViewZoneDetail.Children.Add(view);
-
+            catch
+            {
+                ScrollViewZoneDetail.Children.Clear();
+                ScrollViewZoneDetail.Children.Add(new ViewException());
+            }
         }
 
-       
+
 
         private void ThreadController(IReadOnlyList<string> scheduleDetailList)
         {
@@ -173,7 +144,7 @@ namespace Pump.Layout
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewNoConnection());
+                    ScrollViewZoneDetail.Children.Add(new ViewException());
                 });
             }
         }
@@ -197,7 +168,7 @@ namespace Pump.Layout
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewNoConnection());
+                    ScrollViewZoneDetail.Children.Add(new ViewException());
                 });
             }
         }
@@ -222,7 +193,7 @@ namespace Pump.Layout
             }
             catch
             {
-                zoneListObject = new List<object> {new ViewNoConnection()};
+                zoneListObject = new List<object> {new ViewException()};
                 return zoneListObject;
             }
         }
@@ -265,7 +236,7 @@ namespace Pump.Layout
             }
             catch
             {
-                zoneListObject = new List<object> {new ViewNoConnection()};
+                zoneListObject = new List<object> {new ViewException()};
                 return zoneListObject;
             }
         }
@@ -294,7 +265,7 @@ namespace Pump.Layout
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewNoConnection());
+                    ScrollViewZoneDetail.Children.Add(new ViewException());
                 });
             }
         }
@@ -324,7 +295,7 @@ namespace Pump.Layout
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewNoConnection());
+                    ScrollViewZoneDetail.Children.Add(new ViewException());
                 });
             }
         }
@@ -378,7 +349,7 @@ namespace Pump.Layout
         }
 
 
-        private void SetSelectedWeek(IReadOnlyList<string> weekdaysList)
+        private void SetSelectedWeek()
         {
             //SetUpWeekDays();
             var frames = new List<Frame>
@@ -391,11 +362,12 @@ namespace Pump.Layout
                 FrameFriday,
                 FrameSaturday
             };
+
+            if(_schedule == null)
+                return;
             foreach (var frame in frames)
             {
-                ChangeWeekSelect(frame, weekdaysList.Contains(frame.AutomationId));
-
-                _weekdayList = (List<string>) weekdaysList;
+                ChangeWeekSelect(frame, _schedule.WEEK.Contains(frame.AutomationId));
             }
         }
 
@@ -571,13 +543,13 @@ namespace Pump.Layout
             foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
             {
                 var child = (ViewZoneAndTimeGrid) scrollViewZone;
-                var maskTime = child.getMaskText();
+                var maskTime = child.GetMaskText();
                 if (string.IsNullOrWhiteSpace(maskTime.Text) || maskTime.Text.Length >= 4) continue;
                 if (string.IsNullOrWhiteSpace(notification))
-                    notification = "\u2022 " + child.getZoneNameText().Text + " time format is incorrect";
+                    notification = "\u2022 " + child.GetZoneNameText().Text + " time format is incorrect";
                 else
-                    notification += "\n\u2022 " + child.getZoneNameText().Text + " time format is incorrect";
-                child.getZoneNameText().TextColor = Color.Red;
+                    notification += "\n\u2022 " + child.GetZoneNameText().Text + " time format is incorrect";
+                child.GetZoneNameText().TextColor = Color.Red;
             }
 
             return notification;
@@ -591,7 +563,7 @@ namespace Pump.Layout
             foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
             {
                 var child = (ViewZoneAndTimeGrid) scrollViewZone;
-                var maskTime = child.getMaskText();
+                var maskTime = child.GetMaskText();
                 if (!string.IsNullOrWhiteSpace(maskTime.Text))
                 {
                     if (zoneTime.Length < 1)
@@ -606,7 +578,7 @@ namespace Pump.Layout
 
         private List<ScheduleDetail> GetSelectedZonesList()
         {
-            var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.getMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
+            var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.GetMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
 
             return scheduleDetailList;
         }

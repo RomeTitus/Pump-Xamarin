@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Pump.IrrigationController;
-using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -11,85 +9,74 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleSummary : ContentView
     {
-        private readonly List<Equipment> _equipmentList = null;
-        private readonly FloatingScreen _floatingScreen;
-        private readonly IReadOnlyList<string> _scheduleDetail;
+        private readonly List<Equipment> _equipmentList;
+        private readonly Schedule _schedule;
 
-        public ViewScheduleSummary(IReadOnlyList<string> schedule, FloatingScreen floatingScreen)
+        public ViewScheduleSummary(Schedule schedule, List<Equipment> equipmentList)
         {
             InitializeComponent();
-            _floatingScreen = floatingScreen;
-            _scheduleDetail = schedule;
-            SetScheduleSummary();
-        }
-        public ViewScheduleSummary(IReadOnlyList<string> schedule, FloatingScreen floatingScreen, List<Equipment> equipmentList)
-        {
-            InitializeComponent();
-            _floatingScreen = floatingScreen;
-            _scheduleDetail = schedule;
+            _schedule = schedule;
             _equipmentList = equipmentList;
             SetScheduleSummary();
         }
 
         private void SetScheduleSummary()
         {
-            foreach (var week in _scheduleDetail[0].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList())
-                SetWeek(week);
-
-            labelScheduleTime.Text = _scheduleDetail[1];
-            LabelPumpName.Text = _scheduleDetail[2];
-            labelScheduleName.Text = _scheduleDetail[5];
-
-            for (var i = 6; i < _scheduleDetail.Count; i++)
-                ScrollViewZoneDetail.Children.Add(
-                    new ViewZoneAndTimeGrid(_scheduleDetail[i].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList(),
-                        true));
+            labelScheduleTime.Text = _schedule.TIME;
+            LabelPumpName.Text = _equipmentList.First(x => x.ID == _schedule.id_Pump).NAME;
+            labelScheduleName.Text = _schedule.NAME;
+            SetWeek();
+            foreach (var scheduleDetail in _schedule.ScheduleDetails)
+            {
+                ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail,
+                    _equipmentList.First(x => x.ID == scheduleDetail.id_Equipment), true));
+            }
         }
-        private void SetWeek(string week)
+        private void SetWeek()
         {
-            if (week.Contains("SUNDAY"))
+            if (_schedule.WEEK.Contains("SUNDAY"))
             {
                 LabelSunday.TextColor = Color.Black;
                 LabelSunday.FontAttributes = FontAttributes.Bold;
                 LabelSunday.FontSize = 24;
             }
 
-            if (week.Contains("MONDAY"))
+            if (_schedule.WEEK.Contains("MONDAY"))
             {
                 LabelMonday.TextColor = Color.Black;
                 LabelMonday.FontAttributes = FontAttributes.Bold;
                 LabelMonday.FontSize = 24;
             }
 
-            if (week.Contains("TUESDAY"))
+            if (_schedule.WEEK.Contains("TUESDAY"))
             {
                 LabelTuesday.TextColor = Color.Black;
                 LabelTuesday.FontAttributes = FontAttributes.Bold;
                 LabelTuesday.FontSize = 24;
             }
 
-            if (week.Contains("WEDNESDAY"))
+            if (_schedule.WEEK.Contains("WEDNESDAY"))
             {
                 LabelWednesday.TextColor = Color.Black;
                 LabelWednesday.FontAttributes = FontAttributes.Bold;
                 LabelWednesday.FontSize = 24;
             }
 
-            if (week.Contains("THURSDAY"))
+            if (_schedule.WEEK.Contains("THURSDAY"))
             {
                 LabelThursday.TextColor = Color.Black;
                 LabelThursday.FontAttributes = FontAttributes.Bold;
                 LabelThursday.FontSize = 24;
             }
 
-            if (week.Contains("FRIDAY"))
+            if (_schedule.WEEK.Contains("FRIDAY"))
             {
                 LabelFriday.TextColor = Color.Black;
                 LabelFriday.FontAttributes = FontAttributes.Bold;
                 LabelFriday.FontSize = 24;
             }
 
-            if (week.Contains("SATURDAY"))
+            if (_schedule.WEEK.Contains("SATURDAY"))
             {
                 LabelSaturday.TextColor = Color.Black;
                 LabelSaturday.FontAttributes = FontAttributes.Bold;
@@ -98,17 +85,18 @@ namespace Pump.Layout.Views
         }
 
 
-        private void ButtonEdit_OnClicked(object sender, EventArgs e)
+        public Button GetButtonEdit()
         {
-            Navigation.PushModalAsync(_equipmentList != null
-                ? new UpdateSchedule(_scheduleDetail, _equipmentList)
-                : new UpdateSchedule(_scheduleDetail));
-            PopupNavigation.Instance.PopAsync();
+            if (ButtonEdit.AutomationId == null)
+                ButtonEdit.AutomationId = _schedule.ID;
+            return ButtonEdit;
         }
 
-        private void ButtonDelete_OnClicked(object sender, EventArgs e)
+        public Button GetButtonDelete()
         {
-            _floatingScreen.SetFloatingScreen(new List<object> {new ViewDeleteConfirmation(_scheduleDetail)});
+            if (ButtonDelete.AutomationId == null)
+                ButtonDelete.AutomationId = _schedule.ID;
+            return ButtonDelete;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Firebase.Database.Streaming;
 using Pump.Class;
 using Pump.Database;
@@ -124,7 +125,7 @@ namespace Pump.Layout
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         ScrollViewCustomScheduleDetail.Children.Clear();
-                        ScrollViewCustomScheduleDetail.Children.Add(new ViewNoConnection());
+                        ScrollViewCustomScheduleDetail.Children.Add(new ViewException());
                     });
                 }
                 Thread.Sleep(2000);
@@ -156,7 +157,7 @@ namespace Pump.Layout
             }
             catch
             {
-                scheduleListObject = new List<object> { new ViewNoConnection() };
+                scheduleListObject = new List<object> { new ViewException() };
                 return scheduleListObject;
             }
         }
@@ -191,10 +192,8 @@ namespace Pump.Layout
 
         private void ChangeCustomScheduleState(CustomSchedule schedule)
         {
-           
-            //new Authentication().SetCustomSchedule(schedule);
-
-            
+            var key = Task.Run(() => new Authentication().SetCustomSchedule(schedule)).Result;
+            //TODO Needs Confirmation that The Pi got it and its running :)
             foreach (var view in ScrollViewCustomScheduleDetail.Children)
             {
                 var viewCustomSchedule = (ViewCustomSchedule) view;
@@ -227,7 +226,7 @@ namespace Pump.Layout
                     }
                     catch
                     {
-                        var scheduleSummaryListObject = new List<object> { new ViewNoConnection() };
+                        var scheduleSummaryListObject = new List<object> { new ViewException() };
                         _floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                     }
                 });
@@ -246,7 +245,7 @@ namespace Pump.Layout
                 }
 
                 
-                _viewSchedule = new ViewCustomScheduleSummary(schedule, _floatingScreen, _equipmentList);
+                _viewSchedule = new ViewCustomScheduleSummary(schedule, _equipmentList);
 
                 _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
                 _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
@@ -262,7 +261,7 @@ namespace Pump.Layout
             }
             catch
             {
-                customScheduleSummaryListObject = new List<object> { new ViewNoConnection() };
+                customScheduleSummaryListObject = new List<object> { new ViewException() };
                 return customScheduleSummaryListObject;
             }
         }

@@ -1,31 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Firebase.Database.Streaming;
-using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
-using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Switch = Xamarin.Forms.Switch;
 
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleHomeScreen : ContentPage
     {
-        private DatabaseController databaseController = new DatabaseController();
-        private List<Equipment> _equipmentList;
-        private List<Equipment> _oldEquipmentList;
-        private List<Schedule> _scheduleList;
-        private List<Schedule> _oldScheduleList;
+        private ObservableCollection<Equipment> _equipmentList;
+        private ObservableCollection<Schedule> _scheduleList;
+        private readonly FloatingScreen _floatingScreen = new FloatingScreen();
+        private ViewScheduleSummary _viewSchedule;
 
         public ViewScheduleHomeScreen()
         {
@@ -46,12 +41,17 @@ namespace Pump.Layout
                     try
                     {
                         if (_equipmentList == null)
-                            _equipmentList = new List<Equipment>();
+                            _equipmentList = new ObservableCollection<Equipment>();
+
                         var equipment = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            _equipmentList.RemoveAll(y => y.ID == x.Key);
+                            for (int i = 0; i < _equipmentList.Count; i++)
+                            {
+                                if (_equipmentList[i].ID == x.Key)
+                                    _equipmentList.RemoveAt(i);
+                            }
                         }
                         else
                         {
@@ -65,6 +65,7 @@ namespace Pump.Layout
                                 equipment.ID = x.Key;
                                 _equipmentList.Add(equipment);
                             }
+
                         }
                     }
                     catch (Exception e)
@@ -72,7 +73,6 @@ namespace Pump.Layout
                         Console.WriteLine(e);
                     }
                 });
-
 
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/Schedule")
@@ -82,12 +82,16 @@ namespace Pump.Layout
                     try
                     {
                         if (_scheduleList == null)
-                            _scheduleList = new List<Schedule>();
+                            _scheduleList = new ObservableCollection<Schedule>();
                         var schedule = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            _scheduleList.RemoveAll(y => y.ID == x.Key);
+                            for (int i = 0; i < _scheduleList.Count; i++)
+                            {
+                                if (_scheduleList[i].ID == x.Key)
+                                    _scheduleList.RemoveAt(i);
+                            }
                         }
                         else
                         {
@@ -111,176 +115,179 @@ namespace Pump.Layout
                 });
 
 
-            PopulateScheduleSummary();
+            LoadScheduleStatus();
         }
 
-        private void PopulateScheduleSummary()
+        private void LoadScheduleStatus()
         {
-            while (databaseController.IsRealtimeFirebaseSelected())
+            var hasSubscribed = false;
+            while (!hasSubscribed)
             {
                 try
                 {
-
-                    if (_equipmentList != null && _scheduleList != null && (_oldScheduleList == null || (!_scheduleList.All(_oldScheduleList.Contains) || _scheduleList.Count < _oldScheduleList.Count)))
+                    if (_equipmentList != null && _scheduleList != null)
                     {
-                        if (_oldScheduleList == null)
-                            _oldScheduleList = new List<Schedule>();
-                        _oldScheduleList.Clear();
-                        foreach (var schedule in _scheduleList)
-                        {
-                            _oldScheduleList.Add(schedule);
-                        }
-
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            ScrollViewScheduleDetail.Children.Clear();
-                            var allScheduleList = GetScheduleObject();
-                            foreach (View view in allScheduleList) ScrollViewScheduleDetail.Children.Add(view);
-                        });
+                        hasSubscribed = true;
+                        _equipmentList.CollectionChanged += PopulateScheduleStatusEvent;
+                        _scheduleList.CollectionChanged += PopulateScheduleStatusEvent;
+                        Device.InvokeOnMainThreadAsync(PopulateScheduleStatus);
                     }
                 }
                 catch
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        ScrollViewScheduleDetail.Children.Clear();
-                        ScrollViewScheduleDetail.Children.Add(new ViewNoConnection());
-                    });
+                    // ignored
                 }
-                Thread.Sleep(2000);
+
+
             }
         }
 
-
-        private List<object> GetScheduleObject()
+        private void PopulateScheduleStatusEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            Device.BeginInvokeOnMainThread(PopulateScheduleStatus);
+        }
 
-            var scheduleListObject = new List<object>();
+        private void PopulateScheduleStatus()
+        {
+            ScreenCleanupForSchedules();
             try
             {
-                if (_scheduleList.Count == 0)
+                if (_scheduleList.Any())
+                    foreach (var schedule in _scheduleList)
+                    {
+                        var viewSchedule = ScrollViewScheduleDetail.Children.FirstOrDefault(x =>
+                            x.AutomationId == schedule.ID);
+                        if (viewSchedule != null)
+                        {
+                            var equipment = _equipmentList.First(x => x.ID == schedule.id_Pump);
+                            var viewScheduleStatus = (ViewScheduleSettingSummary)viewSchedule;
+                            viewScheduleStatus._schedule.NAME = schedule.NAME;
+                            viewScheduleStatus._schedule.TIME = schedule.TIME;
+                            viewScheduleStatus._schedule.isActive = schedule.isActive;
+                            viewScheduleStatus._equipment.NAME = equipment.NAME;
+                            viewScheduleStatus.Populate();
+                        }
+                        else
+                        {
+                            var viewScheduleSettingSummary = new ViewScheduleSettingSummary(schedule,
+                                _equipmentList.First(x => x.ID == schedule.id_Pump));
+                            ScrollViewScheduleDetail.Children.Add(viewScheduleSettingSummary);
+                            //viewScheduleSettingSummary.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                            viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
+                        }
+                    }
+                else
                 {
-                    scheduleListObject.Add(new ViewEmptySchedule("No Schedules Made"));
-                    return scheduleListObject;
+                    ScrollViewScheduleDetail.Children.Add(new ViewEmptySchedule("No Schedules Here"));
                 }
-
-                foreach (var viewSchedule in _scheduleList.Select(schedule => new ViewScheduleSettingSummary(schedule, _equipmentList.First(x => x.ID == schedule.id_Pump))))
-                {
-                    scheduleListObject.Add(viewSchedule);
-                    //viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
-                    //viewSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
-                }
-                return scheduleListObject;
             }
             catch
             {
-                scheduleListObject = new List<object> { new ViewNoConnection() };
-                return scheduleListObject;
+                // ignored
             }
         }
 
-
-
-        //Old Stuff
-
-
-
-        /*
-        private void GetScheduleSummary(string id, FloatingScreen floatingScreen)
+        private void ScreenCleanupForSchedules()
         {
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
+
+            //CleanUp :)
+            try
             {
-                
-                var schedule = _schedulesList.First(x => x.ID == id);
-                var pump = _equipmentList.First(x => x.ID == schedule.id_Pump);
-                var schedulesSummary = "";
-                schedulesSummary += schedule.WEEK + '#' + schedule.TIME + '#' + pump.NAME + '#' + schedule.ID + '#' + pump.ID + '#'+ schedule.NAME;
-                foreach (var scheduleDetail in schedule.ScheduleDetails)
+                if (_scheduleList != null)
                 {
-                    var equipment = _equipmentList.First(x => x.ID == scheduleDetail.id_Equipment);
-                    schedulesSummary += '#' + scheduleDetail.id_Equipment + ',' + equipment.NAME + ',' + scheduleDetail.DURATION ;
+
+                    var itemsThatAreOnDisplay = _scheduleList.Select(x => x.ID).ToList();
+                    if (itemsThatAreOnDisplay.Count == 0)
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+
+
+                    for (var index = 0; index < ScrollViewScheduleDetail.Children.Count; index++)
+                    {
+                        var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
+                            x == ScrollViewScheduleDetail.Children[index].AutomationId);
+                        if (existingItems != null) continue;
+                        ScrollViewScheduleDetail.Children.RemoveAt(index);
+                        index--;
+                    }
                 }
 
-                var scheduleList = GetScheduleSummaryObject(schedulesSummary, floatingScreen);
-
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    try
-                    {
-                        floatingScreen.SetFloatingScreen(scheduleList);
-                    }
-                    catch
-                    {
-                        var scheduleSummaryListObject = new List<object> { new ViewNoConnection() };
-                        floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
-                    }
-                });
             }
-            else
+            catch
+            {
+                // ignored
+            }
+
+
+        }
+
+
+        private void GetScheduleSummary(string id)
+        {
+            Device.BeginInvokeOnMainThread(() =>
             {
                 try
                 {
-                    var schedulesSummary = _socket.Message(_command.getScheduleInfo(id));
-                    var scheduleList = GetScheduleSummaryObject(schedulesSummary, floatingScreen);
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        try
-                        {
-                            floatingScreen.SetFloatingScreen(scheduleList);
-                        }
-                        catch
-                        {
-                            var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
-                            floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
-                        }
-                    });
+                    _floatingScreen.SetFloatingScreen(GetScheduleSummaryObject(_scheduleList.FirstOrDefault(x => x.ID == id)));
                 }
                 catch
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        var scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
-                        floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
-                    });
+                    var scheduleSummaryListObject = new List<object> { new ViewException() };
+                    _floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
                 }
-            }
+            });
+            ;
         }
 
-        private List<object> GetScheduleSummaryObject(string schedulesSummary, FloatingScreen floatingScreen)
+        private List<object> GetScheduleSummaryObject(Schedule schedule)
         {
+            //new ViewScheduleSummary(_scheduleList.First(x => x.ID == id), _equipmentList.ToList());
             var scheduleSummaryListObject = new List<object>();
             try
             {
-                if (schedulesSummary == "No Data" || schedulesSummary == "")
+                if (schedule == null)
                 {
                     scheduleSummaryListObject.Add(new ViewEmptySchedule("No Schedules Details Found"));
                     return scheduleSummaryListObject;
                 }
 
 
-                var scheduleList = schedulesSummary.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                
-                ViewScheduleSummary viewSchedule = null;
-                viewSchedule = new DatabaseController().IsRealtimeFirebaseSelected() ? new ViewScheduleSummary(scheduleList, floatingScreen, _equipmentList) : 
-                    new ViewScheduleSummary(scheduleList, floatingScreen);
-                
-                scheduleSummaryListObject.Add(viewSchedule);
+                _viewSchedule = new ViewScheduleSummary(schedule, _equipmentList.ToList());
 
-
+                //_viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
+                //_viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
+                scheduleSummaryListObject.Add(_viewSchedule);
+                //var zoneAndTimeTapGesture = _viewSchedule.GetZoneAndTimeGestureRecognizers();
+                //foreach (var t in zoneAndTimeTapGesture)
+                //{
+                //    t.Tapped += SkipCustomSchedule_Tapped;
+                //}
                 return scheduleSummaryListObject;
             }
             catch
             {
-                scheduleSummaryListObject = new List<object> {new ViewNoConnection()};
+                scheduleSummaryListObject = new List<object> { new ViewException() };
                 return scheduleSummaryListObject;
             }
         }
 
+        private void ViewScheduleSummary(string id)
+        {
+
+            PopupNavigation.Instance.PushAsync(_floatingScreen);
+            new Thread(() => GetScheduleSummary(id)).Start();
+        }
+
         private void ViewScheduleScreen_Tapped(object sender, EventArgs e)
         {
-            var scheduleSwitch = (View) sender;
+            var scheduleSwitch = (View)sender;
             ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
+
+
+        //Old Stuff
+
+        /*
+        
 
         private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
         {

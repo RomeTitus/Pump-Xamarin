@@ -9,44 +9,35 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewZoneAndTimeGrid : ContentView
     {
-        public string Id = "";
-        public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet)
+        private readonly Equipment _equipment;
+        public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet = false)
         {
             InitializeComponent();
-            Id = equipment.ID;
-            LabelZoneTime.AutomationId = equipment.ID;
-            LabelZoneName.Text = equipment.NAME;
-            if (isTimeSet)
+            _equipment = equipment;
+            LabelZoneTime.AutomationId = _equipment.ID;
+            LabelZoneName.Text = _equipment.NAME;
+            if (isTimeSet && scheduleDetail != null)
                 LabelZoneTime.Text = scheduleDetail.DURATION;
         }
-        public ViewZoneAndTimeGrid(IReadOnlyList<string> zoneAndTimeList, bool isTimeSet)
-        {
-            InitializeComponent();
-            Id = zoneAndTimeList[0];
-            LabelZoneTime.AutomationId = zoneAndTimeList[0];
-            LabelZoneName.Text = zoneAndTimeList[1];
-            if (isTimeSet)
-                LabelZoneTime.Text = zoneAndTimeList[2];
-        }
 
-        public MaskedEntry getMaskText()
+        public MaskedEntry GetMaskText()
         {
             return LabelZoneTime;
         }
 
-        public Label getZoneNameText()
+        public Label GetZoneNameText()
         {
             return LabelZoneName;
         }
 
-        public void SetBackGroundColour(Color colour)
+        public void SetBackGroundColor(Color color)
         {
-            ZoneAndTimeGrid.BackgroundColor = colour;
+            ZoneAndTimeGrid.BackgroundColor = color;
         }
 
         public TapGestureRecognizer GetTapGesture()
         {
-            ZoneAndTimeGrid.AutomationId = Id;
+            ZoneAndTimeGrid.AutomationId = _equipment.ID;
             return GridViewScheduleTapGesture;
         }
     }

@@ -85,6 +85,9 @@
     <Compile Update="Layout\Views\ViewActiveScheduleSummary.xaml.cs">
       <DependentUpon>ViewActiveScheduleSummary.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Layout\Views\ViewException.xaml.cs">
+      <DependentUpon>ViewException.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Layout\Views\ViewScheduleSettingSummary.xaml.cs">
       <DependentUpon>ViewScheduleSettingSummary.xaml</DependentUpon>
     </Compile>
@@ -145,7 +148,7 @@
     <EmbeddedResource Update="Layout\Views\ViewManualSchedule.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\Views\ViewNoConnection.xaml">
+    <EmbeddedResource Update="Layout\Views\ViewException.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewScheduleSettingSummary.xaml">

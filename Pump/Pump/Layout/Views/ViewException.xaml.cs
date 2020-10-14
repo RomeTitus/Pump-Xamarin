@@ -4,9 +4,9 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewNoConnection : ContentView
+    public partial class ViewException : ContentView
     {
-        public ViewNoConnection()
+        public ViewException()
         {
             ID = "-849";
             AutomationId = ID;

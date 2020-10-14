@@ -46,7 +46,7 @@ namespace Pump.Layout
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     ScrollViewLastOnDetail.Children.Clear();
-                    ScrollViewLastOnDetail.Children.Add(new ViewNoConnection());
+                    ScrollViewLastOnDetail.Children.Add(new ViewException());
                 });
             }
         }
@@ -74,7 +74,7 @@ namespace Pump.Layout
             }
             catch
             {
-                equipmentLastUsedDetailList = new List<object> {new ViewNoConnection()};
+                equipmentLastUsedDetailList = new List<object> {new ViewException()};
                 return equipmentLastUsedDetailList;
             }
         }

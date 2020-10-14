@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
@@ -16,211 +13,53 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class UpdateCustomSchedule : ContentPage
     {
-        private readonly string _id = null;
-        private readonly List<Equipment> _equipmentList = new List<Equipment>();
-        private readonly CustomSchedule _customSchedule = null;
+        private readonly List<Equipment> _equipmentList;
+        private CustomSchedule _customSchedule;
         private readonly List<string> _pumpIdList = new List<string>();
-        private readonly List<string> _zoneDetailList = new List<string>();
-        public UpdateCustomSchedule(List<Equipment> equipmentList)
+        public UpdateCustomSchedule(List<Equipment> equipmentList, CustomSchedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;
-            PopulateEquipment();
-            ButtonCreateCustomSchedule.IsEnabled = true;
-            CustomPumpPicker.IsEnabled = true;
-           
-        }
-
-        public UpdateCustomSchedule(List<Equipment> equipmentList, CustomSchedule schedule)
-        {
-            InitializeComponent();
             _customSchedule = schedule;
-            _equipmentList = equipmentList;
             PopulateEquipment();
             ButtonCreateCustomSchedule.IsEnabled = true;
             CustomPumpPicker.IsEnabled = true;
-            PopulateCustomSchedule();
-            ButtonCreateCustomSchedule.Text = "SAVE";
-            _id = schedule.ID;
-        }
-
-        private void PopulateCustomSchedule()
-        {
+            
+            if (schedule == null) return;
             ScheduleName.Text = _customSchedule.NAME;
-
-            for (var i = 0; i < _pumpIdList.Count; i++)
-            {
-                if (_pumpIdList[i] != _customSchedule.ID) continue;
-                CustomPumpPicker.SelectedIndex = i;
-                break;
-            }
-
-            foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
-            {
-                var child = (ViewZoneAndTimeGrid)scrollViewZone;
-                
-                var maskTime = child.getMaskText();
-                var equipmentTime = _customSchedule.ScheduleDetails.FirstOrDefault(detail => detail.id_Equipment == maskTime.AutomationId);
-                if (equipmentTime != null)
-                    maskTime.Text = equipmentTime.DURATION;
-            }
+            ButtonCreateCustomSchedule.Text = "SAVE";
         }
-
+        
         private void PopulateEquipment()
         {
             foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump))
             {
                 CustomPumpPicker.Items.Add(equipment.NAME);
                 _pumpIdList.Add(equipment.ID);
-            }
-            
-
-            if (CustomPumpPicker.Items.Count > 0)
-                CustomPumpPicker.SelectedIndex = 0;
-
-            ScrollViewZoneDetail.Children.Clear();
-
-            var zone = "";
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false))
-            {
-                zone += equipment.ID + ',' + equipment.NAME + ',' + equipment.GPIO;
-                if (equipment.AttachedPiController == null)
-                    zone += ",0#";
-                else
-                    zone += "," + equipment.AttachedPiController + "#";
+                if (_customSchedule.id_Pump != null && _customSchedule.id_Pump == equipment.ID)
+                {
+                    CustomPumpPicker.SelectedIndex = (CustomPumpPicker.Items.Count -1);
+                }
             }
 
-            var zoneDetailObject = _zoneDetailList.Count < 1 ? getZoneDetailObject(zone) : getZoneDetailObject(zone, _zoneDetailList);
-            foreach (View view in zoneDetailObject) ScrollViewZoneDetail.Children.Add(view);
-        }
-
-        private List<object> getZoneDetailObject(string zone)
-        {
-            var zoneListObject = new List<object>();
             try
             {
-                if (zone == "No Data" || zone == "")
+                ScrollViewZoneDetail.Children.Clear();
+                if (_equipmentList.Count(equipment => equipment.isPump == false) == 0)
+                    ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
+                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false))
                 {
-                    zoneListObject.Add(new ViewEmptySchedule("No Zones Found"));
-                    return zoneListObject;
+                    var scheduleDetail =
+                        _customSchedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);
+                    ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail, equipment, true));
                 }
-
-
-                var zoneList = zone.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                zoneListObject.AddRange(zoneList.Select(schedule =>
-                    new ViewZoneAndTimeGrid(schedule.Split(',').ToList(), false)));
-                return zoneListObject;
             }
             catch
             {
-                zoneListObject = new List<object> { new ViewNoConnection() };
-                return zoneListObject;
+                ScrollViewZoneDetail.Children.Clear();
+                ScrollViewZoneDetail.Children.Add(new ViewException());
             }
         }
-
-        private List<object> getZoneDetailObject(string zones, IReadOnlyList<string> zoneDetailList)
-        {
-            var zoneListObject = new List<object>();
-            try
-            {
-                if (zones == "No Data" || zones == "")
-                {
-                    zoneListObject.Add(new ViewEmptySchedule("No Zones Found"));
-                    return zoneListObject;
-                }
-
-
-                var zonesList = zones.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                foreach (var zone in zonesList)
-                {
-                    var hasProperty = false;
-                    var zoneList = zone.Split(',').ToList();
-
-                    foreach (var zoneDetail in zoneDetailList)
-                    {
-                        var existingZone = zoneDetail.Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                        if (existingZone[0] == zoneList[0])
-                        {
-                            zoneList[2] = existingZone[2];
-                            zoneListObject.Add(new ViewZoneAndTimeGrid(zoneList, true));
-                            hasProperty = true;
-                        }
-                    }
-
-                    if (!hasProperty)
-                        zoneListObject.Add(new ViewZoneAndTimeGrid(zoneList, false));
-                }
-
-                return zoneListObject;
-            }
-            catch
-            {
-                zoneListObject = new List<object> { new ViewNoConnection() };
-                return zoneListObject;
-            }
-        }
-
-        private void ButtonCreateCustomSchedule_OnClicked(object sender, EventArgs e)
-        {
-            SendCustomSchedule();
-        }
-
-        private void SendCustomSchedule()
-        {
-            var notification = CustomScheduleValidate();
-            notification = SendSelectedZonesValidate(notification);
-
-            if (!string.IsNullOrWhiteSpace(notification))
-            {
-                DisplayAlert("Incomplete", notification, "Understood");
-            }
-            else
-            {
-                if (new DatabaseController().IsRealtimeFirebaseSelected())
-                {
-                    var schedule = new CustomSchedule
-                    {
-                        ID = _id,
-                        NAME = ScheduleName.Text,
-                        id_Pump = _pumpIdList[CustomPumpPicker.SelectedIndex]
-                    };
-                    var scheduleDetail = GetSelectedZonesList();
-                    if (scheduleDetail.Count > 0)
-                    {
-                        schedule.ScheduleDetails = scheduleDetail;
-                        var key = Task.Run(() => new Authentication().SetCustomSchedule(schedule)).Result;
-                        Navigation.PopModalAsync();
-                    }
-                    else
-                        DisplayAlert("Incomplete", "\u2022 One or more zones are required!", "Understood");
-                }
-                /*
-                else
-                {
-                    var schedule = ScheduleName.Text;
-                    schedule += "#" + MaskedEntryTime.Text;
-                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
-                    schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
-                    var zoneSchedule = GetSelectedZones();
-                    if (string.IsNullOrWhiteSpace(zoneSchedule))
-                    {
-                        GetViewSchedulePumpTime();
-                    }
-                    else
-                    {
-                        schedule += "#" + zoneSchedule;
-                        new Thread(() => SendScheduleSocket(schedule)).Start();
-                        Navigation.PopModalAsync();
-                        Navigation.PopModalAsync();
-                        Navigation.PushModalAsync(new ViewScheduleHomeScreen());
-                    }
-                }
-                */
-            }
-        }
-
         private string CustomScheduleValidate()
         {
             var notification = "";
@@ -250,28 +89,58 @@ namespace Pump.Layout
             foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
             {
                 var child = (ViewZoneAndTimeGrid)scrollViewZone;
-                var maskTime = child.getMaskText();
+                var maskTime = child.GetMaskText();
                 if (string.IsNullOrWhiteSpace(maskTime.Text) || maskTime.Text.Length >= 4) continue;
                 if (string.IsNullOrWhiteSpace(notification))
-                    notification = "\u2022 " + child.getZoneNameText().Text + " time format is incorrect";
+                    notification = "\u2022 " + child.GetZoneNameText().Text + " time format is incorrect";
                 else
-                    notification += "\n\u2022 " + child.getZoneNameText().Text + " time format is incorrect";
-                child.getZoneNameText().TextColor = Color.Red;
+                    notification += "\n\u2022 " + child.GetZoneNameText().Text + " time format is incorrect";
+                child.GetZoneNameText().TextColor = Color.Red;
             }
 
             return notification;
         }
+        private List<ScheduleDetail> GetSelectedZonesList()
+        {
+            var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children
+                select child.GetMaskText()
+                into maskTime
+                where !string.IsNullOrWhiteSpace(maskTime.Text)
+                select
+                    new ScheduleDetail { id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text }).ToList();
 
+            return scheduleDetailList;
+        }
+        private void ButtonCreateCustomSchedule_OnClicked(object sender, EventArgs e)
+        {
+            var notification = CustomScheduleValidate();
+            notification = SendSelectedZonesValidate(notification);
+
+            if (!string.IsNullOrWhiteSpace(notification))
+            {
+                DisplayAlert("Incomplete", notification, "Understood");
+            }
+            else
+            {
+                if (_customSchedule == null)
+                    _customSchedule = new CustomSchedule();
+                _customSchedule.NAME = ScheduleName.Text;
+                _customSchedule.id_Pump = _pumpIdList[CustomPumpPicker.SelectedIndex];
+
+                var scheduleDetail = GetSelectedZonesList();
+                if (scheduleDetail.Count > 0)
+                {
+                    _customSchedule.ScheduleDetails = scheduleDetail;
+                    var key = Task.Run(() => new Authentication().SetCustomSchedule(_customSchedule)).Result;
+                    Navigation.PopModalAsync();
+                }
+                else
+                    DisplayAlert("Incomplete", "\u2022 One or more zones are required!", "Understood");
+            }
+        }
         private void ButtonBack_OnClicked(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
-        }
-
-        private List<ScheduleDetail> GetSelectedZonesList()
-        {
-            var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.getMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail { id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text }).ToList();
-
-            return scheduleDetailList;
         }
     }
 }
