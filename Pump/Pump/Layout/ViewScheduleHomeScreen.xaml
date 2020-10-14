@@ -43,6 +43,7 @@
             <StackLayout VerticalOptions="End">
                 <Button
                     x:Name="ButtonCreateSchedule"
+                    Pressed="ButtonCreateSchedule_OnClicked"
                     Text="Create Schedule" />
             </StackLayout>
 

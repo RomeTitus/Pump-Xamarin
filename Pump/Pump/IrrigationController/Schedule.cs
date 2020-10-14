@@ -5,6 +5,12 @@ namespace Pump.IrrigationController
 {
     public class Schedule
     {
+        public Schedule()
+        {
+            isActive = "1";
+            WEEK = string.Empty;
+            ScheduleDetails = new List<ScheduleDetail>();
+        }
         public string ID { get; set; }
         public string NAME { get; set; }
         public string TIME { get; set; }
@@ -14,10 +20,6 @@ namespace Pump.IrrigationController
 
 
         public List<ScheduleDetail> ScheduleDetails { get; set; }
-        public Schedule Clone()
-        {
-            return (Schedule)this.MemberwiseClone();
-        }
     }
 
     public class ScheduleDetail

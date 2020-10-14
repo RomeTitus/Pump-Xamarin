@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
-using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -20,28 +18,30 @@ namespace Pump.Layout
         private readonly List<Equipment> _equipmentList;
         private Schedule _schedule;
         private readonly List<string> _pumpIdList = new List<string>();
-
-        //private ViewSchedulePumpTime _pumpSelectedTime;
-        //private List<string> _weekdayList = new List<string>();
+        private ViewSchedulePumpTime _pumpSelectedTime;
 
         public UpdateSchedule(List<Equipment> equipmentList, Schedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;
+            if (schedule == null)
+                schedule = new Schedule();
             _schedule = schedule;
 
-            var selectWeekThread = new Thread(SetSelectedWeek);
-            selectWeekThread.Start();
+            //SetUpWeekDays(); //Not sure where this should go
+            new Thread(SetUpWeekDays).Start();
 
             PopulateEquipment();
             ButtonCreateSchedule.IsEnabled = true;
             PumpPicker.IsEnabled = true;
-
+            
             if (schedule != null)
             {
                 ButtonCreateSchedule.Text = "SAVE";
                 ScheduleName.Text = _schedule.NAME;
                 MaskedEntryTime.Text = _schedule.TIME;
+                var selectWeekThread = new Thread(SetSelectedWeek);
+                selectWeekThread.Start();
             }
 
         }
@@ -57,7 +57,8 @@ namespace Pump.Layout
                     PumpPicker.SelectedIndex = (PumpPicker.Items.Count - 1);
                 }
             }
-
+            if(PumpPicker.SelectedIndex == -1 && PumpPicker.Items.Count>0)
+                PumpPicker.SelectedIndex = 0;
             try
             {
                 ScrollViewZoneDetail.Children.Clear();
@@ -74,229 +75,6 @@ namespace Pump.Layout
             {
                 ScrollViewZoneDetail.Children.Clear();
                 ScrollViewZoneDetail.Children.Add(new ViewException());
-            }
-        }
-
-
-
-        private void ThreadController(IReadOnlyList<string> scheduleDetailList)
-        {
-            var selectWeekThread = new Thread(() =>
-                SetSelectedWeek(scheduleDetailList[0].Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()));
-
-            var zoneDetailList = new List<string>();
-            for (var i = 6; i < scheduleDetailList.Count; i++) zoneDetailList.Add(scheduleDetailList[i]);
-            var populateZoneThread = new Thread(() => PopulateZone(zoneDetailList));
-
-            var populatePumpThread = new Thread(() => PopulatePump(scheduleDetailList));
-
-            selectWeekThread.Start();
-            populateZoneThread.Start();
-            populatePumpThread.Start();
-
-            while (selectWeekThread.IsAlive || populateZoneThread.IsAlive || populatePumpThread.IsAlive)
-                Thread.Sleep(300);
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                ButtonCreateSchedule.IsEnabled = true;
-                PumpPicker.IsEnabled = true;
-            });
-        }
-
-        private void ThreadController()
-        {
-            var selectWeekThread = new Thread(SetUpWeekDays);
-
-            var populateZoneThread = new Thread(PopulateZone);
-
-            var populatePumpThread = new Thread(PopulatePump);
-
-            selectWeekThread.Start();
-            populateZoneThread.Start();
-            populatePumpThread.Start();
-
-            while (selectWeekThread.IsAlive || populateZoneThread.IsAlive || populatePumpThread.IsAlive)
-                Thread.Sleep(300);
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                ButtonCreateSchedule.IsEnabled = true;
-                PumpPicker.IsEnabled = true;
-            });
-        }
-
-
-        private void PopulateZone()
-        {
-            try
-            {
-                var zone = _socket.Message(_command.getValves());
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewZoneDetail.Children.Clear();
-
-
-                    var scheduleList = getZoneDetailObject(zone);
-                    foreach (View view in scheduleList) ScrollViewZoneDetail.Children.Add(view);
-                });
-            }
-            catch
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewException());
-                });
-            }
-        }
-
-        private void PopulateZone(IReadOnlyList<string> zoneDetailList)
-        {
-            try
-            {
-                var zone = _socket.Message(_command.getValves());
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewZoneDetail.Children.Clear();
-
-
-                    var scheduleList = getZoneDetailObject(zone, zoneDetailList);
-                    foreach (View view in scheduleList) ScrollViewZoneDetail.Children.Add(view);
-                });
-            }
-            catch
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewException());
-                });
-            }
-        }
-
-        private List<object> getZoneDetailObject(string zone)
-        {
-            var zoneListObject = new List<object>();
-            try
-            {
-                if (zone == "No Data" || zone == "")
-                {
-                    zoneListObject.Add(new ViewEmptySchedule("No Zones Found"));
-                    return zoneListObject;
-                }
-
-
-                var zoneList = zone.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                zoneListObject.AddRange(zoneList.Select(schedule =>
-                    new ViewZoneAndTimeGrid(schedule.Split(',').ToList(), false)));
-                return zoneListObject;
-            }
-            catch
-            {
-                zoneListObject = new List<object> {new ViewException()};
-                return zoneListObject;
-            }
-        }
-
-        private List<object> getZoneDetailObject(string zones, IReadOnlyList<string> zoneDetailList)
-        {
-            var zoneListObject = new List<object>();
-            try
-            {
-                if (zones == "No Data" || zones == "")
-                {
-                    zoneListObject.Add(new ViewEmptySchedule("No Zones Found"));
-                    return zoneListObject;
-                }
-
-
-                var zonesList = zones.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                foreach (var zone in zonesList)
-                {
-                    var hasProperty = false;
-                    var zoneList = zone.Split(',').ToList();
-
-                    foreach (var zoneDetail in zoneDetailList)
-                    {
-                        var existingZone = zoneDetail.Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                        if (existingZone[0] == zoneList[0])
-                        {
-                            zoneList[2] = existingZone[2];
-                            zoneListObject.Add(new ViewZoneAndTimeGrid(zoneList, true));
-                            hasProperty = true;
-                        }
-                    }
-
-                    if (!hasProperty)
-                        zoneListObject.Add(new ViewZoneAndTimeGrid(zoneList, false));
-                }
-
-                return zoneListObject;
-            }
-            catch
-            {
-                zoneListObject = new List<object> {new ViewException()};
-                return zoneListObject;
-            }
-        }
-
-
-        private void PopulatePump()
-        {
-            try
-            {
-                var pumps = _socket.Message(_command.getPumps());
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    foreach (var pumpDetail in pumps.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()
-                        .Select(pump => pump.Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()))
-                    {
-                        PumpPicker.Items.Add(pumpDetail[1]);
-                        _pumpIdList.Add(pumpDetail[0]);
-                    }
-
-                    if (PumpPicker.Items.Count > 0)
-                        PumpPicker.SelectedIndex = 0;
-                });
-            }
-            catch
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewException());
-                });
-            }
-        }
-
-        private void PopulatePump(IReadOnlyList<string> zoneDetailList)
-        {
-            try
-            {
-                var pumps = _socket.Message(_command.getPumps());
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    PumpPicker.Items.Clear();
-                    foreach (var pumpDetail in pumps.Split('#').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()
-                        .Select(pump => pump.Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToList()))
-                    {
-                        PumpPicker.Items.Add(pumpDetail[1]);
-                        _pumpIdList.Add(pumpDetail[0]);
-                    }
-
-                    for (var i = 0; i < _pumpIdList.Count; i++)
-                        if (_pumpIdList[i] == zoneDetailList[4])
-                            PumpPicker.SelectedIndex = i;
-                });
-            }
-            catch
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    ScrollViewZoneDetail.Children.Clear();
-                    ScrollViewZoneDetail.Children.Add(new ViewException());
-                });
             }
         }
 
@@ -340,18 +118,38 @@ namespace Pump.Layout
                 throw;
             }
 
-
             foreach (var frame in frames)
             {
                 frame.BorderColor = Color.Gray;
                 frame.BackgroundColor = Color.DeepSkyBlue;
             }
         }
+        
+        private static void FramesLoaded(IReadOnlyCollection<Frame> frames)
+        {
+            for (var i = 0; i < 100; i++)
+            {
+                foreach (var frame in frames)
+                    if (frame.Height > -1 || frame.Width > -1)
+                        return;
+                Thread.Sleep(10);
+            }
+        }
 
+        private void Frame_OnTap(object sender, EventArgs e)
+        {
+            var frame = (Frame)sender;
+            var weekday = frame.AutomationId;
 
+            if (_schedule.WEEK.Split(',').Contains(weekday)) 
+                _schedule.WEEK = _schedule.WEEK.Replace(weekday+",","");
+            else
+                _schedule.WEEK += (weekday + ",");
+
+            SetSelectedWeek();
+        }
         private void SetSelectedWeek()
         {
-            //SetUpWeekDays();
             var frames = new List<Frame>
             {
                 FrameSunday,
@@ -363,48 +161,23 @@ namespace Pump.Layout
                 FrameSaturday
             };
 
-            if(_schedule == null)
+            if (_schedule == null)
                 return;
             foreach (var frame in frames)
             {
-                ChangeWeekSelect(frame, _schedule.WEEK.Contains(frame.AutomationId));
+                ChangeWeekSelect(frame, _schedule.WEEK.Split(',').Contains(frame.AutomationId));
             }
         }
-
-        private static void FramesLoaded(IReadOnlyCollection<Frame> frames)
-        {
-            for (var i = 0; i < 100; i++)
-            {
-                foreach (var frame in frames)
-                    if (frame.Height > -1 || frame.Width > -1)
-                        return;
-                Thread.Sleep(30);
-            }
-        }
-
-        private void Frame_OnTap(object sender, EventArgs e)
-        {
-            var frame = (Frame) sender;
-            var weekday = frame.AutomationId;
-
-            if (_weekdayList.Contains(weekday))
-                _weekdayList.Remove(weekday);
-            else
-                _weekdayList.Add(weekday);
-
-            SetSelectedWeek(_weekdayList);
-        }
-
         private static void ChangeWeekSelect(Frame frame, bool isSelected)
         {
             var frameChildren = frame.Children;
             foreach (var element in frameChildren)
             {
-                var child = (StackLayout) element;
+                var child = (StackLayout)element;
                 foreach (var view in child.Children)
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        var label = (Label) view;
+                        var label = (Label)view;
                         frame.BackgroundColor = isSelected ? Color.White : Color.DeepSkyBlue;
                         frame.BorderColor = isSelected ? Color.Black : Color.Gray;
                         label.BackgroundColor = isSelected ? Color.White : Color.DeepSkyBlue;
@@ -420,11 +193,8 @@ namespace Pump.Layout
 
         private void ButtonUpdateSchedule_OnClicked(object sender, EventArgs e)
         {
-            SendUpdateSchedule();
-        }
 
-        private void SendUpdateSchedule()
-        {
+
             var notification = SendUpdateScheduleValidate();
             notification = SendSelectedZonesValidate(notification);
 
@@ -434,53 +204,30 @@ namespace Pump.Layout
             }
             else
             {
-                if (new DatabaseController().IsRealtimeFirebaseSelected())
+                if (_schedule == null)
+                    _schedule = new Schedule();
+                _schedule.NAME = ScheduleName.Text;
+                _schedule.id_Pump = _pumpIdList[PumpPicker.SelectedIndex];
+                _schedule.TIME = MaskedEntryTime.Text;
+
+                var scheduleDetail = GetSelectedZonesList();
+                if (scheduleDetail.Count > 0)
                 {
-                    var schedule = new Schedule
-                    {
-                        ID = _id,
-                        NAME = ScheduleName.Text,
-                        TIME = MaskedEntryTime.Text,
-                        id_Pump = _pumpIdList[PumpPicker.SelectedIndex],
-                        isActive = "1",
-                        WEEK = _weekdayList.Aggregate("", (current, week) => current + (week + ','))
-                    };
-                    var scheduleDetail = GetSelectedZonesList();
-                    if (scheduleDetail.Count > 0)
-                    {
-                        schedule.ScheduleDetails = scheduleDetail;
-                        var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
-                        Navigation.PopModalAsync();
-                        Navigation.PopModalAsync();
-                        Navigation.PushModalAsync(new ViewScheduleHomeScreen());
-                    }
-                    else
-                        GetViewSchedulePumpTime();
+                    _schedule.ScheduleDetails = scheduleDetail;
+                    var key = Task.Run(() => new Authentication().SetSchedule(_schedule)).Result;
+                    Navigation.PopModalAsync();
                 }
                 else
                 {
-                    var schedule = ScheduleName.Text;
-                    schedule += "#" + MaskedEntryTime.Text;
-                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
-                    schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
-                    var zoneSchedule = GetSelectedZones();
-                    if (string.IsNullOrWhiteSpace(zoneSchedule))
-                    {
-                        GetViewSchedulePumpTime();
-                    }
-                    else
-                    {
-                        schedule += "#" + zoneSchedule;
-                        new Thread(() => SendScheduleSocket(schedule)).Start();
-                        Navigation.PopModalAsync();
-                        Navigation.PopModalAsync();
-                        Navigation.PushModalAsync(new ViewScheduleHomeScreen());
-                    }
+                    var floatingScreen = new FloatingScreen();
+                    PopupNavigation.Instance.PushAsync(floatingScreen);
+                    _pumpSelectedTime = new ViewSchedulePumpTime(_schedule, _equipmentList.First(x => x.ID == _schedule.id_Pump));
+                    _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
+                    floatingScreen.SetFloatingScreen(new List<object> { _pumpSelectedTime });
                 }
-
-                
             }
         }
+
 
         private string SendUpdateScheduleValidate()
         {
@@ -514,7 +261,7 @@ namespace Pump.Layout
                 PumpPicker.BackgroundColor = Color.Red;
             }
 
-            if (_weekdayList.Count == 0)
+            if (_schedule.WEEK.Split(',').ToList().Count == 0)
             {
                 var frames = new List<Frame>
                 {
@@ -555,41 +302,9 @@ namespace Pump.Layout
             return notification;
         }
 
-        private string GetSelectedZones()
-        {
-            var zoneTime = "";
-
-
-            foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
-            {
-                var child = (ViewZoneAndTimeGrid) scrollViewZone;
-                var maskTime = child.GetMaskText();
-                if (!string.IsNullOrWhiteSpace(maskTime.Text))
-                {
-                    if (zoneTime.Length < 1)
-                        zoneTime = maskTime.AutomationId + "," + maskTime.Text;
-                    else
-                        zoneTime += "#" + maskTime.AutomationId + "," + maskTime.Text;
-                }
-            }
-
-            return zoneTime;
-        }
-
         private List<ScheduleDetail> GetSelectedZonesList()
         {
-            var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.GetMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
-
-            return scheduleDetailList;
-        }
-        private void GetViewSchedulePumpTime()
-        {
-            var floatingScreen = new FloatingScreen();
-            PopupNavigation.Instance.PushAsync(floatingScreen);
-            _pumpSelectedTime = new ViewSchedulePumpTime(PumpPicker.Items[PumpPicker.SelectedIndex], _id != null);
-            var scheduleSummaryListObject = new List<object> {_pumpSelectedTime};
-            _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
-            floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
+            return (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.GetMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
         }
 
         private void UpdateSchedulePumpDuration_Pressed(object sender, EventArgs e)
@@ -597,43 +312,27 @@ namespace Pump.Layout
             var notification = "";
             notification += SendSelectedPumpValidate(notification, PumpPicker.Items[PumpPicker.SelectedIndex]);
             if (!string.IsNullOrWhiteSpace(notification))
-
             {
                 DisplayAlert("Incomplete", notification, "Understood");
             }
-
             else
             {
                 PopupNavigation.Instance.PopAsync();
-                if (new DatabaseController().IsRealtimeFirebaseSelected())
+                _schedule.ScheduleDetails = new List<ScheduleDetail>
                 {
-                    var schedule = new Schedule
+                    new ScheduleDetail()
                     {
-                        ID = _id,
-                        isActive = "1",
-                        NAME = ScheduleName.Text,
-                        TIME = MaskedEntryTime.Text,
-                        id_Pump = _pumpIdList[PumpPicker.SelectedIndex],
-                        WEEK = _weekdayList.Aggregate("", (current, week) => current + (week + ',')),
-                        ScheduleDetails = new List<ScheduleDetail>() { new ScheduleDetail() { id_Equipment = _pumpIdList[PumpPicker.SelectedIndex], DURATION = _pumpSelectedTime.getPumpDurationTime().Text } }
-                    };
-                    var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
-                }
-                else
-                {
-                    var schedule = ScheduleName.Text;
-                    schedule += "#" + MaskedEntryTime.Text;
-                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "#";
-                    schedule = _weekdayList.Aggregate(schedule, (current, week) => current + "," + week);
-                    schedule += "#" + _pumpIdList[PumpPicker.SelectedIndex] + "," +
-                                _pumpSelectedTime.getPumpDurationTime().Text;
-                    new Thread(() => SendScheduleSocket(schedule)).Start();
-                }
-
-                Navigation.PopModalAsync();
-                Navigation.PopModalAsync();
+                        id_Equipment = _pumpIdList[PumpPicker.SelectedIndex],
+                        DURATION = _pumpSelectedTime.getPumpDurationTime().Text
+                    }
+                };
+                var key = Task.Run(() => new Authentication().SetSchedule(_schedule)).Result;
             }
+
+            Navigation.PopModalAsync();
+            Navigation.PopModalAsync();
         }
+        
 
         private string SendSelectedPumpValidate(string notification, string pumpName)
         {
@@ -648,18 +347,6 @@ namespace Pump.Layout
             _pumpSelectedTime.getPumpDurationTime().PlaceholderColor = Color.Red;
 
             return notification;
-        }
-
-        private void SendScheduleSocket(string schedule)
-        {
-            var result = _socket.Message(_id == null
-                ? _command.addSchedule(schedule)
-                : _command.updateSchedule(Convert.ToInt32(_id), schedule));
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                if (result != "success") DisplayAlert("Warning!!!", result, "Understood");
-            });
         }
     }
 }

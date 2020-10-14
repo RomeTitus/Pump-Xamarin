@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Firebase.Database.Streaming;
 using Pump.Database;
 using Pump.FirebaseDatabase;
@@ -172,7 +173,7 @@ namespace Pump.Layout
                             var viewScheduleSettingSummary = new ViewScheduleSettingSummary(schedule,
                                 _equipmentList.First(x => x.ID == schedule.id_Pump));
                             ScrollViewScheduleDetail.Children.Add(viewScheduleSettingSummary);
-                            //viewScheduleSettingSummary.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                            viewScheduleSettingSummary.GetSwitch().Toggled += ScheduleSwitch_Toggled;
                             viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                         }
                     }
@@ -216,10 +217,7 @@ namespace Pump.Layout
             {
                 // ignored
             }
-
-
         }
-
 
         private void GetScheduleSummary(string id)
         {
@@ -240,7 +238,6 @@ namespace Pump.Layout
 
         private List<object> GetScheduleSummaryObject(Schedule schedule)
         {
-            //new ViewScheduleSummary(_scheduleList.First(x => x.ID == id), _equipmentList.ToList());
             var scheduleSummaryListObject = new List<object>();
             try
             {
@@ -253,14 +250,9 @@ namespace Pump.Layout
 
                 _viewSchedule = new ViewScheduleSummary(schedule, _equipmentList.ToList());
 
-                //_viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
-                //_viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
+                _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
+                _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
                 scheduleSummaryListObject.Add(_viewSchedule);
-                //var zoneAndTimeTapGesture = _viewSchedule.GetZoneAndTimeGestureRecognizers();
-                //foreach (var t in zoneAndTimeTapGesture)
-                //{
-                //    t.Tapped += SkipCustomSchedule_Tapped;
-                //}
                 return scheduleSummaryListObject;
             }
             catch
@@ -284,10 +276,42 @@ namespace Pump.Layout
         }
 
 
-        //Old Stuff
+        private void EditButton_Tapped(object sender, EventArgs e)
+        {
+            PopupNavigation.Instance.PopAsync();
+            var edit = (Button)sender;
+            var schedule = _scheduleList.First(x => x.ID == edit.AutomationId);
+            Navigation.PushModalAsync(new UpdateSchedule(_equipmentList.ToList(), schedule));
+        }
 
-        /*
-        
+        private void DeleteButton_Tapped(object sender, EventArgs e)
+        {
+            var delete = (Button)sender;
+            var schedule = _scheduleList.First(x => x.ID == delete.AutomationId);
+            var deleteConfirm = new ViewDeleteConfirmation(schedule);
+            _floatingScreen.SetFloatingScreen(new List<object> { deleteConfirm });
+            deleteConfirm.GetDeleteButton().Clicked += DeleteConfirmButton_Tapped;
+        }
+
+        private void DeleteConfirmButton_Tapped(object sender, EventArgs e)
+        {
+            PopupNavigation.Instance.PopAsync();
+            var delete = (Button)sender;
+            new Authentication().DeleteSchedule(new Schedule { ID = delete.AutomationId });
+        }
+
+        private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
+        {
+            if (new DatabaseController().IsRealtimeFirebaseSelected())
+            {
+                if (_equipmentList.Count > 0)
+                    Navigation.PushModalAsync(new UpdateSchedule(_equipmentList.ToList()));
+                else
+                    DisplayAlert("Cannot Create a Schedule",
+                        "You are missing the equipment that is needed to create a schedule", "Understood");
+            }
+
+        }
 
         private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
         {
@@ -306,64 +330,12 @@ namespace Pump.Layout
 
         private void ChangeScheduleState(Switch scheduleSwitch, string id)
         {
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
-                var schedule = _schedulesList.First(x => x.ID == id);
+                var schedule = _scheduleList.First(x => x.ID == id);
                 schedule.isActive = Convert.ToInt32(scheduleSwitch.IsToggled).ToString();
                 var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
                 
             }
-            else
-            {
-                try
-                {
-                    var result = _socket.Message(_command.ChangeSchedule(id, Convert.ToInt32(scheduleSwitch.IsToggled)));
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        if (result == "success")
-                        {
-                        }
-                        else
-                        {
-                            DisplayAlert("Warning!!!", result, "Understood");
-                        }
-                    });
-                }
-                catch
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        scheduleSwitch.Toggled -= ScheduleSwitch_Toggled;
-                        scheduleSwitch.IsToggled = !scheduleSwitch.IsToggled;
-                        scheduleSwitch.Toggled += ScheduleSwitch_Toggled;
-                        DisplayAlert("Warning!!!", "Failed to reach the controller \n COULD NOT CHANGE SCHEDULE STATE",
-                            "Understood");
-                    });
-                }
-
-            }
-
         }
-
-        private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
-        {
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
-            {
-                if (_equipmentList.Count > 0)
-                    Navigation.PushModalAsync(new UpdateSchedule(_equipmentList));
-                else
-                    DisplayAlert("Cannot Create a Schedule", "You are missing the equipment that is needed to create a schedule", "Understood");
-                
-            }
-            else
-                Navigation.PushModalAsync(new UpdateSchedule());
-        }
-
-        private void ButtonBack_OnClicked(object sender, EventArgs e)
-        {
-            Navigation.PopModalAsync();
-        }
-    
-        */
     }
 }

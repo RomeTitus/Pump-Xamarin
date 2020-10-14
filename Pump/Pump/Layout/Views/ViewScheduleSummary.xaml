@@ -121,14 +121,8 @@
 
             <StackLayout VerticalOptions="End">
 
-                <Button
-                    x:Name="ButtonEdit"
-                    Clicked="ButtonEdit_OnClicked"
-                    Text="Edit Schedule" />
-                <Button
-                    x:Name="ButtonDelete"
-                    Clicked="ButtonDelete_OnClicked"
-                    Text="Delete Schedule" />
+                <Button x:Name="ButtonEdit" Text="Edit Schedule" />
+                <Button x:Name="ButtonDelete" Text="Delete Schedule" />
             </StackLayout>
         </StackLayout>
 

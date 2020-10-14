@@ -315,14 +315,14 @@ namespace Pump.Layout
                     "You have selected " + equipment.NAME + "\nConfirm to skip to this zone ?", "Confirm",
                     "cancel")) return;
                 if(_viewSchedule == null) return;
-                var nullableStartTime = RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.schedule, equipment);
+                var nullableStartTime = RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.CustomSchedule, equipment);
                 if (nullableStartTime != null)
                 {
                     var startTime = (DateTime) nullableStartTime;
-                    _viewSchedule.schedule.StartTime =
+                    _viewSchedule.CustomSchedule.StartTime =
                         (Int32) (startTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                     _viewSchedule.UpdateScheduleSummary();
-                    ChangeCustomScheduleState(_viewSchedule.schedule);
+                    ChangeCustomScheduleState(_viewSchedule.CustomSchedule);
                 }
             });
 

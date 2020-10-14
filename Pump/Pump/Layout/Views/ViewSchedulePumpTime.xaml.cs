@@ -1,4 +1,5 @@
 ﻿using System;
+using Pump.IrrigationController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.MaskedEntry;
@@ -9,15 +10,16 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSchedulePumpTime : ContentView
     {
-        public ViewSchedulePumpTime(string pumpName, bool isEdit)
+        private Schedule _schedule;
+        private  Equipment _equipment;
+        public ViewSchedulePumpTime(Schedule schedule, Equipment equipment)
         {
             InitializeComponent();
-            PumpPicker.Items.Add(pumpName);
+            _schedule = schedule;
+            _equipment = equipment;
+            PumpPicker.Items.Add(equipment.NAME);
             PumpPicker.SelectedIndex = 0;
-            if (isEdit)
-                ButtonEditSchedulePump.Text = "EDIT SCHEDULE";
-            else
-                ButtonEditSchedulePump.Text = "CREATE SCHEDULE";
+            ButtonEditSchedulePump.Text = schedule.ID != null ? "Save" : "CREATE SCHEDULE";
         }
 
         private void ButtonCancel_OnClicked(object sender, EventArgs e)

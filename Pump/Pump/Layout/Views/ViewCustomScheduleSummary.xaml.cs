@@ -12,71 +12,67 @@ namespace Pump.Layout.Views
     public partial class ViewCustomScheduleSummary : ContentView
     {
         private readonly List<Equipment> _equipmentList;
-        public readonly CustomSchedule schedule;
-        readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
+        public readonly CustomSchedule CustomSchedule;
+        private readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
         public ViewCustomScheduleSummary()
         {
             InitializeComponent();
         }
 
-        public ViewCustomScheduleSummary(CustomSchedule schedule, List<Equipment> equipmentList)
+        public ViewCustomScheduleSummary(CustomSchedule customSchedule, List<Equipment> equipmentList)
         {
             InitializeComponent();
-            this.schedule = schedule;
+            this.CustomSchedule = customSchedule;
             _equipmentList = equipmentList;
             SetScheduleSummary();
         }
 
         public void UpdateScheduleSummary()
         {
-            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(schedule);
-            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
+            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(CustomSchedule);
+            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(schedule.StartTime));
+                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == schedule.id_Pump))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == CustomSchedule.id_Pump))
             {
                 LabelPumpName.Text = equipment.NAME;
             }
-
-            labelScheduleName.Text = schedule.NAME;
-
-
+            labelScheduleName.Text = CustomSchedule.NAME;
             foreach (ViewZoneAndTimeGrid scheduleGrid in ScrollViewZoneDetail.Children)
             {
                 
                 scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
                 {
-                    if (scheduleGrid.Id == runningScheduleDetail.id_Equipment)
+                    if (scheduleGrid.AutomationId == runningScheduleDetail.id_Equipment)
                         scheduleGrid.SetBackGroundColor(Color.YellowGreen);
                 }
             }
         }
-        public void SetScheduleSummary()
+
+        private void SetScheduleSummary()
         {
-            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(schedule);
-            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(schedule);
+            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(CustomSchedule);
+            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(schedule.StartTime));
+                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
-
-
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == schedule.id_Pump))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == CustomSchedule.id_Pump))
             {
                 LabelPumpName.Text = equipment.NAME;
             }
 
-            labelScheduleName.Text = schedule.NAME;
+            labelScheduleName.Text = CustomSchedule.NAME;
 
             
-            foreach (var scheduleEquipment in schedule.ScheduleDetails)
+            foreach (var scheduleEquipment in CustomSchedule.ScheduleDetails)
             {
                 var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
                     _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
@@ -101,14 +97,14 @@ namespace Pump.Layout.Views
         public Button GetButtonEdit()
         {
             if(ButtonEdit.AutomationId == null)
-                ButtonEdit.AutomationId = schedule.ID;
+                ButtonEdit.AutomationId = CustomSchedule.ID;
             return ButtonEdit;
         }
 
         public Button GetButtonDelete()
         {
             if(ButtonDelete.AutomationId == null)
-                ButtonDelete.AutomationId = schedule.ID;
+                ButtonDelete.AutomationId = CustomSchedule.ID;
             return ButtonDelete;
         }
     }
