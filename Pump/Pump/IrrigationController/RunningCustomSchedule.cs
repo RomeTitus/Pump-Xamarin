@@ -18,12 +18,15 @@ namespace Pump.IrrigationController
             {
 
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(schedule.StartTime);
-
+                for (var i = 0; i < schedule.Repeat+1; i++)
+                {
                     foreach (var scheduleDetails in schedule.ScheduleDetails)
                     {
                         var activeSchedule = new ActiveSchedule
                         {
-                            ID = schedule.ID+ scheduleDetails.id_Equipment, NAME = schedule.NAME, id_Equipment = scheduleDetails.id_Equipment
+                            ID = schedule.ID + scheduleDetails.id_Equipment,
+                            NAME = schedule.NAME,
+                            id_Equipment = scheduleDetails.id_Equipment
                         };
                         activeSchedule.name_Equipment =
                             equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
@@ -31,7 +34,7 @@ namespace Pump.IrrigationController
                         activeSchedule.name_Pump =
                             equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
-                        
+
                         //gets Next Schedule Start Time
                         var durationHour = scheduleDetails.DURATION.Split(':').First();
                         var durationMinute = scheduleDetails.DURATION.Split(':').Last();
@@ -40,6 +43,8 @@ namespace Pump.IrrigationController
                         activeSchedule.EndTime = startTimeDateTime;
                         activeScheduleList.Add(activeSchedule);
                     }
+                }
+                    
             }
             
             var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
@@ -54,22 +59,29 @@ namespace Pump.IrrigationController
             {
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
                 var currentTime = DateTime.UtcNow;
-                foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
+                var index = 0;
+                for (var i = 0; i < customScheduleList.Repeat+1; i++)
                 {
-                    //gets Next Schedule Start Time
-                    var durationHour = scheduleDetails.DURATION.Split(':').First();
-                    var durationMinute = scheduleDetails.DURATION.Split(':').Last();
-                    var endTimeDateTime = startTimeDateTime + TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
-                                          TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
-                    if (startTimeDateTime < currentTime && endTimeDateTime > currentTime)
-                        return scheduleDetails;
-                    startTimeDateTime = endTimeDateTime;
+                    foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
+                    {
+                        //gets Next Schedule Start Time
+                        scheduleDetails.ID = index.ToString();
+                        var durationHour = scheduleDetails.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                        var endTimeDateTime = startTimeDateTime + TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                              TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                        if (startTimeDateTime < currentTime && endTimeDateTime > currentTime)
+                            return scheduleDetails.Clone();
+                        startTimeDateTime = endTimeDateTime;
+                        index++;
+                    }
                 }
             }
-            catch (Exception e)
+            catch
             {
-
+                // ignored
             }
+
             return null;
         }
 
@@ -78,43 +90,52 @@ namespace Pump.IrrigationController
             try
             {
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
-                foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
+                for (var i = 0; i < customScheduleList.Repeat+1; i++)
                 {
-                    //gets Next Schedule Start Time
-                    var durationHour = scheduleDetails.DURATION.Split(':').First();
-                    var durationMinute = scheduleDetails.DURATION.Split(':').Last();
-                    var endTimeDateTime = startTimeDateTime + TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
-                                          TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
-                    startTimeDateTime = endTimeDateTime;
+                    foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
+                    {
+                        //gets Next Schedule Start Time
+                        var durationHour = scheduleDetails.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                        var endTimeDateTime = startTimeDateTime + TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                              TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                        startTimeDateTime = endTimeDateTime;
+                    }
                 }
 
                 return startTimeDateTime;
             }
-            catch (Exception e)
+            catch
             {
-
+                // ignored
             }
             return null;
         }
 
-        public static DateTime? GetCustomScheduleRunningTimeForEquipment(CustomSchedule customScheduleList, Equipment equipment)
+        public static DateTime? GetCustomScheduleRunningTimeForEquipment(CustomSchedule customScheduleList, int selectIndex)
         {
             try
             {
                 var startTimeDateTime = DateTime.UtcNow;
-                foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
+                var index = 0;
+                for (var i = 0; i < customScheduleList.Repeat+1; i++)
                 {
-                    if (scheduleDetails.id_Equipment == equipment.ID)
+                    foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
-                        return startTimeDateTime;
+                        if (index == selectIndex)
+                        {
+                            return startTimeDateTime;
+                        }
+
+                        //gets Next Schedule Start Time
+                        var durationHour = scheduleDetails.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                        var endTimeDateTime = startTimeDateTime - (TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                                                   TimeSpan.FromMinutes(Convert.ToInt32(durationMinute))
+                            );
+                        startTimeDateTime = endTimeDateTime;
+                        index++;
                     }
-                    //gets Next Schedule Start Time
-                    var durationHour = scheduleDetails.DURATION.Split(':').First();
-                    var durationMinute = scheduleDetails.DURATION.Split(':').Last();
-                    var endTimeDateTime = startTimeDateTime - (TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
-                                          TimeSpan.FromMinutes(Convert.ToInt32(durationMinute)));
-                    startTimeDateTime = endTimeDateTime;
-                    
                 }
 
             }

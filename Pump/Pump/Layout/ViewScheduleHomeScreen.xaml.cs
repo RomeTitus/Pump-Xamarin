@@ -100,6 +100,7 @@ namespace Pump.Layout
                             if (existingSchedule != null)
                             {
                                 FirebaseMerger.CopyValues(existingSchedule, schedule);
+                                PopulateScheduleStatus();
                             }
                             else
                             {

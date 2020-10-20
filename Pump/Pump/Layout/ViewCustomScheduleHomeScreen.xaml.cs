@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,9 +19,8 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewCustomScheduleHomeScreen : ContentPage
     {
-        private List<Equipment> _equipmentList;
-        private List<CustomSchedule> _customSchedulesList;
-        private List<CustomSchedule> _oldCustomSchedulesList;
+        private ObservableCollection<Equipment> _equipmentList;
+        private ObservableCollection<CustomSchedule> _customSchedulesList;
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
         private ViewCustomScheduleSummary _viewSchedule;
 
@@ -33,20 +33,21 @@ namespace Pump.Layout
         private void GetScheduleAndEquipmentFirebase()
         {
             var auth = new Authentication();
-
-
             auth._FirebaseClient
                 .Child(auth.getConnectedPi() + "/CustomSchedule")
                 .AsObservable<CustomSchedule>()
                 .Subscribe(x =>
                 {
-                    if(_customSchedulesList == null)
-                        _customSchedulesList = new List<CustomSchedule>();
+                    if (_customSchedulesList == null)
+                        _customSchedulesList = new ObservableCollection<CustomSchedule>();
                     var customSchedule = x.Object;
-                    _customSchedulesList.RemoveAll(y => y.ID == x.Key);
                     if (x.EventType == FirebaseEventType.Delete)
                     {
-                        _customSchedulesList.RemoveAll(y => y.ID == x.Key);
+                        for (int i = 0; i < _customSchedulesList.Count; i++)
+                        {
+                            if (_customSchedulesList[i].ID == x.Key)
+                                _customSchedulesList.RemoveAt(i);
+                        }
                     }
                     else
                     {
@@ -54,6 +55,7 @@ namespace Pump.Layout
                         if (existingCustomSchedule != null)
                         {
                             FirebaseMerger.CopyValues(existingCustomSchedule, customSchedule);
+                            Device.InvokeOnMainThreadAsync(PopulateCustomScheduleStatus);
                         }
                         else
                         {
@@ -70,12 +72,15 @@ namespace Pump.Layout
                 .Subscribe(x =>
                 {
                     if (_equipmentList == null)
-                        _equipmentList = new List<Equipment>();
+                        _equipmentList = new ObservableCollection<Equipment>();
                     var equipment = x.Object;
-                    _equipmentList.RemoveAll(y => y.ID == x.Key);
                     if (x.EventType == FirebaseEventType.Delete)
                     {
-                        _equipmentList.RemoveAll(y => y.ID == x.Key);
+                        for (int i = 0; i < _equipmentList.Count; i++)
+                        {
+                            if (_equipmentList[i].ID == x.Key)
+                                _equipmentList.RemoveAt(i);
+                        }
                     }
                     else
                     {
@@ -83,6 +88,7 @@ namespace Pump.Layout
                         if (existingEquipment != null)
                         {
                             FirebaseMerger.CopyValues(existingEquipment, equipment);
+                            Device.InvokeOnMainThreadAsync(PopulateCustomScheduleStatus);
                         }
                         else
                         {
@@ -91,74 +97,111 @@ namespace Pump.Layout
                         }
 
                     }
-
-                    _equipmentList = _equipmentList.OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList();
                 });
 
-            var databaseController = new DatabaseController();
 
-            while (databaseController.IsRealtimeFirebaseSelected())
+            LoadCustomScheduleStatus();
+        }
+
+
+        private void LoadCustomScheduleStatus()
+        {
+            var hasSubscribed = false;
+            while (!hasSubscribed)
             {
                 try
                 {
-                    
-                    if (_equipmentList != null && _customSchedulesList != null && (_oldCustomSchedulesList == null || (!_customSchedulesList.All(_oldCustomSchedulesList.Contains) || _customSchedulesList.Count < _oldCustomSchedulesList.Count)))
+                    if (_equipmentList != null && _customSchedulesList != null)
                     {
-                        if (_oldCustomSchedulesList == null)
-                            _oldCustomSchedulesList = new List<CustomSchedule>();
-                        _oldCustomSchedulesList.Clear();
-                        foreach (var customSchedules in _customSchedulesList)
-                        {
-                            _oldCustomSchedulesList.Add(customSchedules);
-                        }
-
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            ScrollViewCustomScheduleDetail.Children.Clear();
-                            var allScheduleList = GetCustomScheduleObject();
-                            foreach (View view in allScheduleList) ScrollViewCustomScheduleDetail.Children.Add(view);
-                        });
+                        hasSubscribed = true;
+                        _equipmentList.CollectionChanged += PopulateCustomScheduleStatusEvent;
+                        _customSchedulesList.CollectionChanged += PopulateCustomScheduleStatusEvent;
+                        Device.InvokeOnMainThreadAsync(PopulateCustomScheduleStatus);
                     }
                 }
                 catch
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        ScrollViewCustomScheduleDetail.Children.Clear();
-                        ScrollViewCustomScheduleDetail.Children.Add(new ViewException());
-                    });
+                    // ignored
                 }
-                Thread.Sleep(2000);
-            }
 
+
+            }
         }
 
-        private List<object> GetCustomScheduleObject()
+        private void PopulateCustomScheduleStatusEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            
-            var scheduleListObject = new List<object>();
+            Device.BeginInvokeOnMainThread(PopulateCustomScheduleStatus);
+        }
+
+        private void PopulateCustomScheduleStatus()
+        {
+            ScreenCleanupForCustomSchedules();
+
             try
             {
-                if (_customSchedulesList.Count == 0)
+                if (_customSchedulesList.Any())
+                    foreach (var customSchedule in _customSchedulesList)
+                    {
+                        var viewSchedule = ScrollViewCustomScheduleDetail.Children.FirstOrDefault(x =>
+                            x.AutomationId == customSchedule.ID);
+                        if (viewSchedule != null)
+                        {
+                            var equipment = _equipmentList.First(x => x.ID == customSchedule.id_Pump);
+                            var viewScheduleStatus = (ViewCustomSchedule)viewSchedule;
+                            viewScheduleStatus.Schedule.NAME = customSchedule.NAME;
+                            viewScheduleStatus.Schedule.StartTime = customSchedule.StartTime;
+                            viewScheduleStatus.Schedule.Repeat = customSchedule.Repeat;
+                            viewScheduleStatus.Equipment.NAME = equipment.NAME;
+                            viewScheduleStatus.Equipment.NAME = equipment.NAME;
+                            viewScheduleStatus.Populate();
+                        }
+                        else
+                        {
+                            var viewScheduleSettingSummary = new ViewCustomSchedule(customSchedule,
+                                _equipmentList.First(x => x.ID == customSchedule.id_Pump));
+                            ScrollViewCustomScheduleDetail.Children.Add(viewScheduleSettingSummary);
+                            viewScheduleSettingSummary.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                            viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
+                        }
+                    }
+                else
                 {
-                    scheduleListObject.Add(new ViewEmptySchedule("No Custom Schedules Made"));
-                    return scheduleListObject;
+                    ScrollViewCustomScheduleDetail.Children.Add(new ViewEmptySchedule("No Custom Schedules Here"));
                 }
-
-
-                
-                foreach (var viewCustomSchedule in _customSchedulesList.Select(schedule => new ViewCustomSchedule(schedule, _equipmentList)))
-                {
-                    scheduleListObject.Add(viewCustomSchedule);
-                    viewCustomSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
-                    viewCustomSchedule.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
-                }
-                return scheduleListObject;
             }
             catch
             {
-                scheduleListObject = new List<object> { new ViewException() };
-                return scheduleListObject;
+                // ignored
+            }
+        }
+
+        private void ScreenCleanupForCustomSchedules()
+        {
+
+            try
+            {
+                if (_customSchedulesList != null)
+                {
+
+                    var itemsThatAreOnDisplay = _customSchedulesList.Select(x => x.ID).ToList();
+                    if (itemsThatAreOnDisplay.Count == 0)
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+
+
+                    for (var index = 0; index < ScrollViewCustomScheduleDetail.Children.Count; index++)
+                    {
+                        var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
+                            x == ScrollViewCustomScheduleDetail.Children[index].AutomationId);
+                        if (existingItems != null) continue;
+                        ScrollViewCustomScheduleDetail.Children.RemoveAt(index);
+                        index--;
+                    }
+                }
+
+            }
+            catch
+            {
+                // ignored
             }
         }
 
@@ -173,13 +216,13 @@ namespace Pump.Layout
             var scheduleSwitch = (Switch)sender;
             try
             {
-                var updateSchedule = _oldCustomSchedulesList.First(x => x.ID == scheduleSwitch.AutomationId);
+                var updateSchedule = _customSchedulesList.First(x => x.ID == scheduleSwitch.AutomationId);
 
                 if (scheduleSwitch.IsToggled)
                     updateSchedule.StartTime = ScheduleTime.GetUnixTimeStampUtcNow();
                 else
                     updateSchedule.StartTime = 0;
-                
+
                 new Thread(() => ChangeCustomScheduleState(updateSchedule))
                     .Start();
             }
@@ -192,20 +235,28 @@ namespace Pump.Layout
 
         private void ChangeCustomScheduleState(CustomSchedule schedule)
         {
-            var key = Task.Run(() => new Authentication().SetCustomSchedule(schedule)).Result;
-            //TODO Needs Confirmation that The Pi got it and its running :)
+
+
             foreach (var view in ScrollViewCustomScheduleDetail.Children)
             {
-                var viewCustomSchedule = (ViewCustomSchedule) view;
+                var viewCustomSchedule = (ViewCustomSchedule)view;
                 if (viewCustomSchedule.Schedule.ID != schedule.ID) continue;
                 viewCustomSchedule.Schedule = schedule;
-                Device.BeginInvokeOnMainThread(() => { viewCustomSchedule.Populate(); });
+                
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    viewCustomSchedule.GetSwitch().Toggled -= ScheduleSwitch_Toggled;
+                    viewCustomSchedule.Populate();
+                    viewCustomSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+                });
             }
+            //TODO Needs Confirmation that The Pi got it and its running :)
+            var key = Task.Run(() => new Authentication().SetCustomSchedule(schedule)).Result;
         }
 
         private void ViewScheduleSummary(string id)
         {
-            
+
             PopupNavigation.Instance.PushAsync(_floatingScreen);
             new Thread(() => GetScheduleSummary(id)).Start();
         }
@@ -215,7 +266,6 @@ namespace Pump.Layout
             {
 
                 var schedule = _customSchedulesList.FirstOrDefault(x => x.ID == id);
-                
                 var scheduleList = GetCustomScheduleSummaryObject(schedule);
 
                 Device.BeginInvokeOnMainThread(() =>
@@ -244,8 +294,8 @@ namespace Pump.Layout
                     return customScheduleSummaryListObject;
                 }
 
-                
-                _viewSchedule = new ViewCustomScheduleSummary(schedule, _equipmentList);
+
+                _viewSchedule = new ViewCustomScheduleSummary(schedule, _equipmentList.ToList());
 
                 _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
                 _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
@@ -255,7 +305,7 @@ namespace Pump.Layout
                 {
                     t.Tapped += SkipCustomSchedule_Tapped;
                 }
-                
+
 
                 return customScheduleSummaryListObject;
             }
@@ -272,7 +322,7 @@ namespace Pump.Layout
             if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 if (_equipmentList.Count > 0)
-                    Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList));
+                    Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList.ToList()));
                 else
                     DisplayAlert("Cannot Create a Schedule",
                         "You are missing the equipment that is needed to create a schedule", "Understood");
@@ -282,9 +332,9 @@ namespace Pump.Layout
         private void EditButton_Tapped(object sender, EventArgs e)
         {
             PopupNavigation.Instance.PopAsync();
-            var edit = (Button) sender;
+            var edit = (Button)sender;
             var customSchedule = _customSchedulesList.First(schedule => schedule.ID == edit.AutomationId);
-            Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList, customSchedule));
+            Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList.ToList(), customSchedule));
         }
 
         private void DeleteButton_Tapped(object sender, EventArgs e)
@@ -306,27 +356,34 @@ namespace Pump.Layout
         private void SkipCustomSchedule_Tapped(object sender, EventArgs e)
         {
             var gridEquipmentAndTime = (Grid)sender;
-            var equipment = _equipmentList.FirstOrDefault(x => x.ID == gridEquipmentAndTime.AutomationId);
-            if(equipment == null)
-                return;
+            int.TryParse(gridEquipmentAndTime.AutomationId, out var selectIndex);
+            var customScheduleDetails = new List<ScheduleDetail>();
+            for (int i = 0; i < _viewSchedule.CustomSchedule.Repeat+1; i++)
+            {
+                foreach (var scheduleDetail in _viewSchedule.CustomSchedule.ScheduleDetails)
+                {
+                    customScheduleDetails.Add(scheduleDetail);
+                }
+            }
+            
+            var selectedCustomScheduleDetails = customScheduleDetails[selectIndex];
+
             Device.BeginInvokeOnMainThread(async () =>
             {
                 if (!await DisplayAlert("Are you sure?",
-                    "You have selected " + equipment.NAME + "\nConfirm to skip to this zone ?", "Confirm",
+                    "You have selected " + _equipmentList.First(x => x.ID == selectedCustomScheduleDetails.id_Equipment).NAME  + "\nConfirm to skip to this zone ?", "Confirm",
                     "cancel")) return;
-                if(_viewSchedule == null) return;
-                var nullableStartTime = RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.CustomSchedule, equipment);
+                if (_viewSchedule == null) return;
+                var nullableStartTime = RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.CustomSchedule, selectIndex);
                 if (nullableStartTime != null)
                 {
-                    var startTime = (DateTime) nullableStartTime;
+                    var startTime = (DateTime)nullableStartTime;
                     _viewSchedule.CustomSchedule.StartTime =
-                        (Int32) (startTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                        (Int32)(startTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                     _viewSchedule.UpdateScheduleSummary();
                     ChangeCustomScheduleState(_viewSchedule.CustomSchedule);
                 }
             });
-
         }
-
     }
 }

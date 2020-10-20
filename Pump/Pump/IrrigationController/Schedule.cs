@@ -27,5 +27,9 @@ namespace Pump.IrrigationController
         public string ID { get; set; }
         public string DURATION { get; set; }
         public string id_Equipment { get; set; }
+        public ScheduleDetail Clone()
+        {
+            return (ScheduleDetail) this.MemberwiseClone();
+        }
     }
 }

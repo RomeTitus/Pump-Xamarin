@@ -10,10 +10,12 @@ namespace Pump.Layout.Views
     public partial class ViewZoneAndTimeGrid : ContentView
     {
         private readonly Equipment _equipment;
+        private readonly ScheduleDetail _scheduleDetail;
         public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet = false)
         {
             InitializeComponent();
             _equipment = equipment;
+            _scheduleDetail = scheduleDetail;
             LabelZoneTime.AutomationId = _equipment.ID;
             LabelZoneName.Text = _equipment.NAME;
             if (isTimeSet && scheduleDetail != null)
@@ -37,7 +39,7 @@ namespace Pump.Layout.Views
 
         public TapGestureRecognizer GetTapGesture()
         {
-            ZoneAndTimeGrid.AutomationId = _equipment.ID;
+            ZoneAndTimeGrid.AutomationId = _scheduleDetail.ID;
             return GridViewScheduleTapGesture;
         }
     }

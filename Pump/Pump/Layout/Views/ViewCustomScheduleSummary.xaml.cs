@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Pump.Class;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -14,15 +15,11 @@ namespace Pump.Layout.Views
         private readonly List<Equipment> _equipmentList;
         public readonly CustomSchedule CustomSchedule;
         private readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
-        public ViewCustomScheduleSummary()
-        {
-            InitializeComponent();
-        }
 
         public ViewCustomScheduleSummary(CustomSchedule customSchedule, List<Equipment> equipmentList)
         {
             InitializeComponent();
-            this.CustomSchedule = customSchedule;
+            CustomSchedule = customSchedule;
             _equipmentList = equipmentList;
             SetScheduleSummary();
         }
@@ -42,13 +39,14 @@ namespace Pump.Layout.Views
                 LabelPumpName.Text = equipment.NAME;
             }
             labelScheduleName.Text = CustomSchedule.NAME;
+
             foreach (ViewZoneAndTimeGrid scheduleGrid in ScrollViewZoneDetail.Children)
             {
                 
                 scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
                 {
-                    if (scheduleGrid.AutomationId == runningScheduleDetail.id_Equipment)
+                    if (scheduleGrid.AutomationId == runningScheduleDetail.ID)
                         scheduleGrid.SetBackGroundColor(Color.YellowGreen);
                 }
             }
@@ -71,21 +69,27 @@ namespace Pump.Layout.Views
 
             labelScheduleName.Text = CustomSchedule.NAME;
 
-            
-            foreach (var scheduleEquipment in CustomSchedule.ScheduleDetails)
+            var index = 0;
+            for (var i = 0; i < CustomSchedule.Repeat+1; i++)
             {
-                var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
-                    _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
-                    true);
-                _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
-                scheduleGrid.SetBackGroundColor(Color.Yellow);
-                if (runningScheduleDetail != null)
+                foreach (var scheduleEquipment in CustomSchedule.ScheduleDetails)
                 {
-                    if(scheduleEquipment == runningScheduleDetail)
-                        scheduleGrid.SetBackGroundColor(Color.YellowGreen);
+                    scheduleEquipment.ID = index.ToString(); 
+                    var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
+                        _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
+                        true);
+                    _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
+                    scheduleGrid.SetBackGroundColor(Color.Yellow);
+                    scheduleGrid.AutomationId = scheduleEquipment.ID;
+                    if (runningScheduleDetail != null)
+                    {
+                        if (scheduleEquipment.ID == runningScheduleDetail.ID) //Why does the ID randomly Change?
+                            scheduleGrid.SetBackGroundColor(Color.YellowGreen);
+                    }
+
+                    ScrollViewZoneDetail.Children.Add(scheduleGrid);
+                    index++;
                 }
-                
-                ScrollViewZoneDetail.Children.Add(scheduleGrid);
             }
         }
 

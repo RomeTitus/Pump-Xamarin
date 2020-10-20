@@ -4,6 +4,7 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    xmlns:maskedEntry="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
     BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
         <ScrollView>
@@ -116,6 +117,24 @@
 
                 </StackLayout>
                 <StackLayout VerticalOptions="EndAndExpand">
+                    <StackLayout Margin="5" Orientation="Horizontal">
+                        <Label
+                            FontSize="Large"
+                            HorizontalOptions="Center"
+                            Text="Repeat: "
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <maskedEntry:MaskedEntry
+                            x:Name="MaskedEntryRepeat"
+                            FlowDirection="RightToLeft"
+                            HorizontalOptions="StartAndExpand"
+                            Keyboard="Numeric"
+                            Mask="X"
+                            Placeholder="0"
+                            Scale="1.2" />
+                    </StackLayout>
+
                     <Button
                         x:Name="ButtonCreateCustomSchedule"
                         Clicked="ButtonCreateCustomSchedule_OnClicked"

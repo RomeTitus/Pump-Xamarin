@@ -12,12 +12,12 @@ namespace Pump.Layout.Views
     public partial class ViewCustomSchedule : ContentView
     {
         public CustomSchedule Schedule { get; set; }
-        private readonly List<Equipment> _equipmentList;
-        public ViewCustomSchedule(CustomSchedule schedule, List<Equipment> equipmentList)
+        public Equipment Equipment { get; set; }
+        public ViewCustomSchedule(CustomSchedule schedule, Equipment equipment)
         {
             InitializeComponent();
             Schedule = schedule;
-            _equipmentList = equipmentList;
+            Equipment = equipment;
             Populate();
         }
 
@@ -27,8 +27,9 @@ namespace Pump.Layout.Views
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(Schedule);
             if(switchScheduleIsActive.AutomationId == null)
                 switchScheduleIsActive.AutomationId = Schedule.ID;
-            if(StackLayoutViewSchedule.AutomationId == null)
+            if (StackLayoutViewSchedule.AutomationId == null)
                 StackLayoutViewSchedule.AutomationId = Schedule.ID;
+            LabelScheduleRepeat.Text = "Repeat: " + Schedule.Repeat;
             if (endTime != null)
             {
                 if (RunningCustomSchedule.GetCustomScheduleDetailRunning(Schedule) != null)
@@ -47,10 +48,8 @@ namespace Pump.Layout.Views
 
             labelScheduleName.Text = Schedule.NAME;
             
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == Schedule.id_Pump))
-            {
-                LabelPumpName.Text = equipment.NAME;
-            }
+            LabelPumpName.Text = Equipment.NAME;
+            
 
         }
 

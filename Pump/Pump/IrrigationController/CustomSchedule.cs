@@ -8,25 +8,17 @@ namespace Pump.IrrigationController
 
         public CustomSchedule()
         {
+            id_Pump = string.Empty;
+            ScheduleDetails = new List<ScheduleDetail>();
+            Repeat = 0;
         }
         public string ID { get; set; }
         public string NAME { get; set; }
         public string id_Pump { get; set; }
-        public string isActive => isScheduleRunning();
         public long StartTime { get; set; }
+        public long Repeat { get; set; }
 
 
         public List<ScheduleDetail> ScheduleDetails { get; set; }
-
-        private string isScheduleRunning()
-        {
-            var scheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(this);
-            return scheduleDetail != null ? "1" : "0";
-        }
-
-        public CustomSchedule Clone()
-        {
-            return (CustomSchedule)this.MemberwiseClone();
-        }
     }
 }

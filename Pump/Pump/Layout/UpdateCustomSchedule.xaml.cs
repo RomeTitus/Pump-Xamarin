@@ -20,14 +20,18 @@ namespace Pump.Layout
         {
             InitializeComponent();
             _equipmentList = equipmentList;
+            if (schedule != null)
+            {
+                ScheduleName.Text = schedule.NAME;
+                ButtonCreateCustomSchedule.Text = "SAVE";
+                
+            }else
+                schedule = new CustomSchedule();
             _customSchedule = schedule;
+            MaskedEntryRepeat.Text = _customSchedule.Repeat.ToString();
             PopulateEquipment();
             ButtonCreateCustomSchedule.IsEnabled = true;
             CustomPumpPicker.IsEnabled = true;
-            
-            if (schedule == null) return;
-            ScheduleName.Text = _customSchedule.NAME;
-            ButtonCreateCustomSchedule.Text = "SAVE";
         }
         
         private void PopulateEquipment()
@@ -40,6 +44,8 @@ namespace Pump.Layout
                 {
                     CustomPumpPicker.SelectedIndex = (CustomPumpPicker.Items.Count -1);
                 }
+                if (CustomPumpPicker.SelectedIndex == -1 && CustomPumpPicker.Items.Count > 0)
+                    CustomPumpPicker.SelectedIndex = 0;
             }
 
             try
@@ -80,6 +86,15 @@ namespace Pump.Layout
                     notification = "\u2022 Select a pump";
                 else
                     notification += "\n\u2022 Select a pump";
+                CustomPumpPicker.BackgroundColor = Color.Red;
+            }
+            
+            if (MaskedEntryRepeat.Text.Length == 0)
+            {
+                if (notification.Length < 1)
+                    notification = "\u2022 Select repeat amount";
+                else
+                    notification += "\n\u2022 Select repeat amount";
                 CustomPumpPicker.BackgroundColor = Color.Red;
             }
             return notification;
@@ -126,7 +141,8 @@ namespace Pump.Layout
                     _customSchedule = new CustomSchedule();
                 _customSchedule.NAME = ScheduleName.Text;
                 _customSchedule.id_Pump = _pumpIdList[CustomPumpPicker.SelectedIndex];
-
+                long.TryParse(MaskedEntryRepeat.Text, out var repeat);
+                _customSchedule.Repeat = repeat;
                 var scheduleDetail = GetSelectedZonesList();
                 if (scheduleDetail.Count > 0)
                 {
