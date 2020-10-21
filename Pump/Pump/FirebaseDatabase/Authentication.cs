@@ -332,6 +332,42 @@ namespace Pump.FirebaseDatabase
 
 
         //Equipment
+        public async Task<string> SetEquipment(Equipment equipment)
+        {
+            try
+            {
+                if (equipment.ID == null)
+                {
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/Equipment")
+                        .PostAsync(equipment);
+                    return result.Key;
+                }
+
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Equipment/" + equipment.ID)
+                    .PutAsync(equipment);
+                return equipment.ID;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+        public async void DeleteEquipment(Equipment equipment)
+        {
+            try
+            {
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Equipment/" + equipment.ID)
+                    .DeleteAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
         public Equipment GetJsonEquipmentToObjectList(JObject equipmentDetailObject, string key)
         {
             try

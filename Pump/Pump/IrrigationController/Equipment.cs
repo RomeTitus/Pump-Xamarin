@@ -10,9 +10,5 @@ namespace Pump.IrrigationController
         public string GPIO { get; set; }
         public bool isPump { get; set; }
         public string DirectOnlineGPIO { get; set; }
-        public Equipment Clone()
-        {
-            return (Equipment) this.MemberwiseClone();
-        }
     }
 }

@@ -28,5 +28,10 @@ namespace Pump.Layout
         {
             Navigation.PushModalAsync(new ViewGraphSummaryScreen());
         }
+
+        private void BtnEquipmentDetail_OnPressed(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(new ViewEquipmentScreen());
+        }
     }
 }

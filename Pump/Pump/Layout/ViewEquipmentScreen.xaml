@@ -1,15 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-
 <ContentPage
-    x:Class="Pump.Layout.ScheduleStatusHomeScreen"
+    x:Class="Pump.Layout.ViewEquipmentScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-    xmlns:local="clr-namespace:EmbeddedImages"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:views="clr-namespace:Pump.Layout.Views"
-    Title="Schedule Summary"
-    mc:Ignorable="d">
+    Title="Configuration"
+    BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
         <ScrollView>
             <FlexLayout
@@ -17,26 +12,24 @@
                 Direction="Column"
                 JustifyContent="SpaceAround"
                 VerticalOptions="Center">
-
                 <StackLayout>
                     <Label
                         FontSize="Subtitle"
                         HorizontalOptions="Center"
-                        Text="Active Now"
+                        Text="Current Equipment"
                         TextColor="White"
                         TextDecorations="Underline" />
-
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
                         HorizontalOptions="FillAndExpand">
                         <ScrollView HeightRequest="100">
-                            <StackLayout x:Name="ScrollViewScheduleStatus">
+                            <StackLayout x:Name="ScrollViewEquipment">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" Tapped="ScrollViewScheduleStatusTap_OnTapped" />
+                                    <TapGestureRecognizer x:Name="ScrollViewEquipmentTap" />
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
-                                    AutomationId="ActivityIndicatorScheduleStatusLoading"
+                                    AutomationId="ActivityIndicatorEquipmentLoading"
                                     HorizontalOptions="Center"
                                     IsEnabled="true"
                                     IsRunning="True"
@@ -46,55 +39,31 @@
 
                         </ScrollView>
                     </Frame>
-
+                    <Button
+                        x:Name="BtnAddEquipment"
+                        BackgroundColor="DeepSkyBlue"
+                        IsEnabled="False"
+                        Pressed="BtnAddEquipment_OnPressed"
+                        Text="Add Equipment"
+                        TextColor="White"
+                        VerticalOptions="Center" />
                 </StackLayout>
 
                 <StackLayout>
                     <Label
                         FontSize="Subtitle"
                         HorizontalOptions="Center"
-                        Text="Queued"
+                        Text="Current Sensor"
                         TextColor="White"
                         TextDecorations="Underline" />
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
                         HorizontalOptions="FillAndExpand">
-
-
                         <ScrollView HeightRequest="100">
-
-                            <StackLayout x:Name="ScrollViewQueueStatus">
+                            <StackLayout x:Name="ScrollViewSensor">
                                 <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" Tapped="ScrollViewQueueStatusTap_OnTapped" />
-                                </StackLayout.GestureRecognizers>
-                                <ActivityIndicator
-                                    AutomationId="ActivityIndicatorScheduleQueLoading"
-                                    HorizontalOptions="Center"
-                                    IsEnabled="true"
-                                    IsRunning="True"
-                                    IsVisible="True"
-                                    VerticalOptions="Center" />
-                            </StackLayout>
-
-                        </ScrollView>
-
-
-                    </Frame>
-
-                </StackLayout>
-                <StackLayout>
-                    <Label
-                        FontSize="Subtitle"
-                        HorizontalOptions="Center"
-                        Text="Sensor Status"
-                        TextColor="White"
-                        TextDecorations="Underline" />
-                    <Frame BackgroundColor="White" BorderColor="Black">
-                        <ScrollView HeightRequest="100">
-                            <StackLayout x:Name="ScrollViewSensorStatus">
-                                <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" Tapped="ScrollViewSensorStatusTap_OnTapped" />
+                                    <TapGestureRecognizer x:Name="ScrollViewSensorTap" />
                                 </StackLayout.GestureRecognizers>
                                 <ActivityIndicator
                                     AutomationId="ActivityIndicatorSensorLoading"
@@ -106,7 +75,52 @@
                             </StackLayout>
                         </ScrollView>
                     </Frame>
+                    <Button
+                        x:Name="BtnAddSensor"
+                        BackgroundColor="DeepSkyBlue"
+                        IsEnabled="False"
+                        Text="Add Sensor"
+                        TextColor="White"
+                        VerticalOptions="Center" />
                 </StackLayout>
+                <StackLayout>
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Current Sub-Controller"
+                        TextColor="White"
+                        TextDecorations="Underline" />
+                    <Frame BackgroundColor="White" BorderColor="Black">
+                        <ScrollView HeightRequest="100">
+                            <StackLayout x:Name="ScrollViewSubController">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewSubControllerTap" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorSubControllerLoading"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </ScrollView>
+                    </Frame>
+                    <Button
+                        x:Name="BtnAddSubController"
+                        BackgroundColor="DeepSkyBlue"
+                        IsEnabled="False"
+                        Text="Add Sub-Controller"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                </StackLayout>
+                <Button
+                    x:Name="BtnBack"
+                    BackgroundColor="DeepSkyBlue"
+                    Pressed="BtnBack_OnPressed"
+                    Text="Back"
+                    TextColor="White"
+                    VerticalOptions="Center" />
             </FlexLayout>
         </ScrollView>
     </ContentPage.Content>

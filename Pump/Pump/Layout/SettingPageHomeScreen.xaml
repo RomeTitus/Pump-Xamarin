@@ -6,8 +6,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Title="Settings">
+    Title="Settings"
+    mc:Ignorable="d">
     <ContentPage.Content>
 
         <StackLayout VerticalOptions="Center">
@@ -21,6 +21,11 @@
                 IsVisible="False"
                 Pressed="BtnScheduleDetail_OnPressed"
                 Text="Schedule Edit/Delete"
+                VerticalOptions="Center" />
+            <Button
+                x:Name="BtnEquipmentDetail"
+                Pressed="BtnEquipmentDetail_OnPressed"
+                Text="Edit Equipment"
                 VerticalOptions="Center" />
             <Button
                 x:Name="BtnGraphSummary"
