@@ -19,7 +19,7 @@ namespace Pump.Layout
     {
         private ObservableCollection<Equipment> _equipmentList;
         private ObservableCollection<Sensor> _sensorList;
-        private ObservableCollection<PiController> _piControllerList;
+        private ObservableCollection<SubController> _subControllerList;
 
         public ViewEquipmentScreen()
         {
@@ -106,37 +106,37 @@ namespace Pump.Layout
                 });
 
             auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/PiController")
-                .AsObservable<PiController>()
+                .Child(auth.getConnectedPi() + "/SubController")
+                .AsObservable<SubController>()
                 .Subscribe(x =>
                 {
 
                     try
                     {
-                        if (_piControllerList == null)
-                            _piControllerList = new ObservableCollection<PiController>();
-                        var piController = x.Object;
+                        if (_subControllerList == null)
+                            _subControllerList = new ObservableCollection<SubController>();
+                        var subController = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
                             for (int i = 0; i < _sensorList.Count; i++)
                             {
-                                if (_piControllerList[i].ID == x.Key)
-                                    _piControllerList.RemoveAt(i);
+                                if (_subControllerList[i].ID == x.Key)
+                                    _subControllerList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingPiController = _piControllerList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingPiController != null)
+                            var existingSubController = _subControllerList.FirstOrDefault(y => y.ID == x.Key);
+                            if (existingSubController != null)
                             {
-                                FirebaseMerger.CopyValues(existingPiController, piController);
-                                Device.BeginInvokeOnMainThread(PopulatePiController);
+                                FirebaseMerger.CopyValues(existingSubController, subController);
+                                Device.BeginInvokeOnMainThread(PopulateSubController);
                             }
                             else
                             {
-                                piController.ID = x.Key;
-                                _piControllerList.Add(piController);
+                                subController.ID = x.Key;
+                                _subControllerList.Add(subController);
                             }
 
                         }
@@ -157,12 +157,12 @@ namespace Pump.Layout
             var hasSubscribed = false;
             var equipmentHasRun = false;
             var sensorHasRun = false;
-            var piControllerHasRun = false;
+            var subControllerHasRun = false;
             while (!hasSubscribed)
             {
                 try
                 {
-                    if (_equipmentList != null && _sensorList != null && _piControllerList != null)
+                    if (_equipmentList != null && _sensorList != null && _subControllerList != null)
                     {
                         Device.InvokeOnMainThreadAsync(() =>
                         {
@@ -174,24 +174,28 @@ namespace Pump.Layout
                     }
                     if (_equipmentList != null && !equipmentHasRun)
                     {
+                        equipmentHasRun = true;
                         _equipmentList.CollectionChanged += PopulateEquipmentEvent;
                         Device.InvokeOnMainThreadAsync(PopulateEquipment);
                     }
                     if (_sensorList != null && !sensorHasRun)
                     {
+                        sensorHasRun = true;
                         _sensorList.CollectionChanged += PopulateSensorEvent;
                         Device.InvokeOnMainThreadAsync(PopulateSensor);
                     }
-                    if (_piControllerList != null && !piControllerHasRun)
+                    if (_subControllerList != null && !subControllerHasRun)
                     {
-                        _piControllerList.CollectionChanged += PopulatePiControllerEvent;
-                        Device.InvokeOnMainThreadAsync(PopulatePiController);
+                        subControllerHasRun = true;
+                        _subControllerList.CollectionChanged += PopulateSubControllerEvent;
+                        Device.InvokeOnMainThreadAsync(PopulateSubController);
                     }
                 }
                 catch
                 {
                     // ignored
                 }
+                Thread.Sleep(100);
             }
         }
 
@@ -218,7 +222,7 @@ namespace Pump.Layout
                             viewScheduleStatus._equipment.DirectOnlineGPIO = equipment.DirectOnlineGPIO;
                             viewScheduleStatus._equipment.GPIO = equipment.GPIO;
                             viewScheduleStatus._equipment.isPump = equipment.isPump;
-                            viewScheduleStatus._equipment.AttachedPiController = equipment.AttachedPiController;
+                            viewScheduleStatus._equipment.AttachedSubController = equipment.AttachedSubController;
                             viewScheduleStatus.Populate();
                         }
                         else
@@ -288,7 +292,7 @@ namespace Pump.Layout
                             var viewSensor = (ViewSensorSummary)viewSensorChild;
                             viewSensor._sensor.NAME = sensor.NAME;
                             viewSensor._sensor.TYPE = sensor.TYPE;
-                            viewSensor._sensor.AttachedPiController = sensor.AttachedPiController;
+                            viewSensor._sensor.AttachedSubController = sensor.AttachedSubController;
                             viewSensor._sensor.GPIO = sensor.GPIO;
                             viewSensor.Populate();
                         }
@@ -336,36 +340,36 @@ namespace Pump.Layout
         }
 
 
-        private void PopulatePiControllerEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void PopulateSubControllerEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(PopulatePiController);
+            Device.BeginInvokeOnMainThread(PopulateSubController);
         }
 
-        private void PopulatePiController()
+        private void PopulateSubController()
         {
-            ScreenCleanupForPiController();
+            ScreenCleanupForSubController();
 
             try
             {
-                if (_piControllerList.Any())
-                    foreach (var piController in _piControllerList.ToList())
+                if (_subControllerList.Any())
+                    foreach (var subController in _subControllerList.ToList())
                     {
-                        var viewPiControllerChild = ScrollViewSubController.Children.FirstOrDefault(x =>
-                            x.AutomationId == piController.ID);
-                        if (viewPiControllerChild != null)
+                        var viewSubControllerChild = ScrollViewSubController.Children.FirstOrDefault(x =>
+                            x.AutomationId == subController.ID);
+                        if (viewSubControllerChild != null)
                         {
-                            var viewPiController = (ViewSubControllerSummary)viewPiControllerChild;
-                            viewPiController._piController.NAME = piController.NAME;
-                            viewPiController._piController.IpAdress = piController.IpAdress;
-                            viewPiController._piController.BTmac = piController.IpAdress;
-                            viewPiController._piController.Port = piController.Port;
-                            viewPiController.Populate();
+                            var viewSubController = (ViewSubControllerSummary)viewSubControllerChild;
+                            viewSubController.SubController.NAME = subController.NAME;
+                            viewSubController.SubController.IpAdress = subController.IpAdress;
+                            viewSubController.SubController.BTmac = subController.IpAdress;
+                            viewSubController.SubController.Port = subController.Port;
+                            viewSubController.Populate();
                         }
                         else
                         {
-                            var viewPiControllerSummary = new ViewSubControllerSummary(piController);
-                            ScrollViewSubController.Children.Add(viewPiControllerSummary);
-                            viewPiControllerSummary.GetTapGestureRecognizer().Tapped += ViewPiControllerScreen_Tapped;
+                            var viewSubControllerSummary = new ViewSubControllerSummary(subController);
+                            ScrollViewSubController.Children.Add(viewSubControllerSummary);
+                            viewSubControllerSummary.GetTapGestureRecognizer().Tapped += ViewSubControllerScreen_Tapped;
                         }
                     }
                 else
@@ -379,13 +383,13 @@ namespace Pump.Layout
             }
         }
 
-        private void ScreenCleanupForPiController()
+        private void ScreenCleanupForSubController()
         {
             try
             {
-                if (_piControllerList != null)
+                if (_subControllerList != null)
                 {
-                    var itemsThatAreOnDisplay = _piControllerList.Select(x => x.ID).ToList();
+                    var itemsThatAreOnDisplay = _subControllerList.Select(x => x.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
                     for (var index = 0; index < ScrollViewSubController.Children.Count; index++)
@@ -416,11 +420,11 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    var availablePins = getAvailablePins();
-                    availablePins.Add(long.Parse(equipment.GPIO));
+                    var availablePins = GetDigitalAvailablePins();
+                    availablePins.Add(equipment.GPIO);
                     if (equipment.DirectOnlineGPIO != null)
-                        availablePins.Add(long.Parse(equipment.DirectOnlineGPIO));
-                    await Navigation.PushModalAsync(new UpdateEquipment(availablePins, _piControllerList.ToList(), equipment));
+                        availablePins.Add((long) equipment.DirectOnlineGPIO);
+                    await Navigation.PushModalAsync(new UpdateEquipment(availablePins.OrderBy(x => x).ToList(), _subControllerList.ToList(), equipment));
                 }
                 else
                 {
@@ -445,7 +449,9 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    
+                    var availablePins = GetAllAvailablePins();
+                    availablePins.Add(sensor.GPIO);
+                    await Navigation.PushModalAsync(new UpdateSensor(availablePins.OrderBy(x => x).ToList(), _subControllerList.ToList(), _equipmentList.ToList(), sensor));
                 }
                 else
                 {
@@ -457,24 +463,24 @@ namespace Pump.Layout
             //ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
 
-        private void ViewPiControllerScreen_Tapped(object sender, EventArgs e)
+        private void ViewSubControllerScreen_Tapped(object sender, EventArgs e)
         {
-            var viewPiController = (StackLayout)sender;
-            var piController = _piControllerList.First(x => x.ID == viewPiController.AutomationId);
+            var viewSubController = (StackLayout)sender;
+            var subController = _subControllerList.First(x => x.ID == viewSubController.AutomationId);
             Device.BeginInvokeOnMainThread(async () =>
             {
-                var action = await DisplayActionSheet("You have selected " + piController.NAME,
+                var action = await DisplayActionSheet("You have selected " + subController.NAME,
                     "Cancel", null, "Update", "Delete");
                 if (action == null) return;
 
                 if (action == "Update")
                 {
-
+                    await Navigation.PushModalAsync(new UpdateSubController(subController));
                 }
                 else
                 {
                     if (await DisplayAlert("Are you sure?",
-                        "Confirm to delete " + piController.NAME, "Delete",
+                        "Confirm to delete " + subController.NAME, "Delete",
                         "Cancel")) return;
                 }
             });
@@ -482,12 +488,35 @@ namespace Pump.Layout
         }
 
 
-        private List<long> getAvailablePins()
+        private List<long> GetDigitalAvailablePins()
         {
-            var availableList = new GpioPins().GetGpioList();
+            var availableList = new GpioPins().GetDigitalGpioList();
 
-            var usedPins = _equipmentList.Select(x => long.Parse(x.GPIO)).ToList();
-            usedPins.AddRange(_sensorList.Select(x => long.Parse(x.GPIO)).ToList());
+            var usedPins = _equipmentList.Select(x => x.GPIO).ToList();
+            usedPins.AddRange(_sensorList.Select(x => x.GPIO));
+
+
+            for (var i = 0; i < availableList.Count; i++)
+            {
+                var exist = false;
+
+                if (usedPins.Contains(availableList[i]))
+                {
+                    availableList.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+
+            }
+            return availableList;
+        }
+
+        private List<long> GetAllAvailablePins()
+        {
+            var availableList = new GpioPins().GetAllGpioList();
+
+            var usedPins = _equipmentList.Select(x => x.GPIO).ToList();
+            usedPins.AddRange(_sensorList.Select(x => x.GPIO));
 
 
             for (var i = 0; i < availableList.Count; i++)
@@ -512,7 +541,18 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new UpdateEquipment(getAvailablePins(), _piControllerList.ToList()));
+            Navigation.PushModalAsync(new UpdateEquipment(GetDigitalAvailablePins(), _subControllerList.ToList()));
+        }
+
+        private void BtnAddSubController_OnPressed(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(new UpdateSubController());
+        }
+
+        private void BtnAddSensor_OnPressed(object sender, EventArgs e)
+        {
+            
+            Navigation.PushModalAsync(new UpdateSensor(GetAllAvailablePins(), _subControllerList.ToList(), _equipmentList.ToList()));
         }
     }
 }

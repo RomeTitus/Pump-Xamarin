@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Pump.IrrigationController
 {
-    public class PiController
+    public class SubController
     {
         public string ID { get; set; }
         public string NAME { get; set; }

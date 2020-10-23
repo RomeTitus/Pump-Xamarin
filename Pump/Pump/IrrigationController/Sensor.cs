@@ -11,8 +11,8 @@ namespace Pump.IrrigationController
         public string LastReading { get; set; }
         public string NAME { get; set; }
         public string TYPE { get; set; }
-        public string GPIO { get; set; }
-        public string AttachedPiController { get; set; }
+        public long GPIO { get; set; }
+        public string AttachedSubController { get; set; }
 
 
 

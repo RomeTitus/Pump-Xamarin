@@ -14,14 +14,14 @@ namespace Pump.Layout
     public partial class UpdateEquipment : ContentPage
     {
         List<long> _avalibleGpio;
-        private List<PiController> _piControllerList;
+        private List<SubController> _subControllerList;
         private Equipment _equipment;
 
-        public UpdateEquipment(List<long> avalibleGpio, List<PiController> piControllerList, Equipment equipment = null)
+        public UpdateEquipment(List<long> avalibleGpio, List<SubController> subControllerList, Equipment equipment = null)
         {
             InitializeComponent();
             _avalibleGpio = avalibleGpio;
-            _piControllerList = piControllerList;
+            _subControllerList = subControllerList;
             if (equipment == null)
             {
                 equipment = new Equipment();
@@ -38,10 +38,10 @@ namespace Pump.Layout
             SystemPicker.Items.Add("Main");
             SystemPicker.SelectedIndex = 0;
             var index = 1;
-            foreach (var piController in _piControllerList)
+            foreach (var subController in _subControllerList)
             {
-                SystemPicker.Items.Add(piController.NAME);
-                if (_equipment.AttachedPiController != null && _equipment.AttachedPiController == piController.ID)
+                SystemPicker.Items.Add(subController.NAME);
+                if (_equipment.AttachedSubController != null && _equipment.AttachedSubController == subController.ID)
                     SystemPicker.SelectedIndex = index;
                 index++;
             }
@@ -63,7 +63,7 @@ namespace Pump.Layout
             foreach (var gpio in _avalibleGpio)
             {
                 GpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.GPIO != null && long.Parse(_equipment.GPIO) == gpio)
+                if (_equipment.GPIO != null && _equipment.GPIO == gpio)
                     GpioPicker.SelectedIndex = index;
                 index++;
             }
@@ -75,7 +75,7 @@ namespace Pump.Layout
             foreach (var gpio in _avalibleGpio)
             {
                 DirectOnlineGpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.DirectOnlineGPIO != null && long.Parse(_equipment.DirectOnlineGPIO) == gpio)
+                if (_equipment.DirectOnlineGPIO != null && _equipment.DirectOnlineGPIO == gpio)
                     DirectOnlineGpioPicker.SelectedIndex = index;
                 index++;
             }
@@ -133,15 +133,15 @@ namespace Pump.Layout
             else
             {
                 _equipment.NAME = EquipmentName.Text;
-                _equipment.GPIO = _avalibleGpio[GpioPicker.SelectedIndex].ToString();
+                _equipment.GPIO = _avalibleGpio[GpioPicker.SelectedIndex];
                 _equipment.isPump = IsPumpCheckBox.IsChecked;
                 if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
-                    _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex].ToString();
+                    _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
                 if (SystemPicker.SelectedIndex == 0)
-                    _equipment.AttachedPiController = null;
+                    _equipment.AttachedSubController = null;
                 else
                 {
-                    _equipment.AttachedPiController = _piControllerList[SystemPicker.SelectedIndex -1].ID;
+                    _equipment.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex -1].ID;
                 }
                 var key = Task.Run(() => new Authentication().SetEquipment(_equipment)).Result;
                 Navigation.PopModalAsync();

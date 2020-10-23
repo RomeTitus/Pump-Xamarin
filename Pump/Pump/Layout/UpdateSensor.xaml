@@ -1,12 +1,149 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Pump.Layout.UpdateSensor">
+<ContentPage
+    x:Class="Pump.Layout.UpdateSensor"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <ScrollView Margin="5">
+            <StackLayout Orientation="Vertical">
+                <StackLayout>
+                    <Label
+                        CharacterSpacing="2"
+                        FontSize="30"
+                        HorizontalTextAlignment="Center"
+                        Text="Create Sensor"
+                        TextColor="White" />
+                </StackLayout>
+                <StackLayout Orientation="Vertical">
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Large"
+                            HorizontalOptions="Start"
+                            Text="Name"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <Editor
+                            x:Name="SensorName"
+                            Margin="0,0,17,0"
+                            AutoSize="TextChanges"
+                            FontSize="Large"
+                            HorizontalOptions="EndAndExpand"
+                            MaxLength="225"
+                            Placeholder="Sensor name"
+                            PlaceholderColor="Gray"
+                            Scale="1"
+                            TextColor="White"
+                            WidthRequest="180" />
+                    </StackLayout>
+                </StackLayout>
+
+                <StackLayout
+                    HeightRequest="50"
+                    HorizontalOptions="FillAndExpand"
+                    Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Select System"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Frame
+                        Margin="0,0,10,0"
+                        Padding="10,0,10,0"
+                        BackgroundColor="AliceBlue"
+                        CornerRadius="30"
+                        HorizontalOptions="EndAndExpand">
+                        <StackLayout Orientation="Horizontal" WidthRequest="160">
+                            <Image HeightRequest="18" Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                            <Picker x:Name="SystemPicker" HorizontalOptions="FillAndExpand" />
+
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+
+
+                <StackLayout
+                    HeightRequest="50"
+                    HorizontalOptions="FillAndExpand"
+                    Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Sensor Type"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Frame
+                        Margin="0,0,10,0"
+                        Padding="10,0,10,0"
+                        BackgroundColor="AliceBlue"
+                        CornerRadius="30"
+                        HorizontalOptions="EndAndExpand">
+                        <StackLayout Orientation="Horizontal" WidthRequest="160">
+                            <Picker
+                                x:Name="SensorTypePicker"
+                                HorizontalOptions="FillAndExpand"
+                                SelectedIndexChanged="SensorTypePicker_OnSelectedIndexChanged" />
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+
+                <StackLayout
+                    HeightRequest="50"
+                    HorizontalOptions="FillAndExpand"
+                    Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Select Pin"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Frame
+                        Margin="0,0,10,0"
+                        Padding="10,0,10,0"
+                        BackgroundColor="AliceBlue"
+                        CornerRadius="30"
+                        HorizontalOptions="EndAndExpand">
+                        <StackLayout Orientation="Horizontal" WidthRequest="160">
+                            <Picker x:Name="GpioPicker" HorizontalOptions="FillAndExpand" />
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+                <Label
+                    CharacterSpacing="1"
+                    FontSize="Large"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="Attached Equipment"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView HeightRequest="250">
+                        <StackLayout x:Name="ScrollViewAttachedEquipment" />
+                    </ScrollView>
+                </Frame>
+
+                <StackLayout VerticalOptions="End">
+                    <StackLayout Margin="5">
+                        <Button
+                            x:Name="ButtonUpdateSensor"
+                            Clicked="ButtonUpdateSensor_OnClicked"
+                            Text="Update" />
+                        <Button
+                            x:Name="ButtonBack"
+                            Clicked="ButtonBack_OnClicked"
+                            Text="Back" />
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

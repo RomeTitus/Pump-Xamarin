@@ -368,32 +368,7 @@ namespace Pump.FirebaseDatabase
                 Console.WriteLine(e);
             }
         }
-        public Equipment GetJsonEquipmentToObjectList(JObject equipmentDetailObject, string key)
-        {
-            try
-            {
-                var equipment = new Equipment();
 
-                equipment.ID = key;
-                equipment.NAME = equipmentDetailObject["NAME"].ToString();
-                equipment.GPIO = equipmentDetailObject["GPIO"].ToString();
-                equipment.isPump = equipmentDetailObject["isPump"].ToString() == "1";
-
-                if (equipmentDetailObject.ContainsKey("AttachedPiController"))
-                    equipment.AttachedPiController = equipmentDetailObject["AttachedPiController"].ToString();
-                if (equipmentDetailObject.ContainsKey("DirectOnlineGPIO"))
-                    equipment.DirectOnlineGPIO = equipmentDetailObject["DirectOnlineGPIO"].ToString();
-                return equipment;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-            
-        }
-
-         
         //Status
         public async void SetAlive(Alive alive)
         {
@@ -425,5 +400,31 @@ namespace Pump.FirebaseDatabase
                 return null;
             }
         }
+
+        //Sensor
+        public async Task<string> SetSensor(Sensor sensor)
+        {
+            try
+            {
+                if (sensor.ID == null)
+                {
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/Sensor")
+                        .PostAsync(sensor);
+                    return result.Key;
+                }
+
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Sensor/" + sensor.ID)
+                    .PutAsync(sensor);
+                return sensor.ID;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+
     }
 }

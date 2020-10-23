@@ -139,8 +139,7 @@ namespace Pump.Layout
                 {
                     // ignored
                 }
-
-
+                Thread.Sleep(100);
             }
         }
 

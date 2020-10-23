@@ -13,12 +13,25 @@
                 JustifyContent="SpaceAround"
                 VerticalOptions="Center">
                 <StackLayout>
-                    <Label
-                        FontSize="Subtitle"
-                        HorizontalOptions="Center"
-                        Text="Current Equipment"
-                        TextColor="White"
-                        TextDecorations="Underline" />
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Current Equipment"
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <Button
+                            x:Name="BtnAddEquipment"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="End"
+                            IsEnabled="False"
+                            Pressed="BtnAddEquipment_OnPressed"
+                            Text="Add Equipment"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
@@ -39,23 +52,29 @@
 
                         </ScrollView>
                     </Frame>
-                    <Button
-                        x:Name="BtnAddEquipment"
-                        BackgroundColor="DeepSkyBlue"
-                        IsEnabled="False"
-                        Pressed="BtnAddEquipment_OnPressed"
-                        Text="Add Equipment"
-                        TextColor="White"
-                        VerticalOptions="Center" />
+
                 </StackLayout>
 
                 <StackLayout>
-                    <Label
-                        FontSize="Subtitle"
-                        HorizontalOptions="Center"
-                        Text="Current Sensor"
-                        TextColor="White"
-                        TextDecorations="Underline" />
+
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Current Sensor"
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <Button
+                            x:Name="BtnAddSensor"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="End"
+                            IsEnabled="False"
+                            Pressed="BtnAddSensor_OnPressed"
+                            Text="Add Sensor"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
@@ -75,21 +94,27 @@
                             </StackLayout>
                         </ScrollView>
                     </Frame>
-                    <Button
-                        x:Name="BtnAddSensor"
-                        BackgroundColor="DeepSkyBlue"
-                        IsEnabled="False"
-                        Text="Add Sensor"
-                        TextColor="White"
-                        VerticalOptions="Center" />
+
                 </StackLayout>
                 <StackLayout>
-                    <Label
-                        FontSize="Subtitle"
-                        HorizontalOptions="Center"
-                        Text="Current Sub-Controller"
-                        TextColor="White"
-                        TextDecorations="Underline" />
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Current Sub-Controller"
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <Button
+                            x:Name="BtnAddSubController"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="End"
+                            IsEnabled="False"
+                            Pressed="BtnAddSubController_OnPressed"
+                            Text="Add Sub-Controller"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
                     <Frame BackgroundColor="White" BorderColor="Black">
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewSubController">
@@ -106,13 +131,6 @@
                             </StackLayout>
                         </ScrollView>
                     </Frame>
-                    <Button
-                        x:Name="BtnAddSubController"
-                        BackgroundColor="DeepSkyBlue"
-                        IsEnabled="False"
-                        Text="Add Sub-Controller"
-                        TextColor="White"
-                        VerticalOptions="Center" />
                 </StackLayout>
                 <Button
                     x:Name="BtnBack"

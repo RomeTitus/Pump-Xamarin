@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.Layout.UpdateSubController"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    BackgroundColor="DeepSkyBlue">
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical">
+            <StackLayout>
+                <Label
+                    CharacterSpacing="2"
+                    FontSize="30"
+                    HorizontalTextAlignment="Center"
+                    Text="Create Sub Controller"
+                    TextColor="White" />
+            </StackLayout>
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Name"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerName"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        MaxLength="225"
+                        Placeholder="Sub controller name"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="IP"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerIp"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        MaxLength="225"
+                        Placeholder="127.0.0.1"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Port"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerPort"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        Keyboard="Numeric"
+                        MaxLength="225"
+                        Placeholder="8080"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+
+
+            <StackLayout VerticalOptions="EndAndExpand">
+                <StackLayout Margin="5">
+                    <Button
+                        x:Name="ButtonUpdateSubController"
+                        Clicked="ButtonUpdateSubController_OnClicked"
+                        Text="Update" />
+                    <Button
+                        x:Name="ButtonBack"
+                        Clicked="ButtonBack_OnClicked"
+                        Text="Back" />
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

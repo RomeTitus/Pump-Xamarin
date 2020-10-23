@@ -14,19 +14,19 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSubControllerSummary : ContentView
     {
-        public readonly PiController _piController;
-        public ViewSubControllerSummary(PiController piController)
+        public readonly SubController SubController;
+        public ViewSubControllerSummary(SubController subController)
         {
             InitializeComponent();
-            _piController = piController;
-            stackLayoutSubControllerSummary.AutomationId = _piController.ID;
+            SubController = subController;
+            stackLayoutSubControllerSummary.AutomationId = SubController.ID;
             Populate();
         }
 
         public void Populate()
         {
-            LabelSubControllerName.Text = _piController.NAME;
-            if(_piController.IpAdress == null)
+            LabelSubControllerName.Text = SubController.NAME;
+            if(SubController.IpAdress == null)
                 LabelType.Text = "LoRa";
         }
 
