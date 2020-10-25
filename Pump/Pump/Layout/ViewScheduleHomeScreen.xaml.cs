@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Firebase.Database.Streaming;
+using Pump.Class;
 using Pump.Database;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
@@ -27,7 +28,7 @@ namespace Pump.Layout
         {
             InitializeComponent();
 
-                new Thread(SubscribeToFirebase).Start();
+            new Thread(SubscribeToFirebase).Start();
         }
 
         private void SubscribeToFirebase()
@@ -100,7 +101,7 @@ namespace Pump.Layout
                             if (existingSchedule != null)
                             {
                                 FirebaseMerger.CopyValues(existingSchedule, schedule);
-                                PopulateScheduleStatus();
+                                Device.InvokeOnMainThreadAsync(PopulateScheduleStatus);
                             }
                             else
                             {
@@ -162,9 +163,9 @@ namespace Pump.Layout
                         {
                             var equipment = _equipmentList.First(x => x.ID == schedule.id_Pump);
                             var viewScheduleStatus = (ViewScheduleSettingSummary)viewSchedule;
-                            viewScheduleStatus._schedule.NAME = schedule.NAME;
-                            viewScheduleStatus._schedule.TIME = schedule.TIME;
-                            viewScheduleStatus._schedule.isActive = schedule.isActive;
+                            viewScheduleStatus.Schedule.NAME = schedule.NAME;
+                            viewScheduleStatus.Schedule.TIME = schedule.TIME;
+                            viewScheduleStatus.Schedule.isActive = schedule.isActive;
                             viewScheduleStatus._equipment.NAME = equipment.NAME;
                             viewScheduleStatus.Populate();
                         }
@@ -315,10 +316,18 @@ namespace Pump.Layout
 
         private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
         {
-            var scheduleSwitch = (Switch) sender;
+            var scheduleSwitch = (Switch)sender;
             try
             {
-                new Thread(() => ChangeScheduleState(scheduleSwitch, scheduleSwitch.AutomationId))
+                var updateSchedule = _scheduleList.First(x => x.ID == scheduleSwitch.AutomationId);
+
+                if (scheduleSwitch.IsToggled)
+                    updateSchedule.isActive = "1";
+                
+                else
+                    updateSchedule.isActive = "0";
+
+                new Thread(() => ChangeScheduleState(updateSchedule))
                     .Start();
             }
             catch
@@ -328,14 +337,23 @@ namespace Pump.Layout
             }
         }
 
-        private void ChangeScheduleState(Switch scheduleSwitch, string id)
+        private void ChangeScheduleState(Schedule _schedule)
         {
+            var viewScheduleScreen = ScrollViewScheduleDetail.Children.First(x => (((ViewScheduleSettingSummary)x).Schedule.ID == _schedule.ID));
+            var viewSchedule = (ViewScheduleSettingSummary) viewScheduleScreen;
+            
+            viewSchedule.Schedule = _schedule;
+
+            Device.BeginInvokeOnMainThread(() =>
             {
-                var schedule = _scheduleList.First(x => x.ID == id);
-                schedule.isActive = Convert.ToInt32(scheduleSwitch.IsToggled).ToString();
-                var key = Task.Run(() => new Authentication().SetSchedule(schedule)).Result;
-                
-            }
+                viewSchedule.GetSwitch().Toggled -= ScheduleSwitch_Toggled;
+                viewSchedule.Populate();
+                viewSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
+            });
+            
+            //TODO Needs Confirmation that The Pi got it and its running :)
+            var key = Task.Run(() => new Authentication().SetSchedule(_schedule)).Result;
+
         }
     }
 }

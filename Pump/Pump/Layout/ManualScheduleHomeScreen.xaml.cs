@@ -27,6 +27,8 @@ namespace Pump.Layout
         private FloatingScreenScroll _floatingScreenScroll;
         private bool? _firebaseHasReplied = false;
 
+
+
         public ManualScheduleHomeScreen()
         {
             InitializeComponent();
@@ -150,7 +152,7 @@ namespace Pump.Layout
                 {
                     // ignored
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(100); //Change to 100 when you can
             }
         }
 
@@ -162,6 +164,7 @@ namespace Pump.Layout
 
         private void PopulateManualElements()
         {
+            ScreenCleanupForManualScreen();
             try
             {
                 foreach (var pump in _equipmentList.Where(x => x.isPump))
@@ -228,7 +231,7 @@ namespace Pump.Layout
                 // ignored
             }
 
-            ScreenCleanupForManualScreen();
+            
         }
 
         private void ScreenCleanupForManualScreen()
