@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Firebase.Database.Streaming;
 using Pump.Class;
 using Pump.Database;
+using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
@@ -17,108 +18,23 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewScheduleHomeScreen : ContentPage
+    public partial class ScheduleHomeScreen : ContentPage
     {
-        private ObservableCollection<Equipment> _equipmentList;
-        private ObservableCollection<Schedule> _scheduleList;
+        private readonly ObservableCollection<Equipment> _equipmentList;
+        private readonly ObservableCollection<Schedule> _scheduleList;
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
         private ViewScheduleSummary _viewSchedule;
+        private readonly ObservableCollection<Site> _siteList;
+        private readonly PumpConnection _pumpConnection;
 
-        public ViewScheduleHomeScreen()
+        public ScheduleHomeScreen(ObservableCollection<Schedule> scheduleList, ObservableCollection<Equipment> equipmentList, ObservableCollection<Site> siteList)
         {
+            _scheduleList = scheduleList;
+            _equipmentList = equipmentList;
+            _siteList = siteList;
             InitializeComponent();
-
-            new Thread(SubscribeToFirebase).Start();
-        }
-
-        private void SubscribeToFirebase()
-        {
-            var auth = new Authentication();
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Equipment")
-                .AsObservable<Equipment>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (_equipmentList == null)
-                            _equipmentList = new ObservableCollection<Equipment>();
-
-                        var equipment = x.Object;
-
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _equipmentList.Count; i++)
-                            {
-                                if (_equipmentList[i].ID == x.Key)
-                                    _equipmentList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingEquipment != null)
-                            {
-                                FirebaseMerger.CopyValues(existingEquipment, equipment);
-                            }
-                            else
-                            {
-                                equipment.ID = x.Key;
-                                _equipmentList.Add(equipment);
-                            }
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Schedule")
-                .AsObservable<Schedule>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (_scheduleList == null)
-                            _scheduleList = new ObservableCollection<Schedule>();
-                        var schedule = x.Object;
-
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _scheduleList.Count; i++)
-                            {
-                                if (_scheduleList[i].ID == x.Key)
-                                    _scheduleList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingSchedule = _scheduleList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingSchedule != null)
-                            {
-                                FirebaseMerger.CopyValues(existingSchedule, schedule);
-                                Device.InvokeOnMainThreadAsync(PopulateScheduleStatus);
-                            }
-                            else
-                            {
-                                schedule.ID = x.Key;
-                                _scheduleList.Add(schedule);
-                            }
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-
-
-            LoadScheduleStatus();
+            _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            new Thread(LoadScheduleStatus).Start();
         }
 
         private void LoadScheduleStatus()
@@ -154,8 +70,9 @@ namespace Pump.Layout
             ScreenCleanupForSchedules();
             try
             {
+                if(_scheduleList.Contains(null) || _equipmentList.Contains(null))return;
                 if (_scheduleList.Any())
-                    foreach (var schedule in _scheduleList)
+                    foreach (var schedule in _scheduleList.Where(x => _siteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)))
                     {
                         var viewSchedule = ScrollViewScheduleDetail.Children.FirstOrDefault(x =>
                             x.AutomationId == schedule.ID);
@@ -195,7 +112,7 @@ namespace Pump.Layout
             //CleanUp :)
             try
             {
-                if (_scheduleList != null)
+                if (!_scheduleList.Contains(null))
                 {
 
                     var itemsThatAreOnDisplay = _scheduleList.Select(x => x.ID).ToList();
@@ -212,7 +129,20 @@ namespace Pump.Layout
                         index--;
                     }
                 }
-
+                else
+                {
+                    ScrollViewScheduleDetail.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewScheduleDetail.Children.Add(loadingIcon);
+                }
             }
             catch
             {
@@ -282,7 +212,7 @@ namespace Pump.Layout
             PopupNavigation.Instance.PopAsync();
             var edit = (Button)sender;
             var schedule = _scheduleList.First(x => x.ID == edit.AutomationId);
-            Navigation.PushModalAsync(new UpdateSchedule(_equipmentList.ToList(), schedule));
+            Navigation.PushModalAsync(new ScheduleUpdate(_equipmentList.Where(x => _siteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), schedule));
         }
 
         private void DeleteButton_Tapped(object sender, EventArgs e)
@@ -306,7 +236,7 @@ namespace Pump.Layout
             if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 if (_equipmentList.Count > 0)
-                    Navigation.PushModalAsync(new UpdateSchedule(_equipmentList.ToList()));
+                    Navigation.PushModalAsync(new ScheduleUpdate(_equipmentList.Where(x => _siteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
                 else
                     DisplayAlert("Cannot Create a Schedule",
                         "You are missing the equipment that is needed to create a schedule", "Understood");

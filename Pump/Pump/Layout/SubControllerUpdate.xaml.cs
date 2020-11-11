@@ -10,10 +10,10 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class UpdateSubController : ContentPage
+    public partial class SubControllerUpdate : ContentPage
     {
         private SubController _subController;
-        public UpdateSubController(SubController subController = null)
+        public SubControllerUpdate(SubController subController = null)
         {
             InitializeComponent();
             if (subController == null)

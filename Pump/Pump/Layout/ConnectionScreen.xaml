@@ -79,7 +79,6 @@
             </StackLayout>
 
             <StackLayout>
-                <!--<div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
                 <Image
                     x:Name="ConnectionViewImage"
                     HeightRequest="68"
@@ -117,7 +116,6 @@
                     BackgroundColor="AliceBlue"
                     CornerRadius="30">
                     <StackLayout Orientation="Horizontal">
-                        <!--<div>Icons made by <a href="https://icon54.com/" title="Pixel perfect">Pixel perfect</a> from<a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> -->
                         <Image HeightRequest="18" Source="{local:ImageResourceExtention Pump.Icons.SwitchController.png}" />
                         <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand" SelectedIndexChanged="ControllerPicker_OnSelectedIndexChanged"/>
 

@@ -11,13 +11,13 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class UpdateEquipment : ContentPage
+    public partial class EquipmentUpdate : ContentPage
     {
         List<long> _avalibleGpio;
         private List<SubController> _subControllerList;
         private Equipment _equipment;
 
-        public UpdateEquipment(List<long> avalibleGpio, List<SubController> subControllerList, Equipment equipment = null)
+        public EquipmentUpdate(List<long> avalibleGpio, List<SubController> subControllerList, Equipment equipment = null)
         {
             InitializeComponent();
             _avalibleGpio = avalibleGpio;
@@ -63,7 +63,7 @@ namespace Pump.Layout
             foreach (var gpio in _avalibleGpio)
             {
                 GpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.GPIO != null && _equipment.GPIO == gpio)
+                if (_equipment.GPIO == gpio)
                     GpioPicker.SelectedIndex = index;
                 index++;
             }

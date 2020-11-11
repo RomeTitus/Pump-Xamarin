@@ -152,12 +152,12 @@ namespace Pump.Database
             }
         }
 
-            public void setSelectedController(PumpConnection pumpConnection)
+            public void SetSelectedController(PumpConnection pumpConnection)
             {
             lock (Locker)
             {
                 _database.DeleteAll<PumpSelection>();
-                _database.Insert(new PumpSelection(pumpConnection.ID));
+                _database.Insert(new PumpSelection{PumpConnectionId = pumpConnection.ID});
             }
         }
 

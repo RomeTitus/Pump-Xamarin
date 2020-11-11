@@ -12,25 +12,41 @@
 
         <StackLayout VerticalOptions="Center">
             <Button
+                x:Name="BtnSites"
+                BackgroundColor="DeepSkyBlue"
+                Text="Edit Sites"
+                TextColor="White"
+                VerticalOptions="Center" />
+            <Button
                 x:Name="BtnConnectionDetail"
+                BackgroundColor="DeepSkyBlue"
+                IsVisible="False"
                 Pressed="BtnConnectionDetail_OnPressed"
                 Text="Connection Detail"
+                TextColor="White"
                 VerticalOptions="Center" />
             <Button
                 x:Name="BtnScheduleDetail"
+                BackgroundColor="DeepSkyBlue"
                 IsVisible="False"
                 Pressed="BtnScheduleDetail_OnPressed"
                 Text="Schedule Edit/Delete"
+                TextColor="White"
                 VerticalOptions="Center" />
             <Button
                 x:Name="BtnEquipmentDetail"
+                BackgroundColor="DeepSkyBlue"
                 Pressed="BtnEquipmentDetail_OnPressed"
                 Text="Edit Equipment"
+                TextColor="White"
                 VerticalOptions="Center" />
             <Button
                 x:Name="BtnGraphSummary"
+                BackgroundColor="DeepSkyBlue"
+                IsVisible="False"
                 Pressed="BtnGraphSummary_OnPressed"
                 Text="View Graphs"
+                TextColor="White"
                 VerticalOptions="Center" />
 
 

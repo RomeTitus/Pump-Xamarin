@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Firebase.Database.Streaming;
 using Pump.Class;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
@@ -15,143 +14,21 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewEquipmentScreen : ContentPage
+    public partial class EquipmentScreen : ContentPage
     {
-        private ObservableCollection<Equipment> _equipmentList;
-        private ObservableCollection<Sensor> _sensorList;
-        private ObservableCollection<SubController> _subControllerList;
+        private readonly ObservableCollection<Equipment> _equipmentList;
+        private readonly ObservableCollection<Sensor> _sensorList;
+        private readonly ObservableCollection<SubController> _subControllerList;
 
-        public ViewEquipmentScreen()
+        public EquipmentScreen(ObservableCollection<Equipment> equipmentList, ObservableCollection<Sensor> sensorList, 
+            ObservableCollection<SubController> subControllerList)
         {
+            _equipmentList = equipmentList;
+            _sensorList = sensorList;
+            _subControllerList = subControllerList;
             InitializeComponent();
-            new Thread(GetEquipmentFirebase).Start();
+            new Thread(LoadScreens).Start();
         }
-
-        private void GetEquipmentFirebase()
-        {
-            var auth = new Authentication();
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Equipment")
-                .AsObservable<Equipment>()
-                .Subscribe(x =>
-                {
-                    if (_equipmentList == null)
-                        _equipmentList = new ObservableCollection<Equipment>();
-                    var equipment = x.Object;
-                    if (x.EventType == FirebaseEventType.Delete)
-                    {
-                        for (int i = 0; i < _equipmentList.Count; i++)
-                        {
-                            if (_equipmentList[i].ID == x.Key)
-                                _equipmentList.RemoveAt(i);
-                        }
-                    }
-                    else
-                    {
-                        var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
-                        if (existingEquipment != null)
-                        {
-                            FirebaseMerger.CopyValues(existingEquipment, equipment);
-                            Device.InvokeOnMainThreadAsync(PopulateEquipment);
-                        }
-                        else
-                        {
-                            equipment.ID = x.Key;
-                            _equipmentList.Add(equipment);
-                        }
-                    }
-                });
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Sensor")
-                .AsObservable<Sensor>()
-                .Subscribe(x =>
-                {
-
-                    try
-                    {
-                        if (_sensorList == null)
-                            _sensorList = new ObservableCollection<Sensor>();
-                        var sensor = x.Object;
-
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _sensorList.Count; i++)
-                            {
-                                if (_sensorList[i].ID == x.Key)
-                                    _sensorList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingSensor = _sensorList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingSensor != null)
-                            {
-                                FirebaseMerger.CopyValues(existingSensor, sensor);
-                                Device.BeginInvokeOnMainThread(PopulateSensor);
-                            }
-                            else
-                            {
-                                sensor.ID = x.Key;
-                                _sensorList.Add(sensor);
-                            }
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-
-                });
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/SubController")
-                .AsObservable<SubController>()
-                .Subscribe(x =>
-                {
-
-                    try
-                    {
-                        if (_subControllerList == null)
-                            _subControllerList = new ObservableCollection<SubController>();
-                        var subController = x.Object;
-
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _sensorList.Count; i++)
-                            {
-                                if (_subControllerList[i].ID == x.Key)
-                                    _subControllerList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingSubController = _subControllerList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingSubController != null)
-                            {
-                                FirebaseMerger.CopyValues(existingSubController, subController);
-                                Device.BeginInvokeOnMainThread(PopulateSubController);
-                            }
-                            else
-                            {
-                                subController.ID = x.Key;
-                                _subControllerList.Add(subController);
-                            }
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-
-                });
-
-            LoadScreens();
-        }
-
-
         private void LoadScreens()
         {
             var hasSubscribed = false;
@@ -162,7 +39,7 @@ namespace Pump.Layout
             {
                 try
                 {
-                    if (_equipmentList != null && _sensorList != null && _subControllerList != null)
+                    if (!_equipmentList.Contains(null) && !_sensorList.Contains(null) && !_subControllerList.Contains(null))
                     {
                         Device.InvokeOnMainThreadAsync(() =>
                         {
@@ -172,19 +49,19 @@ namespace Pump.Layout
                         });
                         hasSubscribed = true;
                     }
-                    if (_equipmentList != null && !equipmentHasRun)
+                    if (!_equipmentList.Contains(null) && !equipmentHasRun)
                     {
                         equipmentHasRun = true;
                         _equipmentList.CollectionChanged += PopulateEquipmentEvent;
                         Device.InvokeOnMainThreadAsync(PopulateEquipment);
                     }
-                    if (_sensorList != null && !sensorHasRun)
+                    if (!_sensorList.Contains(null) && !sensorHasRun)
                     {
                         sensorHasRun = true;
                         _sensorList.CollectionChanged += PopulateSensorEvent;
                         Device.InvokeOnMainThreadAsync(PopulateSensor);
                     }
-                    if (_subControllerList != null && !subControllerHasRun)
+                    if (!_subControllerList.Contains(null)  && !subControllerHasRun)
                     {
                         subControllerHasRun = true;
                         _subControllerList.CollectionChanged += PopulateSubControllerEvent;
@@ -207,9 +84,9 @@ namespace Pump.Layout
         private void PopulateEquipment()
         {
             ScreenCleanupForEquipment();
-
             try
             {
+                if(_equipmentList.Contains(null))return;
                 if (_equipmentList.Any())
                     foreach (var equipment in _equipmentList.OrderBy(x => Convert.ToInt32(x.GPIO)).ToList())
                     {
@@ -247,7 +124,7 @@ namespace Pump.Layout
         {
             try
             {
-                if (_equipmentList != null)
+                if (!_equipmentList.Contains(null))
                 {
 
                     var itemsThatAreOnDisplay = _equipmentList.Select(x => x.ID).ToList();
@@ -262,6 +139,20 @@ namespace Pump.Layout
                         ScrollViewEquipment.Children.RemoveAt(index);
                         index--;
                     }
+                }
+                else
+                {
+                    ScrollViewEquipment.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewEquipment.Children.Add(loadingIcon);
                 }
 
             }
@@ -282,6 +173,7 @@ namespace Pump.Layout
 
             try
             {
+                if(_sensorList.Contains(null))return;
                 if (_sensorList.Any())
                     foreach (var sensor in _sensorList.OrderBy(x => Convert.ToInt32(x.GPIO)).ToList())
                     {
@@ -305,7 +197,7 @@ namespace Pump.Layout
                     }
                 else
                 {
-                    ScrollViewEquipment.Children.Add(new ViewEmptySchedule("No Sensor Here"));
+                    ScrollViewSensor.Children.Add(new ViewEmptySchedule("No Sensor Here"));
                 }
             }
             catch
@@ -318,7 +210,7 @@ namespace Pump.Layout
         {
             try
             {
-                if (_sensorList != null)
+                if (!_sensorList.Contains(null))
                 {
                     var itemsThatAreOnDisplay = _sensorList.Select(x => x.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
@@ -331,6 +223,20 @@ namespace Pump.Layout
                         ScrollViewSensor.Children.RemoveAt(index);
                         index--;
                     }
+                }
+                else
+                {
+                    ScrollViewSensor.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewSensor.Children.Add(loadingIcon);
                 }
             }
             catch
@@ -351,6 +257,7 @@ namespace Pump.Layout
 
             try
             {
+                if(_subControllerList.Contains(null))return;
                 if (_subControllerList.Any())
                     foreach (var subController in _subControllerList.ToList())
                     {
@@ -387,7 +294,7 @@ namespace Pump.Layout
         {
             try
             {
-                if (_subControllerList != null)
+                if (!_subControllerList.Contains(null))
                 {
                     var itemsThatAreOnDisplay = _subControllerList.Select(x => x.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
@@ -400,6 +307,20 @@ namespace Pump.Layout
                         ScrollViewSubController.Children.RemoveAt(index);
                         index--;
                     }
+                }
+                else
+                {
+                    ScrollViewSubController.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewSubController.Children.Add(loadingIcon);
                 }
             }
             catch
@@ -424,7 +345,7 @@ namespace Pump.Layout
                     availablePins.Add(equipment.GPIO);
                     if (equipment.DirectOnlineGPIO != null)
                         availablePins.Add((long) equipment.DirectOnlineGPIO);
-                    await Navigation.PushModalAsync(new UpdateEquipment(availablePins.OrderBy(x => x).ToList(), _subControllerList.ToList(), equipment));
+                    await Navigation.PushModalAsync(new EquipmentUpdate(availablePins.OrderBy(x => x).ToList(), _subControllerList.ToList(), equipment));
                 }
                 else
                 {
@@ -434,7 +355,6 @@ namespace Pump.Layout
                         await Task.Run(() => new Authentication().DeleteEquipment(equipment));
                 }
             });
-            //ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
 
         private void ViewSensorScreen_Tapped(object sender, EventArgs e)
@@ -451,7 +371,7 @@ namespace Pump.Layout
                 {
                     var availablePins = GetAllAvailablePins();
                     availablePins.Add(sensor.GPIO);
-                    await Navigation.PushModalAsync(new UpdateSensor(availablePins.OrderBy(x => x).ToList(), _subControllerList.ToList(), _equipmentList.ToList(), sensor));
+                    await Navigation.PushModalAsync(new SensorUpdate(availablePins.OrderBy(x => x).ToList(), _subControllerList.ToList(), _equipmentList.ToList(), sensor));
                 }
                 else
                 {
@@ -460,7 +380,6 @@ namespace Pump.Layout
                         "Cancel")) return;
                 }
             });
-            //ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
 
         private void ViewSubControllerScreen_Tapped(object sender, EventArgs e)
@@ -475,7 +394,7 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    await Navigation.PushModalAsync(new UpdateSubController(subController));
+                    await Navigation.PushModalAsync(new SubControllerUpdate(subController));
                 }
                 else
                 {
@@ -484,7 +403,6 @@ namespace Pump.Layout
                         "Cancel")) return;
                 }
             });
-            //ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
 
 
@@ -498,14 +416,9 @@ namespace Pump.Layout
 
             for (var i = 0; i < availableList.Count; i++)
             {
-                var exist = false;
-
-                if (usedPins.Contains(availableList[i]))
-                {
-                    availableList.RemoveAt(i);
-                    i--;
-                    continue;
-                }
+                if (!usedPins.Contains(availableList[i])) continue;
+                availableList.RemoveAt(i);
+                i--;
 
             }
             return availableList;
@@ -541,18 +454,18 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new UpdateEquipment(GetDigitalAvailablePins(), _subControllerList.ToList()));
+            Navigation.PushModalAsync(new EquipmentUpdate(GetDigitalAvailablePins(), _subControllerList.ToList()));
         }
 
         private void BtnAddSubController_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new UpdateSubController());
+            Navigation.PushModalAsync(new SubControllerUpdate());
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
             
-            Navigation.PushModalAsync(new UpdateSensor(GetAllAvailablePins(), _subControllerList.ToList(), _equipmentList.ToList()));
+            Navigation.PushModalAsync(new SensorUpdate(GetAllAvailablePins(), _subControllerList.ToList(), _equipmentList.ToList()));
         }
     }
 }

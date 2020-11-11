@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="Pump.Layout.UpdateSensor"
+    x:Class="Pump.Layout.EquipmentUpdate"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    xmlns:maskedEntry="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
     BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
         <ScrollView Margin="5">
@@ -13,7 +14,7 @@
                         CharacterSpacing="2"
                         FontSize="30"
                         HorizontalTextAlignment="Center"
-                        Text="Create Sensor"
+                        Text="Create Equipment"
                         TextColor="White" />
                 </StackLayout>
                 <StackLayout Orientation="Vertical">
@@ -26,13 +27,13 @@
                             TextColor="White"
                             VerticalOptions="Center" />
                         <Editor
-                            x:Name="SensorName"
+                            x:Name="EquipmentName"
                             Margin="0,0,17,0"
                             AutoSize="TextChanges"
                             FontSize="Large"
                             HorizontalOptions="EndAndExpand"
                             MaxLength="225"
-                            Placeholder="Sensor name"
+                            Placeholder="Equipment name"
                             PlaceholderColor="Gray"
                             Scale="1"
                             TextColor="White"
@@ -65,33 +66,6 @@
                     </Frame>
                 </StackLayout>
 
-
-                <StackLayout
-                    HeightRequest="50"
-                    HorizontalOptions="FillAndExpand"
-                    Orientation="Horizontal">
-                    <Label
-                        CharacterSpacing="1"
-                        FontSize="Large"
-                        HorizontalOptions="Start"
-                        Text="Sensor Type"
-                        TextColor="White"
-                        VerticalOptions="Center" />
-                    <Frame
-                        Margin="0,0,10,0"
-                        Padding="10,0,10,0"
-                        BackgroundColor="AliceBlue"
-                        CornerRadius="30"
-                        HorizontalOptions="EndAndExpand">
-                        <StackLayout Orientation="Horizontal" WidthRequest="160">
-                            <Picker
-                                x:Name="SensorTypePicker"
-                                HorizontalOptions="FillAndExpand"
-                                SelectedIndexChanged="SensorTypePicker_OnSelectedIndexChanged" />
-                        </StackLayout>
-                    </Frame>
-                </StackLayout>
-
                 <StackLayout
                     HeightRequest="50"
                     HorizontalOptions="FillAndExpand"
@@ -113,29 +87,79 @@
                             <Picker x:Name="GpioPicker" HorizontalOptions="FillAndExpand" />
                         </StackLayout>
                     </Frame>
-                </StackLayout>
-                <Label
-                    CharacterSpacing="1"
-                    FontSize="Large"
-                    HorizontalOptions="CenterAndExpand"
-                    Text="Attached Equipment"
-                    TextColor="White"
-                    VerticalOptions="Center" />
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand">
-                    <ScrollView HeightRequest="250">
-                        <StackLayout x:Name="ScrollViewAttachedEquipment" />
-                    </ScrollView>
-                </Frame>
 
-                <StackLayout VerticalOptions="End">
+                </StackLayout>
+
+
+                <StackLayout Orientation="Vertical">
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <CheckBox
+                            x:Name="IsPumpCheckBox"
+                            Margin="0,0,17,0"
+                            CheckedChanged="IsPumpCheckBox_OnCheckedChanged"
+                            HorizontalOptions="Start" />
+                        <Label
+                            FontSize="Large"
+                            HorizontalOptions="Start"
+                            Text="is Pump"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                </StackLayout>
+
+                <StackLayout>
+
+                    <StackLayout
+                        x:Name="StackLayoutPump"
+                        IsVisible="False"
+                        Orientation="Vertical">
+                        <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                            <CheckBox
+                                x:Name="IsDirectOnlineCheckBox"
+                                Margin="0,0,17,0"
+                                CheckedChanged="IsDirectOnlineCheckBox_OnCheckedChanged"
+                                HorizontalOptions="Start" />
+                            <Label
+                                FontSize="Large"
+                                HorizontalOptions="Start"
+                                Text="is DirectOnline"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout
+                        x:Name="StackLayoutDirectOnline"
+                        HeightRequest="50"
+                        HorizontalOptions="FillAndExpand"
+                        IsVisible="False"
+                        Orientation="Horizontal">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Large"
+                            HorizontalOptions="Start"
+                            Text="Select DirectOnline"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <Frame
+                            Margin="0,0,10,0"
+                            Padding="10,0,10,0"
+                            BackgroundColor="AliceBlue"
+                            CornerRadius="30"
+                            HorizontalOptions="EndAndExpand">
+                            <StackLayout Orientation="Horizontal" WidthRequest="160">
+                                <Picker x:Name="DirectOnlineGpioPicker" HorizontalOptions="FillAndExpand" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </StackLayout>
+
+
+                <StackLayout VerticalOptions="EndAndExpand">
                     <StackLayout Margin="5">
                         <Button
-                            x:Name="ButtonUpdateSensor"
-                            Clicked="ButtonUpdateSensor_OnClicked"
+                            x:Name="ButtonUpdateEquipment"
+                            Clicked="ButtonUpdateEquipment_OnClicked"
                             Text="Update" />
                         <Button
                             x:Name="ButtonBack"

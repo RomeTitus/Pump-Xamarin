@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.Layout.SiteUpdate"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    BackgroundColor="DeepSkyBlue">
+    <ContentPage.Content>
+        <ScrollView Margin="5">
+            <StackLayout Orientation="Vertical">
+                <StackLayout>
+                    <Label
+                        CharacterSpacing="2"
+                        FontSize="30"
+                        HorizontalTextAlignment="Center"
+                        Text="Create Site"
+                        TextColor="White" />
+                </StackLayout>
+                <StackLayout Orientation="Vertical">
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Large"
+                            HorizontalOptions="Start"
+                            Text="Name"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <Editor
+                            x:Name="SiteName"
+                            Margin="0,0,17,0"
+                            AutoSize="TextChanges"
+                            FontSize="Large"
+                            HorizontalOptions="EndAndExpand"
+                            MaxLength="225"
+                            Placeholder="Site name"
+                            PlaceholderColor="Gray"
+                            Scale="1"
+                            TextColor="White"
+                            WidthRequest="180" />
+                    </StackLayout>
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Large"
+                            HorizontalOptions="Start"
+                            Text="Description"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <Editor
+                            x:Name="SiteDescription"
+                            Margin="0,0,17,0"
+                            AutoSize="TextChanges"
+                            FontSize="Large"
+                            HorizontalOptions="EndAndExpand"
+                            MaxLength="225"
+                            Placeholder="Site Description"
+                            PlaceholderColor="Gray"
+                            Scale="1"
+                            TextColor="White"
+                            WidthRequest="180" />
+                    </StackLayout>
+
+                </StackLayout>
+
+                <Label
+                    CharacterSpacing="1"
+                    FontSize="Large"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="Add to Site"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView HeightRequest="250">
+                        <StackLayout x:Name="ScrollViewSiteSelection" />
+                    </ScrollView>
+                </Frame>
+
+                <StackLayout VerticalOptions="End">
+                    <StackLayout Margin="5">
+                        <Button
+                            x:Name="ButtonUpdateSite"
+                            Clicked="ButtonUpdateSite_OnClicked"
+                            Text="Update" />
+                        <Button
+                            x:Name="ButtonBack"
+                            Clicked="ButtonBack_OnClicked"
+                            Text="Back" />
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

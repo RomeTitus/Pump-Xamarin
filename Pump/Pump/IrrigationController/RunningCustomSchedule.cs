@@ -139,10 +139,11 @@ namespace Pump.IrrigationController
                 }
 
             }
-            catch (Exception e)
+            catch
             {
-
+                // ignored
             }
+
             return null;
         }
 

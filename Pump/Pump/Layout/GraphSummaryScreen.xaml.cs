@@ -10,12 +10,12 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewGraphSummaryScreen : ContentPage
+    public partial class GraphSummaryScreen : ContentPage
     {
         private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
 
-        public ViewGraphSummaryScreen()
+        public GraphSummaryScreen()
         {
             InitializeComponent();
             new Thread(PopulateEquipmentLastUsed).Start();

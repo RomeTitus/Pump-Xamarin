@@ -2,7 +2,7 @@
 
 namespace Pump.Droid.Database.Table
 {
-    internal class PumpSelection
+    public class PumpSelection
     {
         public PumpSelection()
         {

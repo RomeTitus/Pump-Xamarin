@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Database;
-using Firebase.Database.Offline;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
-using Pump.Class;
 using Pump.Database;
 using Pump.IrrigationController;
 
@@ -239,29 +237,26 @@ namespace Pump.FirebaseDatabase
         {
             try
             {
-                var manualJObject = new JObject
+                if (manual.ID == null)
                 {
-                    {"EndTime", manual.EndTime},{"DURATION", manual.DURATION}, {"RunWithSchedule", manual.RunWithSchedule ? "1" : "0"}
-                };
-                manualJObject["ManualDetails"] = new JObject();
-                foreach (var equipment in manual.ManualDetails)
-                {
-                    var key = Guid.NewGuid().ToString().GetHashCode().ToString("x");
-                    manualJObject["ManualDetails"][key] = new JObject { ["id_Equipment"] = equipment.id_Equipment };
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/ManualSchedule")
+                        .PostAsync(manual);
+                    return result.Key;
                 }
 
-                var result = await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule")
-                    .PostAsync(manual);
-                return result.Key;
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/ManualSchedule/" + manual.ID)
+                    .PutAsync(manual);
+                return manual.ID;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return null;
             }
-            
-            
+
+
         }
         public async Task<string> DeleteManualSchedule()
         {
@@ -293,7 +288,6 @@ namespace Pump.FirebaseDatabase
             {
                 var manualSchedule = new ManualSchedule()
                 {
-                    DURATION = scheduleDetailObject["DURATION"].ToString(),
                     EndTime = long.Parse(scheduleDetailObject["EndTime"].ToString()),
                     RunWithSchedule = scheduleDetailObject["RunWithSchedule"].ToString() == "1"
                 };
@@ -426,5 +420,43 @@ namespace Pump.FirebaseDatabase
             }
         }
 
+        //Site
+        public async Task<string> SetSite(Site site)
+        {
+            try
+            {
+                if (site.ID == null)
+                {
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/Site")
+                        .PostAsync(site);
+                    return result.Key;
+                }
+
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Site/" + site.ID)
+                    .PutAsync(site);
+                return site.ID;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+
+        public async void DeleteSite(Site site)
+        {
+            try
+            {
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Site/" + site.ID)
+                    .DeleteAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
     }
 }

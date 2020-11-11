@@ -1,21 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentPage
-    x:Class="Pump.Layout.ViewGraphSummaryScreen"
+    x:Class="Pump.Layout.ScheduleHomeScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    BackgroundColor="DeepSkyBlue"
+    Title="Schedule"
     mc:Ignorable="d">
     <ContentPage.Content>
+
         <StackLayout>
 
             <StackLayout Padding="20" VerticalOptions="FillAndExpand">
                 <Label
                     FontSize="Title"
                     HorizontalOptions="Center"
-                    Text="Summary"
+                    Text="Schedule"
                     TextColor="White"
                     TextDecorations="Underline" />
 
@@ -25,7 +26,7 @@
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
                     <ScrollView>
-                        <StackLayout x:Name="ScrollViewLastOnDetail">
+                        <StackLayout x:Name="ScrollViewScheduleDetail">
                             <ActivityIndicator
                                 AutomationId="ActivityIndicatorManualPump"
                                 HorizontalOptions="Center"
@@ -40,13 +41,15 @@
             </StackLayout>
 
             <StackLayout VerticalOptions="End">
-                <Button x:Name="ButtonCreateSchedule" Text="View Graph" />
                 <Button
-                    x:Name="ButtonBack"
-                    Clicked="ButtonBack_OnClicked"
-                    Text="Back" />
+                    x:Name="ButtonCreateSchedule"
+                    BackgroundColor="DeepSkyBlue"
+                    Pressed="ButtonCreateSchedule_OnClicked"
+                    Text="Create Schedule"
+                    TextColor="White" />
             </StackLayout>
 
         </StackLayout>
+
     </ContentPage.Content>
 </ContentPage>

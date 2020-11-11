@@ -18,7 +18,6 @@ namespace Pump.IrrigationController
         public long StartTime { get; set; }
         public long Repeat { get; set; }
 
-
         public List<ScheduleDetail> ScheduleDetails { get; set; }
     }
 }

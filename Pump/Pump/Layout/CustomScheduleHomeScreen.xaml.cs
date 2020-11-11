@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Firebase.Database.Streaming;
 using Pump.Class;
 using Pump.Database;
+using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
@@ -17,92 +18,25 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewCustomScheduleHomeScreen : ContentPage
+    public partial class CustomScheduleHomeScreen : ContentPage
     {
-        private ObservableCollection<Equipment> _equipmentList;
-        private ObservableCollection<CustomSchedule> _customSchedulesList;
+        private readonly ObservableCollection<Equipment> _equipmentList;
+        private readonly ObservableCollection<CustomSchedule> _customSchedulesList;
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
         private ViewCustomScheduleSummary _viewSchedule;
+        private readonly ObservableCollection<Site> _siteList;
+        private readonly PumpConnection _pumpConnection;
 
-        public ViewCustomScheduleHomeScreen()
+        public CustomScheduleHomeScreen(ObservableCollection<CustomSchedule> customSchedulesList, ObservableCollection<Equipment> equipmentList,
+            ObservableCollection<Site> siteList)
         {
+            _equipmentList = equipmentList;
+            _customSchedulesList = customSchedulesList;
+            _siteList = siteList;
             InitializeComponent();
-            new Thread(GetScheduleAndEquipmentFirebase).Start();
+            _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            new Thread(LoadCustomScheduleStatus).Start();
         }
-
-        private void GetScheduleAndEquipmentFirebase()
-        {
-            var auth = new Authentication();
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/CustomSchedule")
-                .AsObservable<CustomSchedule>()
-                .Subscribe(x =>
-                {
-                    if (_customSchedulesList == null)
-                        _customSchedulesList = new ObservableCollection<CustomSchedule>();
-                    var customSchedule = x.Object;
-                    if (x.EventType == FirebaseEventType.Delete)
-                    {
-                        for (int i = 0; i < _customSchedulesList.Count; i++)
-                        {
-                            if (_customSchedulesList[i].ID == x.Key)
-                                _customSchedulesList.RemoveAt(i);
-                        }
-                    }
-                    else
-                    {
-                        var existingCustomSchedule = _customSchedulesList.FirstOrDefault(y => y.ID == x.Key);
-                        if (existingCustomSchedule != null)
-                        {
-                            FirebaseMerger.CopyValues(existingCustomSchedule, customSchedule);
-                            Device.InvokeOnMainThreadAsync(PopulateCustomScheduleStatus);
-                        }
-                        else
-                        {
-                            customSchedule.ID = x.Key;
-                            _customSchedulesList.Add(customSchedule);
-                        }
-                    }
-                });
-
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Equipment")
-                .AsObservable<Equipment>()
-                .Subscribe(x =>
-                {
-                    if (_equipmentList == null)
-                        _equipmentList = new ObservableCollection<Equipment>();
-                    var equipment = x.Object;
-                    if (x.EventType == FirebaseEventType.Delete)
-                    {
-                        for (int i = 0; i < _equipmentList.Count; i++)
-                        {
-                            if (_equipmentList[i].ID == x.Key)
-                                _equipmentList.RemoveAt(i);
-                        }
-                    }
-                    else
-                    {
-                        var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
-                        if (existingEquipment != null)
-                        {
-                            FirebaseMerger.CopyValues(existingEquipment, equipment);
-                            Device.InvokeOnMainThreadAsync(PopulateCustomScheduleStatus);
-                        }
-                        else
-                        {
-                            equipment.ID = x.Key;
-                            _equipmentList.Add(equipment);
-                        }
-
-                    }
-                });
-
-
-            LoadCustomScheduleStatus();
-        }
-
 
         private void LoadCustomScheduleStatus()
         {
@@ -111,7 +45,7 @@ namespace Pump.Layout
             {
                 try
                 {
-                    if (_equipmentList != null && _customSchedulesList != null)
+                    if (!_equipmentList.Contains(null) && !_customSchedulesList.Contains(null))
                     {
                         hasSubscribed = true;
                         _equipmentList.CollectionChanged += PopulateCustomScheduleStatusEvent;
@@ -138,8 +72,9 @@ namespace Pump.Layout
 
             try
             {
+                if (_customSchedulesList.Contains(null) || _equipmentList.Contains(null)) return;
                 if (_customSchedulesList.Any())
-                    foreach (var customSchedule in _customSchedulesList)
+                    foreach (var customSchedule in _customSchedulesList.Where(x => _siteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)))
                     {
                         var viewSchedule = ScrollViewCustomScheduleDetail.Children.FirstOrDefault(x =>
                             x.AutomationId == customSchedule.ID);
@@ -179,7 +114,7 @@ namespace Pump.Layout
 
             try
             {
-                if (_customSchedulesList != null)
+                if (!_customSchedulesList.Contains(null))
                 {
 
                     var itemsThatAreOnDisplay = _customSchedulesList.Select(x => x.ID).ToList();
@@ -195,6 +130,20 @@ namespace Pump.Layout
                         ScrollViewCustomScheduleDetail.Children.RemoveAt(index);
                         index--;
                     }
+                }
+                else
+                {
+                    ScrollViewCustomScheduleDetail.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewCustomScheduleDetail.Children.Add(loadingIcon);
                 }
 
             }
@@ -321,7 +270,7 @@ namespace Pump.Layout
             if (new DatabaseController().IsRealtimeFirebaseSelected())
             {
                 if (_equipmentList.Count > 0)
-                    Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList.ToList()));
+                    Navigation.PushModalAsync(new CustomScheduleUpdate(_equipmentList.Where(x => _siteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
                 else
                     DisplayAlert("Cannot Create a Schedule",
                         "You are missing the equipment that is needed to create a schedule", "Understood");
@@ -333,7 +282,7 @@ namespace Pump.Layout
             PopupNavigation.Instance.PopAsync();
             var edit = (Button)sender;
             var customSchedule = _customSchedulesList.First(schedule => schedule.ID == edit.AutomationId);
-            Navigation.PushModalAsync(new UpdateCustomSchedule(_equipmentList.ToList(), customSchedule));
+            Navigation.PushModalAsync(new CustomScheduleUpdate(_equipmentList.Where(x => _siteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), customSchedule));
         }
 
         private void DeleteButton_Tapped(object sender, EventArgs e)

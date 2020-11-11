@@ -14,7 +14,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class UpdateSensor : ContentPage
+    public partial class SensorUpdate : ContentPage
     {
         private readonly List<long> _avalibleGpio;
         private List<long> _usableGpio;
@@ -23,7 +23,7 @@ namespace Pump.Layout
         private readonly List<string> _sensorTypesList = new List<string>{"Pressure Sensor"};
         private readonly Sensor _sensor;
 
-        public UpdateSensor(List<long> avalibleGpio, List<SubController> subControllerList, List<Equipment> equipmentList, Sensor sensor = null)
+        public SensorUpdate(List<long> avalibleGpio, List<SubController> subControllerList, List<Equipment> equipmentList, Sensor sensor = null)
         {
             InitializeComponent();
             _avalibleGpio = avalibleGpio;
@@ -74,7 +74,7 @@ namespace Pump.Layout
             foreach (var gpio in _usableGpio)
             {
                 GpioPicker.Items.Add("Pin: " + gpio);
-                if (_sensor.GPIO != null && _sensor.GPIO == gpio)
+                if (_sensor.GPIO == gpio)
                     GpioPicker.SelectedIndex = index;
                 index++;
             }
@@ -162,10 +162,6 @@ namespace Pump.Layout
                     var attachedSensor = _equipmentList.First(x => x.ID == viewEquipment._equipment.ID).AttachedSensor.FirstOrDefault(x => x.ID == _sensor.ID);
                     var newAttachedSensor = viewEquipment.GetAttachedSensorDetail();
 
-                    if (newAttachedSensor != null)
-                    {
-                        var test = "";
-                    }
                     if (JsonConvert.SerializeObject(attachedSensor) == JsonConvert.SerializeObject(newAttachedSensor)) continue;
 
                     if(newAttachedSensor == null)

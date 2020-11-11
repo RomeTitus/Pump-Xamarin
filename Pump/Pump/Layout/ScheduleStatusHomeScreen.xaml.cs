@@ -10,6 +10,8 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Pump.Database;
+using Pump.Droid.Database.Table;
 using Rg.Plugins.Popup.Services;
 
 namespace Pump.Layout
@@ -17,187 +19,31 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScheduleStatusHomeScreen : ContentPage
     {
-        private ObservableCollection<Equipment> _equipmentList;
-        private ObservableCollection<ManualSchedule> _manualScheduleList = new ObservableCollection<ManualSchedule>();
-        private ObservableCollection<Schedule> _scheduleList;
-        private ObservableCollection<Sensor> _sensorList;
+        private readonly ObservableCollection<Equipment> _equipmentList;
+        private readonly ObservableCollection<Sensor> _sensorList;
+        private readonly ObservableCollection<ManualSchedule> _manualScheduleList;
+        private readonly ObservableCollection<Schedule> _scheduleList;
+        private readonly ObservableCollection<Site> _siteList;
+        private readonly PumpConnection PumpConnection;
+
+
         private const double PopUpSize = 1.5;
 
-        public ScheduleStatusHomeScreen()
+        public ScheduleStatusHomeScreen(ObservableCollection<Equipment> equipmentList, ObservableCollection<ManualSchedule> manualScheduleList, 
+            ObservableCollection<Schedule> scheduleList, ObservableCollection<Sensor> sensorList, ObservableCollection<Site> siteList)
         {
-            InitializeComponent();
-            Task.Run(SubscribeToFirebase);
-            //SubscribeToFirebase();
-        }
-
-        private void SubscribeToFirebase()
-        {
-            var auth = new Authentication();
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Equipment")
-                .AsObservable<Equipment>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (_equipmentList == null)
-                            _equipmentList = new ObservableCollection<Equipment>();
-                        
-                        var equipment = x.Object;
-
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _equipmentList.Count; i++)
-                            {
-                                if(_equipmentList[i].ID == x.Key)
-                                    _equipmentList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingEquipment != null)
-                            {
-                                FirebaseMerger.CopyValues(existingEquipment, equipment);
-                            }
-                            else
-                            {
-                                equipment.ID = x.Key;
-                                _equipmentList.Add(equipment);
-                            }
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-            
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/ManualSchedule")
-                .AsObservable<ManualSchedule>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (_manualScheduleList == null)
-                            _manualScheduleList = new ObservableCollection<ManualSchedule>();
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-
-                            if (x.EventType == FirebaseEventType.Delete)
-                            {
-                                for (int i = 0; i < _manualScheduleList.Count; i++)
-                                {
-                                    if (_manualScheduleList[i].ID == x.Key)
-                                        _manualScheduleList.RemoveAt(i);
-                                }
-                            }
-                            if (x.Object != null)
-                            {
-                                var manualSchedule = x.Object;
-                                manualSchedule.ID = x.Key;
-                                _manualScheduleList.Add(manualSchedule);
-                            }
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Schedule")
-                .AsObservable<Schedule>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (_scheduleList == null)
-                            _scheduleList = new ObservableCollection<Schedule>();
-                        var schedule = x.Object;
-
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _scheduleList.Count; i++)
-                            {
-                                if (_scheduleList[i].ID == x.Key)
-                                    _scheduleList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingSchedule = _scheduleList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingSchedule != null)
-                            {
-                                FirebaseMerger.CopyValues(existingSchedule, schedule);
-                            }
-                            else
-                            {
-                                schedule.ID = x.Key;
-                                _scheduleList.Add(schedule);
-                            }
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Sensor")
-                .AsObservable<Sensor>()
-                .Subscribe(x =>
-                {
-
-                    try
-                    {
-                        if (_sensorList == null)
-                            _sensorList = new ObservableCollection<Sensor>();
-                        var sensor = x.Object;
-                        
-                        if (x.EventType == FirebaseEventType.Delete)
-                        {
-                            for (int i = 0; i < _sensorList.Count; i++)
-                            {
-                                if (_sensorList[i].ID == x.Key)
-                                    _sensorList.RemoveAt(i);
-                            }
-                        }
-                        else
-                        {
-                            var existingSensor = _sensorList.FirstOrDefault(y => y.ID == x.Key);
-                            if (existingSensor != null)
-                            {
-                                FirebaseMerger.CopyValues(existingSensor, sensor);
-                                Device.BeginInvokeOnMainThread(SensorStatus);
-                            }
-                            else
-                            {
-                                sensor.ID = x.Key;
-                                _sensorList.Add(sensor);
-                            }
-                            
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-
-                });
-
-
-            PopulateScheduleStatusElements();
+            _equipmentList = equipmentList;
+            _manualScheduleList = manualScheduleList;
+            _scheduleList = scheduleList;
+            _sensorList = sensorList;
+            _siteList = siteList;
+            InitializeComponent(); 
+            PumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            Task.Run(PopulateScheduleStatusElements);
         }
 
 
-        
+
         private void PopulateScheduleStatusElements()
         {
             bool hasSubscribed = false;
@@ -207,24 +53,21 @@ namespace Pump.Layout
             {
                 try
                 {
-                    if (_equipmentList != null && _scheduleList != null && _manualScheduleList != null && _scheduleList != null)
+                    if (!_equipmentList.Contains(null) && !_scheduleList.Contains(null) && !_manualScheduleList.Contains(null) && !_scheduleList.Contains(null))
                     {
                         hasSubscribed = true;
                     }
 
-                    if (_equipmentList != null && _scheduleList != null && _manualScheduleList != null &&
+                    if (!_equipmentList.Contains(null) && !_scheduleList.Contains(null) && !_manualScheduleList.Contains(null) &&
                         scheduleHasRun == false)
                     {
                         scheduleHasRun = true;
-                        _equipmentList =
-                            new ObservableCollection<Equipment>(_equipmentList
-                                .OrderBy(equip => Convert.ToInt16(equip.GPIO)).ToList());
                         _equipmentList.CollectionChanged += ActiveAndQueScheduleEvent;
                         _scheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
                         _manualScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
                         Device.InvokeOnMainThreadAsync(ActiveAndQueSchedule);
                     }
-                    if (_sensorList != null && sensorHasRun == false)
+                    if (!_sensorList.Contains(null) && sensorHasRun == false)
                     {
                         sensorHasRun = true;
                         _sensorList.CollectionChanged += SensorStatusEvent;
@@ -247,20 +90,21 @@ namespace Pump.Layout
         private void ActiveAndQueSchedule()
         {
             ScreenCleanupForSchedule();
-
             //get All Manual Stuff
-            if (_manualScheduleList.Count > 0)
-                    foreach (var manual in from manual in _manualScheduleList
-                        let existingManualSchedule =
-                            ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
-                                x.AutomationId == manual.ID)
-                        where existingManualSchedule == null
-                        select manual)
-                    {
-                        ScrollViewScheduleStatus.Children.Add(new ViewManualSchedule(manual));
-                    }
-                
-            var runningScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetRunningSchedule().ToList();
+            if (_manualScheduleList.Contains(null) || _equipmentList.Contains(null) || _scheduleList.Contains(null)) return;
+            var manualSchedule = _manualScheduleList.FirstOrDefault(x => x.ManualDetails.Any(z => _siteList.First(r => r.ID == PumpConnection.SiteSelectedId).Attachments.Contains(z.id_Equipment)));
+
+            if (manualSchedule != null)
+            {
+                var existingManualSchedule = ScrollViewScheduleStatus.Children.FirstOrDefault(x => x.AutomationId == manualSchedule.ID);
+                if (existingManualSchedule == null)
+
+                {
+                    ScrollViewScheduleStatus.Children.Add(new ViewManualSchedule(manualSchedule));
+                }
+            }
+
+            var runningScheduleList = new RunningSchedule(_scheduleList.Where(x => _siteList.First(y => y.ID == PumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _equipmentList).GetRunningSchedule().ToList();
                 
             if (runningScheduleList.Any())
                 foreach (var runningSchedule in runningScheduleList)
@@ -285,7 +129,7 @@ namespace Pump.Layout
             }
                 
                 
-            var queScheduleList = new RunningSchedule(_scheduleList, _equipmentList).GetQueSchedule().ToList();
+            var queScheduleList = new RunningSchedule(_scheduleList.Where(x => _siteList.First(y => y.ID == PumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _equipmentList).GetQueSchedule().ToList();
             if (queScheduleList.Any())
                 foreach (var runningSchedule in queScheduleList)
                 {
@@ -320,8 +164,9 @@ namespace Pump.Layout
             ScreenCleanupForSensor();
             try
             {
+                if (_sensorList.Contains(null)) return;
                 if (_sensorList.Any())
-                    foreach (var sensor in _sensorList)
+                    foreach (var sensor in _sensorList.Where(x => _siteList.First(y => y.ID == PumpConnection.SiteSelectedId).Attachments.Contains(x.ID)))
                     {
                         var viewSensor = ScrollViewSensorStatus.Children.FirstOrDefault(x =>
                             x.AutomationId == sensor.ID);
@@ -354,15 +199,15 @@ namespace Pump.Layout
 
         private void ScreenCleanupForSchedule()
         {
-            //CleanUp :)
-                try
+            try
+            {
+                if (!_scheduleList.Contains(null) && !_equipmentList.Contains(null))
                 {
-                    if (_equipmentList == null || _scheduleList == null || _manualScheduleList == null) return;
                     var runningScheduleList = new RunningSchedule(_scheduleList, _equipmentList)
                         .GetRunningSchedule().ToList();
                     var queScheduleList = new RunningSchedule(_scheduleList, _equipmentList)
                         .GetQueSchedule().ToList();
-
+                    
                     var itemsThatAreOnDisplay = runningScheduleList.Select(x => x.ID).ToList();
                     itemsThatAreOnDisplay.AddRange(_manualScheduleList.Select(x => x.ID));
                     if (itemsThatAreOnDisplay.Count == 0)
@@ -377,7 +222,6 @@ namespace Pump.Layout
                         ScrollViewScheduleStatus.Children.RemoveAt(index);
                         index--;
                     }
-
 
                     itemsThatAreOnDisplay = queScheduleList.Select(x => x.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
@@ -394,27 +238,39 @@ namespace Pump.Layout
                     }
 
                 }
-                catch
+                else
                 {
-                    // ignored
+                    ScrollViewScheduleStatus.Children.Clear();
+                    ScrollViewQueueStatus.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewScheduleStatus.Children.Add(loadingIcon);
+                    ScrollViewQueueStatus.Children.Add(loadingIcon);
                 }
 
-            
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void ScreenCleanupForSensor()
         {
-
-            //CleanUp :)
             try
             {
-                if (_sensorList != null)
+                if (!_sensorList.Contains(null))
                 {
-
                     var itemsThatAreOnDisplay = _sensorList.Select(x => x.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
-
 
                     for (var index = 0; index < ScrollViewSensorStatus.Children.Count; index++)
                     {
@@ -425,14 +281,25 @@ namespace Pump.Layout
                         index--;
                     }
                 }
-
+                else
+                {
+                    ScrollViewSensorStatus.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewSensorStatus.Children.Add(loadingIcon);
+                }
             }
             catch
             {
                 // ignored
             }
-
-
         }
         
         

@@ -7,38 +7,4 @@
     xmlns:local="clr-namespace:Pump.Layout"
     xmlns:localImage="clr-namespace:EmbeddedImages"
     x:Name="TabPageMain"
-    BackgroundColor="Coral">
-
-
-    <NavigationPage x:Name="ScheduleStatusTab" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.Home.png}">
-        <x:Arguments>
-            <local:ScheduleStatusHomeScreen />
-        </x:Arguments>
-    </NavigationPage>
-
-
-    <NavigationPage x:Name="ManualStatusTab" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.ManualSchedule.png}">
-        <x:Arguments>
-            <local:ManualScheduleHomeScreen />
-        </x:Arguments>
-    </NavigationPage>
-
-    <NavigationPage x:Name="CustomScheduleTab" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.CustomSchedule.png}">
-        <x:Arguments>
-            <local:ViewCustomScheduleHomeScreen />
-        </x:Arguments>
-    </NavigationPage>
-
-    <NavigationPage x:Name="ScheduleTab" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.FieldSun.png}">
-        <x:Arguments>
-            <local:ViewScheduleHomeScreen />
-        </x:Arguments>
-    </NavigationPage>
-
-    <NavigationPage x:Name="SettingTab" IconImageSource="{localImage:ImageResourceExtention Pump.Icons.setting.png}">
-        <x:Arguments>
-            <local:SettingPageHomeScreen />
-        </x:Arguments>
-    </NavigationPage>
-
-</TabbedPage>
+    BackgroundColor="Coral" />

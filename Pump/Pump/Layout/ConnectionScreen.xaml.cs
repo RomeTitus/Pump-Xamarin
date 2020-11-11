@@ -60,7 +60,6 @@ namespace Pump.Layout
             {
                 if(ControllerList[i].ID == _connection.ID)
                     ControllerPicker.SelectedIndex = i;
-                continue;
             }
             
             TxtInternalConnection.Text = _connection.InternalPath;
@@ -324,8 +323,8 @@ namespace Pump.Layout
 
         private void ControllerPicker_OnSelectedIndexChanged(object sender, EventArgs e)
         {
-            if(ControllerPicker.SelectedIndex != -1)
-                new DatabaseController().setSelectedController(ControllerList[ControllerPicker.SelectedIndex]);
+            //if(ControllerPicker.SelectedIndex != -1)
+            //    new DatabaseController().SetSelectedController(ControllerList[ControllerPicker.SelectedIndex]);
 
         }
     }

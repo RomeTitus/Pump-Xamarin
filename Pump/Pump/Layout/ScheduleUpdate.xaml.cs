@@ -13,14 +13,14 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class UpdateSchedule : ContentPage
+    public partial class ScheduleUpdate : ContentPage
     {
         private readonly List<Equipment> _equipmentList;
         private Schedule _schedule;
         private readonly List<string> _pumpIdList = new List<string>();
         private ViewSchedulePumpTime _pumpSelectedTime;
 
-        public UpdateSchedule(List<Equipment> equipmentList, Schedule schedule = null)
+        public ScheduleUpdate(List<Equipment> equipmentList, Schedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;

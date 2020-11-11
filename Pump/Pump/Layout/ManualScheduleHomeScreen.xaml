@@ -129,13 +129,17 @@
                 <StackLayout>
                     <Button
                         x:Name="ButtonStartManual"
+                        BackgroundColor="DeepSkyBlue"
                         Clicked="ButtonStartManual_Clicked"
-                        Text="Start" />
+                        Text="Start"
+                        TextColor="White" />
                     <Button
                         x:Name="ButtonStopManual"
+                        BackgroundColor="DeepSkyBlue"
                         Clicked="ButtonStopManual_Clicked"
-                        Text="Stop" 
-                        IsEnabled="False"/>
+                        IsEnabled="False"
+                        Text="Stop"
+                        TextColor="White" />
                 </StackLayout>
 
             </FlexLayout>

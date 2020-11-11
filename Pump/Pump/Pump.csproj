@@ -76,11 +76,35 @@
     <Compile Update="Layout\SettingPageHomeScreen.xaml.cs">
       <DependentUpon>SettingPageHomeScreen.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Layout\SubControllerUpdate.xaml.cs">
+      <DependentUpon>SubControllerUpdate.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\CustomScheduleUpdate.xaml.cs">
+      <DependentUpon>CustomScheduleUpdate.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\SensorUpdate.xaml.cs">
+      <DependentUpon>SensorUpdate.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\EquipmentUpdate.xaml.cs">
+      <DependentUpon>EquipmentUpdate.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\ScheduleUpdate.xaml.cs">
+      <DependentUpon>ScheduleUpdate.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Layout\VerifyConnections.xaml.cs">
       <DependentUpon>VerifyConnections.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\ViewScheduleHomeScreen.xaml.cs">
-      <DependentUpon>ViewScheduleHomeScreen.xaml</DependentUpon>
+    <Compile Update="Layout\CustomScheduleHomeScreen.xaml.cs">
+      <DependentUpon>CustomScheduleHomeScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\EquipmentScreen.xaml.cs">
+      <DependentUpon>EquipmentScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\ScheduleHomeScreen.xaml.cs">
+      <DependentUpon>ScheduleHomeScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\GraphSummaryScreen.xaml.cs">
+      <DependentUpon>GraphSummaryScreen.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\Views\ViewActiveScheduleSummary.xaml.cs">
       <DependentUpon>ViewActiveScheduleSummary.xaml</DependentUpon>
@@ -115,31 +139,37 @@
     <EmbeddedResource Update="Layout\SettingPageHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\UpdateCustomSchedule.xaml">
+    <EmbeddedResource Update="Layout\CustomScheduleUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\UpdateEquipment.xaml">
+    <EmbeddedResource Update="Layout\EquipmentUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\UpdateSchedule.xaml">
+    <EmbeddedResource Update="Layout\ScheduleUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\UpdateSensor.xaml">
+    <EmbeddedResource Update="Layout\SensorUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\UpdateSubController.xaml">
+    <EmbeddedResource Update="Layout\SiteScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\SiteUpdate.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\SubControllerUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\VerifyConnections.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ViewCustomScheduleHomeScreen.xaml">
+    <EmbeddedResource Update="Layout\CustomScheduleHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ViewEquipmentScreen.xaml">
+    <EmbeddedResource Update="Layout\EquipmentScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ViewGraphSummaryScreen.xaml">
+    <EmbeddedResource Update="Layout\GraphSummaryScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewAttachedEquipment.xaml">
@@ -185,6 +215,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewSensorSummary.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewSiteSummary.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewSubControllerSummary.xaml">
