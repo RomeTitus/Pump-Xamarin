@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Threading;
 using System.Threading.Tasks;
 using Pump.Database;
 using Pump.Droid.Database.Table;
@@ -12,24 +11,27 @@ using Xamarin.Forms;
 
 namespace Pump
 {
-    // Learn more about making custom code visible in the Xamarin.Forms previewer
-    // by visiting https://aka.ms/xamarinforms-previewer
-    [DesignTimeVisible(false)]
     public partial class AddController : ContentPage
     {
+        private bool? _internalConnection;
+        private bool? _externalConnection;
+        private bool? _firebaseConnection;
+        private string _mac;
+        private readonly VerifyConnections _loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+        private readonly PumpConnection _pumpConnection = new PumpConnection();
+        private double _height;
+        private double _width;
 
-        bool? _internalConnection = null;
-        bool? _externalConnection = null;
-        bool? _firebaseConnection = null;
-        private String _mac;
-        readonly VerifyConnections _loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
-        PumpConnection _pumpConnection = new PumpConnection();
-        private double height;
-        private double width;
-
-        public AddController(bool firstConnection)
+        public AddController(bool firstConnection, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
+
+            if (pumpConnection != null)
+            {
+                _pumpConnection = pumpConnection;
+                PopulateElements();
+            }
+                
             if (!firstConnection)
                 BtnBackAddConnectionScreen.IsVisible = true;
         }
@@ -37,6 +39,18 @@ namespace Pump
         private void BtnAddController_Clicked(object sender, EventArgs e)
         {
             AddIrrigationController();
+        }
+
+        private void PopulateElements()
+        {
+            TxtControllerName.Text = _pumpConnection.Name;
+            TxtInternalConnection.Text = _pumpConnection.InternalPath;
+            TxtInternalPort.Text = _pumpConnection.InternalPort.ToString();
+            TxtExternalConnection.Text = _pumpConnection.ExternalPath;
+            TxtExternalPort.Text = _pumpConnection.ExternalPort.ToString();
+            TxtControllerCode.Text = _pumpConnection.Mac;
+            TxtControllerCode.IsEnabled = false;
+            BtnAddController.Text = "Update";
         }
 
         private void AddIrrigationController()
@@ -120,7 +134,7 @@ namespace Pump
                 _loadingScreen.StopActivityIndicator();
                 if (_firebaseConnection == true || _externalConnection == true || _internalConnection == true)
                 {
-                    addPumpConnection(_pumpConnection);
+                    AddPumpConnection(_pumpConnection);
                 }
             }
         }
@@ -243,12 +257,12 @@ namespace Pump
         }
 
 
-        private void addPumpConnection(PumpConnection pumpConnection)
+        private void AddPumpConnection(PumpConnection pumpConnection)
         {
 
             var databaseController = new DatabaseController();
             databaseController.AddControllerConnection(pumpConnection);
-
+            Navigation.PopModalAsync();
         }
 
        
@@ -256,9 +270,9 @@ namespace Pump
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height);
-            if (width == this.width && height == this.height) return;
-            this.width = width;
-            this.height = height;
+            if (width == this._width && height == this._height) return;
+            this._width = width;
+            this._height = height;
             if (width > height)
             {
                 LayoutAddController.Direction = FlexDirection.Row;
@@ -276,7 +290,11 @@ namespace Pump
         private void BtnBackAddConnectionScreen_OnClicked(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
-            Navigation.PushModalAsync(new ConnectionScreen());
+        }
+
+        public Button GetUpdateButton()
+        {
+            return BtnAddController;
         }
     }
 }

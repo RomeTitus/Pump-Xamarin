@@ -24,10 +24,7 @@
                 HorizontalOptions="Fill">
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="18" Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
-                    <Picker
-                        x:Name="ControllerPicker"
-                        HorizontalOptions="FillAndExpand"
-                        SelectedIndexChanged="ControllerPicker_OnSelectedIndexChanged" />
+                    <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand" />
 
                 </StackLayout>
             </Frame>
@@ -47,14 +44,13 @@
                         x:Name="BtnEditController"
                         BackgroundColor="DeepSkyBlue"
                         IsEnabled="False"
-                        Pressed="BtnAddController_OnPressed"
+                        Pressed="BtnEditController_OnPressed"
                         Text="Edit"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Button
                         x:Name="BtnAddController"
                         BackgroundColor="DeepSkyBlue"
-                        IsEnabled="False"
                         Pressed="BtnAddController_OnPressed"
                         Text="Add"
                         TextColor="White"

@@ -1,22 +1,13 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Firebase.Database.Streaming;
-using Newtonsoft.Json.Linq;
 using Pump.IrrigationController;
 
 namespace Pump.FirebaseDatabase
 {
     class InitializeFirebase
     {
-        private readonly ObservableCollection<Equipment> _equipmentList;
-        private readonly ObservableCollection<Alive> _aliveList;
-        private readonly ObservableCollection<Sensor> _sensorList;
-        private readonly ObservableCollection<ManualSchedule> _manualScheduleList;
-        private readonly ObservableCollection<Schedule> _scheduleList;
-        private readonly ObservableCollection<CustomSchedule> _customScheduleList;
-        private readonly ObservableCollection<Site> _siteList;
-        private readonly ObservableCollection<SubController> _subController;
+        private readonly ObservableIrrigation _observableIrrigation;
 
         private IDisposable _subscribeSensor;
         private IDisposable _subscribeEquipment;
@@ -26,19 +17,9 @@ namespace Pump.FirebaseDatabase
         private IDisposable _subscribeSite;
         private IDisposable _subscribeSubController;
         private IDisposable _subscribeAlive;
-        public InitializeFirebase(ObservableCollection<Equipment> equipmentList ,ObservableCollection<Sensor> sensorList, 
-            ObservableCollection<ManualSchedule> manualScheduleList, ObservableCollection<Schedule> scheduleList,
-            ObservableCollection<CustomSchedule> customScheduleList, ObservableCollection<Site> siteList, ObservableCollection<Alive> aliveList,
-                ObservableCollection<SubController> subController)
+        public InitializeFirebase(ObservableIrrigation observableIrrigation)
         {
-            _equipmentList = equipmentList;
-            _sensorList = sensorList;
-            _manualScheduleList = manualScheduleList;
-            _scheduleList = scheduleList;
-            _customScheduleList = customScheduleList;
-            _siteList = siteList;
-            _aliveList = aliveList;
-            _subController = subController;
+            _observableIrrigation = observableIrrigation;
             SubscribeFirebase();
         }
         public void SubscribeFirebase()
@@ -52,29 +33,31 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_sensorList.Count> 0 && _sensorList[0] == null)
-                            _sensorList.Clear();
+                        if (_observableIrrigation.SensorList.Count> 0 && _observableIrrigation.SensorList[0] == null)
+                            _observableIrrigation.SensorList.Clear();
                         var sensor = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _sensorList.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.SensorList.Count; i++)
                             {
-                                if (_sensorList[i].ID == x.Key)
-                                    _sensorList.RemoveAt(i);
+                                if (_observableIrrigation.SensorList[i].ID == x.Key)
+                                    _observableIrrigation.SensorList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingSensor = _sensorList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingSensor = _observableIrrigation.SensorList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingSensor != null)
                             {
                                 FirebaseMerger.CopyValues(existingSensor, sensor);
+                                var index = _observableIrrigation.SensorList.IndexOf(existingSensor);
+                                _observableIrrigation.SensorList[index] = existingSensor;
                             }
                             else
                             {
                                 sensor.ID = x.Key;
-                                _sensorList.Add(sensor);
+                                _observableIrrigation.SensorList.Add(sensor);
                             }
 
                         }
@@ -92,29 +75,36 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_equipmentList.Count > 0 && _equipmentList[0] == null)
-                            _equipmentList.Clear();
+                        if (_observableIrrigation.EquipmentList.Count > 0 && _observableIrrigation.EquipmentList[0] == null)
+                            _observableIrrigation.EquipmentList.Clear();
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.EquipmentList.Clear();
+                            return;
+                        }
                         var equipment = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _equipmentList.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.EquipmentList.Count; i++)
                             {
-                                if (_equipmentList[i].ID == x.Key)
-                                    _equipmentList.RemoveAt(i);
+                                if (_observableIrrigation.EquipmentList[i].ID == x.Key)
+                                    _observableIrrigation.EquipmentList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingEquipment = _equipmentList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingEquipment = _observableIrrigation.EquipmentList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingEquipment != null)
                             {
                                 FirebaseMerger.CopyValues(existingEquipment, equipment);
+                                var index = _observableIrrigation.EquipmentList.IndexOf(existingEquipment);
+                                _observableIrrigation.EquipmentList[index] = existingEquipment;
                             }
                             else
                             {
                                 equipment.ID = x.Key;
-                                _equipmentList.Add(equipment);
+                                _observableIrrigation.EquipmentList.Add(equipment);
                             }
 
                         }
@@ -132,29 +122,36 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_scheduleList.Count > 0 && _scheduleList[0] == null)
-                            _scheduleList.Clear();
+                        if (_observableIrrigation.ScheduleList.Count > 0 && _observableIrrigation.ScheduleList[0] == null)
+                            _observableIrrigation.ScheduleList.Clear();
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.ScheduleList.Clear();
+                            return;
+                        }
                         var schedule = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _scheduleList.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.ScheduleList.Count; i++)
                             {
-                                if (_scheduleList[i].ID == x.Key)
-                                    _scheduleList.RemoveAt(i);
+                                if (_observableIrrigation.ScheduleList[i].ID == x.Key)
+                                    _observableIrrigation.ScheduleList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingSchedule = _scheduleList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingSchedule = _observableIrrigation.ScheduleList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingSchedule != null)
                             {
                                 FirebaseMerger.CopyValues(existingSchedule, schedule);
+                                var index = _observableIrrigation.ScheduleList.IndexOf(existingSchedule);
+                                _observableIrrigation.ScheduleList[index] = existingSchedule;
                             }
                             else
                             {
                                 schedule.ID = x.Key;
-                                _scheduleList.Add(schedule);
+                                _observableIrrigation.ScheduleList.Add(schedule);
                             }
                         }
                     }
@@ -171,29 +168,36 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_customScheduleList.Count > 0 && _customScheduleList[0] == null)
-                            _customScheduleList.Clear();
+                        if (_observableIrrigation.CustomScheduleList.Count > 0 && _observableIrrigation.CustomScheduleList[0] == null)
+                            _observableIrrigation.CustomScheduleList.Clear();
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.CustomScheduleList.Clear();
+                            return;
+                        }
                         var customSchedule = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _customScheduleList.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.CustomScheduleList.Count; i++)
                             {
-                                if (_customScheduleList[i].ID == x.Key)
-                                    _customScheduleList.RemoveAt(i);
+                                if (_observableIrrigation.CustomScheduleList[i].ID == x.Key)
+                                    _observableIrrigation.CustomScheduleList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingCustomSchedule = _customScheduleList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingCustomSchedule = _observableIrrigation.CustomScheduleList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingCustomSchedule != null)
                             {
                                 FirebaseMerger.CopyValues(existingCustomSchedule, customSchedule);
+                                var index = _observableIrrigation.CustomScheduleList.IndexOf(existingCustomSchedule);
+                                _observableIrrigation.CustomScheduleList[index] = existingCustomSchedule;
                             }
                             else
                             {
                                 customSchedule.ID = x.Key;
-                                _customScheduleList.Add(customSchedule);
+                                _observableIrrigation.CustomScheduleList.Add(customSchedule);
                             }
 
                         }
@@ -211,29 +215,36 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_manualScheduleList.Count > 0 && _manualScheduleList[0] == null)
-                            _manualScheduleList.Clear();
+                        if (_observableIrrigation.ManualScheduleList.Count > 0 && _observableIrrigation.ManualScheduleList[0] == null)
+                            _observableIrrigation.ManualScheduleList.Clear();
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.ManualScheduleList.Clear();
+                            return;
+                        }
                         var manualSchedule = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _manualScheduleList.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.ManualScheduleList.Count; i++)
                             {
-                                if (_manualScheduleList[i].ID == x.Key)
-                                    _manualScheduleList.RemoveAt(i);
+                                if (_observableIrrigation.ManualScheduleList[i].ID == x.Key)
+                                    _observableIrrigation.ManualScheduleList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingManualSchedule = _manualScheduleList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingManualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingManualSchedule != null)
                             {
                                 FirebaseMerger.CopyValues(existingManualSchedule, manualSchedule);
+                                var index = _observableIrrigation.ManualScheduleList.IndexOf(existingManualSchedule);
+                                _observableIrrigation.ManualScheduleList[index] = existingManualSchedule;
                             }
                             else
                             {
                                 manualSchedule.ID = x.Key;
-                                _manualScheduleList.Add(manualSchedule);
+                                _observableIrrigation.ManualScheduleList.Add(manualSchedule);
                             }
                         }
                     }
@@ -250,29 +261,36 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_siteList.Count > 0 && _siteList[0] == null)
-                            _siteList.Clear();
+                        if (_observableIrrigation.SiteList.Count > 0 && _observableIrrigation.SiteList[0] == null)
+                            _observableIrrigation.SiteList.Clear();
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.SiteList.Clear();
+                            return;
+                        }
                         var site = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _siteList.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.SiteList.Count; i++)
                             {
-                                if (_siteList[i].ID == x.Key)
-                                    _siteList.RemoveAt(i);
+                                if (_observableIrrigation.SiteList[i].ID == x.Key)
+                                    _observableIrrigation.SiteList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingSite = _siteList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingSite = _observableIrrigation.SiteList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingSite != null)
                             {
                                 FirebaseMerger.CopyValues(existingSite, site);
+                                var index = _observableIrrigation.SiteList.IndexOf(existingSite);
+                                _observableIrrigation.SiteList[index] = existingSite;
                             }
                             else
                             {
                                 site.ID = x.Key;
-                                _siteList.Add(site);
+                                _observableIrrigation.SiteList.Add(site);
                             }
                         }
                     }
@@ -289,29 +307,36 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (_subController.Count > 0 && _subController[0] == null)
-                            _subController.Clear();
+                        if (_observableIrrigation.SubControllerList.Count > 0 && _observableIrrigation.SubControllerList[0] == null)
+                            _observableIrrigation.SubControllerList.Clear();
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.SubControllerList.Clear();
+                            return;
+                        }
                         var subController = x.Object;
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _subController.Count; i++)
+                            for (int i = 0; i < _observableIrrigation.SubControllerList.Count; i++)
                             {
-                                if (_subController[i].ID == x.Key)
-                                    _subController.RemoveAt(i);
+                                if (_observableIrrigation.SubControllerList[i].ID == x.Key)
+                                    _observableIrrigation.SubControllerList.RemoveAt(i);
                             }
                         }
                         else
                         {
-                            var existingSubController = _subController.FirstOrDefault(y => y.ID == x.Key);
+                            var existingSubController = _observableIrrigation.SubControllerList.FirstOrDefault(y => y.ID == x.Key);
                             if (existingSubController != null)
                             {
                                 FirebaseMerger.CopyValues(existingSubController, subController);
+                                var index = _observableIrrigation.SubControllerList.IndexOf(existingSubController);
+                                _observableIrrigation.SubControllerList[index] = existingSubController;
                             }
                             else
                             {
                                 subController.ID = x.Key;
-                                _subController.Add(subController);
+                                _observableIrrigation.SubControllerList.Add(subController);
                             }
                         }
                     }
@@ -329,8 +354,7 @@ namespace Pump.FirebaseDatabase
                     try
                     {
                         if (x.Object == null) return;
-                        var test = x.Key;
-                        //_aliveList[0] = x.Object;
+                        _observableIrrigation.AliveList[0] = x.Object;
                     }
                     catch (Exception e)
                     {
@@ -350,24 +374,23 @@ namespace Pump.FirebaseDatabase
             _subscribeSubController.Dispose();
             _subscribeAlive.Dispose();
 
-            _equipmentList.Clear();
-            _sensorList.Clear();
-            _manualScheduleList.Clear();
-            _scheduleList.Clear();
-            _customScheduleList.Clear();
-            _siteList.Clear();
-            _subController.Clear();
-            _aliveList.Clear();
+            _observableIrrigation.EquipmentList.Clear();
+            _observableIrrigation.SensorList.Clear();
+            _observableIrrigation.ManualScheduleList.Clear();
+            _observableIrrigation.ScheduleList.Clear();
+            _observableIrrigation.CustomScheduleList.Clear();
+            _observableIrrigation.SiteList.Clear();
+            _observableIrrigation.SubControllerList.Clear();
+            _observableIrrigation.AliveList.Clear();
 
-            _equipmentList.Add(null);
-            _sensorList.Add(null);
-            _manualScheduleList.Add(null);
-            _scheduleList.Add(null);
-            _customScheduleList.Add(null);
-            _siteList.Add(null);
-            _subController.Add(null);
-            _aliveList.Add(null);
-
+            _observableIrrigation.EquipmentList.Add(null);
+            _observableIrrigation.SensorList.Add(null);
+            _observableIrrigation.ManualScheduleList.Add(null);
+            _observableIrrigation.ScheduleList.Add(null);
+            _observableIrrigation.CustomScheduleList.Add(null);
+            _observableIrrigation.SiteList.Add(null);
+            _observableIrrigation.SubControllerList.Add(null);
+            _observableIrrigation.AliveList.Add(null);
         }
 
     }

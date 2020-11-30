@@ -123,11 +123,17 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-                if (_database.Table<PumpSelection>().Any())
-                    _database.DeleteAll<PumpSelection>();
-
-                _database.Insert(pumpConnection);
-                _database.Insert(new PumpSelection(pumpConnection.ID));
+                var existingPumpConnection = _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(pumpConnection.Mac));
+                if (existingPumpConnection != null)
+                    _database.Update(pumpConnection);
+                else
+                {
+                    if (_database.Table<PumpSelection>().Any())
+                        _database.DeleteAll<PumpSelection>();
+                    _database.Insert(pumpConnection);
+                    _database.Insert(new PumpSelection(pumpConnection.ID));
+                }
+                
             }
         }
 

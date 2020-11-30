@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading;
 using EmbeddedImages;
 using Pump.Class;
@@ -16,30 +14,15 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : TabbedPage
     {
-        private readonly ObservableCollection<Equipment> _equipmentList;
-        private readonly ObservableCollection<Alive> _aliveList;
-        private readonly ObservableCollection<Sensor> _sensorList;
-        private readonly ObservableCollection<ManualSchedule> _manualScheduleList;
-        private readonly ObservableCollection<Schedule> _scheduleList;
-        private readonly ObservableCollection<CustomSchedule> _customScheduleList;
-        private readonly ObservableCollection<Site> _siteList;
-        private readonly ObservableCollection<SubController> _subController;
+        private readonly ObservableIrrigation _observableIrrigation;
+        private SettingPageHomeScreen _settingPageHomeScreen;
+        private bool _hasSentUpdateRequest;
+        private bool firstRun = true;
 
         private readonly DatabaseController _databaseController = new DatabaseController();
-        public HomeScreen(ObservableCollection<Equipment> equipmentList, ObservableCollection<Sensor> sensorList,
-            ObservableCollection<ManualSchedule> manualScheduleList, ObservableCollection<Schedule> scheduleList,
-            ObservableCollection<CustomSchedule> customScheduleList, ObservableCollection<Site> siteList, ObservableCollection<Alive> aliveList,
-            ObservableCollection<SubController> subController)
+        public HomeScreen(ObservableIrrigation observableIrrigation)
         {
-            _equipmentList = equipmentList;
-            _sensorList = sensorList;
-            _manualScheduleList = manualScheduleList;
-            _scheduleList = scheduleList;
-            _customScheduleList = customScheduleList;
-            _siteList = siteList;
-            _aliveList = aliveList;
-            _subController = subController;
-
+            _observableIrrigation = observableIrrigation;
             InitializeComponent();
             if (Device.RuntimePlatform == Device.iOS)
             {
@@ -65,16 +48,17 @@ namespace Pump.Layout
 
 
 
-            setUpNavigationPage();
+            SetUpNavigationPage();
+            observableIrrigation.AliveList.CollectionChanged += subscribeToLastOnline;
         }
 
-        private void setUpNavigationPage()
+        private void SetUpNavigationPage()
         {
-            var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_equipmentList, _manualScheduleList, _scheduleList, _sensorList, _siteList);
-            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_manualScheduleList, _equipmentList, _siteList);
-            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_customScheduleList, _equipmentList, _siteList);
-            var scheduleHomeScreen = new ScheduleHomeScreen(_scheduleList, _equipmentList, _siteList);
-            var settingPageHomeScreen = new SettingPageHomeScreen(_equipmentList, _sensorList, _subController);
+            var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableIrrigation);
+            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableIrrigation);
+            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableIrrigation);
+            var scheduleHomeScreen = new ScheduleHomeScreen(_observableIrrigation);
+            _settingPageHomeScreen = new SettingPageHomeScreen(_observableIrrigation);
             var navigationScheduleStatusHomeScreen = new NavigationPage(scheduleStatusHomeScreen)
             {
                 IconImageSource = ImageSource.FromResource(
@@ -103,7 +87,7 @@ namespace Pump.Layout
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
 
-            var navigationSettingPageHomeScreen = new NavigationPage(settingPageHomeScreen)
+            var navigationSettingPageHomeScreen = new NavigationPage(_settingPageHomeScreen)
             {
                 IconImageSource = ImageSource.FromResource(
                     "Pump.Icons.setting.png",
@@ -116,32 +100,35 @@ namespace Pump.Layout
             Children.Add(navigationCustomScheduleHomeScreen);
             Children.Add(navigationScheduleHomeScreen);
             Children.Add(navigationSettingPageHomeScreen);
-
-            settingPageHomeScreen.GetSiteButton().Pressed += BtnSite_OnPressed;
         }
 
 
-        private void BtnSite_OnPressed(object sender, EventArgs e)
+        public Button GetSiteButton()
         {
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                Navigation.PopAsync();
-            });
-            
+            return _settingPageHomeScreen.GetSiteButton();
+        }
+
+
+        private void subscribeToLastOnline(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (!_hasSentUpdateRequest) return;
+            firstRun = false;
+            _hasSentUpdateRequest = false;
+
         }
 
         private void LastOnline()
         {
             Device.BeginInvokeOnMainThread(() =>
             {
-                if (_aliveList[0] == null)
+                if (_observableIrrigation.AliveList[0] == null)
                 {
                     TabPageMain.BackgroundColor = Color.DarkOrange;
                     return;
                 }
-                    
-                _aliveList[0].RequestedTime = ScheduleTime.GetUnixTimeStampUtcNow();
-                if (_aliveList[0].ResponseTime == 0)
+
+                _observableIrrigation.AliveList[0].RequestedTime = ScheduleTime.GetUnixTimeStampUtcNow();
+                if (_observableIrrigation.AliveList[0].ResponseTime == 0)
                 {
                     TabPageMain.BackgroundColor = Color.Crimson;
                 }
@@ -149,7 +136,7 @@ namespace Pump.Layout
                 {
                     var now = ScheduleTime.GetUnixTimeStampUtcNow();
 
-                    TabPageMain.BackgroundColor = _aliveList[0].ResponseTime > (now - 100) ? Color.DeepSkyBlue : Color.Crimson;
+                    TabPageMain.BackgroundColor = _observableIrrigation.AliveList[0].ResponseTime > (now - 100) ? Color.DeepSkyBlue : Color.Crimson;
                 }
             });
         }
@@ -160,29 +147,37 @@ namespace Pump.Layout
             {
                 try
                 {
-                    LastOnline();
-
-                    if (_aliveList[0] != null)
+                    if (!_hasSentUpdateRequest)
                     {
 
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
+                        if(!firstRun)
+                            LastOnline();
 
-                            _aliveList[0].RequestedTime = ScheduleTime.GetUnixTimeStampUtcNow();
-                            if (_aliveList[0] == null || _aliveList[0].ResponseTime == 0)
+                        if (_observableIrrigation.AliveList[0] != null)
+                        {
+                            _observableIrrigation.AliveList[0].RequestedTime =
+                                ScheduleTime.GetUnixTimeStampUtcNow();
+                            if (_observableIrrigation.AliveList[0] == null ||
+                                _observableIrrigation.AliveList[0].ResponseTime == 0)
                             {
-                                new Authentication().SetAlive(_aliveList[0]);
-                                TabPageMain.BackgroundColor = Color.Crimson;
+                                new Authentication().SetAlive(_observableIrrigation.AliveList[0]);
+                                _hasSentUpdateRequest = true;
                             }
                             else
                             {
                                 var now = ScheduleTime.GetUnixTimeStampUtcNow();
-                                if (_aliveList[0].ResponseTime < (now - 60))
-                                    new Authentication().SetAlive(_aliveList[0]);
-                                else if (_aliveList[0].ResponseTime < (now - 120))
-                                    TabPageMain.BackgroundColor = Color.Coral;
+                                if (_observableIrrigation.AliveList[0].ResponseTime < (now - 60))
+                                {
+                                    new Authentication().SetAlive(_observableIrrigation.AliveList[0]);
+                                    _hasSentUpdateRequest = true;
+                                }
                             }
-                        });
+                        }
+                        else
+                        {
+                            new Authentication().SetAlive(_observableIrrigation.AliveList[0]);
+                            _hasSentUpdateRequest = true;
+                        }
                     }
                 }
                 catch
@@ -190,7 +185,7 @@ namespace Pump.Layout
                     // ignored
                 }
 
-                Thread.Sleep(50000);
+                Thread.Sleep(1000);
             }
         }
 

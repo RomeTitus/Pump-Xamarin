@@ -5,31 +5,74 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
     <ContentView.Content>
-        <StackLayout x:Name="stackLayoutSiteSummary" Margin="0,0,0,5">
-            <StackLayout.GestureRecognizers>
-                <TapGestureRecognizer x:Name="StackLayoutViewSiteTapGesture" />
-            </StackLayout.GestureRecognizers>
+        <Frame
+            Padding="1,1,1,1"
+            BackgroundColor="Black"
+            BorderColor="Black"
+            CornerRadius="5"
+            HasShadow="False"
+            HorizontalOptions="FillAndExpand">
+            <Frame
+                x:Name="FrameSiteSummary"
+                Padding="5,5,5,5"
+                BorderColor="Black"
+                CornerRadius="5"
+                HasShadow="False"
+                HorizontalOptions="FillAndExpand">
 
-            <StackLayout Orientation="Horizontal">
-                <Image
-                    HeightRequest="40"
-                    HorizontalOptions="StartAndExpand"
-                    Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
-                <StackLayout Orientation="Vertical">
-                    <Label
-                        x:Name="LabelSiteName"
-                        FontSize="Large"
-                        HorizontalOptions="Start"
-                        Text="Name"
-                        VerticalOptions="Center" />
-                    <Label
-                        x:Name="LabelSiteDescription"
-                        FontSize="Large"
-                        HorizontalOptions="EndAndExpand"
-                        Text="Description"
-                        VerticalOptions="CenterAndExpand" />
+
+                <StackLayout x:Name="StackLayoutSiteSummary" Margin="0,0,0,5">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer x:Name="StackLayoutViewSiteTapGesture" />
+                    </StackLayout.GestureRecognizers>
+
+                    <StackLayout Orientation="Horizontal">
+                        <StackLayout Orientation="Vertical">
+                            <Label
+                                x:Name="LabelSiteName"
+                                FontSize="Large"
+                                HorizontalOptions="Start"
+                                Text="Name"
+                                VerticalOptions="Center" />
+                            <Label
+                                x:Name="LabelSiteDescription"
+                                FontSize="Large"
+                                HorizontalOptions="EndAndExpand"
+                                Text="Description"
+                                VerticalOptions="CenterAndExpand" />
+                        </StackLayout>
+
+                        <Label
+                            x:Name="LabelPressure"
+                            FontSize="Large"
+                            HorizontalOptions="EndAndExpand"
+                            Text=""
+                            VerticalOptions="CenterAndExpand" />
+                        <Frame
+                            Margin="0"
+                            Padding="1"
+                            BackgroundColor="White"
+                            BorderColor="DarkGreen"
+                            CornerRadius="30"
+                            HasShadow="False"
+                            HeightRequest="30"
+                            HorizontalOptions="EndAndExpand"
+                            VerticalOptions="CenterAndExpand"
+                            WidthRequest="30">
+                            <Frame
+                                x:Name="FrameScheduleStatus"
+                                Margin="0"
+                                Padding="1"
+                                BackgroundColor="White"
+                                BorderColor="DarkGreen"
+                                CornerRadius="30"
+                                HasShadow="False"
+                                HeightRequest="30"
+                                WidthRequest="30" />
+                        </Frame>
+                    </StackLayout>
                 </StackLayout>
-            </StackLayout>
-        </StackLayout>
+            </Frame>
+        </Frame>
     </ContentView.Content>
 </ContentView>

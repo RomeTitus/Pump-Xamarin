@@ -49,8 +49,6 @@ namespace Pump.IrrigationController
             
             var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
             return sortedList;
-
-
         }
 
         public static ScheduleDetail GetCustomScheduleDetailRunning(CustomSchedule customScheduleList)

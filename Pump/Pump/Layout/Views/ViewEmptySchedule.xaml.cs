@@ -10,7 +10,7 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             EmptyScheduleLabel.Text = text;
-            populate();
+            Populate();
         }
 
         public ViewEmptySchedule(string text, double size)
@@ -19,9 +19,10 @@ namespace Pump.Layout.Views
             EmptyScheduleLabel.Text = text;
             EmptyScheduleLabel.FontSize *= size;
             this.HeightRequest = 150 * size;
-            populate();
+            Populate();
         }
-        public void populate()
+
+        private void Populate()
         {
             ID = "-849";
             AutomationId = ID;
