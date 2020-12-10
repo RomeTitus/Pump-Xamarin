@@ -4,7 +4,6 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
-    xmlns:maskedEntry="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
     BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
         <ScrollView Margin="5">

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Firebase.Database.Streaming;
 using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
@@ -205,25 +203,22 @@ namespace Pump.Layout
         }
         private void GetScheduleSummary(string id)
         {
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
+            var schedule = _observableIrrigation.CustomScheduleList.FirstOrDefault(x => x.ID == id);
+            var scheduleList = GetCustomScheduleSummaryObject(schedule);
+
+            Device.BeginInvokeOnMainThread(() =>
             {
-
-                var schedule = _observableIrrigation.CustomScheduleList.FirstOrDefault(x => x.ID == id);
-                var scheduleList = GetCustomScheduleSummaryObject(schedule);
-
-                Device.BeginInvokeOnMainThread(() =>
+                try
                 {
-                    try
-                    {
-                        _floatingScreen.SetFloatingScreen(scheduleList);
-                    }
-                    catch
-                    {
-                        var scheduleSummaryListObject = new List<object> { new ViewException() };
-                        _floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
-                    }
-                });
-            }
+                    _floatingScreen.SetFloatingScreen(scheduleList);
+                }
+                catch
+                {
+                    var scheduleSummaryListObject = new List<object> { new ViewException() };
+                    _floatingScreen.SetFloatingScreen(scheduleSummaryListObject);
+                }
+            });
+            
         }
 
         private List<object> GetCustomScheduleSummaryObject(CustomSchedule schedule)
@@ -262,14 +257,12 @@ namespace Pump.Layout
         private void ButtonCreateCustomSchedule_OnClicked(object sender, EventArgs e)
         {
 
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
-            {
                 if (_observableIrrigation.EquipmentList.Count > 0)
                     Navigation.PushModalAsync(new CustomScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
                 else
                     DisplayAlert("Cannot Create a Schedule",
                         "You are missing the equipment that is needed to create a schedule", "Understood");
-            }
+            
         }
 
         private void EditButton_Tapped(object sender, EventArgs e)

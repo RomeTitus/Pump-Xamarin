@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pump.Class;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -13,27 +14,32 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EquipmentUpdate : ContentPage
     {
-        List<long> _avalibleGpio;
-        private List<SubController> _subControllerList;
-        private Equipment _equipment;
+        private readonly List<SubController> _subControllerList;
+        private List<Equipment> _equipmentList;
+        private List<long> _avalibleGpio;
+        private readonly Equipment _equipment;
 
-        public EquipmentUpdate(List<long> avalibleGpio, List<SubController> subControllerList, Equipment equipment = null)
+        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList, Equipment equipment = null)
         {
             InitializeComponent();
-            _avalibleGpio = avalibleGpio;
+            _equipmentList = equipmentList;
             _subControllerList = subControllerList;
             if (equipment == null)
             {
                 equipment = new Equipment();
                 ButtonUpdateEquipment.Text = "Create";
             }
+            else
+                _equipmentList.Remove(equipment);
+            
 
             _equipment = equipment;
-            populate();
+            Populate();
         }
 
-        private void populate()
+        private void Populate()
         {
+            SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
             EquipmentName.Text = _equipment.NAME;
             SystemPicker.Items.Add("Main");
             SystemPicker.SelectedIndex = 0;
@@ -54,33 +60,12 @@ namespace Pump.Layout
                     IsDirectOnlineCheckBox.IsChecked = true;
                 }
             }
-                
+            
 
             
-                
-
-            index = 0;
-            foreach (var gpio in _avalibleGpio)
-            {
-                GpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.GPIO == gpio)
-                    GpioPicker.SelectedIndex = index;
-                index++;
-            }
             
-            //if (GpioPicker.SelectedIndex == -1 && GpioPicker.Items.Count > 0)
-            //    GpioPicker.SelectedItem = 0;
 
-            index = 0;
-            foreach (var gpio in _avalibleGpio)
-            {
-                DirectOnlineGpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.DirectOnlineGPIO != null && _equipment.DirectOnlineGPIO == gpio)
-                    DirectOnlineGpioPicker.SelectedIndex = index;
-                index++;
-            }
-            //if (DirectOnlineGpioPicker.SelectedIndex == -1 && DirectOnlineGpioPicker.Items.Count > 0)
-            //    DirectOnlineGpioPicker.SelectedItem = 0;
+            
         }
         private string EquipmentValidate()
         {
@@ -165,6 +150,42 @@ namespace Pump.Layout
         {
             var isDirectOnlineCheckBox = (CheckBox) sender;
             StackLayoutDirectOnline.IsVisible = isDirectOnlineCheckBox.IsChecked;
+        }
+
+        private void SystemPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            var systemPicker = (Picker) sender;
+            var selectedIndex = systemPicker.SelectedIndex;
+           _avalibleGpio = new GpioPins().GetDigitalGpioList();
+            var usedEquipment = selectedIndex == 0 ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList() : _equipmentList.Where(y => !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController == _subControllerList[SystemPicker.SelectedIndex - 1].ID).ToList();
+            var usedPins = usedEquipment.Select(x => x.GPIO).ToList();
+            usedPins.AddRange(usedEquipment.Where(x => x.DirectOnlineGPIO != null).Select(y => y.DirectOnlineGPIO.Value));
+            
+            for (var i = 0; i < _avalibleGpio.Count; i++)
+            {
+                if (!usedPins.Contains(_avalibleGpio[i])) continue;
+                _avalibleGpio.RemoveAt(i);
+                i--;
+            }
+           
+            GpioPicker.Items.Clear();
+            var index = 0;
+            foreach (var gpio in _avalibleGpio)
+            {
+                GpioPicker.Items.Add("Pin: " + gpio);
+                if (_equipment.GPIO == gpio && ((usedEquipment.FirstOrDefault(x => x.AttachedSubController == _equipment.AttachedSubController) != null) || usedEquipment.Count == 0))
+                    GpioPicker.SelectedIndex = index;
+                index++;
+            }
+
+            index = 0;
+            foreach (var gpio in _avalibleGpio)
+            {
+                DirectOnlineGpioPicker.Items.Add("Pin: " + gpio);
+                if (_equipment.DirectOnlineGPIO != null && (_equipment.DirectOnlineGPIO == gpio && (usedEquipment.FirstOrDefault(x => x.AttachedSubController == _equipment.AttachedSubController) != null) || usedEquipment.Count == 0))
+                    DirectOnlineGpioPicker.SelectedIndex = index;
+                index++;
+            }
         }
 
     }

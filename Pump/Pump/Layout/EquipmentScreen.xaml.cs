@@ -339,11 +339,7 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    var availablePins = GetDigitalAvailablePins();
-                    availablePins.Add(equipment.GPIO);
-                    if (equipment.DirectOnlineGPIO != null)
-                        availablePins.Add((long) equipment.DirectOnlineGPIO);
-                    await Navigation.PushModalAsync(new EquipmentUpdate(availablePins.OrderBy(x => x).ToList(), _observableIrrigation.SubControllerList.ToList(), equipment));
+                    await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), equipment));
                 }
                 else
                 {
@@ -367,9 +363,7 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    var availablePins = GetAllAvailablePins();
-                    availablePins.Add(sensor.GPIO);
-                    await Navigation.PushModalAsync(new SensorUpdate(availablePins.OrderBy(x => x).ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), sensor));
+                    await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), sensor));
                 }
                 else
                 {
@@ -404,45 +398,6 @@ namespace Pump.Layout
         }
 
 
-        private List<long> GetDigitalAvailablePins()
-        {
-            var availableList = new GpioPins().GetDigitalGpioList();
-
-            var usedPins = _observableIrrigation.EquipmentList.Select(x => x.GPIO).ToList();
-            usedPins.AddRange(_observableIrrigation.SensorList.Select(x => x.GPIO));
-
-
-            for (var i = 0; i < availableList.Count; i++)
-            {
-                if (!usedPins.Contains(availableList[i])) continue;
-                availableList.RemoveAt(i);
-                i--;
-
-            }
-            return availableList;
-        }
-
-        private List<long> GetAllAvailablePins()
-        {
-            var availableList = new GpioPins().GetAllGpioList();
-
-            var usedPins = _observableIrrigation.EquipmentList.Select(x => x.GPIO).ToList();
-            usedPins.AddRange(_observableIrrigation.SensorList.Select(x => x.GPIO));
-
-
-            for (var i = 0; i < availableList.Count; i++)
-            {
-                if (usedPins.Contains(availableList[i]))
-                {
-                    availableList.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-
-            }
-            return availableList;
-        }
-
         private void BtnBack_OnPressed(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
@@ -450,7 +405,7 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentUpdate(GetDigitalAvailablePins(), _observableIrrigation.SubControllerList.ToList()));
+            Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList()));
         }
 
         private void BtnAddSubController_OnPressed(object sender, EventArgs e)
@@ -461,7 +416,7 @@ namespace Pump.Layout
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
             
-            Navigation.PushModalAsync(new SensorUpdate(GetAllAvailablePins(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList()));
+            Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList()));
         }
     }
 }

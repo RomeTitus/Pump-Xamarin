@@ -16,17 +16,18 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SensorUpdate : ContentPage
     {
-        private readonly List<long> _avalibleGpio;
+        private List<long> _avalibleGpio;
         private List<long> _usableGpio;
         private readonly List<SubController> _subControllerList;
         private readonly List<Equipment> _equipmentList;
+        private List<Sensor> _sensorList;
         private readonly List<string> _sensorTypesList = new List<string>{"Pressure Sensor"};
         private readonly Sensor _sensor;
 
-        public SensorUpdate(List<long> avalibleGpio, List<SubController> subControllerList, List<Equipment> equipmentList, Sensor sensor = null)
+        public SensorUpdate(List<Sensor> sensorList, List<SubController> subControllerList, List<Equipment> equipmentList, Sensor sensor = null)
         {
             InitializeComponent();
-            _avalibleGpio = avalibleGpio;
+            _sensorList = sensorList;
             _subControllerList = subControllerList;
             _equipmentList = equipmentList;
             if (sensor == null)
@@ -41,6 +42,7 @@ namespace Pump.Layout
 
         private void Populate()
         {
+            SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
             SensorName.Text = _sensor.NAME;
             SystemPicker.Items.Add("Main");
             SystemPicker.SelectedIndex = 0;
@@ -50,15 +52,6 @@ namespace Pump.Layout
                 SystemPicker.Items.Add(subController.NAME);
                 if (_sensor.AttachedSubController != null && _sensor.AttachedSubController == subController.ID)
                     SystemPicker.SelectedIndex = index;
-                index++;
-            }
-
-            index = 0;
-            foreach (var sensorType in _sensorTypesList)
-            {
-                SensorTypePicker.Items.Add(sensorType);
-                if (_sensor.TYPE != null && _sensor.TYPE == sensorType)
-                    SensorTypePicker.SelectedIndex = index;
                 index++;
             }
 
@@ -204,5 +197,32 @@ namespace Pump.Layout
 
             UpdateGpioPicker();
         }
+
+        private void SystemPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            var systemPicker = (Picker)sender;
+            var selectedIndex = systemPicker.SelectedIndex;
+            _avalibleGpio = new GpioPins().GetAnalogGpioList();
+            var usedSensors = selectedIndex == 0 ? _sensorList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList() : _sensorList.Where(y => !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController == _subControllerList[SystemPicker.SelectedIndex - 1].ID).ToList();
+            var usedPins = usedSensors.Select(x => x.GPIO).ToList();
+            
+            for (var i = 0; i < _avalibleGpio.Count; i++)
+            {
+                if (!usedPins.Contains(_avalibleGpio[i])) continue;
+                _avalibleGpio.RemoveAt(i);
+                i--;
+            }
+
+            GpioPicker.Items.Clear();
+            var index = 0;
+            foreach (var gpio in _avalibleGpio)
+            {
+                GpioPicker.Items.Add("Pin: " + gpio);
+                if (_sensor.GPIO == gpio && ((usedSensors.FirstOrDefault(x => x.AttachedSubController == _sensor.AttachedSubController) != null) || usedSensors.Count == 0))
+                    GpioPicker.SelectedIndex = index;
+                index++;
+            }
+        }
+
     }
 }

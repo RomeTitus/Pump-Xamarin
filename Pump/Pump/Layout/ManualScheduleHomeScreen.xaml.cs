@@ -289,60 +289,58 @@ namespace Pump.Layout
 
             Device.BeginInvokeOnMainThread(() => { ButtonStartManual.IsEnabled = false; });
 
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
+            var auth = new Authentication();
+            var duration = MaskedEntryTime.Text.Split(':');
+            _firebaseHasReplied = null;
+            var manual = new ManualSchedule
             {
-                var auth = new Authentication();
-                var duration = MaskedEntryTime.Text.Split(':');
-                _firebaseHasReplied = null;
-                var manual = new ManualSchedule
-                {
-                    EndTime = ScheduleTime.GetUnixTimeStampUtcNow(TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1]))),
-                    RunWithSchedule = SwitchRunWithSchedule.IsToggled,
-                    ManualDetails = selectedEquipment.Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList()
-                };
+                EndTime = ScheduleTime.GetUnixTimeStampUtcNow(TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1]))),
+                RunWithSchedule = SwitchRunWithSchedule.IsToggled,
+                ManualDetails = selectedEquipment.Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList()
+            };
 
-                var key = Task.Run(() => auth.SetManualSchedule(manual)).Result;
-                auth._FirebaseClient
-                    .Child(auth.getConnectedPi()).Child("Status")
-                    .AsObservable<ControllerStatus>()
-                    .Subscribe(x =>
+            var key = Task.Run(() => auth.SetManualSchedule(manual)).Result;
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi()).Child("Status")
+                .AsObservable<ControllerStatus>()
+                .Subscribe(x =>
+                {
+                    try
                     {
-                        try
-                        {
-                            if (x.Key != key || _firebaseHasReplied == false)
-                                return;
-                            _firebaseHasReplied = true;
-                            PopupNavigation.Instance.PopAsync();
-                            var result = x.Object;
-                            result.ID = x.Key;
-                            Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                    });
+                        if (x.Key != key || _firebaseHasReplied == false)
+                            return;
+                        _firebaseHasReplied = true;
+                        PopupNavigation.Instance.PopAsync();
+                        var result = x.Object;
+                        result.ID = x.Key;
+                        Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                });
 
-                var stopwatch = new Stopwatch();
-                var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
-                PopupNavigation.Instance.PushAsync(floatingScreenScreen);
-                stopwatch.Start();
+            var stopwatch = new Stopwatch();
+            var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
+            PopupNavigation.Instance.PushAsync(floatingScreenScreen);
+            stopwatch.Start();
 
-                while (stopwatch.Elapsed < TimeSpan.FromSeconds(20))
-                {
-                    Thread.Sleep(500);
-                }
-                stopwatch.Stop();
-
-
-                if (_firebaseHasReplied != null) return;
-                {
-                    PopupNavigation.Instance.PopAsync();
-                    _firebaseHasReplied = false;
-                    Device.BeginInvokeOnMainThread(async () => { if(await DisplayAlert("No Reply :/", "We never got a reply back\nWould you like to keep your changes?", "I'm a Dev", "Revert"))
-                         await Task.Run(() => auth.DeleteManualSchedule());});
-                }
+            while (stopwatch.Elapsed < TimeSpan.FromSeconds(20))
+            {
+                Thread.Sleep(500);
             }
+            stopwatch.Stop();
+
+
+            if (_firebaseHasReplied != null) return;
+            {
+                PopupNavigation.Instance.PopAsync();
+                _firebaseHasReplied = false;
+                Device.BeginInvokeOnMainThread(async () => { if(await DisplayAlert("No Reply :/", "We never got a reply back\nWould you like to keep your changes?", "I'm a Dev", "Revert"))
+                     await Task.Run(() => auth.DeleteManualSchedule());});
+            }
+            
         }
 
         private void ButtonStopManual_Clicked(object sender, EventArgs e)
@@ -352,56 +350,54 @@ namespace Pump.Layout
 
         private void StopManualSchedule()
         {
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
-            {
-                _firebaseHasReplied = null;
-                var auth = new Authentication();
-                var key = Task.Run(() => auth.DeleteManualSchedule()).Result;
+            _firebaseHasReplied = null;
+            var auth = new Authentication();
+            var key = Task.Run(() => auth.DeleteManualSchedule()).Result;
 
-                auth._FirebaseClient
-                    .Child(auth.getConnectedPi()).Child("Status")
-                    .AsObservable<ControllerStatus>()
-                    .Subscribe(x =>
-                    {
-                        try
-                        {
-                            if (x.Key != key || _firebaseHasReplied == false)
-                                return;
-                            _firebaseHasReplied = true;
-
-                            PopupNavigation.Instance.PopAsync();
-                            var result = x.Object;
-                            result.ID = x.Key;
-                            if (result.Code == "success")
-                            {
-                                Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-                                return;
-                            }
-                            Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                    });
-
-                var stopwatch = new Stopwatch();
-                var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
-                PopupNavigation.Instance.PushAsync(floatingScreenScreen);
-                stopwatch.Start();
-
-                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15))
+            auth._FirebaseClient
+                .Child(auth.getConnectedPi()).Child("Status")
+                .AsObservable<ControllerStatus>()
+                .Subscribe(x =>
                 {
-                    Thread.Sleep(500);
-                }
-                stopwatch.Stop();
+                    try
+                    {
+                        if (x.Key != key || _firebaseHasReplied == false)
+                            return;
+                        _firebaseHasReplied = true;
 
-                if (_firebaseHasReplied != null) return;
-                PopupNavigation.Instance.PopAsync();
-                _firebaseHasReplied = false;
-                Device.BeginInvokeOnMainThread(() => { DisplayAlert("Cleared!", "We never got a reply back", "Understood"); });
+                        PopupNavigation.Instance.PopAsync();
+                        var result = x.Object;
+                        result.ID = x.Key;
+                        if (result.Code == "success")
+                        {
+                            Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
+                            return;
+                        }
+                        Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                });
+
+            var stopwatch = new Stopwatch();
+            var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
+            PopupNavigation.Instance.PushAsync(floatingScreenScreen);
+            stopwatch.Start();
+
+            while (stopwatch.Elapsed < TimeSpan.FromSeconds(15))
+            {
+                Thread.Sleep(500);
             }
+            stopwatch.Stop();
+
+            if (_firebaseHasReplied != null) return;
+            PopupNavigation.Instance.PopAsync();
+            _firebaseHasReplied = false;
+            Device.BeginInvokeOnMainThread(() => { DisplayAlert("Cleared!", "We never got a reply back", "Understood"); });
         }
+        
 
         private void ScrollViewManualZoneTap_Tapped(object sender, EventArgs e)
         {

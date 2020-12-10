@@ -229,15 +229,11 @@ namespace Pump.Layout
 
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
         {
-            if (new DatabaseController().IsRealtimeFirebaseSelected())
-            {
-                if (_observableIrrigation.EquipmentList.Count > 0)
-                    Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
-                else
-                    DisplayAlert("Cannot Create a Schedule",
-                        "You are missing the equipment that is needed to create a schedule", "Understood");
-            }
-
+            if (_observableIrrigation.EquipmentList.Count > 0)
+                Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
+            else
+                DisplayAlert("Cannot Create a Schedule",
+                    "You are missing the equipment that is needed to create a schedule", "Understood");
         }
 
         private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
