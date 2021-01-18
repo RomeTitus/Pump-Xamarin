@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Pump.Layout.SetupNewSystem"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    BackgroundColor="DeepSkyBlue">
+    <ContentPage.Content>
+        <StackLayout Margin="15" HorizontalOptions="FillAndExpand">
+            <Label
+                Margin="0,15,0,0"
+                FontSize="Title"
+                HorizontalOptions="CenterAndExpand"
+                Text="Nearby Controllers"
+                TextColor="White"
+                TextDecorations="Underline"
+                VerticalOptions="Center" />
+            <StackLayout VerticalOptions="FillAndExpand">
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView HeightRequest="100">
+                        <StackLayout x:Name="ScrollViewSetupSystem">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer x:Name="ScrollViewSetupSystemTap" />
+                            </StackLayout.GestureRecognizers>
+                        </StackLayout>
+
+                    </ScrollView>
+                </Frame>
+            </StackLayout>
+            <Button
+                x:Name="BtnScan"
+                BackgroundColor="DeepSkyBlue"
+                Clicked="BtnScan_OnClicked"
+                HorizontalOptions="Center"
+                IsVisible="True"
+                Text="Scan"
+                VerticalOptions="End" />
+        </StackLayout>
+
+    </ContentPage.Content>
+
+
+
+</ContentPage>

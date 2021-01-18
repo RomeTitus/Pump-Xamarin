@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Pump.Database;
 using Pump.Droid.Database.Table;
@@ -11,7 +10,7 @@ using Xamarin.Forms;
 
 namespace Pump
 {
-    public partial class AddController : ContentPage
+    public partial class AddExistingController : ContentPage
     {
         private bool? _internalConnection;
         private bool? _externalConnection;
@@ -22,7 +21,7 @@ namespace Pump
         private double _height;
         private double _width;
 
-        public AddController(bool firstConnection, PumpConnection pumpConnection = null)
+        public AddExistingController(bool firstConnection, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
 
@@ -51,6 +50,7 @@ namespace Pump
             TxtControllerCode.Text = _pumpConnection.Mac;
             TxtControllerCode.IsEnabled = false;
             BtnAddController.Text = "Update";
+            BtnNewController.IsVisible = false;
         }
 
         private void AddIrrigationController()
@@ -239,6 +239,7 @@ namespace Pump
 
         private bool CheckSocket(string host, int port)
         {
+            //TODO Create Socket File
             var socket = new SocketVerify(host, port);
             try
             {
@@ -295,6 +296,15 @@ namespace Pump
         public Button GetUpdateButton()
         {
             return BtnAddController;
+        }
+
+        private void BtnNewController_OnClicked(object sender, EventArgs e)
+        {
+            Navigation.PopModalAsync();
+            
+            //var connectionScreen = new AddExistingController(false);
+            //connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
+            Navigation.PushModalAsync(new SetupNewSystem());
         }
     }
 }

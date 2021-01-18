@@ -19,7 +19,7 @@ namespace Pump
             InitializeComponent();
             if (_databaseController.GetControllerConnectionSelection() == null)
             {
-                var newConnectionScreen = new AddController(true);
+                var newConnectionScreen = new AddExistingController(true);
                 MainPage = newConnectionScreen;
             }
             else

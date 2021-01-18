@@ -33,7 +33,7 @@ namespace Pump.Layout
             if (_databaseController.GetControllerConnectionSelection() == null)
             {
                 _databaseController.SetActivityStatus(new ActivityStatus(false));
-                Navigation.PushModalAsync(new AddController(true));
+                Navigation.PushModalAsync(new AddExistingController(true));
 
             }
             else

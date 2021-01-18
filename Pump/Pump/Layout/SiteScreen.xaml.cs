@@ -133,14 +133,22 @@ namespace Pump.Layout
 
         private void SetSelectedSite()
         {
-            if(_observableIrrigation.SiteList.Contains(null))
-                return;
             var connection = new DatabaseController().GetControllerConnectionSelection();
-            if (string.IsNullOrEmpty(connection.SiteSelectedId))
+
+            try
             {
-                var site = _observableIrrigation.SiteList.First();
-                connection.SiteSelectedId = site.ID;
-                new DatabaseController().UpdateControllerConnection(connection);
+                if (_observableIrrigation.SiteList.Contains(null))
+                    return;
+                if (string.IsNullOrEmpty(connection.SiteSelectedId))
+                {
+                    var site = _observableIrrigation.SiteList.First();
+                    connection.SiteSelectedId = site.ID;
+                    new DatabaseController().UpdateControllerConnection(connection);
+                }
+            }
+            catch
+            {
+                //check this
             }
 
             foreach (var view in ScrollViewSite.Children)
@@ -246,14 +254,14 @@ namespace Pump.Layout
 
         private void BtnAddController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new AddController(false);
+            var connectionScreen = new AddExistingController(false);
             connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
 
         private void BtnEditController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new AddController(false, new DatabaseController().GetControllerConnectionSelection());
+            var connectionScreen = new AddExistingController(false, new DatabaseController().GetControllerConnectionSelection());
             connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }

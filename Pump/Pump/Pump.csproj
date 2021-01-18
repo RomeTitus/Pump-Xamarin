@@ -32,6 +32,7 @@
   <ItemGroup>
     <PackageReference Include="FirebaseDatabase.net" Version="4.0.4" />
     <PackageReference Include="LiteDB" Version="5.0.9" />
+    <PackageReference Include="Plugin.BLE" Version="2.1.1" />
     <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.6" />
     <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     <PackageReference Include="Xamarin.Forms" Version="4.8.0.1269" />
@@ -58,8 +59,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Layout\AddController.xaml.cs">
-      <DependentUpon>AddController.xaml</DependentUpon>
+    <Compile Update="Layout\AddExistingController.xaml.cs">
+      <DependentUpon>AddExistingController.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\FloatingScreenScroll.xaml.cs">
       <DependentUpon>FloatingScreenScroll.xaml</DependentUpon>
@@ -149,6 +150,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\SensorUpdate.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\SetupNewSystem.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\SiteScreen.xaml">
