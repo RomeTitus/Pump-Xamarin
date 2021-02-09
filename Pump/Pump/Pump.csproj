@@ -31,15 +31,15 @@
 
   <ItemGroup>
     <PackageReference Include="ble.net" Version="1.2.1" />
-    <PackageReference Include="FirebaseDatabase.net" Version="4.0.4" />
-    <PackageReference Include="LiteDB" Version="5.0.9" />
-    <PackageReference Include="MvvmCross" Version="6.0.0" />
+    <PackageReference Include="FirebaseDatabase.net" Version="4.0.5" />
+    <PackageReference Include="LiteDB" Version="5.0.10" />
+    <PackageReference Include="MvvmCross" Version="7.1.2" />
     <PackageReference Include="MvvmCross.Plugin.BLE" Version="2.2.0-pre2" />
     <PackageReference Include="Plugin.BLE" Version="2.2.0-pre2" />
     <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.10" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1269" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.6.0-pre2" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.0-beta" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.1931" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     <PackageReference Include="Xamarin.Forms.MaskedEntry" Version="1.0.0" />
   </ItemGroup>
 
@@ -68,16 +68,16 @@
     <Compile Update="Layout\FloatingScreenScroll.xaml.cs">
       <DependentUpon>FloatingScreenScroll.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\ManualScheduleHomeScreen.xaml.cs">
+    <Compile Update="Layout\Dashboard\ManualScheduleHomeScreen.xaml.cs">
       <DependentUpon>ManualScheduleHomeScreen.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\ScheduleStatusHomeScreen - Copy.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
-    <Compile Update="Layout\ScheduleStatusHomeScreen.xaml.cs">
+    <Compile Update="Layout\Dashboard\ScheduleStatusHomeScreen.xaml.cs">
       <DependentUpon>ScheduleStatusHomeScreen.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\SettingPageHomeScreen.xaml.cs">
+    <Compile Update="Layout\Dashboard\SettingPageHomeScreen.xaml.cs">
       <DependentUpon>SettingPageHomeScreen.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\BluetoothScan.xaml.cs">
@@ -86,7 +86,7 @@
     <Compile Update="Layout\SubControllerUpdate.xaml.cs">
       <DependentUpon>SubControllerUpdate.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\CustomScheduleUpdate.xaml.cs">
+    <Compile Update="Layout\Schedule\CustomScheduleUpdate.xaml.cs">
       <DependentUpon>CustomScheduleUpdate.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\SensorUpdate.xaml.cs">
@@ -95,19 +95,19 @@
     <Compile Update="Layout\EquipmentUpdate.xaml.cs">
       <DependentUpon>EquipmentUpdate.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\ScheduleUpdate.xaml.cs">
+    <Compile Update="Layout\Schedule\ScheduleUpdate.xaml.cs">
       <DependentUpon>ScheduleUpdate.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\VerifyConnections.xaml.cs">
       <DependentUpon>VerifyConnections.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\CustomScheduleHomeScreen.xaml.cs">
+    <Compile Update="Layout\Dashboard\CustomScheduleHomeScreen.xaml.cs">
       <DependentUpon>CustomScheduleHomeScreen.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\EquipmentScreen.xaml.cs">
       <DependentUpon>EquipmentScreen.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Layout\ScheduleHomeScreen.xaml.cs">
+    <Compile Update="Layout\Dashboard\ScheduleHomeScreen.xaml.cs">
       <DependentUpon>ScheduleHomeScreen.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\GraphSummaryScreen.xaml.cs">
@@ -137,25 +137,25 @@
     <EmbeddedResource Update="Layout\FloatingScreenScroll.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\HomeScreen.xaml">
+    <EmbeddedResource Update="Layout\Dashboard\HomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ManualScheduleHomeScreen.xaml">
+    <EmbeddedResource Update="Layout\Dashboard\ManualScheduleHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ScheduleStatusHomeScreen.xaml">
+    <EmbeddedResource Update="Layout\Dashboard\ScheduleStatusHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\SettingPageHomeScreen.xaml">
+    <EmbeddedResource Update="Layout\Dashboard\SettingPageHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\CustomScheduleUpdate.xaml">
+    <EmbeddedResource Update="Layout\Schedule\CustomScheduleUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\EquipmentUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\ScheduleUpdate.xaml">
+    <EmbeddedResource Update="Layout\Schedule\ScheduleUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\SensorUpdate.xaml">
@@ -179,7 +179,7 @@
     <EmbeddedResource Update="Layout\VerifyConnections.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\CustomScheduleHomeScreen.xaml">
+    <EmbeddedResource Update="Layout\Dashboard\CustomScheduleHomeScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\EquipmentScreen.xaml">
@@ -195,6 +195,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewAvailableWiFi.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewBasicAlert.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewBluetoothSummary.xaml">

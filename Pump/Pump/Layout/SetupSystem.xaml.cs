@@ -14,16 +14,19 @@ using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout
 {
+    //DisplayPromptAsync
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SetupSystem : ContentPage
     {
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
-        private BluetoothManager _bluetoothManage;
+        private readonly BluetoothManager _blueToothManage;
         private List<WiFiContainer> _wiFiContainers;
-        public SetupSystem(BluetoothManager bluetoothManager)
+        private WiFiContainer selectedWiFiContainer;
+        private ViewBasicAlert _viewBasicAlert;
+        public SetupSystem(BluetoothManager blueToothManager)
         {
             InitializeComponent();
-            _bluetoothManage = bluetoothManager;
+            _blueToothManage = blueToothManager;
             IsMain.CheckedChanged += IsMain_CheckedChanged;
             PopulateControllers();
         }
@@ -52,13 +55,10 @@ namespace Pump.Layout
                 }
 
                 _wiFiContainers = DictToWiFiContainer(result);
-                var WiFiView = new ViewAvailableWiFi(_wiFiContainers);
-                var floatingScreen = new FloatingScreenScroll();
-                floatingScreen.SetFloatingScreen(new List<object> {WiFiView});
-                await PopupNavigation.Instance.PushAsync(floatingScreen);
-
-
-                foreach (var views in WiFiView.GetChildren())
+                var wiFiView = new ViewAvailableWiFi(_wiFiContainers);
+                await GeneratePopupScreen(new List<object> {wiFiView});
+                
+                foreach (var views in wiFiView.GetChildren())
                 {
                     var wifiView = (ViewWiFi) views;
                     wifiView.GetGestureRecognizer().Tapped += WiFiView_Tapped;
@@ -75,31 +75,23 @@ namespace Pump.Layout
             try
             {
                 var tapGestureRecognizerWiFi = (StackLayout)sender;
-                var wifiContainer = _wiFiContainers.FirstOrDefault(x => x.ssid == tapGestureRecognizerWiFi.AutomationId);
+                selectedWiFiContainer = _wiFiContainers.FirstOrDefault(x => x.ssid == tapGestureRecognizerWiFi.AutomationId);
 
-                if (wifiContainer != null)
+                if (selectedWiFiContainer != null)
                 {
-                    if (string.IsNullOrEmpty(wifiContainer.encryption_type))
-                        await DisplayAlert("WIFI", "Are you use you want to connect to " + wifiContainer.ssid, "Connect", "Cancel");
+                    if (string.IsNullOrEmpty(selectedWiFiContainer.encryption_type))
+                        _viewBasicAlert = new ViewBasicAlert("WIFI",
+                            "Are you use you want to connect to " + selectedWiFiContainer.ssid, "Connect",
+                            "Cancel");
                     else
                     {
-                        var passkey = await DisplayPromptAsync("WIFI", "Are you use you want to connect to " + wifiContainer.ssid + "\nEnter Password", "Connect", "Cancel");
-                        Forms9Patch.KeyboardService.Hide();
-                        if (string.IsNullOrEmpty(passkey)) return;
-                        wifiContainer.passkey = passkey;
+                        _viewBasicAlert = new ViewBasicAlert("WIFI",
+                            "Are you use you want to connect to " + selectedWiFiContainer.ssid + "\nEnter Password",
+                            "Connect",
+                            "Cancel", true);
                     }
-                         
-                    LabelWiFi.Text = wifiContainer.ssid;
-                    
-                    await PopupNavigation.Instance.PopAllAsync();
-
-                    var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
-                    await PopupNavigation.Instance.PushAsync(loadingScreen);
-                    var result = await ConnectToWifi(wifiContainer);
-                    await PopupNavigation.Instance.PopAllAsync();
-                    //await DisplayAlert("WIFI", result, "Understood");
-                    LabelIP.IsVisible = true;
-                    LabelIP.Text = result;
+                    _viewBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
+                    await GeneratePopupScreen(new List<object> {_viewBasicAlert});
                 }
                 else
                     await DisplayAlert("WIFI", "We could not find that WiFi Details", "Understood");
@@ -110,27 +102,43 @@ namespace Pump.Layout
             }
         }
 
+        private async void WiFiPassword_Clicked(object sender, EventArgs e)
+        {
+            if(_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.getEditableText()))
+                selectedWiFiContainer.passkey = _viewBasicAlert.getEditableText();
+
+            LabelWiFi.Text = selectedWiFiContainer.ssid;
+
+            await PopupNavigation.Instance.PopAllAsync();
+
+            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
+            var result = await ConnectToWifi(selectedWiFiContainer);
+            await PopupNavigation.Instance.PopAllAsync();
+            LabelIP.IsVisible = true;
+            LabelIP.Text = result;
+        }
+
         private List<WiFiContainer> DictToWiFiContainer(string Dict)
         {
-            var WiFiList = new List<WiFiContainer>();
-            if (Dict == "None") return WiFiList;
-            //var test1 = JsonConvert.DeserializeObject<Dictionary<string, string>>(Dict);
-            var WiFiObject = JObject.Parse(Dict);
+            var wiFiList = new List<WiFiContainer>();
+            if (Dict == "None") return wiFiList;
+            var wiFiObject = JObject.Parse(Dict);
 
-            WiFiList.AddRange(WiFiObject["Networks"].Select(WiFiInfo => 
-                new WiFiContainer {encryption_type = WiFiInfo["encryption_type"].ToString(), signal = WiFiInfo["signal"].ToString(), ssid = WiFiInfo["ssid"].ToString()}));
-            return WiFiList;
+            wiFiList.AddRange(wiFiObject["Networks"].Select(wiFiInfo => 
+                new WiFiContainer {encryption_type = wiFiInfo["encryption_type"].ToString(), signal = wiFiInfo["signal"].ToString(), ssid = wiFiInfo["ssid"].ToString()}));
+            return wiFiList;
         }
 
         private async Task<string> ScanWiFi()
         {
-            return await _bluetoothManage.WriteToBle(SocketCommands.WiFiScan);
+            return await _blueToothManage.WriteToBle(SocketCommands.WiFiScan);
         }
 
         private async Task<string> ConnectToWifi(WiFiContainer wiFiContainer)
         {
-            var wiFiJosn = JObject.FromObject(wiFiContainer);
-            return await _bluetoothManage.WriteToBle(SocketCommands.WiFiConnect(wiFiJosn), 8000);
+            var wiFiJson = JObject.FromObject(wiFiContainer);
+            return await _blueToothManage.WriteToBle(SocketCommands.WiFiConnect(wiFiJson), 8000);
         }
 
         private void PopulateControllers()
@@ -148,7 +156,7 @@ namespace Pump.Layout
 
         private async Task<string> SendUid(string uid)
         {
-            return await _bluetoothManage.WriteToBle(SocketCommands.FirebaseUID(uid));
+            return await _blueToothManage.WriteToBle(SocketCommands.FirebaseUID(uid));
         }
 
         private async void WiFiIpLabel_OnTapped(object sender, EventArgs e)
@@ -160,21 +168,32 @@ namespace Pump.Layout
         {
             if (IsMain.IsChecked)
             {
-                var passkey = await DisplayPromptAsync("Setup", "You are creating a new Controller \nTo prevent someone from Pickpocketing  \nEnter a good Password", "Connect", "Cancel");
-                Forms9Patch.KeyboardService.Hide();
-                if (string.IsNullOrEmpty(passkey)) return;
-                var passkeyConfirmation = await DisplayPromptAsync("Setup", "Please re-enter your password  \nEnter Password", "Connect", "Cancel");
-                Forms9Patch.KeyboardService.Hide();
-                if (passkey != passkeyConfirmation)
-                    await DisplayAlert("Setup", "Passwords does not match", "Understood");
-                else
-                {
-                    var result = await SendUid(passkey);
-                    await DisplayAlert("Setup", result, "Understood");
-                }
-                    
-
+                _viewBasicAlert = new ViewBasicAlert("Setup",
+                    "You are creating a new Controller \nTo prevent someone from Pickpocketing  \nEnter a good Password",
+                    "Please re-enter your password  \nEnter Password",
+                    "Connect",
+                    "Cancel", true);
+                _viewBasicAlert.GetAcceptButton().Clicked += SetUpMainController_Clicked;
+                await GeneratePopupScreen(new List<object>{_viewBasicAlert});
             }
+        }
+
+        private async void SetUpMainController_Clicked(object sender, EventArgs e)
+        {
+            if (_viewBasicAlert.getEditableText() != _viewBasicAlert.getSubEditableText())
+                await DisplayAlert("Setup", "Passwords does not match", "Understood");
+            else
+            {
+                var result = await SendUid(_viewBasicAlert.getEditableText());
+                await DisplayAlert("Setup", result, "Understood");
+            }
+        }
+
+        private static async Task GeneratePopupScreen(IEnumerable<object> screenViews)
+        {
+            var floatingScreen = new FloatingScreenScroll();
+            floatingScreen.SetFloatingScreen(screenViews);
+            await PopupNavigation.Instance.PushAsync(floatingScreen);
         }
     }
 }

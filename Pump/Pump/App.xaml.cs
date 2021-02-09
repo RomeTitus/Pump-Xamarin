@@ -1,11 +1,9 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout;
-using Pump.SocketController;
 using Xamarin.Forms;
 
 namespace Pump

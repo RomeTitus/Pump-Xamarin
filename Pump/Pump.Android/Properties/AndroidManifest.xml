@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.Varkensvlei.Pump" android:installLocation="auto">
-	<uses-sdk android:minSdkVersion="27" android:targetSdkVersion="28" />
+	<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="29" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -9,14 +9,14 @@
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.BLUETOOTH" />
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 	<permission android:name="com.Varkensvlei.Pump.permission.C2D_MESSAGE" android:protectionLevel="signature" />
 	<uses-permission android:name="com.Varkensvlei.Pump.C2D_MESSAGE" />
 	<uses-permission android:name="android.permission.VIBRATE" />
-  <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+	<uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 	<application android:label="Pump.Android">
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
