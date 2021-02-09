@@ -1,15 +1,27 @@
-﻿using Android.App;
+﻿using Android;
+using Android.App;
 using Android.Content.PM;
 using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
 using Rg.Plugins.Popup.Services;
 using Android.Util;
+using nexus.protocols.ble;
+using ConnectionResult = Android.Gms.Common.ConnectionResult;
+
 namespace Pump.Droid
 {
     [Activity(Label = "Pump", Icon = "@drawable/Logo", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
+        private readonly string[] Permissions =
+        {
+            Manifest.Permission.Bluetooth,
+            Manifest.Permission.BluetoothAdmin,
+            Manifest.Permission.AccessCoarseLocation,
+            Manifest.Permission.AccessFineLocation
+        };
+
         public const string TAG = "MainActivity";
         internal static readonly string CHANNEL_ID = "my_notification_channel";
         protected override void OnCreate(Bundle savedInstanceState)
@@ -21,6 +33,8 @@ namespace Pump.Droid
             base.OnCreate(savedInstanceState);
 
             
+
+
             if (Intent.Extras != null)
             {
                 foreach (var key in Intent.Extras.KeySet())
@@ -30,12 +44,33 @@ namespace Pump.Droid
                     Log.Debug(TAG, "Key: {0} Value: {1}", key, value);
                 }
             }
-
-            Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);
+            Rg.Plugins.Popup.Popup.Init(this);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            BluetoothLowEnergyAdapter.Init(this);
+            CheckPermissions();
             LoadApplication(new App());
             IsPlayServicesAvailable();
+        }
+
+
+        private void CheckPermissions()
+        {
+            bool minimumPermissionsGranted = true;
+
+            foreach (string permission in Permissions)
+            {
+                if (CheckSelfPermission(permission) != Permission.Granted)
+                {
+                    minimumPermissionsGranted = false;
+                }
+            }
+
+            // If any of the minimum permissions aren't granted, we request them from the user
+            if (!minimumPermissionsGranted)
+            {
+                RequestPermissions(Permissions, 0);
+            }
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)

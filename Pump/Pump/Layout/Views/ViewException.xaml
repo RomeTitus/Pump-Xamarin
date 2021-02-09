@@ -20,7 +20,6 @@
             Grid.Column="0"
             HorizontalOptions="Center">
             <Label FontSize="20" Text="Something, somewhere broke" />
-            <!--Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>-->
             <Image HeightRequest="68" Source="{localImage:ImageResourceExtention Pump.Icons.NoConnection.png}" />
         </StackLayout>
     </Grid>

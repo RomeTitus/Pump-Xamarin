@@ -6,6 +6,7 @@ using Pump.Database;
 using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -17,8 +18,8 @@ namespace Pump.Layout
         private readonly ObservableIrrigation _observableIrrigation;
         private SettingPageHomeScreen _settingPageHomeScreen;
         private bool _hasSentUpdateRequest;
-        private bool firstRun = true;
-
+        private bool _firstRun = true;
+        
         private readonly DatabaseController _databaseController = new DatabaseController();
         public HomeScreen(ObservableIrrigation observableIrrigation)
         {
@@ -50,6 +51,15 @@ namespace Pump.Layout
 
             SetUpNavigationPage();
             observableIrrigation.AliveList.CollectionChanged += subscribeToLastOnline;
+            Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        private void Connectivity_ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
+        {
+            if (Connectivity.NetworkAccess != NetworkAccess.Internet)
+                DisplayAlert("No Internet", "We are unable to connect to the Internet \n Trying again", "Understood");
+            else if(Connectivity.NetworkAccess == NetworkAccess.Internet)
+                DisplayAlert("Internet", "We are Connected!", "Understood");
         }
 
         private void SetUpNavigationPage()
@@ -112,7 +122,7 @@ namespace Pump.Layout
         private void subscribeToLastOnline(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (!_hasSentUpdateRequest) return;
-            firstRun = false;
+            _firstRun = false;
             _hasSentUpdateRequest = false;
 
         }
@@ -121,6 +131,8 @@ namespace Pump.Layout
         {
             Device.BeginInvokeOnMainThread(() =>
             {
+                
+
                 if (_observableIrrigation.AliveList[0] == null)
                 {
                     TabPageMain.BackgroundColor = Color.DarkOrange;
@@ -150,7 +162,7 @@ namespace Pump.Layout
                     if (!_hasSentUpdateRequest)
                     {
 
-                        if(!firstRun)
+                        if(!_firstRun)
                             LastOnline();
 
                         if (_observableIrrigation.AliveList[0] != null)

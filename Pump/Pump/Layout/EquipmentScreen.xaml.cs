@@ -341,7 +341,7 @@ namespace Pump.Layout
                 {
                     await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), equipment));
                 }
-                else
+                else if(action == "Delete")
                 {
                     if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + equipment.NAME, "Delete",

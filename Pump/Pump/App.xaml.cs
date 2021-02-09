@@ -1,9 +1,11 @@
 ﻿using System;
+using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout;
+using Pump.SocketController;
 using Xamarin.Forms;
 
 namespace Pump
@@ -17,6 +19,7 @@ namespace Pump
         public App()
         {
             InitializeComponent();
+
             if (_databaseController.GetControllerConnectionSelection() == null)
             {
                 var newConnectionScreen = new AddExistingController(true);

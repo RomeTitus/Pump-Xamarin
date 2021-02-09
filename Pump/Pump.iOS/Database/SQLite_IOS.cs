@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-
-using Foundation;
 using Pump.Database;
 using Pump.iOS.Database;
 using SQLite;
-using UIKit;
 using Xamarin.Forms;
 
 [assembly: Dependency(typeof(SQLite_IOS))]

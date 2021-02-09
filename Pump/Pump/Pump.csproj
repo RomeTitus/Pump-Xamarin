@@ -30,10 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ble.net" Version="1.2.1" />
     <PackageReference Include="FirebaseDatabase.net" Version="4.0.4" />
     <PackageReference Include="LiteDB" Version="5.0.9" />
-    <PackageReference Include="Plugin.BLE" Version="2.1.1" />
-    <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.6" />
+    <PackageReference Include="MvvmCross" Version="6.0.0" />
+    <PackageReference Include="MvvmCross.Plugin.BLE" Version="2.2.0-pre2" />
+    <PackageReference Include="Plugin.BLE" Version="2.2.0-pre2" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.10" />
     <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     <PackageReference Include="Xamarin.Forms" Version="4.8.0.1269" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.0-pre2" />
@@ -77,6 +80,9 @@
     <Compile Update="Layout\SettingPageHomeScreen.xaml.cs">
       <DependentUpon>SettingPageHomeScreen.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Layout\BluetoothScan.xaml.cs">
+      <DependentUpon>BluetoothScan.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Layout\SubControllerUpdate.xaml.cs">
       <DependentUpon>SubControllerUpdate.xaml</DependentUpon>
     </Compile>
@@ -106,6 +112,9 @@
     </Compile>
     <Compile Update="Layout\GraphSummaryScreen.xaml.cs">
       <DependentUpon>GraphSummaryScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Layout\AvailableWiFi.xaml.cs">
+      <DependentUpon>AvailableWiFi.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\Views\ViewActiveScheduleSummary.xaml.cs">
       <DependentUpon>ViewActiveScheduleSummary.xaml</DependentUpon>
@@ -152,7 +161,10 @@
     <EmbeddedResource Update="Layout\SensorUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\SetupNewSystem.xaml">
+    <EmbeddedResource Update="Layout\BluetoothScan.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\SetupSystem.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\SiteScreen.xaml">
@@ -176,7 +188,16 @@
     <EmbeddedResource Update="Layout\GraphSummaryScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Layout\AvailableWiFi.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewAttachedEquipment.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewAvailableWiFi.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewBluetoothSummary.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewCustomSchedule.xaml">
@@ -225,6 +246,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewSubControllerSummary.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\Views\ViewWiFi.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Views\ViewZoneAndTimeGrid.xaml">

@@ -32,7 +32,10 @@
         WidthRequest="300">
         <ScrollView>
 
-            <StackLayout x:Name="ScrollViewFloatingPage" />
+            <StackLayout
+                x:Name="ScrollViewFloatingPage"
+                HorizontalOptions="StartAndExpand"
+                VerticalOptions="StartAndExpand" />
 
         </ScrollView>
     </StackLayout>

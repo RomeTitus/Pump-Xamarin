@@ -1,96 +1,29 @@
 ﻿using System;
+using System.Linq.Expressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
-    internal class SocketCommands
+    internal static class SocketCommands
     {
-        public string getActiveSchedule()
+        public static string WiFiScan = "{\"Task\" : \"WiFiScan\"}";
+
+        public static string WiFiConnect(JObject wiFiConnect)
         {
-            return "getActiveSchedule";
+            var wiFiCommand = new JObject{{ "Task", new JObject()}};
+            wiFiCommand["Task"] = new JObject{{ "WiFiConnect", new JObject()}};
+            wiFiCommand["Task"]["WiFiConnect"] = wiFiConnect;
+            return wiFiCommand.ToString();
         }
 
-        public string getScheduleInfo(string id)
+        public static string FirebaseUID(string uid)
         {
-            return id + "$getScheduleInfo";
-        }
-
-        public string getSchedule()
-        {
-            return "getSchedule";
-        }
-
-        public string addSchedule(string schedule)
-        {
-            return schedule + "$SCHEDULE";
-        }
-
-        public string updateSchedule(int id, string schedule)
-        {
-            return id + "#" + schedule + "$EDITSCHEDULE";
-        }
-
-        public string deleteSchedule(string id)
-        {
-            return id + "$DeleteSchedule";
-        }
-
-        public string getMacAddress()
-        {
-            return "getMAC";
-        }
-
-        public string getQueueSchedule()
-        {
-            return "getQueueSchedule";
-        }
-
-        public string getActiveSensorStatus()
-        {
-            return "getActiveSensorStatus";
-        }
-
-        public string getPumps()
-        {
-            return "getPumps";
-        }
-
-        public string getValves()
-        {
-            return "getValves";
-        }
-
-        public string getManualSchedule()
-        {
-            return "getManualSchedule";
-        }
-
-
-        public string StopManualSchedule()
-        {
-            return "StopManualSchedule";
-        }
-
-        public string ChangeSchedule(string id, int isActive)
-        {
-            return id + "," + isActive + "$ChangeSchedule";
-        }
-
-        public string getEquipmentLastUsed()
-        {
-            return "getEquipmentLastUsedHistoryReading";
-        }
-
-        public string setToken(string token)
-        {
-            var deviceId = Preferences.Get("my_deviceId", string.Empty);
-            if (string.IsNullOrEmpty(deviceId))
-            {
-                deviceId = Guid.NewGuid().ToString();
-                Preferences.Set("my_deviceId", deviceId);
-            }
-
-            return deviceId + "," + token + "$setToken";
+            var wiFiCommand = new JObject { { "Task", new JObject() } };
+            wiFiCommand["Task"] = new JObject { { "uid", new JObject() } };
+            wiFiCommand["Task"]["uid"] = uid;
+            return wiFiCommand.ToString();
         }
     }
 }

@@ -15,10 +15,6 @@
         Direction="Column"
         JustifyContent="SpaceAround"
         VerticalOptions="Center">
-
-        <!--  This rectangle is painted with a diagonal linear gradient.  -->
-
-        <!--  Place new controls here  -->
         <StackLayout>
             <Label
                 x:Name="LabelControllerName"

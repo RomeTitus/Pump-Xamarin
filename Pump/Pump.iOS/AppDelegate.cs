@@ -25,6 +25,7 @@ namespace Pump.iOS
             global::Xamarin.Forms.Forms.Init();
             IQKeyboardManager.SharedManager.Enable = true;
             RegisterForRemoteNotifications();
+            Forms9Patch.iOS.Settings.Initialize(this);
             LoadApplication(new App());
             
             return base.FinishedLaunching(app, options);

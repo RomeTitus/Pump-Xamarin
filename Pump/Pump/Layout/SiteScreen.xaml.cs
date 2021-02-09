@@ -17,9 +17,9 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SiteScreen : ContentPage
     {
-        private List<PumpConnection> ControllerList = new List<PumpConnection>();
+        private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly ObservableIrrigation _observableIrrigation;
-        private HomeScreen homeScreen;
+        private HomeScreen _homeScreen;
 
         public SiteScreen(ObservableIrrigation observableIrrigation)
         {
@@ -34,7 +34,6 @@ namespace Pump.Layout
             _observableIrrigation.CustomScheduleList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.ManualScheduleList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
-
             ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
             if (!string.IsNullOrEmpty(new DatabaseController().GetControllerConnectionSelection().SiteSelectedId))
                 StartHomePage();
@@ -42,18 +41,18 @@ namespace Pump.Layout
 
         private void PopulateControllers()
         {
-            ControllerList = new DatabaseController().GetControllerConnectionList();
+            _controllerList = new DatabaseController().GetControllerConnectionList();
             ControllerPicker.Items.Clear();
             var selectedController = new DatabaseController().GetControllerConnectionSelection();
-            for (var i = 0; i < ControllerList.Count; i++)
+            for (var i = 0; i < _controllerList.Count; i++)
             {
-                ControllerPicker.Items.Add(string.IsNullOrEmpty(ControllerList[i].Name) ? "Name is missing" : ControllerList[i].Name);
-                if (ControllerList[i].ID == selectedController.ID)
+                ControllerPicker.Items.Add(string.IsNullOrEmpty(_controllerList[i].Name) ? "Name is missing" : _controllerList[i].Name);
+                if (_controllerList[i].ID == selectedController.ID)
                     ControllerPicker.SelectedIndex = i;
             }
 
-            BtnDeleteController.IsEnabled = ControllerPicker.Items.Count > 1;
-            BtnEditController.IsEnabled = ControllerPicker.Items.Count > 1;
+            BtnDeleteController.IsEnabled = ControllerPicker.Items.Count > 0;
+            BtnEditController.IsEnabled = ControllerPicker.Items.Count > 0;
         }
 
         private void BtnAddSite_OnPressed(object sender, EventArgs e)
@@ -108,7 +107,6 @@ namespace Pump.Layout
                                 viewScheduleStatus._site.NAME = site.NAME;
                                 viewScheduleStatus._site.Description = site.Description;
                                 viewScheduleStatus.Populate();
-
                             }
                             else
                             {
@@ -235,7 +233,7 @@ namespace Pump.Layout
                 }
                 else if(action == "Select")
                 {
-                    var controller = ControllerList[ControllerPicker.SelectedIndex];
+                    var controller = _controllerList[ControllerPicker.SelectedIndex];
                     controller.SiteSelectedId = site.ID;
                     new DatabaseController().UpdateControllerConnection(controller);
                     SetSelectedSite();
@@ -268,7 +266,7 @@ namespace Pump.Layout
 
         private void BtnDeleteController_OnPressed_(object sender, EventArgs e)
         {
-            new DatabaseController().DeleteControllerConnection(ControllerList[ControllerPicker.SelectedIndex]);
+            new DatabaseController().DeleteControllerConnection(_controllerList[ControllerPicker.SelectedIndex]);
             PopulateControllers();
         }
 
@@ -281,9 +279,9 @@ namespace Pump.Layout
         {
             try
             {
-                homeScreen = new HomeScreen(_observableIrrigation);
-                homeScreen.GetSiteButton().Pressed += BtnHomeScreenSite_OnPressed;
-                Navigation.PushModalAsync(homeScreen);
+                _homeScreen = new HomeScreen(_observableIrrigation);
+                _homeScreen.GetSiteButton().Pressed += BtnHomeScreenSite_OnPressed;
+                Navigation.PushModalAsync(_homeScreen);
 
             }
             catch
@@ -308,7 +306,7 @@ namespace Pump.Layout
         private void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
         {
             if(ControllerPicker.SelectedIndex != -1)
-                homeScreen = null;
+                _homeScreen = null;
         }
 
         

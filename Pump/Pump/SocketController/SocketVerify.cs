@@ -13,9 +13,9 @@
         }
 
         public string verifyConnection()
-        {
-            var commands = new SocketCommands();
-            return Send(commands.getMacAddress(), host, port);
+        { //TODO FIX THIS WHEN SOCKETS ARE WORKING AGAIN
+            //return Send(commands.getMacAddress(), host, port);
+            return "Fix This";
         }
     }
 }

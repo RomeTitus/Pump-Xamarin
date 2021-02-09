@@ -12,13 +12,12 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class GraphSummaryScreen : ContentPage
     {
-        private readonly SocketCommands _command = new SocketCommands();
         private readonly SocketMessage _socket = new SocketMessage();
 
         public GraphSummaryScreen()
         {
             InitializeComponent();
-            new Thread(PopulateEquipmentLastUsed).Start();
+            //new Thread(PopulateEquipmentLastUsed).Start();
         }
 
         private void ButtonBack_OnClicked(object sender, EventArgs e)
@@ -26,12 +25,12 @@ namespace Pump.Layout
             Navigation.PopModalAsync();
         }
 
-
+        /*
         private void PopulateEquipmentLastUsed()
         {
             try
             {
-                var equipmentLastUsed = _socket.Message(_command.getEquipmentLastUsed());
+                var equipmentLastUsed = _socket.Message(SocketCommands.getEquipmentLastUsed);
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     ScrollViewLastOnDetail.Children.Clear();
@@ -78,5 +77,6 @@ namespace Pump.Layout
                 return equipmentLastUsedDetailList;
             }
         }
+        */
     }
 }

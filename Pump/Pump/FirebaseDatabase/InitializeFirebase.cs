@@ -353,7 +353,6 @@ namespace Pump.FirebaseDatabase
                 {
                     try
                     {
-                        if (x.Object == null) return;
                         _observableIrrigation.AliveList[0] = x.Object;
                     }
                     catch (Exception e)

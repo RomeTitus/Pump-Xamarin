@@ -337,7 +337,7 @@ namespace Pump.Layout
             {
                 PopupNavigation.Instance.PopAsync();
                 _firebaseHasReplied = false;
-                Device.BeginInvokeOnMainThread(async () => { if(await DisplayAlert("No Reply :/", "We never got a reply back\nWould you like to keep your changes?", "I'm a Dev", "Revert"))
+                Device.BeginInvokeOnMainThread(async () => { if(await DisplayAlert("No Reply :/", "We never got a reply back\nWould you like to keep your changes?", "Revert", "I'm a Dev"))
                      await Task.Run(() => auth.DeleteManualSchedule());});
             }
             

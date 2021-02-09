@@ -47,7 +47,6 @@ namespace Pump.UWP
 
                 List<Assembly> assembliesToInclude = new List<Assembly>();
                 Xamarin.Forms.Forms.Init(e, assembliesToInclude);
-
                 Rg.Plugins.Popup.Popup.Init();
                 Xamarin.Forms.Forms.Init(e, Rg.Plugins.Popup.Popup.GetExtraAssemblies());
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)

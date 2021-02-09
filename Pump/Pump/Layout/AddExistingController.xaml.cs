@@ -301,10 +301,7 @@ namespace Pump
         private void BtnNewController_OnClicked(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
-            
-            //var connectionScreen = new AddExistingController(false);
-            //connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
-            Navigation.PushModalAsync(new SetupNewSystem());
+            Navigation.PushModalAsync(new BluetoothScan());
         }
     }
 }
