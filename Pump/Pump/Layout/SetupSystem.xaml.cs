@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
+using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
@@ -23,19 +25,24 @@ namespace Pump.Layout
         private List<WiFiContainer> _wiFiContainers;
         private WiFiContainer selectedWiFiContainer;
         private ViewBasicAlert _viewBasicAlert;
-        public SetupSystem(BluetoothManager blueToothManager)
+        private ControllerEvent _controllerEvent;
+        public SetupSystem(BluetoothManager blueToothManager, ControllerEvent controllerEvent)
         {
             InitializeComponent();
             _blueToothManage = blueToothManager;
+            _controllerEvent = controllerEvent;
+            _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
             IsMain.CheckedChanged += IsMain_CheckedChanged;
             PopulateControllers();
         }
+
 
         private void IsMain_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
             var isMain = (CheckBox) sender;
             PairGrid.IsVisible = !isMain.IsChecked;
             ButtonCreate.Text = isMain.IsChecked ? "Create" : "Pair";
+            LabelControllerName.Text = isMain.IsChecked ? "Controller Name" : "SubController Name";
         }
 
         private async void WiFiLabel_OnTapped(object sender, EventArgs e)
@@ -91,7 +98,7 @@ namespace Pump.Layout
                             "Cancel", true);
                     }
                     _viewBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
-                    await GeneratePopupScreen(new List<object> {_viewBasicAlert});
+                    await GeneratePopupScreen(new List<object> {_viewBasicAlert}, 400);
                 }
                 else
                     await DisplayAlert("WIFI", "We could not find that WiFi Details", "Understood");
@@ -104,8 +111,8 @@ namespace Pump.Layout
 
         private async void WiFiPassword_Clicked(object sender, EventArgs e)
         {
-            if(_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.getEditableText()))
-                selectedWiFiContainer.passkey = _viewBasicAlert.getEditableText();
+            if(_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.GetEditableText()))
+                selectedWiFiContainer.passkey = _viewBasicAlert.GetEditableText();
 
             LabelWiFi.Text = selectedWiFiContainer.ssid;
 
@@ -152,6 +159,11 @@ namespace Pump.Layout
                 if (_controllerList[i].ID == selectedController.ID)
                     ControllerPicker.SelectedIndex = i;
             }
+
+            if (!_controllerList.Any())
+            {
+                IsMain.IsEnabled = false;
+            }
         }
 
         private async Task<string> SendUid(string uid)
@@ -166,6 +178,13 @@ namespace Pump.Layout
 
         private async void ButtonCreate_OnClicked(object sender, EventArgs e)
         {
+            var notifiction = Validation();
+            if (!string.IsNullOrEmpty(notifiction))
+            {
+                await DisplayAlert("Setup", notifiction, "Understood");
+                return;
+            }
+
             if (IsMain.IsChecked)
             {
                 _viewBasicAlert = new ViewBasicAlert("Setup",
@@ -174,26 +193,102 @@ namespace Pump.Layout
                     "Connect",
                     "Cancel", true);
                 _viewBasicAlert.GetAcceptButton().Clicked += SetUpMainController_Clicked;
-                await GeneratePopupScreen(new List<object>{_viewBasicAlert});
+                await GeneratePopupScreen(new List<object>{_viewBasicAlert}, 400);
+            }
+            else
+            {
+                SetUpSubController();
             }
         }
 
         private async void SetUpMainController_Clicked(object sender, EventArgs e)
         {
-            if (_viewBasicAlert.getEditableText() != _viewBasicAlert.getSubEditableText())
+            if (_viewBasicAlert.GetEditableText() != _viewBasicAlert.GetSubEditableText())
                 await DisplayAlert("Setup", "Passwords does not match", "Understood");
             else
             {
-                var result = await SendUid(_viewBasicAlert.getEditableText());
+                var result = await SendUid(_viewBasicAlert.GetEditableText());
+                await PopupNavigation.Instance.PopAllAsync();
+                var pumpController = new PumpConnection {Name = TxtControllerName.Text, Mac = _blueToothManage.BLEDevice.NativeDevice.ToString()};
+                if (!string.IsNullOrEmpty(LabelIP.Text))
+                {
+                    pumpController.InternalPath = LabelIP.Text;
+                    pumpController.InternalPort = 8080;
+                }
+                new DatabaseController().AddControllerConnection(pumpController);
                 await DisplayAlert("Setup", result, "Understood");
+                _controllerEvent.NewControllerConnection();
             }
         }
 
-        private static async Task GeneratePopupScreen(IEnumerable<object> screenViews)
+        private async void SetUpSubController()
         {
-            var floatingScreen = new FloatingScreenScroll();
+            var pumpConnection = _controllerList[ControllerPicker.SelectedIndex];
+            var randomKey = new Random().Next(10, 100);
+
+            var irrigationSelf = await new Authentication(pumpConnection.Mac).GetConnectedControllerInfo();
+
+            var mainController = new SubController
+            {
+                BTmac = _blueToothManage.BLEDevice.NativeDevice.ToString(),
+                NAME = TxtControllerName.Text,
+                Key = randomKey,
+                IpAdress = LabelIP.Text,
+                Port = 8080,
+                UseLoRa = !IsMain.IsChecked
+            };
+            
+            var subControllerId = await new Authentication(pumpConnection.Mac).SetSubController(mainController);
+
+            var subController = new SubController {
+                BTmac = irrigationSelf.BTmac, 
+                Port = irrigationSelf.Port, 
+                Key = randomKey, 
+                NAME = "Main Controller", 
+                IpAdress = irrigationSelf.IpAdress,
+                UseLoRa = !IsMain.IsChecked
+            };
+            
+            var result = await _blueToothManage.WriteToBle(SocketCommands.SetupSubController(subController, subControllerId));
+
+            await DisplayAlert("Setup", result, "Understood");
+
+            
+            _controllerEvent.NewControllerConnection();
+        
+        }
+
+        private static async Task GeneratePopupScreen(IEnumerable<object> screenViews, double hightRequest = 600)
+        {
+            var floatingScreen = new FloatingScreenScroll(hightRequest);
             floatingScreen.SetFloatingScreen(screenViews);
             await PopupNavigation.Instance.PushAsync(floatingScreen);
+        }
+
+        private string Validation()
+        {
+            var notification = "";
+
+            if (string.IsNullOrEmpty(TxtControllerName.Text))
+            {
+                if (notification.Length < 1)
+                    notification = "\u2022 Controller name required";
+                else
+                    notification += "\n\u2022 Controller name required";
+                LabelControllerName.TextColor = Color.Red;
+            }
+
+            return notification;
+        }
+
+        private async void ButtonBack_OnClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
+        }
+
+        private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
+        {
+            await Navigation.PopModalAsync();
         }
     }
 }

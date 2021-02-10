@@ -9,9 +9,10 @@ namespace Pump.Layout
     public partial class FloatingScreenScroll : PopupPage
     {
         public bool IsStackLayout = true;
-        public FloatingScreenScroll()
+        public FloatingScreenScroll(double hightRequest = 600)
         {
             InitializeComponent();
+            FloatingScreenMainStackLayout.HeightRequest = hightRequest;
         }
 
         public void SetFloatingScreen(IEnumerable<object> screens)

@@ -12,12 +12,11 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewBasicAlert : ContentView
     {
-        private string _title;
-        private string _message;
-        private string _subMessage;
-        private string _accept;
-        private string _cancel;
-        public bool Editable;
+        private readonly string _title;
+        private readonly string _message;
+        private readonly string _accept;
+        private readonly string _cancel;
+        public readonly bool Editable;
         public ViewBasicAlert(string title, string message, string accept, string cancel, bool editable = false)
         {
             InitializeComponent();
@@ -27,7 +26,7 @@ namespace Pump.Layout.Views
             _message = message;
             _accept = accept;
             _cancel = cancel;
-            populate();
+            Populate();
         }
 
         public ViewBasicAlert(string title, string message,string subMessage, string accept, string cancel, bool editable)
@@ -36,17 +35,16 @@ namespace Pump.Layout.Views
             BasicAlertEnter.IsVisible = editable;
             SubBasicAlertEnter.IsVisible = editable;
             LabelSubMessage.IsVisible = editable;
-            _subMessage = subMessage;
             Editable = editable;
             _title = title;
             _message = message;
             _accept = accept;
             _cancel = cancel;
-            LabelSubMessage.Text = _subMessage;
-            populate();
+            LabelSubMessage.Text = subMessage;
+            Populate();
         }
 
-        private void populate()
+        private void Populate()
         {
             LabelTitle.Text = _title;
             LabelMessage.Text = _message;
@@ -54,12 +52,12 @@ namespace Pump.Layout.Views
             ButtonCancel.Text = _cancel;
         }
 
-        public string getEditableText()
+        public string GetEditableText()
         {
             return BasicAlertEnter.Text;
         }
 
-        public string getSubEditableText()
+        public string GetSubEditableText()
         {
             return SubBasicAlertEnter.Text;
         }

@@ -310,8 +310,8 @@ namespace Pump.Layout
         }
 
         private void BtnAddController_OnClicked(object sender, EventArgs e)
-        {
-            Navigation.PushModalAsync(new AddExistingController(false));
+        { 
+            //Navigation.PushModalAsync(new AddExistingController(false));
         }
 
         private void BtnDeleteSelectedController_OnClicked(object sender, EventArgs e)

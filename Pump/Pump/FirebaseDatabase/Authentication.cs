@@ -12,9 +12,10 @@ namespace Pump.FirebaseDatabase
 {
     internal class Authentication
     {
-        public Authentication()
+        private string _blueTooth;
+        public Authentication(string blueTooth = null)
         {
-
+            _blueTooth = blueTooth;
             _FirebaseClient = new FirebaseClient("https://pump-25eee.firebaseio.com/");//, new FirebaseOptions
             //{
             //    OfflineDatabaseFactory = (t, s) => new OfflineDatabase(t, s)
@@ -27,6 +28,8 @@ namespace Pump.FirebaseDatabase
 
         public string getConnectedPi()
         {
+            if (_blueTooth != null)
+                return _blueTooth;
             try
             {
                 var pumpDetail = new DatabaseController().GetControllerConnectionSelection();
@@ -40,6 +43,24 @@ namespace Pump.FirebaseDatabase
            
         }
 
+
+        public async Task<IrrigationSelf> GetConnectedControllerInfo()
+        {
+            try
+            {
+
+                var firebaseSelf = await _FirebaseClient
+                    .Child(getConnectedPi() + "/SelfSetup")
+                    .OnceAsync<IrrigationSelf>();
+
+                return firebaseSelf.FirstOrDefault()?.Object;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
 
         public async Task<FirebaseObject<bool>> IrrigationSystemPath(string path)
         {
@@ -457,6 +478,34 @@ namespace Pump.FirebaseDatabase
             {
                 Console.WriteLine(e);
             }
+        }
+
+
+        //SubController
+        public async Task<string> SetSubController(SubController subController)
+        {
+
+            try
+            {
+                if (subController.ID == null)
+                {
+                    var result = await _FirebaseClient
+                        .Child(getConnectedPi() + "/SubController")
+                        .PostAsync(subController);
+                    return result.Key;
+                }
+
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/SubController/" + subController.ID)
+                    .PutAsync(subController);
+                return subController.ID;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+
         }
     }
 }

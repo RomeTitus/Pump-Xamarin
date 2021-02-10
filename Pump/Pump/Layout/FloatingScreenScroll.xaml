@@ -23,6 +23,7 @@
 
     <!--  You can use any elements here which are extended from Xamarin.Forms.View  -->
     <StackLayout
+        x:Name="FloatingScreenMainStackLayout"
         Margin="12"
         Padding="24"
         BackgroundColor="White"

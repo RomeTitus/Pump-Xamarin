@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
@@ -20,6 +21,7 @@ namespace Pump.Layout
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly ObservableIrrigation _observableIrrigation;
         private HomeScreen _homeScreen;
+        private ControllerEvent _controllerEvent;
 
         public SiteScreen(ObservableIrrigation observableIrrigation)
         {
@@ -35,6 +37,10 @@ namespace Pump.Layout
             _observableIrrigation.ManualScheduleList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
             ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
+            var controllerEvent = new ControllerEvent();
+            _controllerEvent = controllerEvent;
+            _controllerEvent.OnUpdateStatus += NewSelectedController;
+            
             if (!string.IsNullOrEmpty(new DatabaseController().GetControllerConnectionSelection().SiteSelectedId))
                 StartHomePage();
         }
@@ -250,16 +256,16 @@ namespace Pump.Layout
             });
         }
 
-        private void BtnAddController_OnPressed(object sender, EventArgs e)
+        private async void BtnAddController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new AddExistingController(false);
+            var connectionScreen = new AddExistingController(false, _controllerEvent);
             connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
-            Navigation.PushModalAsync(connectionScreen);
+            await Navigation.PushModalAsync(connectionScreen);
         }
 
         private void BtnEditController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new AddExistingController(false, new DatabaseController().GetControllerConnectionSelection());
+            var connectionScreen = new AddExistingController(false, _controllerEvent, new DatabaseController().GetControllerConnectionSelection());
             connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
@@ -309,6 +315,10 @@ namespace Pump.Layout
                 _homeScreen = null;
         }
 
-        
+        private void NewSelectedController(object sender, ControllerEventArgs e)
+        {
+            PopulateControllers();
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
@@ -20,11 +21,13 @@ namespace Pump
         private readonly PumpConnection _pumpConnection = new PumpConnection();
         private double _height;
         private double _width;
+        private ControllerEvent _controllerEvent;
 
-        public AddExistingController(bool firstConnection, PumpConnection pumpConnection = null)
+        public AddExistingController(bool firstConnection, ControllerEvent controllerEvent, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
-
+            _controllerEvent = controllerEvent;
+            _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
             if (pumpConnection != null)
             {
                 _pumpConnection = pumpConnection;
@@ -300,8 +303,11 @@ namespace Pump
 
         private void BtnNewController_OnClicked(object sender, EventArgs e)
         {
-            Navigation.PopModalAsync();
-            Navigation.PushModalAsync(new BluetoothScan());
+            Navigation.PushModalAsync(new BluetoothScan(_controllerEvent));
+        }
+        private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
+        {
+            await Navigation.PopModalAsync();
         }
     }
 }

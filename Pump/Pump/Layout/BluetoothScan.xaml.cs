@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Plugin.BLE.Abstractions.EventArgs;
+using Pump.Class;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -11,10 +12,13 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class BluetoothScan : ContentPage
     {
+        private ControllerEvent _controllerEvent;
         private BluetoothManager _bluetoothManager;
-        public BluetoothScan()
+        public BluetoothScan(ControllerEvent controllerEvent)
         {
             InitializeComponent();
+            _controllerEvent = controllerEvent;
+            _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
             _bluetoothManager = new BluetoothManager();
             _bluetoothManager.DeviceList.CollectionChanged += PopulateBluetoothDeviceEvent;
             _bluetoothManager.AdapterBLE.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
@@ -47,34 +51,33 @@ namespace Pump.Layout
             Device.BeginInvokeOnMainThread(PopulateBluetoothDevice);
         }
 
-        private void ViewSiteScreen_Tapped(object sender, EventArgs e)
+        private async void ViewSiteScreen_Tapped(object sender, EventArgs e)
         {
-            var viewBlueTooth = (StackLayout)sender;
-            var blueToothDevice = _bluetoothManager.DeviceList.First(x => x.Id.ToString() == viewBlueTooth.AutomationId);
-            Device.BeginInvokeOnMainThread(async () =>
+            var viewBlueTooth = (StackLayout) sender;
+            var blueToothDevice =
+                _bluetoothManager.DeviceList.First(x => x.Id.ToString() == viewBlueTooth.AutomationId);
+
+            var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
+                "Accept", "Cancel");
+            if (result)
             {
-                var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
-                    "Accept", "Cancel");
-                if (result)
+                try
                 {
-                    try
+                    await _bluetoothManager.ConnectToDevice(blueToothDevice);
+                    var isController = await _bluetoothManager.IsController();
+                    if (isController)
                     {
-                        await _bluetoothManager.ConnectToDevice(blueToothDevice);
-                        var isController = await _bluetoothManager.IsController();
-                        if (isController)
-                        {
-                            await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager));
-                        }
-                        else
-                            await DisplayAlert("Irrigation", "Not verified controller", "Understood");
+                        await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _controllerEvent));
                     }
-                    catch (Exception exception)
-                    {
-                        await DisplayAlert("Connect Exception!", exception.Message, "Understood");
-                    }
-                    
+                    else
+                        await DisplayAlert("Irrigation", "Not verified controller", "Understood");
                 }
-            });
+                catch (Exception exception)
+                {
+                    await DisplayAlert("Connect Exception!", exception.Message, "Understood");
+                }
+
+            }
         }
 
         private void PopulateBluetoothDevice()
@@ -133,6 +136,11 @@ namespace Pump.Layout
         void Adapter_ScanTimeoutElapsed(object sender, EventArgs e)
         {
             BtnScan.Text = "Start Scan";
+        }
+
+        private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
+        {
+            await Navigation.PopModalAsync();
         }
     }
 }

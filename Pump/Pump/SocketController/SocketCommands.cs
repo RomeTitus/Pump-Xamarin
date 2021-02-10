@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Pump.IrrigationController;
 using Xamarin.Essentials;
 
 namespace Pump.SocketController
@@ -24,6 +25,13 @@ namespace Pump.SocketController
             wiFiCommand["Task"] = new JObject { { "uid", new JObject() } };
             wiFiCommand["Task"]["uid"] = uid;
             return wiFiCommand.ToString();
+        }
+
+        public static string SetupSubController(SubController subController, string Id)
+        {
+            var createSubControllerCommand = new JObject { { "SubController", new JObject() } };
+            createSubControllerCommand["SubController"] = new JObject { { "Id", new JObject(subController) } };
+            return createSubControllerCommand.ToString();
         }
     }
 }

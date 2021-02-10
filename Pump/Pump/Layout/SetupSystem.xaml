@@ -9,6 +9,7 @@
     <ContentPage.Content>
         <ScrollView>
             <StackLayout>
+
                 <StackLayout>
                     <Label
                         CharacterSpacing="2"
@@ -18,6 +19,29 @@
                         TextColor="White" />
                 </StackLayout>
 
+                <StackLayout>
+                    <Label
+                        x:Name="LabelControllerName"
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Center"
+                        Text="Controller Name"
+                        TextColor="White"
+                        TextType="Text"
+                        VerticalOptions="Center" />
+
+                    <Entry
+                        x:Name="TxtControllerName"
+                        Margin="0"
+                        FlowDirection="MatchParent"
+                        HorizontalOptions="Center"
+                        InputTransparent="False"
+                        MinimumWidthRequest="30"
+                        Scale="1"
+                        TextColor="AliceBlue"
+                        VerticalOptions="Center"
+                        WidthRequest="300" />
+                </StackLayout>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -151,7 +175,7 @@
                         x:Name="ButtonCreate"
                         Clicked="ButtonCreate_OnClicked"
                         Text="Create" />
-                    <Button x:Name="ButtonBack" Text="Back" />
+                    <Button x:Name="ButtonBack" Text="Back" Clicked="ButtonBack_OnClicked"/>
                 </StackLayout>
             </StackLayout>
         </ScrollView>

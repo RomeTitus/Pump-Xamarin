@@ -17,7 +17,13 @@ namespace Pump
         public App()
         {
             InitializeComponent();
-
+            _initializeFirebase = new InitializeFirebase(_observableIrrigation);
+            var siteScreen = new SiteScreen(_observableIrrigation);
+            MainPage = siteScreen;
+            siteScreen.GetControllerPicker().SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
+            /*
+             
+             
             if (_databaseController.GetControllerConnectionSelection() == null)
             {
                 var newConnectionScreen = new AddExistingController(true);
@@ -25,13 +31,10 @@ namespace Pump
             }
             else
             {
-                _initializeFirebase = new InitializeFirebase(_observableIrrigation);
-                var siteScreen = new SiteScreen(_observableIrrigation);
-                MainPage = siteScreen;
-
-                siteScreen.GetControllerPicker().SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
+                
 
             }
+            */
         }
 
         private void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
