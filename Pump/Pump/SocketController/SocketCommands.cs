@@ -30,7 +30,7 @@ namespace Pump.SocketController
         public static string SetupSubController(SubController subController, string Id)
         {
             var createSubControllerCommand = new JObject { { "SubController", new JObject() } };
-            createSubControllerCommand["SubController"] = new JObject { { "Id", new JObject(subController) } };
+            createSubControllerCommand["SubController"] = new JObject { { Id,  JToken.FromObject(subController)}};
             return createSubControllerCommand.ToString();
         }
     }

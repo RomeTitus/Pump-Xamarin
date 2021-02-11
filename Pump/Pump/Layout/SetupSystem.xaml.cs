@@ -246,7 +246,8 @@ namespace Pump.Layout
                 Key = randomKey, 
                 NAME = "Main Controller", 
                 IpAdress = irrigationSelf.IpAdress,
-                UseLoRa = !IsMain.IsChecked
+                UseLoRa = !IsMain.IsChecked,
+                ID = subControllerId
             };
             
             var result = await _blueToothManage.WriteToBle(SocketCommands.SetupSubController(subController, subControllerId));

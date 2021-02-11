@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
-using Plugin.BLE.Abstractions.Exceptions;
-using Plugin.BLE.Abstractions.Extensions;
 
 
 namespace Pump.SocketController
@@ -126,6 +122,18 @@ namespace Pump.SocketController
             return services.FirstOrDefault(x => x.Id == Guid.Parse(Irrigation_Service_Code)) != null;
         }
 
+        private string ConvertForIrrigation(string dataToBeConverted)
+        {
+            var updated = dataToBeConverted.Replace("true", "True");
+            return updated;
+        }
+
+        private string ConvertForApplication(string dataToBeConverted)
+        {
+            var updated = dataToBeConverted.Replace("True", "true");
+            return updated;
+        }
+
         public async Task<string> WriteToBle(string dataToSend, int? timeout = null)
         {
             var services = await BLEDevice.GetServicesAsync();
@@ -134,12 +142,14 @@ namespace Pump.SocketController
             var characteristics = await services[0].GetCharacteristicsAsync();
             var characteristic = characteristics[0];
             if (characteristic == null || !characteristic.CanWrite) return null;
-            var bytes = Encoding.ASCII.GetBytes(dataToSend);
+            var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend));
             await characteristic.WriteAsync(bytes);
             if (timeout != null)
                 Thread.Sleep(8000);
             var result =  await characteristic.ReadAsync();
-            return Encoding.ASCII.GetString(result, 0, result.Length);
+            if (result == bytes)
+                throw new Exception("Controller did not reply back using BlueTooth");
+            return ConvertForApplication(Encoding.ASCII.GetString(result, 0, result.Length));
         }
     }
 }
