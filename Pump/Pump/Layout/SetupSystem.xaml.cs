@@ -23,9 +23,9 @@ namespace Pump.Layout
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly BluetoothManager _blueToothManage;
         private List<WiFiContainer> _wiFiContainers;
-        private WiFiContainer selectedWiFiContainer;
+        private WiFiContainer _selectedWiFiContainer;
         private ViewBasicAlert _viewBasicAlert;
-        private ControllerEvent _controllerEvent;
+        private readonly ControllerEvent _controllerEvent;
         public SetupSystem(BluetoothManager blueToothManager, ControllerEvent controllerEvent)
         {
             InitializeComponent();
@@ -82,18 +82,18 @@ namespace Pump.Layout
             try
             {
                 var tapGestureRecognizerWiFi = (StackLayout)sender;
-                selectedWiFiContainer = _wiFiContainers.FirstOrDefault(x => x.ssid == tapGestureRecognizerWiFi.AutomationId);
+                _selectedWiFiContainer = _wiFiContainers.FirstOrDefault(x => x.ssid == tapGestureRecognizerWiFi.AutomationId);
 
-                if (selectedWiFiContainer != null)
+                if (_selectedWiFiContainer != null)
                 {
-                    if (string.IsNullOrEmpty(selectedWiFiContainer.encryption_type))
+                    if (string.IsNullOrEmpty(_selectedWiFiContainer.encryption_type))
                         _viewBasicAlert = new ViewBasicAlert("WIFI",
-                            "Are you use you want to connect to " + selectedWiFiContainer.ssid, "Connect",
+                            "Are you use you want to connect to " + _selectedWiFiContainer.ssid, "Connect",
                             "Cancel");
                     else
                     {
                         _viewBasicAlert = new ViewBasicAlert("WIFI",
-                            "Are you use you want to connect to " + selectedWiFiContainer.ssid + "\nEnter Password",
+                            "Are you use you want to connect to " + _selectedWiFiContainer.ssid + "\nEnter Password",
                             "Connect",
                             "Cancel", true);
                     }
@@ -112,15 +112,15 @@ namespace Pump.Layout
         private async void WiFiPassword_Clicked(object sender, EventArgs e)
         {
             if(_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.GetEditableText()))
-                selectedWiFiContainer.passkey = _viewBasicAlert.GetEditableText();
+                _selectedWiFiContainer.passkey = _viewBasicAlert.GetEditableText();
 
-            LabelWiFi.Text = selectedWiFiContainer.ssid;
+            LabelWiFi.Text = _selectedWiFiContainer.ssid;
 
             await PopupNavigation.Instance.PopAllAsync();
 
             var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
             await PopupNavigation.Instance.PushAsync(loadingScreen);
-            var result = await ConnectToWifi(selectedWiFiContainer);
+            var result = await ConnectToWifi(_selectedWiFiContainer);
             await PopupNavigation.Instance.PopAllAsync();
             LabelIP.IsVisible = true;
             LabelIP.Text = result;

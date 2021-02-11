@@ -36,6 +36,7 @@ namespace Pump.Layout
             _observableIrrigation.CustomScheduleList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.ManualScheduleList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
+            _observableIrrigation.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
             ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
             var controllerEvent = new ControllerEvent();
             _controllerEvent = controllerEvent;
@@ -73,6 +74,10 @@ namespace Pump.Layout
 
 
             Navigation.PushModalAsync(new SiteUpdate(sensors, equipments));
+        }
+        private void BtnAddSubController_OnPressed(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(new SubControllerUpdate());
         }
 
         private void PopulateSensorAndEquipmentEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -294,9 +299,117 @@ namespace Pump.Layout
             {
 
             }
-
-
         }
+
+
+
+        private void PopulateSubControllerEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Device.BeginInvokeOnMainThread(PopulateSubController);
+        }
+
+        private void PopulateSubController()
+        {
+            ScreenCleanupForSubController();
+
+            try
+            {
+                if (_observableIrrigation.SubControllerList.Contains(null)) return;
+                if (_observableIrrigation.SubControllerList.Any())
+                    foreach (var subController in _observableIrrigation.SubControllerList.ToList())
+                    {
+                        var viewSubControllerChild = ScrollViewSubController.Children.FirstOrDefault(x =>
+                            x.AutomationId == subController.ID);
+                        if (viewSubControllerChild != null)
+                        {
+                            var viewSubController = (ViewSubControllerSummary)viewSubControllerChild;
+                            viewSubController.SubController.NAME = subController.NAME;
+                            viewSubController.SubController.IpAdress = subController.IpAdress;
+                            viewSubController.SubController.BTmac = subController.IpAdress;
+                            viewSubController.SubController.Port = subController.Port;
+                            viewSubController.Populate();
+                        }
+                        else
+                        {
+                            var viewSubControllerSummary = new ViewSubControllerSummary(subController);
+                            ScrollViewSubController.Children.Add(viewSubControllerSummary);
+                            viewSubControllerSummary.GetTapGestureRecognizer().Tapped += ViewSubControllerScreen_Tapped;
+                        }
+                    }
+                else
+                {
+                    ScrollViewSubController.Children.Add(new ViewEmptySchedule("No other controller Here"));
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        private void ScreenCleanupForSubController()
+        {
+            try
+            {
+                if (!_observableIrrigation.SubControllerList.Contains(null))
+                {
+                    var itemsThatAreOnDisplay = _observableIrrigation.SubControllerList.Select(x => x.ID).ToList();
+                    if (itemsThatAreOnDisplay.Count == 0)
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+                    for (var index = 0; index < ScrollViewSubController.Children.Count; index++)
+                    {
+                        var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
+                            x == ScrollViewSubController.Children[index].AutomationId);
+                        if (existingItems != null) continue;
+                        ScrollViewSubController.Children.RemoveAt(index);
+                        index--;
+                    }
+                }
+                else
+                {
+                    ScrollViewSubController.Children.Clear();
+                    var loadingIcon = new ActivityIndicator
+                    {
+                        AutomationId = "ActivityIndicatorSiteLoading",
+                        HorizontalOptions = LayoutOptions.Center,
+                        IsEnabled = true,
+                        IsRunning = true,
+                        IsVisible = true,
+                        VerticalOptions = LayoutOptions.Center
+                    };
+                    ScrollViewSubController.Children.Add(loadingIcon);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+
+        private void ViewSubControllerScreen_Tapped(object sender, EventArgs e)
+        {
+            var viewSubController = (StackLayout)sender;
+            var subController = _observableIrrigation.SubControllerList.First(x => x.ID == viewSubController.AutomationId);
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                var action = await DisplayActionSheet("You have selected " + subController.NAME,
+                    "Cancel", null, "Update", "Delete");
+                if (action == null) return;
+
+                if (action == "Update")
+                {
+                    await Navigation.PushModalAsync(new SubControllerUpdate(subController));
+                }
+                else if(action == "Delete")
+                {
+                    if (await DisplayAlert("Are you sure?",
+                        "Confirm to delete " + subController.NAME, "Delete",
+                        "Cancel")) return;
+                }
+            });
+        }
+
 
         private async void BtnHomeScreenSite_OnPressed(object sender, EventArgs e)
         {

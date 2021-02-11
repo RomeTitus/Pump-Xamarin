@@ -11,7 +11,7 @@
                 Margin="0,15,0,0"
                 FontSize="Title"
                 HorizontalOptions="CenterAndExpand"
-                Text="Sites"
+                Text="Irrigation Controllers"
                 TextColor="White"
                 TextDecorations="Underline"
                 VerticalOptions="Center" />
@@ -60,7 +60,14 @@
             </StackLayout>
 
             <StackLayout VerticalOptions="FillAndExpand">
-                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="StartAndExpand"
+                        Text="Current Sites"
+                        TextColor="White"
+                        TextDecorations="Underline"
+                        VerticalOptions="Center" />
                     <Button
                         x:Name="BtnAddSite"
                         BackgroundColor="DeepSkyBlue"
@@ -93,6 +100,42 @@
 
                     </ScrollView>
                 </Frame>
+                <StackLayout>
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="StartAndExpand"
+                            Text="Current Sub-Controller"
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <Button
+                            x:Name="BtnAddSubController"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="End"
+                            IsEnabled="False"
+                            Pressed="BtnAddSubController_OnPressed"
+                            Text="Add Sub-Controller"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                    <Frame BackgroundColor="White" BorderColor="Black">
+                        <ScrollView HeightRequest="100">
+                            <StackLayout x:Name="ScrollViewSubController">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewSubControllerTap" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorSubControllerLoading"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </ScrollView>
+                    </Frame>
+                </StackLayout>
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

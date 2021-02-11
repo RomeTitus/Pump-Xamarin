@@ -23,13 +23,15 @@ namespace Pump.Layout
         private List<Sensor> _sensorList;
         private readonly List<string> _sensorTypesList = new List<string>{"Pressure Sensor"};
         private readonly Sensor _sensor;
+        private Site _site;
 
-        public SensorUpdate(List<Sensor> sensorList, List<SubController> subControllerList, List<Equipment> equipmentList, Sensor sensor = null)
+        public SensorUpdate(List<Sensor> sensorList, List<SubController> subControllerList, List<Equipment> equipmentList, Site site, Sensor sensor = null)
         {
             InitializeComponent();
             _sensorList = sensorList;
             _subControllerList = subControllerList;
             _equipmentList = equipmentList;
+            _site = site;
             if (sensor == null)
             {
                 sensor = new Sensor();
@@ -110,28 +112,16 @@ namespace Pump.Layout
                 else
                     notification += "\n\u2022 Select a Pin";
             }
-
-            
-
-            /*
-            if (DirectOnlineGpioPicker.SelectedIndex == -1 && IsDirectOnlineCheckBox.IsChecked)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Direct Online Pin";
-                else
-                    notification += "\n\u2022 Select a Direct Online Pin";
-            }
-            */
             return notification;
         }
-        private void ButtonUpdateSensor_OnClicked(object sender, EventArgs e)
+        private async void ButtonUpdateSensor_OnClicked(object sender, EventArgs e)
         {
             
             var notification = SensorValidate();
 
             if (!string.IsNullOrWhiteSpace(notification))
             {
-                DisplayAlert("Incomplete", notification, "Understood");
+                await DisplayAlert("Incomplete", notification, "Understood");
             }
             else
             {
@@ -146,8 +136,8 @@ namespace Pump.Layout
                 {
                     _sensor.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex - 1].ID;
                 }
-                var sensorKey = Task.Run(() => new Authentication().SetSensor(_sensor)).Result;
-                Navigation.PopModalAsync();
+                var sensorKey = await new Authentication().SetSensor(_sensor);
+                await UpdateSensorToSite(sensorKey);
 
                 foreach (var scrollViewEquipment in ScrollViewAttachedEquipment.Children)
                 {
@@ -170,7 +160,7 @@ namespace Pump.Layout
                         }
                     }
                     var equipmentKey = Task.Run(() => new Authentication().SetEquipment(_equipmentList.First(x => x.ID == viewEquipment._equipment.ID))).Result;
-                    
+                    Navigation.PopModalAsync();
                 }
             }
             
@@ -223,6 +213,12 @@ namespace Pump.Layout
                 index++;
             }
         }
-
+        private async Task UpdateSensorToSite(string key)
+        {
+            if (_site.Attachments.Contains(key))
+                return;
+            _site.Attachments.Add(key);
+            var siteKey = await new Authentication().SetSite(_site);
+        }
     }
 }

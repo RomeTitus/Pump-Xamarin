@@ -32,7 +32,6 @@ namespace Pump.Layout
             var hasSubscribed = false;
             var equipmentHasRun = false;
             var sensorHasRun = false;
-            var subControllerHasRun = false;
             while (!hasSubscribed)
             {
                 try
@@ -43,7 +42,6 @@ namespace Pump.Layout
                         {
                             BtnAddEquipment.IsEnabled = true;
                             BtnAddSensor.IsEnabled = true;
-                            BtnAddSubController.IsEnabled = true;
                         });
                         hasSubscribed = true;
                     }
@@ -58,12 +56,6 @@ namespace Pump.Layout
                         sensorHasRun = true;
                         _observableIrrigation.SensorList.CollectionChanged += PopulateSensorEvent;
                         Device.InvokeOnMainThreadAsync(PopulateSensor);
-                    }
-                    if (!_observableIrrigation.SubControllerList.Contains(null)  && !subControllerHasRun)
-                    {
-                        subControllerHasRun = true;
-                        _observableIrrigation.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
-                        Device.InvokeOnMainThreadAsync(PopulateSubController);
                     }
                 }
                 catch
@@ -244,88 +236,7 @@ namespace Pump.Layout
         }
 
 
-        private void PopulateSubControllerEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            Device.BeginInvokeOnMainThread(PopulateSubController);
-        }
-
-        private void PopulateSubController()
-        {
-            ScreenCleanupForSubController();
-
-            try
-            {
-                if(_observableIrrigation.SubControllerList.Contains(null))return;
-                if (_observableIrrigation.SubControllerList.Any())
-                    foreach (var subController in _observableIrrigation.SubControllerList.ToList())
-                    {
-                        var viewSubControllerChild = ScrollViewSubController.Children.FirstOrDefault(x =>
-                            x.AutomationId == subController.ID);
-                        if (viewSubControllerChild != null)
-                        {
-                            var viewSubController = (ViewSubControllerSummary)viewSubControllerChild;
-                            viewSubController.SubController.NAME = subController.NAME;
-                            viewSubController.SubController.IpAdress = subController.IpAdress;
-                            viewSubController.SubController.BTmac = subController.IpAdress;
-                            viewSubController.SubController.Port = subController.Port;
-                            viewSubController.Populate();
-                        }
-                        else
-                        {
-                            var viewSubControllerSummary = new ViewSubControllerSummary(subController);
-                            ScrollViewSubController.Children.Add(viewSubControllerSummary);
-                            viewSubControllerSummary.GetTapGestureRecognizer().Tapped += ViewSubControllerScreen_Tapped;
-                        }
-                    }
-                else
-                {
-                    ScrollViewSubController.Children.Add(new ViewEmptySchedule("No other controller Here"));
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        private void ScreenCleanupForSubController()
-        {
-            try
-            {
-                if (!_observableIrrigation.SubControllerList.Contains(null))
-                {
-                    var itemsThatAreOnDisplay = _observableIrrigation.SubControllerList.Select(x => x.ID).ToList();
-                    if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
-                    for (var index = 0; index < ScrollViewSubController.Children.Count; index++)
-                    {
-                        var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
-                            x == ScrollViewSubController.Children[index].AutomationId);
-                        if (existingItems != null) continue;
-                        ScrollViewSubController.Children.RemoveAt(index);
-                        index--;
-                    }
-                }
-                else
-                {
-                    ScrollViewSubController.Children.Clear();
-                    var loadingIcon = new ActivityIndicator
-                    {
-                        AutomationId = "ActivityIndicatorSiteLoading",
-                        HorizontalOptions = LayoutOptions.Center,
-                        IsEnabled = true,
-                        IsRunning = true,
-                        IsVisible = true,
-                        VerticalOptions = LayoutOptions.Center
-                    };
-                    ScrollViewSubController.Children.Add(loadingIcon);
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        }
+        
 
         private void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
         {
@@ -339,7 +250,7 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), equipment));
+                    await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.SiteList.ToList().First(x =>x.ID == _pumpConnection.SiteSelectedId), equipment));
                 }
                 else if(action == "Delete")
                 {
@@ -363,7 +274,7 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), sensor));
+                    await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId), sensor));
                 }
                 else
                 {
@@ -374,30 +285,6 @@ namespace Pump.Layout
             });
         }
 
-        private void ViewSubControllerScreen_Tapped(object sender, EventArgs e)
-        {
-            var viewSubController = (StackLayout)sender;
-            var subController = _observableIrrigation.SubControllerList.First(x => x.ID == viewSubController.AutomationId);
-            Device.BeginInvokeOnMainThread(async () =>
-            {
-                var action = await DisplayActionSheet("You have selected " + subController.NAME,
-                    "Cancel", null, "Update", "Delete");
-                if (action == null) return;
-
-                if (action == "Update")
-                {
-                    await Navigation.PushModalAsync(new SubControllerUpdate(subController));
-                }
-                else
-                {
-                    if (await DisplayAlert("Are you sure?",
-                        "Confirm to delete " + subController.NAME, "Delete",
-                        "Cancel")) return;
-                }
-            });
-        }
-
-
         private void BtnBack_OnPressed(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
@@ -405,18 +292,12 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList()));
-        }
-
-        private void BtnAddSubController_OnPressed(object sender, EventArgs e)
-        {
-            Navigation.PushModalAsync(new SubControllerUpdate());
+            Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId)));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
-            
-            Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList()));
+            Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId)));
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Pump.Class;
+using Pump.Database;
+using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -17,11 +19,14 @@ namespace Pump.Layout
         private readonly List<SubController> _subControllerList;
         private List<Equipment> _equipmentList;
         private List<long> _avalibleGpio;
+        private Site _site;
+        private PumpConnection _pumpConnection;
         private readonly Equipment _equipment;
 
-        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList, Equipment equipment = null)
+        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList, Site site, Equipment equipment = null)
         {
             InitializeComponent();
+            _site = site;
             _equipmentList = equipmentList;
             _subControllerList = subControllerList;
             if (equipment == null)
@@ -107,37 +112,7 @@ namespace Pump.Layout
 
             return notification;
         }
-        private void ButtonUpdateEquipment_OnClicked(object sender, EventArgs e)
-        {
-            var notification = EquipmentValidate();
-            
-            if (!string.IsNullOrWhiteSpace(notification))
-            {
-                DisplayAlert("Incomplete", notification, "Understood");
-            }
-            else
-            {
-                _equipment.NAME = EquipmentName.Text;
-                _equipment.GPIO = _avalibleGpio[GpioPicker.SelectedIndex];
-                _equipment.isPump = IsPumpCheckBox.IsChecked;
-                if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
-                    _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
-                if (SystemPicker.SelectedIndex == 0)
-                    _equipment.AttachedSubController = null;
-                else
-                {
-                    _equipment.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex -1].ID;
-                }
-                var key = Task.Run(() => new Authentication().SetEquipment(_equipment)).Result;
-                Navigation.PopModalAsync();
-            }
-        }
-
-        private void ButtonBack_OnClicked(object sender, EventArgs e)
-        {
-            Navigation.PopModalAsync();
-        }
-
+        
         private void IsPumpCheckBox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
         {
             var isPumpCheckBox = (CheckBox)sender;
@@ -186,6 +161,41 @@ namespace Pump.Layout
                     DirectOnlineGpioPicker.SelectedIndex = index;
                 index++;
             }
+        }
+        private async void ButtonUpdateEquipment_OnClicked(object sender, EventArgs e)
+        {
+            var notification = EquipmentValidate();
+
+            if (!string.IsNullOrWhiteSpace(notification))
+            {
+                await DisplayAlert("Incomplete", notification, "Understood");
+            }
+            else
+            {
+                _equipment.NAME = EquipmentName.Text;
+                _equipment.GPIO = _avalibleGpio[GpioPicker.SelectedIndex];
+                _equipment.isPump = IsPumpCheckBox.IsChecked;
+                if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
+                    _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
+                _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0 ? null : _subControllerList[SystemPicker.SelectedIndex - 1].ID;
+                var key = await new Authentication().SetEquipment(_equipment);
+                await UpdateEquipmentToSite(key);
+                //
+
+                await Navigation.PopModalAsync();
+            }
+        }
+
+        private async Task UpdateEquipmentToSite(string key)
+        {
+            if(_site.Attachments.Contains(key))
+                return;
+            _site.Attachments.Add(key);
+            var siteKey = await new Authentication().SetSite(_site);
+        }
+        private void ButtonBack_OnClicked(object sender, EventArgs e)
+        {
+            Navigation.PopModalAsync();
         }
 
     }

@@ -36,7 +36,7 @@
                         BackgroundColor="White"
                         BorderColor="Black"
                         HorizontalOptions="FillAndExpand">
-                        <ScrollView HeightRequest="100">
+                        <ScrollView HeightRequest="150">
                             <StackLayout x:Name="ScrollViewEquipment">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer x:Name="ScrollViewEquipmentTap" />
@@ -56,7 +56,6 @@
                 </StackLayout>
 
                 <StackLayout>
-
                     <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                         <Label
                             FontSize="Subtitle"
@@ -79,7 +78,7 @@
                         BackgroundColor="White"
                         BorderColor="Black"
                         HorizontalOptions="FillAndExpand">
-                        <ScrollView HeightRequest="100">
+                        <ScrollView HeightRequest="150">
                             <StackLayout x:Name="ScrollViewSensor">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer x:Name="ScrollViewSensorTap" />
@@ -95,42 +94,6 @@
                         </ScrollView>
                     </Frame>
 
-                </StackLayout>
-                <StackLayout>
-                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-                        <Label
-                            FontSize="Subtitle"
-                            HorizontalOptions="CenterAndExpand"
-                            Text="Current Sub-Controller"
-                            TextColor="White"
-                            TextDecorations="Underline"
-                            VerticalOptions="Center" />
-                        <Button
-                            x:Name="BtnAddSubController"
-                            BackgroundColor="DeepSkyBlue"
-                            HorizontalOptions="End"
-                            IsEnabled="False"
-                            Pressed="BtnAddSubController_OnPressed"
-                            Text="Add Sub-Controller"
-                            TextColor="White"
-                            VerticalOptions="Center" />
-                    </StackLayout>
-                    <Frame BackgroundColor="White" BorderColor="Black">
-                        <ScrollView HeightRequest="100">
-                            <StackLayout x:Name="ScrollViewSubController">
-                                <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewSubControllerTap" />
-                                </StackLayout.GestureRecognizers>
-                                <ActivityIndicator
-                                    AutomationId="ActivityIndicatorSubControllerLoading"
-                                    HorizontalOptions="Center"
-                                    IsEnabled="true"
-                                    IsRunning="True"
-                                    IsVisible="True"
-                                    VerticalOptions="Center" />
-                            </StackLayout>
-                        </ScrollView>
-                    </Frame>
                 </StackLayout>
                 <Button
                     x:Name="BtnBack"
