@@ -168,7 +168,7 @@ namespace Pump.Layout
 
         private async Task<string> SendUid(string uid)
         {
-            return await _blueToothManage.WriteToBle(SocketCommands.FirebaseUID(uid));
+            return await _blueToothManage.WriteToBle(SocketCommands.FirebaseUid(uid));
         }
 
         private async void WiFiIpLabel_OnTapped(object sender, EventArgs e)
@@ -215,7 +215,7 @@ namespace Pump.Layout
                     pumpController.InternalPath = LabelIP.Text;
                     pumpController.InternalPort = 8080;
                 }
-                new DatabaseController().AddControllerConnection(pumpController);
+                new DatabaseController().UpdateControllerConnection(pumpController);
                 await DisplayAlert("Setup", result, "Understood");
                 _controllerEvent.NewControllerConnection();
             }

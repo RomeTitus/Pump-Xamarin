@@ -1,9 +1,12 @@
-﻿using SQLite;
+﻿using System.Collections.Generic;
+using SQLite;
 
 namespace Pump.Droid.Database.Table
 {
     public class PumpConnection
     {
+        public List<string> ConnectionTypeList = new List<string>() { "Cloud", "Network", "BlueTooth" };
+
         public PumpConnection()
         {
         }
@@ -20,9 +23,9 @@ namespace Pump.Droid.Database.Table
         }
 
         [PrimaryKey] [AutoIncrement] public int ID { get; set; }
-
         public string Name { get; set; }
         public string Mac { get; set; }
+        public int ConnectionType { get; set; }
         public string InternalPath { get; set; }
         public int InternalPort { get; set; }
         public string ExternalPath { get; set; }

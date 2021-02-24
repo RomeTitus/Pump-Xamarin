@@ -49,8 +49,9 @@ namespace Pump.Droid
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             BluetoothLowEnergyAdapter.Init(this);
             CheckPermissions();
-            LoadApplication(new App());
             IsPlayServicesAvailable();
+            LoadApplication(new App());
+            
         }
 
 

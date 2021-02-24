@@ -62,8 +62,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Layout\AddExistingController.xaml.cs">
-      <DependentUpon>AddExistingController.xaml</DependentUpon>
+    <Compile Update="Layout\ExistingController.xaml.cs">
+      <DependentUpon>ExistingController.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\FloatingScreenScroll.xaml.cs">
       <DependentUpon>FloatingScreenScroll.xaml</DependentUpon>

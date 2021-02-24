@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Firebase.Database.Streaming;
+using Pump.Database;
 using Pump.IrrigationController;
 
 namespace Pump.FirebaseDatabase
@@ -20,10 +21,11 @@ namespace Pump.FirebaseDatabase
         public InitializeFirebase(ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
-            SubscribeFirebase();
         }
         public void SubscribeFirebase()
         {
+            if(new DatabaseController().GetControllerConnectionSelection() == null)
+                return;
             var auth = new Authentication();
 
             _subscribeSensor = auth._FirebaseClient
@@ -364,14 +366,21 @@ namespace Pump.FirebaseDatabase
 
         public void Disposable()
         {
-            _subscribeSensor.Dispose();
-            _subscribeEquipment.Dispose();
-            _subscribeSchedule.Dispose();
-            _subscribeCustomSchedule.Dispose();
-            _subscribeManualSchedule.Dispose();
-            _subscribeSite.Dispose();
-            _subscribeSubController.Dispose();
-            _subscribeAlive.Dispose();
+            try
+            {
+                _subscribeSensor.Dispose();
+                _subscribeEquipment.Dispose();
+                _subscribeSchedule.Dispose();
+                _subscribeCustomSchedule.Dispose();
+                _subscribeManualSchedule.Dispose();
+                _subscribeSite.Dispose();
+                _subscribeSubController.Dispose();
+                _subscribeAlive.Dispose();
+            }
+            catch
+            {
+                // ignored
+            }
 
             _observableIrrigation.EquipmentList.Clear();
             _observableIrrigation.SensorList.Clear();

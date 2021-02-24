@@ -280,8 +280,7 @@ namespace Pump.Layout
             equipmentList.AddRange(ScrollViewManualZone.Children.ToList());
 
             var selectedEquipment = (from button in equipmentList.Cast<Button>() where button.BackgroundColor == Color.BlueViolet select button.AutomationId).ToList();
-
-            if (selectedEquipment.Count < 1 && MaskedEntryTime.Text.Count() < 4)
+            if (selectedEquipment.Count < 1 || MaskedEntryTime.Text.Count() != 5)
             {
                 Device.BeginInvokeOnMainThread(() => { DisplayAlert("Incomplete Operation", "Please Make sure that the Time and Equipment are selected correctly", "Understood"); });
                 return;

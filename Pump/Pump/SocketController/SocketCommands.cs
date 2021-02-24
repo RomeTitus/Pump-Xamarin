@@ -19,7 +19,7 @@ namespace Pump.SocketController
             return wiFiCommand.ToString();
         }
 
-        public static string FirebaseUID(string uid)
+        public static string FirebaseUid(string uid)
         {
             var wiFiCommand = new JObject { { "Task", new JObject() } };
             wiFiCommand["Task"] = new JObject { { "uid", new JObject() } };
@@ -32,6 +32,12 @@ namespace Pump.SocketController
             var createSubControllerCommand = new JObject { { "SubController", new JObject() } };
             createSubControllerCommand["SubController"] = new JObject { { Id,  JToken.FromObject(subController)}};
             return createSubControllerCommand.ToString();
+        }
+
+        public static string AllTogether()
+        {
+            var collectAllTogether = new JObject { { "Task", "AllTogether" } };
+            return collectAllTogether.ToString();
         }
     }
 }

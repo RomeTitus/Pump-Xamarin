@@ -119,7 +119,7 @@ namespace Pump.Database
         }
 
 
-        public void AddControllerConnection(PumpConnection pumpConnection)
+        public void UpdateControllerConnection(PumpConnection pumpConnection)
         {
             lock (Locker)
             {
@@ -137,7 +137,6 @@ namespace Pump.Database
             }
         }
 
-
         public void DeleteControllerConnection(PumpConnection pumpConnection)
         {
             lock (Locker)
@@ -150,16 +149,8 @@ namespace Pump.Database
             }
         }
 
-            public void UpdateControllerConnection(PumpConnection pumpConnection)
+        public void SetSelectedController(PumpConnection pumpConnection)
         {
-            lock (Locker)
-            {
-                _database.Update(pumpConnection);
-            }
-        }
-
-            public void SetSelectedController(PumpConnection pumpConnection)
-            {
             lock (Locker)
             {
                 _database.DeleteAll<PumpSelection>();

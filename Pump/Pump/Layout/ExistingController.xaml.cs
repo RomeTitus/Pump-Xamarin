@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using nexus.core;
 using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
@@ -11,7 +13,7 @@ using Xamarin.Forms;
 
 namespace Pump
 {
-    public partial class AddExistingController : ContentPage
+    public partial class ExistingController : ContentPage
     {
         private bool? _internalConnection;
         private bool? _externalConnection;
@@ -21,9 +23,9 @@ namespace Pump
         private readonly PumpConnection _pumpConnection = new PumpConnection();
         private double _height;
         private double _width;
-        private ControllerEvent _controllerEvent;
+        private readonly ControllerEvent _controllerEvent;
 
-        public AddExistingController(bool firstConnection, ControllerEvent controllerEvent, PumpConnection pumpConnection = null)
+        public ExistingController(bool firstConnection, ControllerEvent controllerEvent, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
             _controllerEvent = controllerEvent;
@@ -31,11 +33,27 @@ namespace Pump
             if (pumpConnection != null)
             {
                 _pumpConnection = pumpConnection;
+                BtnNewController.IsVisible = false;
                 PopulateElements();
+                ConnectionPicker.SelectedIndexChanged += ConnectionPickerOnSelectedIndexChanged;
             }
-                
-            if (!firstConnection)
-                BtnBackAddConnectionScreen.IsVisible = true;
+            else
+                BtnNewController.IsVisible = true;
+            
+
+            if (firstConnection) return;
+            BtnBackAddConnectionScreen.IsVisible = true;
+            
+
+        }
+
+        private void ConnectionPickerOnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(ConnectionPicker.SelectedIndex == -1)
+                return;
+            _pumpConnection.ConnectionType = ConnectionPicker.SelectedIndex;
+            new DatabaseController().UpdateControllerConnection(_pumpConnection);
+            //TODO Throw event to change connection Type otherwise user needs to reload application
         }
 
         private void BtnAddController_Clicked(object sender, EventArgs e)
@@ -45,6 +63,9 @@ namespace Pump
 
         private void PopulateElements()
         {
+            ConnectionPicker.Items.AddAll(_pumpConnection.ConnectionTypeList);
+            ConnectionPicker.SelectedIndex = _pumpConnection.ConnectionType;
+
             TxtControllerName.Text = _pumpConnection.Name;
             TxtInternalConnection.Text = _pumpConnection.InternalPath;
             TxtInternalPort.Text = _pumpConnection.InternalPort.ToString();
@@ -242,7 +263,6 @@ namespace Pump
 
         private bool CheckSocket(string host, int port)
         {
-            //TODO Create Socket File
             var socket = new SocketVerify(host, port);
             try
             {
@@ -263,10 +283,9 @@ namespace Pump
 
         private void AddPumpConnection(PumpConnection pumpConnection)
         {
-
             var databaseController = new DatabaseController();
-            databaseController.AddControllerConnection(pumpConnection);
-            Navigation.PopModalAsync();
+            databaseController.UpdateControllerConnection(pumpConnection);
+            _controllerEvent.NewControllerConnection();
         }
 
        

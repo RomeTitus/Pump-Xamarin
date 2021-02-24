@@ -4,6 +4,7 @@ using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout;
+using Pump.SocketController;
 using Xamarin.Forms;
 
 namespace Pump
@@ -12,32 +13,21 @@ namespace Pump
     {
         private readonly ObservableIrrigation _observableIrrigation = new ObservableIrrigation();
         private readonly DatabaseController _databaseController = new DatabaseController();
-        private readonly InitializeFirebase _initializeFirebase;
+        private readonly SocketPicker _socketPicker;
 
         public App()
         {
             InitializeComponent();
-            _initializeFirebase = new InitializeFirebase(_observableIrrigation);
+            _socketPicker = new SocketPicker(_observableIrrigation);
             var siteScreen = new SiteScreen(_observableIrrigation);
+            
             MainPage = siteScreen;
             siteScreen.GetControllerPicker().SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
-            /*
-             
-             
-            if (_databaseController.GetControllerConnectionSelection() == null)
-            {
-                var newConnectionScreen = new AddExistingController(true);
-                MainPage = newConnectionScreen;
-            }
-            else
-            {
-                
-
-            }
-            */
+            siteScreen.GetControllerPicker().SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
+            _socketPicker.Subscribe();
         }
 
-        private void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        private async void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
         {
 
             var picker = (Picker) sender;
@@ -46,9 +36,9 @@ namespace Pump
                 return;
             var controllerList = new DatabaseController().GetControllerConnectionList();
             var selectedConnection = controllerList[picker.SelectedIndex];
-            _initializeFirebase.Disposable();
+            _socketPicker.Disposable();
             new DatabaseController().SetSelectedController(selectedConnection);
-            _initializeFirebase.SubscribeFirebase();
+            await _socketPicker.Subscribe();
         }
 
         protected override void OnStart()

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database;
@@ -41,8 +39,10 @@ namespace Pump.Layout
             var controllerEvent = new ControllerEvent();
             _controllerEvent = controllerEvent;
             _controllerEvent.OnUpdateStatus += NewSelectedController;
-            
-            if (!string.IsNullOrEmpty(new DatabaseController().GetControllerConnectionSelection().SiteSelectedId))
+            var dbController = new DatabaseController();
+            if (!dbController.GetControllerConnectionList().Any())
+                SetupNewController();
+            else if (!string.IsNullOrEmpty(dbController.GetControllerConnectionSelection().SiteSelectedId))
                 StartHomePage();
         }
 
@@ -261,16 +261,23 @@ namespace Pump.Layout
             });
         }
 
+        private void SetupNewController()
+        {
+            var connectionScreen = new ExistingController(true, _controllerEvent);
+            connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
+            Navigation.PushModalAsync(connectionScreen);
+        }
+
         private async void BtnAddController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new AddExistingController(false, _controllerEvent);
+            var connectionScreen = new ExistingController(false, _controllerEvent);
             connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
             await Navigation.PushModalAsync(connectionScreen);
         }
 
         private void BtnEditController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new AddExistingController(false, _controllerEvent, new DatabaseController().GetControllerConnectionSelection());
+            var connectionScreen = new ExistingController(false, _controllerEvent, new DatabaseController().GetControllerConnectionSelection());
             connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
@@ -301,8 +308,6 @@ namespace Pump.Layout
             }
         }
 
-
-
         private void PopulateSubControllerEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             Device.BeginInvokeOnMainThread(PopulateSubController);
@@ -315,6 +320,7 @@ namespace Pump.Layout
             try
             {
                 if (_observableIrrigation.SubControllerList.Contains(null)) return;
+                BtnAddSubController.IsEnabled = true;
                 if (_observableIrrigation.SubControllerList.Any())
                     foreach (var subController in _observableIrrigation.SubControllerList.ToList())
                     {

@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentPage
-    x:Class="Pump.AddExistingController"
+    x:Class="Pump.ExistingController"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     BackgroundColor="DeepSkyBlue"
     mc:Ignorable="d">
@@ -15,11 +16,13 @@
         Direction="Column"
         JustifyContent="SpaceAround"
         VerticalOptions="Center">
+
         <StackLayout>
             <Label
                 x:Name="LabelControllerName"
                 HorizontalOptions="Center"
                 Text="Controller Name"
+                TextColor="White"
                 TextType="Text"
                 VerticalOptions="Center" />
 
@@ -32,8 +35,35 @@
                 InputTransparent="False"
                 MinimumWidthRequest="-1"
                 Scale="1"
+                TextColor="White"
                 VerticalOptions="Center"
                 WidthRequest="-1" />
+        </StackLayout>
+
+        <StackLayout
+            Margin="0,5,0,5"
+            HorizontalOptions="StartAndExpand"
+            Orientation="Horizontal">
+            <Label
+                Margin="0,15,0,0"
+                HorizontalOptions="StartAndExpand"
+                Text="Connection Type: "
+                TextColor="White"
+                TextDecorations="Underline"
+                VerticalOptions="Center" />
+
+            <Frame
+                Margin="0,0,10,0"
+                Padding="10,0,10,0"
+                BackgroundColor="AliceBlue"
+                CornerRadius="30"
+                HorizontalOptions="FillAndExpand">
+                <StackLayout Orientation="Horizontal">
+                    <Image HeightRequest="18" Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                    <Picker x:Name="ConnectionPicker" HorizontalOptions="FillAndExpand" />
+
+                </StackLayout>
+            </Frame>
         </StackLayout>
 
         <Frame BackgroundColor="White" BorderColor="Black">
@@ -43,11 +73,13 @@
                     x:Name="LabelControllerCode"
                     HorizontalOptions="Center"
                     Text="Controller Code"
+                    TextColor="White"
                     VerticalOptions="Center" />
 
                 <Editor
                     x:Name="TxtControllerCode"
                     HorizontalOptions="Fill"
+                    TextColor="White"
                     VerticalOptions="Center" />
 
             </StackLayout>
@@ -56,6 +88,7 @@
             <Label
                 HorizontalOptions="Center"
                 Text="OR"
+                TextColor="White"
                 VerticalOptions="Center" />
         </StackLayout>
 
@@ -63,7 +96,7 @@
             BackgroundColor="White"
             BorderColor="Black"
             HorizontalOptions="FillAndExpand">
-            <StackLayout>
+            <StackLayout Orientation="Horizontal">
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black"
@@ -78,7 +111,10 @@
                             Text="Internal Connection"
                             VerticalOptions="Center" />
 
-                        <Editor x:Name="TxtInternalConnection" HorizontalOptions="Fill" />
+                        <Editor
+                            x:Name="TxtInternalConnection"
+                            FontSize="Small"
+                            HorizontalOptions="Fill" />
 
 
                         <Label
@@ -88,6 +124,7 @@
 
                         <Editor
                             x:Name="TxtInternalPort"
+                            FontSize="Small"
                             HorizontalOptions="Fill"
                             Keyboard="Numeric" />
 
@@ -104,18 +141,21 @@
 
                         <Editor
                             x:Name="TxtExternalConnection"
+                            FontSize="Small"
                             HorizontalOptions="Fill"
                             VerticalOptions="Center" />
 
 
                         <Label
                             x:Name="LabelExternalPort"
+                            FontSize="Small"
                             HorizontalOptions="Center"
                             Text="External Port"
                             VerticalOptions="Center" />
 
                         <Editor
                             x:Name="TxtExternalPort"
+                            FontSize="Small"
                             HorizontalOptions="Fill"
                             Keyboard="Numeric"
                             VerticalOptions="Center" />
@@ -129,7 +169,9 @@
             BackgroundColor="DeepSkyBlue"
             Clicked="BtnNewController_OnClicked"
             HorizontalOptions="Center"
+            IsVisible="False"
             Text="SETUP NEW SYSTEM"
+            TextColor="White"
             VerticalOptions="Center" />
 
         <Button
@@ -138,6 +180,7 @@
             Clicked="BtnAddController_Clicked"
             HorizontalOptions="Center"
             Text="ADD SYSTEM"
+            TextColor="White"
             VerticalOptions="Center" />
 
         <Button
@@ -147,6 +190,7 @@
             HorizontalOptions="Center"
             IsVisible="False"
             Text="Back"
+            TextColor="White"
             VerticalOptions="End" />
 
     </FlexLayout>
