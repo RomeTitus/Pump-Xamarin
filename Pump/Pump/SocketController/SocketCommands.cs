@@ -1,43 +1,43 @@
-﻿using System;
-using System.Linq.Expressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Pump.IrrigationController;
-using Xamarin.Essentials;
 
 namespace Pump.SocketController
 {
     internal static class SocketCommands
     {
-        public static string WiFiScan = "{\"Task\" : \"WiFiScan\"}";
+        public static JObject WiFiScan()
+        {
+            var wiFiScan = new JObject { { "Task", "WiFiScan" } };
+            return wiFiScan;
+        }
 
-        public static string WiFiConnect(JObject wiFiConnect)
+        public static JObject WiFiConnect(JObject wiFiConnect)
         {
             var wiFiCommand = new JObject{{ "Task", new JObject()}};
             wiFiCommand["Task"] = new JObject{{ "WiFiConnect", new JObject()}};
             wiFiCommand["Task"]["WiFiConnect"] = wiFiConnect;
-            return wiFiCommand.ToString();
+            return wiFiCommand;
         }
 
-        public static string FirebaseUid(string uid)
+        public static JObject FirebaseUid(string uid)
         {
             var wiFiCommand = new JObject { { "Task", new JObject() } };
             wiFiCommand["Task"] = new JObject { { "uid", new JObject() } };
             wiFiCommand["Task"]["uid"] = uid;
-            return wiFiCommand.ToString();
+            return wiFiCommand;
         }
 
-        public static string SetupSubController(SubController subController, string Id)
+        public static JObject SetupSubController(SubController subController, string Id)
         {
-            var createSubControllerCommand = new JObject { { "SubController", new JObject() } };
+            var createSubControllerCommand = new JObject { { "SubController", new JObject() } , { "Task", new JObject{{ "IsMaster", false }}}};
             createSubControllerCommand["SubController"] = new JObject { { Id,  JToken.FromObject(subController)}};
-            return createSubControllerCommand.ToString();
+            return createSubControllerCommand;
         }
 
-        public static string AllTogether()
+        public static JObject AllTogether()
         {
-            var collectAllTogether = new JObject { { "Task", "AllTogether" } };
-            return collectAllTogether.ToString();
+            var collectAllTogether = new JObject { { "Task", new JObject {{"AllTogether", true}, { "PartitionNumber", 0 } } }};
+            return collectAllTogether;
         }
     }
 }

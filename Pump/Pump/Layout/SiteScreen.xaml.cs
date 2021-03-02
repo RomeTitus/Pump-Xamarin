@@ -8,6 +8,7 @@ using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,13 +20,42 @@ namespace Pump.Layout
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly ObservableIrrigation _observableIrrigation;
         private HomeScreen _homeScreen;
-        private ControllerEvent _controllerEvent;
+        private readonly ControllerEvent _controllerEvent;
+        private readonly NotificationEvent _notificationEvent;
 
-        public SiteScreen(ObservableIrrigation observableIrrigation)
+        public SiteScreen()
         {
-            _observableIrrigation = observableIrrigation;
             InitializeComponent();
+            _observableIrrigation = new ObservableIrrigation();
+            SetEvents();
+            
+            _controllerEvent = new ControllerEvent();
+            _controllerEvent.OnUpdateStatus += NewSelectedController;
+
+            _notificationEvent = new NotificationEvent();
+            _notificationEvent.OnNotificationUpdate += _notificationEvent_OnNotificationConnectionUpdate;
+
+            
+            var socketPicker = new SocketPicker(_observableIrrigation, _notificationEvent);
+            ControllerPicker.SelectedIndexChanged += socketPicker.ConnectionPicker_OnSelectedIndexChanged;
+
             PopulateControllers();
+
+
+            var dbController = new DatabaseController();
+            if (!dbController.GetControllerConnectionList().Any())
+                SetupNewController();
+            else if (!string.IsNullOrEmpty(dbController.GetControllerConnectionSelection().SiteSelectedId))
+                StartHomePage();
+        }
+
+        private async void _notificationEvent_OnNotificationConnectionUpdate(object sender, NotificationEventArgs e)
+        {
+            await DisplayAlert(e.Header, e.Main, e.ButtonText);
+        }
+
+        private void SetEvents()
+        {
             _observableIrrigation.SensorList.CollectionChanged += PopulateSensorAndEquipmentEvent;
             _observableIrrigation.EquipmentList.CollectionChanged += PopulateSensorAndEquipmentEvent;
             _observableIrrigation.SensorList.CollectionChanged += PopulateSiteEvent;
@@ -36,14 +66,6 @@ namespace Pump.Layout
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
             ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
-            var controllerEvent = new ControllerEvent();
-            _controllerEvent = controllerEvent;
-            _controllerEvent.OnUpdateStatus += NewSelectedController;
-            var dbController = new DatabaseController();
-            if (!dbController.GetControllerConnectionList().Any())
-                SetupNewController();
-            else if (!string.IsNullOrEmpty(dbController.GetControllerConnectionSelection().SiteSelectedId))
-                StartHomePage();
         }
 
         private void PopulateControllers()
@@ -89,9 +111,6 @@ namespace Pump.Layout
                 else
                     BtnAddSite.IsEnabled = false;
             });
-            
-                
-            
         }
 
         private void PopulateSiteEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

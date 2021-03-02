@@ -10,6 +10,7 @@ using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
+using Pump.SocketController.BT;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -139,13 +140,13 @@ namespace Pump.Layout
 
         private async Task<string> ScanWiFi()
         {
-            return await _blueToothManage.WriteToBle(SocketCommands.WiFiScan);
+            return await _blueToothManage.SendAndReceiveToBle(SocketCommands.WiFiScan());
         }
 
         private async Task<string> ConnectToWifi(WiFiContainer wiFiContainer)
         {
             var wiFiJson = JObject.FromObject(wiFiContainer);
-            return await _blueToothManage.WriteToBle(SocketCommands.WiFiConnect(wiFiJson), 8000);
+            return await _blueToothManage.SendAndReceiveToBle(SocketCommands.WiFiConnect(wiFiJson), 8000);
         }
 
         private void PopulateControllers()
@@ -168,7 +169,7 @@ namespace Pump.Layout
 
         private async Task<string> SendUid(string uid)
         {
-            return await _blueToothManage.WriteToBle(SocketCommands.FirebaseUid(uid));
+            return await _blueToothManage.SendAndReceiveToBle(SocketCommands.FirebaseUid(uid));
         }
 
         private async void WiFiIpLabel_OnTapped(object sender, EventArgs e)
@@ -209,7 +210,7 @@ namespace Pump.Layout
             {
                 var result = await SendUid(_viewBasicAlert.GetEditableText());
                 await PopupNavigation.Instance.PopAllAsync();
-                var pumpController = new PumpConnection {Name = TxtControllerName.Text, Mac = _blueToothManage.BLEDevice.NativeDevice.ToString()};
+                var pumpController = new PumpConnection {Name = TxtControllerName.Text, Mac = _blueToothManage.BleDevice.NativeDevice.ToString()};
                 if (!string.IsNullOrEmpty(LabelIP.Text))
                 {
                     pumpController.InternalPath = LabelIP.Text;
@@ -230,7 +231,7 @@ namespace Pump.Layout
 
             var mainController = new SubController
             {
-                BTmac = _blueToothManage.BLEDevice.NativeDevice.ToString(),
+                BTmac = _blueToothManage.BleDevice.NativeDevice.ToString(),
                 NAME = TxtControllerName.Text,
                 Key = randomKey,
                 IpAdress = LabelIP.Text,
@@ -250,7 +251,7 @@ namespace Pump.Layout
                 ID = subControllerId
             };
             
-            var result = await _blueToothManage.WriteToBle(SocketCommands.SetupSubController(subController, subControllerId));
+            var result = await _blueToothManage.SendAndReceiveToBle(SocketCommands.SetupSubController(subController, subControllerId));
 
             await DisplayAlert("Setup", result, "Understood");
 

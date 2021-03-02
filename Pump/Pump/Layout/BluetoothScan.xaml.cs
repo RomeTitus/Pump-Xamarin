@@ -4,6 +4,7 @@ using Plugin.BLE.Abstractions.EventArgs;
 using Pump.Class;
 using Pump.Layout.Views;
 using Pump.SocketController;
+using Pump.SocketController.BT;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -21,19 +22,19 @@ namespace Pump.Layout
             _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
             _bluetoothManager = new BluetoothManager();
             _bluetoothManager.DeviceList.CollectionChanged += PopulateBluetoothDeviceEvent;
-            _bluetoothManager.AdapterBLE.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
-            _bluetoothManager.AdapterBLE.DeviceConnected += AdapterBLE_DeviceConnected;
+            _bluetoothManager.AdapterBle.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
+            _bluetoothManager.AdapterBle.DeviceConnected += AdapterBLE_DeviceConnected;
         }
 
         private void AdapterBLE_DeviceConnected(object sender, DeviceEventArgs e)
         {
-            DisplayAlert("Bluetooth", e.Device.Name + ": Connected!", "Understood");
+            //DisplayAlert("Bluetooth", e.Device.Name + ": Connected!", "Understood");
         }
 
         private async void BtnScan_OnClicked(object sender, EventArgs e)
         {
             ScrollViewSetupSystem.Children.Clear();
-            if (_bluetoothManager.AdapterBLE.IsScanning)
+            if (_bluetoothManager.AdapterBle.IsScanning)
             {
                 BtnScan.Text = "Start Scan";
                 
