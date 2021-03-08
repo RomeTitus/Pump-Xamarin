@@ -81,7 +81,7 @@
       <DependentUpon>SettingPageHomeScreen.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\BluetoothScan.xaml.cs">
-      <DependentUpon>BluetoothScan.xaml</DependentUpon>
+      <DependentUpon>BlueToothScan.xaml</DependentUpon>
     </Compile>
     <Compile Update="Layout\SubControllerUpdate.xaml.cs">
       <DependentUpon>SubControllerUpdate.xaml</DependentUpon>
@@ -161,7 +161,7 @@
     <EmbeddedResource Update="Layout\SensorUpdate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Layout\BluetoothScan.xaml">
+    <EmbeddedResource Update="Layout\BlueToothScan.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\SetupSystem.xaml">

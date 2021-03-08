@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using nexus.core;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 
@@ -39,6 +40,8 @@ namespace Pump.SocketController.BT
             AdapterBle.DeviceConnected += Adapter_DeviceConnected;
             AdapterBle.DeviceDisconnected += Adapter_DeviceDisconnected;
             AdapterBle.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
+
+            
             AdapterBle.ScanTimeout = 10000;
         }
 
@@ -93,9 +96,9 @@ namespace Pump.SocketController.BT
             Debug.WriteLine("Device already connected");
         }
 
-        async void Adapter_DeviceDisconnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
+        void Adapter_DeviceDisconnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
         {
-            await DisconnectDevice();
+            //await DisconnectDevice();
             _loadedCharacteristic = null;
             //DeviceDisconnectedEvent?.Invoke(sender,e);
             Debug.WriteLine("Device already disconnected");
@@ -153,30 +156,47 @@ namespace Pump.SocketController.BT
 
             var fullData = false;
             var bleReplyBytes = new List<byte>();
-            var partitionNumber = 0;
+            var partNumber = 0;
             while (fullData == false)
             {
-                if (dataToSend.ContainsKey("Task") && dataToSend["Task"]["PartitionNumber"] != null)
-                    dataToSend["Task"]["PartitionNumber"] = partitionNumber;
-                
+                var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
 
-                var receiveBytes = await WriteToBle(dataToSend, timeout);
-                partitionNumber++;
-                bleReplyBytes.AddRange(receiveBytes);
-                if (receiveBytes.Length != 512)
+                if (dataToSend.ContainsKey("Task"))
+                    try
+                    {
+                        dataToSend["Task"]["Part"] = partNumber;
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+
+                var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
+
+                var finalBytesReceived = new byte[0];
+                //Sending Large amounts of Data :/
+                for (var i = 0; i < bytes.Count; i+= 508)
+                {
+                    var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;                   
+                    sendingBytes.InsertRange(0, key);
+                    finalBytesReceived = await WriteToBle(sendingBytes.ToArray(), timeout);
+                }
+
+                partNumber++;
+                bleReplyBytes.AddRange(finalBytesReceived);
+                if (finalBytesReceived.Length != 512)
                     fullData = true;
             }
             return ConvertForApplication(Encoding.ASCII.GetString(bleReplyBytes.ToArray(), 0, bleReplyBytes.Count));
         }
 
-        private async Task<byte[]> WriteToBle(JObject dataToSend, int timeout = 0)
+        private async Task<byte[]> WriteToBle(byte[] bytesToSend,  int timeout = 0)
         {
-            var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString()));
-            await _loadedCharacteristic.WriteAsync(bytes);
+            await _loadedCharacteristic.WriteAsync(bytesToSend);
             Thread.Sleep(timeout);
             var result = await _loadedCharacteristic.ReadAsync();
-            if (result == bytes)
-                throw new Exception("Controller did not reply back using BlueTooth");
+            if (Encoding.ASCII.GetString(result, 0, result.Length) == Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
+                throw new Exception("Controller did not reply back using BlueTooth \n reboot required");
             return result;
         }
     }

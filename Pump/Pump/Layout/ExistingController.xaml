@@ -79,7 +79,7 @@
                 <Editor
                     x:Name="TxtControllerCode"
                     HorizontalOptions="Fill"
-                    TextColor="White"
+                    TextColor="Black"
                     VerticalOptions="Center" />
 
             </StackLayout>
@@ -170,7 +170,7 @@
             Clicked="BtnNewController_OnClicked"
             HorizontalOptions="Center"
             IsVisible="False"
-            Text="SETUP NEW SYSTEM"
+            Text="SCAN FOR NEW SYSTEM"
             TextColor="White"
             VerticalOptions="Center" />
 

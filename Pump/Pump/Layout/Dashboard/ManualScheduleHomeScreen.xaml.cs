@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -23,11 +22,8 @@ namespace Pump.Layout
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly PumpConnection _pumpConnection;
-
         private FloatingScreenScroll _floatingScreenScroll;
         private bool? _firebaseHasReplied = false;
-
-
 
         public ManualScheduleHomeScreen(ObservableIrrigation observableIrrigation)
         {
@@ -49,7 +45,6 @@ namespace Pump.Layout
                         hasSubscribed = true;
                         _observableIrrigation.ManualScheduleList.CollectionChanged += PopulateManualElementsEvent;
                         Device.InvokeOnMainThreadAsync(PopulateManualElements);
-
                     }
 
                     if (_observableIrrigation.EquipmentList.Contains(null) && scheduleHasRun == false)

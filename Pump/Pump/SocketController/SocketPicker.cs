@@ -21,13 +21,9 @@ namespace Pump.SocketController
 
         public SocketPicker(ObservableIrrigation observableIrrigation, NotificationEvent notificationEvent)
         {
-            var observableIrrigation1 = observableIrrigation;
             _notificationEvent = notificationEvent;
-            _initializeFirebase = new InitializeFirebase(observableIrrigation1);
-            _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation1);
-            //Subscribe();
-
-
+            _initializeFirebase = new InitializeFirebase(observableIrrigation);
+            _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation);
         }
 
         private void AdapterBLEOnDeviceConnected(object sender, DeviceEventArgs e)

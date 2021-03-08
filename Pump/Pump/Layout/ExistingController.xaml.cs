@@ -322,7 +322,7 @@ namespace Pump
 
         private void BtnNewController_OnClicked(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new BluetoothScan(_controllerEvent));
+            Navigation.PushModalAsync(new BlueToothScan(_controllerEvent));
         }
         private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
         {

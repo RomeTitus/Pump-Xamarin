@@ -72,9 +72,10 @@ namespace Pump.Layout
                     wifiView.GetGestureRecognizer().Tapped += WiFiView_Tapped;
                 }
             }
-            catch
+            catch (Exception exception)
             {
-                await DisplayAlert("Bluetooth Exception", result, "Connect", "Cancel");
+                await PopupNavigation.Instance.PopAllAsync();
+                await DisplayAlert("Bluetooth Exception", exception.ToString(), "Understood");
             }
         }
 

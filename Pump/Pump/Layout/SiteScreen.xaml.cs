@@ -51,7 +51,10 @@ namespace Pump.Layout
 
         private async void _notificationEvent_OnNotificationConnectionUpdate(object sender, NotificationEventArgs e)
         {
-            await DisplayAlert(e.Header, e.Main, e.ButtonText);
+            Device.BeginInvokeOnMainThread(async () => {
+                await DisplayAlert(e.Header, e.Main, e.ButtonText);
+            });
+            
         }
 
         private void SetEvents()
@@ -270,7 +273,7 @@ namespace Pump.Layout
                     StartHomePage();
                     
                 }
-                else
+                else if (action == "Delete")
                 {
                     if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + site.NAME, "Delete",

@@ -1,10 +1,25 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json.Linq;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController
 {
     internal static class SocketCommands
     {
+        public static string GenerateKey(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var stringChars = new char[length];
+            var random = new Random();
+
+            for (var i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            return new string(stringChars);
+        }
+
         public static JObject WiFiScan()
         {
             var wiFiScan = new JObject { { "Task", "WiFiScan" } };
@@ -36,7 +51,7 @@ namespace Pump.SocketController
 
         public static JObject AllTogether()
         {
-            var collectAllTogether = new JObject { { "Task", new JObject {{"AllTogether", true}, { "PartitionNumber", 0 } } }};
+            var collectAllTogether = new JObject { { "Task", new JObject {{"AllTogether", true}}}};
             return collectAllTogether;
         }
     }
