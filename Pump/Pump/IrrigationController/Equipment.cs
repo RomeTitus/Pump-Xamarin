@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
@@ -9,6 +10,7 @@ namespace Pump.IrrigationController
         {
             AttachedSensor = new List<AttachedSensor>();
         }
+        [JsonIgnore]
         public string ID { get; set; }
         public string AttachedSubController { get; set; }
         public List<AttachedSensor> AttachedSensor { get; set; }

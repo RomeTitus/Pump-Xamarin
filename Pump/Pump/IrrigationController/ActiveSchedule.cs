@@ -1,9 +1,11 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
     public class ActiveSchedule
     {
+        [JsonIgnore]
         public string ID { get; set; }
         public string NAME { get; set; }
         public string id_Pump { get; set; }

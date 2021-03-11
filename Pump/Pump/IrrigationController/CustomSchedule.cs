@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
@@ -12,6 +13,7 @@ namespace Pump.IrrigationController
             ScheduleDetails = new List<ScheduleDetail>();
             Repeat = 0;
         }
+        [JsonIgnore]
         public string ID { get; set; }
         public string NAME { get; set; }
         public string id_Pump { get; set; }

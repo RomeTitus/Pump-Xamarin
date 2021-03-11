@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
@@ -8,6 +9,7 @@ namespace Pump.IrrigationController
         {
             Attachments = new List<string>();
         }
+        [JsonIgnore]
         public string ID { get; set; }
         public string NAME { get; set; }
         public string Description { get; set; }

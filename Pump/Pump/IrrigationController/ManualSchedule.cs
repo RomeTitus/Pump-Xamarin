@@ -7,6 +7,7 @@ namespace Pump.IrrigationController
 {
     public class ManualSchedule
     {
+        [JsonIgnore]
         public string ID;
         public long EndTime { get; set; }
         public bool RunWithSchedule { get; set; }

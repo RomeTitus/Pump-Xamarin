@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
@@ -7,6 +8,7 @@ namespace Pump.IrrigationController
         public Sensor()
         {
         }
+        [JsonIgnore]
         public string ID { get; set; }
         public string LastReading { get; set; }
         public string NAME { get; set; }

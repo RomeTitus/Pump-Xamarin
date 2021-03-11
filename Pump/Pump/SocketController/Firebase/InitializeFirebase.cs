@@ -37,8 +37,13 @@ namespace Pump.FirebaseDatabase
                     {
                         if (_observableIrrigation.SensorList.Count> 0 && _observableIrrigation.SensorList[0] == null)
                             _observableIrrigation.SensorList.Clear();
+                        
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.EquipmentList.Clear();
+                            return;
+                        }
                         var sensor = x.Object;
-
                         if (x.EventType == FirebaseEventType.Delete)
                         {
                             for (int i = 0; i < _observableIrrigation.SensorList.Count; i++)
@@ -368,14 +373,14 @@ namespace Pump.FirebaseDatabase
         {
             try
             {
-                _subscribeSensor.Dispose();
-                _subscribeEquipment.Dispose();
-                _subscribeSchedule.Dispose();
-                _subscribeCustomSchedule.Dispose();
-                _subscribeManualSchedule.Dispose();
-                _subscribeSite.Dispose();
-                _subscribeSubController.Dispose();
-                _subscribeAlive.Dispose();
+                _subscribeSensor?.Dispose();
+                _subscribeEquipment?.Dispose();
+                _subscribeSchedule?.Dispose();
+                _subscribeCustomSchedule?.Dispose();
+                _subscribeManualSchedule?.Dispose();
+                _subscribeSite?.Dispose();
+                _subscribeSubController?.Dispose();
+                _subscribeAlive?.Dispose();
             }
             catch
             {
