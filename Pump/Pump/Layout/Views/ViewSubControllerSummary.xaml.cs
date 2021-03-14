@@ -26,8 +26,8 @@ namespace Pump.Layout.Views
         public void Populate()
         {
             LabelSubControllerName.Text = SubController.NAME;
-            if(SubController.IpAdress == null)
-                LabelType.Text = "LoRa";
+            if(SubController.UseLoRa)
+                LabelType.Text = "Long Range";
         }
 
         public TapGestureRecognizer GetTapGestureRecognizer()

@@ -304,10 +304,15 @@ namespace Pump.Layout
             Navigation.PushModalAsync(connectionScreen);
         }
 
-        private void BtnDeleteController_OnPressed_(object sender, EventArgs e)
+        private async void BtnDeleteController_OnPressed_(object sender, EventArgs e)
         {
-            new DatabaseController().DeleteControllerConnection(_controllerList[ControllerPicker.SelectedIndex]);
-            PopulateControllers();
+            var Result = await DisplayAlert("Are you Sure?", "Confirm to delete " + _controllerList[ControllerPicker.SelectedIndex].Name, "Delete", "Cancel");
+            if (Result)
+            {
+                new DatabaseController().DeleteControllerConnection(_controllerList[ControllerPicker.SelectedIndex]);
+                PopulateControllers();
+            }
+            
         }
 
         public Picker GetControllerPicker()
