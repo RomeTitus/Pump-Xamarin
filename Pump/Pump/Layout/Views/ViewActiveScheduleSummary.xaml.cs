@@ -12,14 +12,14 @@ namespace Pump.Layout.Views
         public ViewActiveScheduleSummary(ActiveSchedule activeSchedule)
         {
             InitializeComponent();
-            AutomationId = activeSchedule.ID;
+            AutomationId = activeSchedule.Id;
             ActiveSchedule = activeSchedule;
             PopulateSchedule();
         }
         public ViewActiveScheduleSummary(ActiveSchedule activeSchedule, double size)
         {
             InitializeComponent();
-            AutomationId = activeSchedule.ID;
+            AutomationId = activeSchedule.Id;
             ActiveSchedule = activeSchedule;
             HeightRequest = 150 * size * 0.7;
             LabelScheduleName.FontSize *= size;
@@ -32,9 +32,9 @@ namespace Pump.Layout.Views
 
         public void PopulateSchedule()
         {
-            LabelScheduleName.Text = ActiveSchedule.NAME;
-            LablePump.Text = ActiveSchedule.name_Pump;
-            LableZone.Text = ActiveSchedule.name_Equipment;
+            LabelScheduleName.Text = ActiveSchedule.Name;
+            LablePump.Text = ActiveSchedule.NamePump;
+            LableZone.Text = ActiveSchedule.NameEquipment;
             LableStartTime.Text = ActiveSchedule.StartTime.ToString(CultureInfo.InvariantCulture);
             LableEndTime.Text = ActiveSchedule.EndTime.ToString(CultureInfo.InvariantCulture);
         }

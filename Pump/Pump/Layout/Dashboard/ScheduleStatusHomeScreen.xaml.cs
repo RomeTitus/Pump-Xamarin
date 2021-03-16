@@ -97,7 +97,7 @@ namespace Pump.Layout
                     foreach (var runningSchedule in runningScheduleList)
                     {
                         var viewActiveSchedule = ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
-                            x.AutomationId == runningSchedule.ID);
+                            x.AutomationId == runningSchedule.Id);
                         if (viewActiveSchedule != null)
                         {
                             var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
@@ -124,7 +124,7 @@ namespace Pump.Layout
                     foreach (var runningSchedule in queScheduleList)
                     {
                         var viewActiveSchedule = ScrollViewQueueStatus.Children.FirstOrDefault(x =>
-                            x.AutomationId == runningSchedule.ID);
+                            x.AutomationId == runningSchedule.Id);
                         if (viewActiveSchedule != null)
                         {
                             var viewActiveScheduleSummary = (ViewActiveScheduleSummary)viewActiveSchedule;
@@ -205,7 +205,7 @@ namespace Pump.Layout
                     var queScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetQueSchedule().ToList();
                     queScheduleList.AddRange(new RunningCustomSchedule().GetQueCustomSchedule(activeCustomScheduleList));
 
-                    var itemsThatAreOnDisplay = runningScheduleList.Select(x => x.ID).ToList();
+                    var itemsThatAreOnDisplay = runningScheduleList.Select(x => x.Id).ToList();
                     itemsThatAreOnDisplay.AddRange(_observableIrrigation.ManualScheduleList.Select(x => x.ID));
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
@@ -220,7 +220,7 @@ namespace Pump.Layout
                         index--;
                     }
 
-                    itemsThatAreOnDisplay = queScheduleList.Select(x => x.ID).ToList();
+                    itemsThatAreOnDisplay = queScheduleList.Select(x => x.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
 

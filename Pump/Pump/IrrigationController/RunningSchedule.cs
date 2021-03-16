@@ -38,15 +38,15 @@ namespace Pump.IrrigationController
                     {
                         var activeSchedule = new ActiveSchedule
                         {
-                            ID = schedule.ID + scheduleDetails.id_Equipment, NAME = schedule.NAME, id_Equipment = scheduleDetails.id_Equipment
+                            Id = schedule.ID + scheduleDetails.id_Equipment, Name = schedule.NAME, IdEquipment = scheduleDetails.id_Equipment
                         };
-                        activeSchedule.name_Equipment =
-                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
-                        activeSchedule.id_Pump = schedule.id_Pump;
-                        activeSchedule.name_Pump =
-                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
+                        activeSchedule.NameEquipment =
+                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdEquipment)?.NAME;
+                        activeSchedule.IdPump = schedule.id_Pump;
+                        activeSchedule.NamePump =
+                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdPump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
-                        activeSchedule.WEEK = schedule.WEEK;
+                        activeSchedule.Week = schedule.WEEK;
                         var durationHour = scheduleDetails.DURATION.Split(':').First();
                         var durationMinute = scheduleDetails.DURATION.Split(':').Last();
                         startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +

@@ -24,15 +24,15 @@ namespace Pump.IrrigationController
                     {
                         var activeSchedule = new ActiveSchedule
                         {
-                            ID = schedule.ID + scheduleDetails.id_Equipment,
-                            NAME = schedule.NAME,
-                            id_Equipment = scheduleDetails.id_Equipment
+                            Id = schedule.ID + scheduleDetails.id_Equipment,
+                            Name = schedule.NAME,
+                            IdEquipment = scheduleDetails.id_Equipment
                         };
-                        activeSchedule.name_Equipment =
-                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Equipment)?.NAME;
-                        activeSchedule.id_Pump = schedule.id_Pump;
-                        activeSchedule.name_Pump =
-                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.id_Pump)?.NAME;
+                        activeSchedule.NameEquipment =
+                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdEquipment)?.NAME;
+                        activeSchedule.IdPump = schedule.id_Pump;
+                        activeSchedule.NamePump =
+                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdPump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
 
                         //gets Next Schedule Start Time
