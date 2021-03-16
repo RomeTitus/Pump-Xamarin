@@ -18,6 +18,7 @@
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black"
+                    CornerRadius="10"
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
                     <ScrollView>
@@ -34,10 +35,11 @@
                 </Frame>
             </StackLayout>
 
-            <StackLayout VerticalOptions="End">
+            <StackLayout VerticalOptions="End" Padding="20,0,20,10">
                 <Button
                     x:Name="ButtonCreateCustomSchedule"
                     BackgroundColor="DeepSkyBlue"
+                    CornerRadius="10"
                     Clicked="ButtonCreateCustomSchedule_OnClicked"
                     Text="Create Custom Schedule"
                     TextColor="White" />

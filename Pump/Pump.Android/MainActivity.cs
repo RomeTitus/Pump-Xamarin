@@ -47,7 +47,16 @@ namespace Pump.Droid
             Rg.Plugins.Popup.Popup.Init(this);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            BluetoothLowEnergyAdapter.Init(this);
+            //TODO fix this
+            try
+            {
+                BluetoothLowEnergyAdapter.Init(this);
+            }
+            catch
+            {
+                //ignore
+            }
+            
             CheckPermissions();
             IsPlayServicesAvailable();
             LoadApplication(new App());

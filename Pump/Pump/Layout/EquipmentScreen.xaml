@@ -35,8 +35,13 @@
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
+                        CornerRadius="10"
+                        HasShadow="True"
                         HorizontalOptions="FillAndExpand">
                         <ScrollView HeightRequest="150">
+
+                            
+
                             <StackLayout x:Name="ScrollViewEquipment">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer x:Name="ScrollViewEquipmentTap" />
@@ -77,6 +82,8 @@
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
+                        CornerRadius="10"
+                        HasShadow="True"
                         HorizontalOptions="FillAndExpand">
                         <ScrollView HeightRequest="150">
                             <StackLayout x:Name="ScrollViewSensor">

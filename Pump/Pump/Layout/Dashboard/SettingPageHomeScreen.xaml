@@ -10,16 +10,18 @@
     mc:Ignorable="d">
     <ContentPage.Content>
 
-        <StackLayout VerticalOptions="Center">
+        <StackLayout VerticalOptions="Center" Padding="20,0,20,10">
             <Button
                 x:Name="BtnSites"
                 BackgroundColor="DeepSkyBlue"
+                CornerRadius="10"
                 Text="Edit Sites"
                 TextColor="White"
                 VerticalOptions="Center" />
             <Button
                 x:Name="BtnConnectionDetail"
                 BackgroundColor="DeepSkyBlue"
+                CornerRadius="10"
                 IsVisible="False"
                 Pressed="BtnConnectionDetail_OnPressed"
                 Text="Connection Detail"
@@ -28,6 +30,7 @@
             <Button
                 x:Name="BtnScheduleDetail"
                 BackgroundColor="DeepSkyBlue"
+                CornerRadius="10"
                 IsVisible="False"
                 Pressed="BtnScheduleDetail_OnPressed"
                 Text="Schedule Edit/Delete"
@@ -36,6 +39,7 @@
             <Button
                 x:Name="BtnEquipmentDetail"
                 BackgroundColor="DeepSkyBlue"
+                CornerRadius="10"
                 Pressed="BtnEquipmentDetail_OnPressed"
                 Text="Edit Equipment"
                 TextColor="White"
@@ -43,6 +47,7 @@
             <Button
                 x:Name="BtnGraphSummary"
                 BackgroundColor="DeepSkyBlue"
+                CornerRadius="10"
                 IsVisible="False"
                 Pressed="BtnGraphSummary_OnPressed"
                 Text="View Graphs"

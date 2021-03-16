@@ -22,23 +22,27 @@
     </pages:PopupPage.Animation>
 
     <!--  You can use any elements here which are extended from Xamarin.Forms.View  -->
-    <StackLayout
+    <Frame CornerRadius="10" 
+       BackgroundColor="Azure"    
+       OutlineColor="Black" 
+       Margin="20">
+        
+        <StackLayout
         x:Name="FloatingScreenMainStackLayout"
-        Margin="12"
-        Padding="24"
-        BackgroundColor="White"
+        Margin="0"
+        Padding="0"
         HeightRequest="600"
         HorizontalOptions="Center"
         VerticalOptions="Center"
         WidthRequest="300">
-        <ScrollView>
+            <ScrollView>
 
-            <StackLayout
+                <StackLayout
                 x:Name="ScrollViewFloatingPage"
-                HorizontalOptions="StartAndExpand"
-                VerticalOptions="StartAndExpand" />
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"/>
 
-        </ScrollView>
-    </StackLayout>
-
+            </ScrollView>
+        </StackLayout>
+    </Frame>
 </pages:PopupPage>

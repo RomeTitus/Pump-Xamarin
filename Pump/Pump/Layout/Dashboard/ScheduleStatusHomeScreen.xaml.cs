@@ -139,7 +139,7 @@ namespace Pump.Layout
                     }
                 else
                 {
-                    ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Que Schedules"));
+                    ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Queued Schedules"));
                 }
 
             }

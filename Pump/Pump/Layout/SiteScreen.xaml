@@ -82,6 +82,7 @@
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black"
+                    CornerRadius="10"
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
                     <ScrollView HeightRequest="100">
@@ -119,7 +120,7 @@
                             TextColor="White"
                             VerticalOptions="Center" />
                     </StackLayout>
-                    <Frame BackgroundColor="White" BorderColor="Black">
+                    <Frame BackgroundColor="White" BorderColor="Black" CornerRadius="10">
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewSubController">
                                 <StackLayout.GestureRecognizers>

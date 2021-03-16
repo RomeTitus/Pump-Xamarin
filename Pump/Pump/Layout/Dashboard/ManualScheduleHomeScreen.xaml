@@ -21,16 +21,16 @@
                 VerticalOptions="Center">
 
                 <StackLayout>
-                    <Label
-                        FontSize="Subtitle"
-                        HorizontalOptions="Center"
-                        Text="Pump"
-                        TextColor="White"
-                        TextDecorations="Underline" />
-
+                            <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="Center"
+                            Text="Pump"
+                            TextColor="White"
+                            TextDecorations="Underline" />
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
+                        CornerRadius="10"
                         HorizontalOptions="FillAndExpand">
                         <ScrollView HeightRequest="100">
                             <FlexLayout
@@ -66,6 +66,7 @@
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
+                        CornerRadius="10"
                         HorizontalOptions="FillAndExpand">
 
 
@@ -115,11 +116,13 @@
 
                     <Label
                         FontSize="Body"
+                        IsVisible="false "
                         HorizontalOptions="Fill"
                         Text="Run with Schedule"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Switch
+                        IsVisible="false "
                         x:Name="SwitchRunWithSchedule"
                         HorizontalOptions="EndAndExpand"
                         VerticalOptions="Center" />
@@ -130,12 +133,15 @@
                     <Button
                         x:Name="ButtonStartManual"
                         BackgroundColor="DeepSkyBlue"
+                        
+                        CornerRadius="10"
                         Clicked="ButtonStartManual_Clicked"
                         Text="Start"
                         TextColor="White" />
                     <Button
                         x:Name="ButtonStopManual"
                         BackgroundColor="DeepSkyBlue"
+                        CornerRadius="10"
                         Clicked="ButtonStopManual_Clicked"
                         IsEnabled="False"
                         Text="Stop"

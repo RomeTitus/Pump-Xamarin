@@ -43,7 +43,8 @@
         <StackLayout
             Margin="0,5,0,5"
             HorizontalOptions="StartAndExpand"
-            Orientation="Horizontal">
+            Orientation="Horizontal" IsVisible="false">
+            
             <Label
                 Margin="0,15,0,0"
                 HorizontalOptions="StartAndExpand"
@@ -73,7 +74,7 @@
                     x:Name="LabelControllerCode"
                     HorizontalOptions="Center"
                     Text="Controller Code"
-                    TextColor="White"
+                    
                     VerticalOptions="Center" />
 
                 <Editor
@@ -88,7 +89,11 @@
             <Label
                 HorizontalOptions="Center"
                 Text="OR"
-                TextColor="White"
+                TextColor="Red"
+                FontSize="Large"
+                FontAttributes="Bold"
+                TextDecorations="Underline"
+               
                 VerticalOptions="Center" />
         </StackLayout>
 
@@ -172,17 +177,18 @@
             IsVisible="False"
             Text="SCAN FOR NEW SYSTEM"
             TextColor="White"
+            FontSize="Large"
             VerticalOptions="Center" />
-
-        <Button
-            x:Name="BtnAddController"
-            BackgroundColor="DeepSkyBlue"
+        <Frame BackgroundColor="Beige" BorderColor="Black">
+            <Button
+            x:Name="BtnAddController" 
             Clicked="BtnAddController_Clicked"
             HorizontalOptions="Center"
-            Text="ADD SYSTEM"
-            TextColor="White"
+            Text="Enter"
+            TextColor="Black"
+            FontSize="Large"
             VerticalOptions="Center" />
-
+        </Frame>
         <Button
             x:Name="BtnBackAddConnectionScreen"
             BackgroundColor="DeepSkyBlue"
