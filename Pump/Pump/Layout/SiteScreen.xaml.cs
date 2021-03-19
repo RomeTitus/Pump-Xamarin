@@ -286,21 +286,21 @@ namespace Pump.Layout
         private void SetupNewController()
         {
             var connectionScreen = new ExistingController(true, _controllerEvent);
-            connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
+            connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
 
         private async void BtnAddController_OnPressed(object sender, EventArgs e)
         {
             var connectionScreen = new ExistingController(false, _controllerEvent);
-            connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
+            connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             await Navigation.PushModalAsync(connectionScreen);
         }
 
         private void BtnEditController_OnPressed(object sender, EventArgs e)
         {
             var connectionScreen = new ExistingController(false, _controllerEvent, new DatabaseController().GetControllerConnectionSelection());
-            connectionScreen.GetUpdateButton().Clicked += BtnUpdateController_OnPressed;
+            connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
 

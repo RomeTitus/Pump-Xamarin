@@ -20,6 +20,7 @@
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black"
+                    CornerRadius="10"
                     HorizontalOptions="FillAndExpand">
                     <StackLayout>
                         <Label
@@ -40,7 +41,7 @@
 
                     </StackLayout>
                 </Frame>
-                <Frame BackgroundColor="White" BorderColor="Black">
+                <Frame BackgroundColor="White" BorderColor="Black" CornerRadius="10">
 
                     <StackLayout>
                         <Label

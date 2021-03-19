@@ -28,6 +28,7 @@ namespace Pump
         public ExistingController(bool firstConnection, ControllerEvent controllerEvent, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
+            FrameAddSystemTap.Tapped += FrameAddSystemTap_Tapped;
             _controllerEvent = controllerEvent;
             _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
             if (pumpConnection != null)
@@ -47,6 +48,11 @@ namespace Pump
 
         }
 
+        private void FrameAddSystemTap_Tapped(object sender, EventArgs e)
+        {
+            AddIrrigationController();
+        }
+
         private void ConnectionPickerOnSelectedIndexChanged(object sender, EventArgs e)
         {
             if(ConnectionPicker.SelectedIndex == -1)
@@ -56,10 +62,7 @@ namespace Pump
             //TODO Throw event to change connection Type otherwise user needs to reload application
         }
 
-        private void BtnAddController_Clicked(object sender, EventArgs e)
-        {
-            AddIrrigationController();
-        }
+        
 
         private void PopulateElements()
         {
@@ -315,9 +318,9 @@ namespace Pump
             Navigation.PopModalAsync();
         }
 
-        public Button GetUpdateButton()
+        public TapGestureRecognizer GetUpdateButton()
         {
-            return BtnAddController;
+           return FrameAddSystemTap;
         }
 
         private void BtnNewController_OnClicked(object sender, EventArgs e)
