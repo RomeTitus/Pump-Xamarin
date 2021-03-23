@@ -10,7 +10,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump.Layout
+namespace Pump.Layout.Dashboard
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : TabbedPage

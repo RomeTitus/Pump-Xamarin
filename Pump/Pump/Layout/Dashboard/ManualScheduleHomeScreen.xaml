@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <ContentPage
-    x:Class="Pump.Layout.ManualScheduleHomeScreen"
+    x:Class="Pump.Layout.Dashboard.ManualScheduleHomeScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:control="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
@@ -21,12 +21,12 @@
                 VerticalOptions="Center">
 
                 <StackLayout>
-                            <Label
-                            FontSize="Subtitle"
-                            HorizontalOptions="Center"
-                            Text="Pump"
-                            TextColor="White"
-                            TextDecorations="Underline" />
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="Center"
+                        Text="Pump"
+                        TextColor="White"
+                        TextDecorations="Underline" />
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
@@ -116,15 +116,15 @@
 
                     <Label
                         FontSize="Body"
-                        IsVisible="false "
                         HorizontalOptions="Fill"
+                        IsVisible="false "
                         Text="Run with Schedule"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Switch
-                        IsVisible="false "
                         x:Name="SwitchRunWithSchedule"
                         HorizontalOptions="EndAndExpand"
+                        IsVisible="false "
                         VerticalOptions="Center" />
 
                 </StackLayout>
@@ -133,16 +133,15 @@
                     <Button
                         x:Name="ButtonStartManual"
                         BackgroundColor="DeepSkyBlue"
-                        
-                        CornerRadius="10"
                         Clicked="ButtonStartManual_Clicked"
+                        CornerRadius="10"
                         Text="Start"
                         TextColor="White" />
                     <Button
                         x:Name="ButtonStopManual"
                         BackgroundColor="DeepSkyBlue"
-                        CornerRadius="10"
                         Clicked="ButtonStopManual_Clicked"
+                        CornerRadius="10"
                         IsEnabled="False"
                         Text="Stop"
                         TextColor="White" />

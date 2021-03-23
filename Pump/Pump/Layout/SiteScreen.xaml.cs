@@ -7,6 +7,7 @@ using Pump.Database;
 using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Xamarin.Forms;

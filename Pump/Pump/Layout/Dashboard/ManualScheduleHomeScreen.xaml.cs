@@ -15,7 +15,7 @@ using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump.Layout
+namespace Pump.Layout.Dashboard
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ManualScheduleHomeScreen : ContentPage
@@ -27,15 +27,16 @@ namespace Pump.Layout
 
         public ManualScheduleHomeScreen(ObservableIrrigation observableIrrigation)
         {
-            _observableIrrigation = observableIrrigation;
             InitializeComponent();
+            _observableIrrigation = observableIrrigation;
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             new Thread(GetManualElementsReady).Start();
         }
+
         private void GetManualElementsReady()
         {
-            bool hasSubscribed = false;
-            bool scheduleHasRun = false;
+            var hasSubscribed = false;
+            var scheduleHasRun = false;
             while (!hasSubscribed)
             {
                 try
@@ -118,10 +119,10 @@ namespace Pump.Layout
                 if (_observableIrrigation.ManualScheduleList.Count == 0)
                 {
                     //Clear Manual
-                    ButtonStopManual.IsEnabled = false;
                     MaskedEntryTime.Text = "";
                     MaskedEntryTime.IsEnabled = true;
                     ButtonStartManual.IsEnabled = true;
+                    ButtonStartManual.Text = "START";
                     SwitchRunWithSchedule.IsEnabled = true;
                     SwitchRunWithSchedule.IsToggled = true;
                 }
@@ -129,11 +130,9 @@ namespace Pump.Layout
                 {
                     //Populate :/
                     ButtonStopManual.IsEnabled = true;
-                    SwitchRunWithSchedule.IsToggled = _observableIrrigation.ManualScheduleList[0].RunWithSchedule;
-                    SwitchRunWithSchedule.IsEnabled = false;
-                    MaskedEntryTime.IsEnabled = false;
+                    ButtonStartManual.Text = "UPDATE";
                     MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_observableIrrigation.ManualScheduleList[0].EndTime) - DateTime.UtcNow);
-                    ButtonStartManual.IsEnabled = false;
+                    
                 }
             }
             catch
@@ -149,7 +148,7 @@ namespace Pump.Layout
                 if (!_observableIrrigation.EquipmentList.Contains(null))
                 {
 
-                    var pumpsThatAreOnDisplay = _observableIrrigation.EquipmentList.Where(x => x.isPump).Select(x => x.ID).ToList();
+                    var pumpsThatAreOnDisplay = _observableIrrigation.EquipmentList.Where(x => x.isPump && _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).Select(x => x.ID).ToList();
                     if (pumpsThatAreOnDisplay.Count == 0)
                         pumpsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
 
@@ -163,7 +162,7 @@ namespace Pump.Layout
                         index--;
                     }
 
-                    var zonesThatAreOnDisplay = _observableIrrigation.EquipmentList.Where(x => !x.isPump).Select(x => x.ID).ToList();
+                    var zonesThatAreOnDisplay = _observableIrrigation.EquipmentList.Where(x => !x.isPump && _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).Select(x => x.ID).ToList();
                     if (zonesThatAreOnDisplay.Count == 0)
                         zonesThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
 
@@ -227,7 +226,6 @@ namespace Pump.Layout
                     if (_observableIrrigation.ManualScheduleList.Count == 0)
                     {
                         button.BackgroundColor = Color.AliceBlue;
-                        button.IsEnabled = true;
                         continue;
                     }
 
@@ -237,7 +235,6 @@ namespace Pump.Layout
                     if (existing == null)
                     {
                         button.BackgroundColor = Color.AliceBlue;
-                        button.IsEnabled = false;
                     }
                     else
                         button.BackgroundColor = Color.BlueViolet;
@@ -249,19 +246,28 @@ namespace Pump.Layout
                 Console.WriteLine(e);
             }
         }
+
         private void Button_Tapped(object sender, EventArgs e)
         {
-            if (_observableIrrigation.ManualScheduleList.Count > 0)
-                return;
-            var button = (Button)sender;
-            var equipmentList = ScrollViewManualPump.Children.ToList().ToList();
-            equipmentList.AddRange(ScrollViewManualZone.Children.ToList());
-            var equipmentOnScreen = (Button)equipmentList.FirstOrDefault(x => x.AutomationId == button.AutomationId);
-            if (equipmentOnScreen != null)
-                equipmentOnScreen.BackgroundColor = button.BackgroundColor == Color.BlueViolet ? Color.AliceBlue : Color.BlueViolet;
+            var button = (Button) sender;
+            var equipmentViewList = ScrollViewManualPump.Children.ToList().ToList();
+            equipmentViewList.AddRange(ScrollViewManualZone.Children.ToList());
+            var equipmentOnScreen = (Button)equipmentViewList.FirstOrDefault(x => x.AutomationId == button.AutomationId);
+            if (_observableIrrigation.ManualScheduleList.Any(x => x.ManualDetails.Select(y => y.id_Equipment).Contains(button.AutomationId)))
+            {
+                if (equipmentOnScreen != null)
+                    equipmentOnScreen.BackgroundColor =
+                        button.BackgroundColor == Color.AliceBlue ? Color.BlueViolet : Color.AliceBlue;
+            }
+            else
+            {
+                if (equipmentOnScreen != null)
+                    equipmentOnScreen.BackgroundColor =
+                        button.BackgroundColor == Color.AliceBlue ? Color.CadetBlue : Color.AliceBlue;
             
-            if (button != equipmentOnScreen)
-                button.BackgroundColor = button.BackgroundColor == Color.BlueViolet ? Color.AliceBlue : Color.BlueViolet;
+                if (button != equipmentOnScreen)
+                    button.BackgroundColor = button.BackgroundColor == Color.AliceBlue ? Color.CadetBlue : Color.AliceBlue;
+            }
         }
 
         private void ButtonStartManual_Clicked(object sender, EventArgs e)
@@ -274,26 +280,46 @@ namespace Pump.Layout
             var equipmentList = ScrollViewManualPump.Children.ToList().ToList();
             equipmentList.AddRange(ScrollViewManualZone.Children.ToList());
 
-            var selectedEquipment = (from button in equipmentList.Cast<Button>() where button.BackgroundColor == Color.BlueViolet select button.AutomationId).ToList();
+            var selectedEquipment = (from button in equipmentList.Cast<Button>() where button.BackgroundColor == Color.BlueViolet || button.BackgroundColor == Color.CadetBlue select button.AutomationId).ToList();
             if (selectedEquipment.Count < 1 || MaskedEntryTime.Text.Count() != 5)
             {
                 Device.BeginInvokeOnMainThread(() => { DisplayAlert("Incomplete Operation", "Please Make sure that the Time and Equipment are selected correctly", "Understood"); });
                 return;
             }
 
-            Device.BeginInvokeOnMainThread(() => { ButtonStartManual.IsEnabled = false; });
-
             var auth = new Authentication();
             var duration = MaskedEntryTime.Text.Split(':');
             _firebaseHasReplied = null;
-            var manual = new ManualSchedule
-            {
-                EndTime = ScheduleTime.GetUnixTimeStampUtcNow(TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1]))),
-                RunWithSchedule = SwitchRunWithSchedule.IsToggled,
-                ManualDetails = selectedEquipment.Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList()
-            };
 
-            var key = Task.Run(() => auth.SetManualSchedule(manual)).Result;
+
+
+            var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault(x =>
+                x.ManualDetails.Any(y => selectedEquipment.Contains(y.id_Equipment)));
+
+            if (manualSchedule == null)
+            {
+                manualSchedule = new ManualSchedule
+                {
+                    EndTime = ScheduleTime.GetUnixTimeStampUtcNow(TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1]))),
+                    RunWithSchedule = SwitchRunWithSchedule.IsToggled,
+                    ManualDetails = selectedEquipment.Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList()
+                };
+            }
+            else
+            {
+                manualSchedule.EndTime = ScheduleTime.GetUnixTimeStampUtcNow(
+                    TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1])));
+                manualSchedule.RunWithSchedule = SwitchRunWithSchedule.IsToggled;
+                manualSchedule.ManualDetails = selectedEquipment
+                    .Select(queue => new ManualScheduleEquipment {id_Equipment = queue}).ToList();
+            }
+            
+            
+
+
+
+            var key = Task.Run(() => auth.SetManualSchedule(manualSchedule)).Result;
+
             auth._FirebaseClient
                 .Child(auth.getConnectedPi()).Child("Status")
                 .AsObservable<ControllerStatus>()
@@ -332,7 +358,7 @@ namespace Pump.Layout
                 PopupNavigation.Instance.PopAsync();
                 _firebaseHasReplied = false;
                 Device.BeginInvokeOnMainThread(async () => { if(await DisplayAlert("No Reply :/", "We never got a reply back\nWould you like to keep your changes?", "Revert", "I'm a Dev"))
-                     await Task.Run(() => auth.DeleteManualSchedule());});
+                    await Task.Run(() => auth.DeleteManualSchedule());});
             }
             
         }
@@ -405,7 +431,6 @@ namespace Pump.Layout
 
                 var zoneButton = ScrollViewManualZone.Children.First(x => x.AutomationId == button.AutomationId);
                 button.BackgroundColor = zoneButton.BackgroundColor;
-                button.IsEnabled = zoneButton.IsEnabled;
                 buttonList.Add(button);
 
             }
@@ -423,7 +448,6 @@ namespace Pump.Layout
                 button.Scale = 1.25;
                 var pumpButton = ScrollViewManualPump.Children.First(x => x.AutomationId == button.AutomationId);
                 button.BackgroundColor = pumpButton.BackgroundColor;
-                button.IsEnabled = pumpButton.IsEnabled;
                 buttonList.Add(button);
             }
             ViewTapped(buttonList);
