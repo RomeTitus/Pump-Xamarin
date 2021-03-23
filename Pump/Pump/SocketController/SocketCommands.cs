@@ -54,5 +54,30 @@ namespace Pump.SocketController
             var collectAllTogether = new JObject { { "Task", new JObject {{"AllTogether", true}}}};
             return collectAllTogether;
         }
+
+        public static JObject DeleteManualSchedule(ManualSchedule manualSchedule)
+        {
+            var createSubControllerCommand = new JObject { { nameof(ManualSchedule), new JObject() }, { "Task", new JObject { { "IsMaster", false } } } };
+            createSubControllerCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, new JObject()}};
+            return createSubControllerCommand;
+        }
+
+        public static JObject SetManualSchedule(ManualSchedule manualSchedule)
+        {
+            var createSubControllerCommand = new JObject { { nameof(ManualSchedule), new JObject()}};
+            createSubControllerCommand[nameof(ManualSchedule)] = new JObject { { GenerateKey(20), JToken.FromObject(manualSchedule) } };
+            return createSubControllerCommand;
+        }
+
+        public static JObject Descript(object entity)
+        {
+            if (entity.GetType() == typeof(ManualSchedule))
+            {
+                ManualSchedule manualSchedule = (ManualSchedule)entity;
+                return manualSchedule.DeleteAwaiting ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule);
+            }
+
+            return null;
+        }
     }
 }

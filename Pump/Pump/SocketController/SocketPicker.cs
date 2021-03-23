@@ -16,6 +16,7 @@ namespace Pump.SocketController
     public class SocketPicker
     {
         private readonly InitializeFirebase _initializeFirebase;
+        private readonly InitializeNetwork _initializeNetwork;
         private readonly InitializeBlueTooth _initializeBlueTooth;
         private readonly NotificationEvent _notificationEvent;
 
@@ -23,6 +24,7 @@ namespace Pump.SocketController
         {
             _notificationEvent = notificationEvent;
             _initializeFirebase = new InitializeFirebase(observableIrrigation);
+            _initializeNetwork = new InitializeNetwork(observableIrrigation);
             _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation);
         }
 
@@ -49,7 +51,9 @@ namespace Pump.SocketController
 
             if(pumpConnection.ConnectionType == 0)
                 _initializeFirebase.Disposable();
-            if (pumpConnection.ConnectionType == 2)
+            else if (pumpConnection.ConnectionType == 1)
+                _initializeNetwork.Disposable();
+            else if (pumpConnection.ConnectionType == 2)
             {
                 _initializeBlueTooth.BlueToothManager.AdapterBle.DeviceConnected -= AdapterBLEOnDeviceConnected;
                 _initializeBlueTooth.BlueToothManager.AdapterBle.DeviceConnectionLost -= AdapterBLEOnDeviceConnected;
@@ -64,14 +68,34 @@ namespace Pump.SocketController
             var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             if (pumpConnection.ConnectionType == 0)
                 _initializeFirebase.SubscribeFirebase();
-            if (pumpConnection.ConnectionType == 2)
+            else if (pumpConnection.ConnectionType == 1)
+                await _initializeNetwork.SubscribeNetwork();
+            else if (pumpConnection.ConnectionType == 2)
             {
                 _initializeBlueTooth.BlueToothManager.AdapterBle.DeviceConnected += AdapterBLEOnDeviceConnected;
                 _initializeBlueTooth.BlueToothManager.AdapterBle.DeviceConnectionLost += AdapterBLEOnDeviceConnected;
                 _initializeBlueTooth.BlueToothManager.AdapterBle.DeviceDisconnected += AdapterBLEOnDeviceConnected;
                 await _initializeBlueTooth.SubscribeBle();
             }
-            
+        }
+        public async Task<string> SendCommand(object sendObject)
+        {
+            var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            if (pumpConnection.ConnectionType == 0)
+            {
+                return await new Authentication().Descript(sendObject);
+            }
+
+            else if (pumpConnection.ConnectionType == 1)
+            {
+                return await _initializeNetwork._networkManager.SendAndReceiveToNetwork(SocketCommands.Descript(sendObject), pumpConnection);
+            }
+            else if (pumpConnection.ConnectionType == 2)
+            {
+                return await _initializeBlueTooth.BlueToothManager.SendAndReceiveToBle(SocketCommands.Descript(sendObject));
+            }
+
+            return "Unknown Operation/Could not Identify user operations";
         }
     }
 }

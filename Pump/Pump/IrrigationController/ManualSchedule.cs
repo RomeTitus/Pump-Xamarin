@@ -9,6 +9,8 @@ namespace Pump.IrrigationController
     {
         [JsonIgnore]
         public string ID;
+        [JsonIgnore]
+        public bool DeleteAwaiting { get; set; }
         public long EndTime { get; set; }
         public bool RunWithSchedule { get; set; }
         public List<ManualScheduleEquipment> ManualDetails { get; set; }

@@ -21,6 +21,7 @@ namespace Pump.Layout
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly ObservableIrrigation _observableIrrigation;
         private HomeScreen _homeScreen;
+        private readonly SocketPicker _socketPicker;
         private readonly ControllerEvent _controllerEvent;
         private readonly NotificationEvent _notificationEvent;
 
@@ -36,9 +37,9 @@ namespace Pump.Layout
             _notificationEvent = new NotificationEvent();
             _notificationEvent.OnNotificationUpdate += _notificationEvent_OnNotificationConnectionUpdate;
 
-            
-            var socketPicker = new SocketPicker(_observableIrrigation, _notificationEvent);
-            ControllerPicker.SelectedIndexChanged += socketPicker.ConnectionPicker_OnSelectedIndexChanged;
+
+            _socketPicker = new SocketPicker(_observableIrrigation, _notificationEvent);
+            ControllerPicker.SelectedIndexChanged += _socketPicker.ConnectionPicker_OnSelectedIndexChanged;
 
             PopulateControllers();
 
@@ -325,7 +326,7 @@ namespace Pump.Layout
         {
             try
             {
-                _homeScreen = new HomeScreen(_observableIrrigation);
+                _homeScreen = new HomeScreen(_observableIrrigation, _socketPicker);
                 _homeScreen.GetSiteButton().Pressed += BtnHomeScreenSite_OnPressed;
                 Navigation.PushModalAsync(_homeScreen);
 

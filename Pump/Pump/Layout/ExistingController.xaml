@@ -17,38 +17,33 @@
         JustifyContent="SpaceAround"
         VerticalOptions="Center">
 
-        <StackLayout>
+        <StackLayout x:Name="NewControllerStackLayout" IsVisible="False">
             <Label
                 x:Name="BltscanName"
                 HorizontalOptions="Center"
                 TextColor="White"
                 TextType="Text"
                 VerticalOptions="Center" />
-            
-            <Button
-            x:Name="BtnNewController"
-            BackgroundColor="Azure"
-            BorderColor="Black"
-            CornerRadius="5"
-            Clicked="BtnNewController_OnClicked"
-            HorizontalOptions="Center"
-            IsVisible="False"
-            Text="SCAN FOR NEW SYSTEM"
-            TextColor="Black"
-            FontSize="Large"
-            VerticalOptions="Center" />
-        </StackLayout>
-        
 
-        <StackLayout Padding="0,15,0,15">
+            <Button
+                x:Name="BtnNewController"
+                BackgroundColor="Azure"
+                BorderColor="Black"
+                Clicked="BtnNewController_OnClicked"
+                CornerRadius="5"
+                FontSize="Large"
+                HorizontalOptions="Center"
+                Text="SCAN FOR NEW SYSTEM"
+                TextColor="Black"
+                VerticalOptions="Center" />
             <Label
+                Padding="0,15,0,15"
+                FontAttributes="Bold"
+                FontSize="Large"
                 HorizontalOptions="Center"
                 Text="OR"
                 TextColor="Red"
-                FontSize="Large"
-                FontAttributes="Bold"
                 TextDecorations="Underline"
-               
                 VerticalOptions="Center" />
         </StackLayout>
 
@@ -76,10 +71,12 @@
         </StackLayout>
 
         <StackLayout
+            x:Name="ConnectionTypePickerStackLayout"
             Margin="0,5,0,5"
             HorizontalOptions="StartAndExpand"
-            Orientation="Horizontal" IsVisible="false">
-            
+            IsVisible="false"
+            Orientation="Horizontal">
+
             <Label
                 Margin="0,15,0,0"
                 HorizontalOptions="StartAndExpand"
@@ -88,7 +85,7 @@
                 TextDecorations="Underline"
                 VerticalOptions="Center" />
 
-            <Frame 
+            <Frame
                 Margin="0,0,10,0"
                 Padding="10,0,10,0"
                 BackgroundColor="AliceBlue"
@@ -109,7 +106,6 @@
                     x:Name="LabelControllerCode"
                     HorizontalOptions="Center"
                     Text="Controller Code"
-                    
                     VerticalOptions="Center" />
 
                 <Editor
@@ -121,21 +117,21 @@
             </StackLayout>
         </Frame>
         <StackLayout Padding="0,0,0,15" IsVisible="false">
-            <Label 
+            <Label
+                FontAttributes="Bold"
+                FontSize="Large"
                 HorizontalOptions="Center"
                 Text="OR"
                 TextColor="Red"
-                FontSize="Large"
-                FontAttributes="Bold"
                 TextDecorations="Underline"
-               
                 VerticalOptions="Center" />
         </StackLayout>
 
-        <Frame IsVisible="false"
+        <Frame
             BackgroundColor="White"
             BorderColor="Black"
-            HorizontalOptions="FillAndExpand">
+            HorizontalOptions="FillAndExpand"
+            IsVisible="false">
             <StackLayout Orientation="Horizontal">
                 <Frame
                     BackgroundColor="White"
@@ -203,39 +199,39 @@
             </StackLayout>
         </Frame>
 
-       
+
         <Frame BackgroundColor="DeepSkyBlue" BorderColor="Gainsboro">
             <Frame.GestureRecognizers>
                 <TapGestureRecognizer x:Name="FrameAddSystemTap" />
             </Frame.GestureRecognizers>
             <Label
-            x:Name="BtnAddController" 
-            HorizontalOptions="CenterAndExpand"
-            Text="Enter"
-            BackgroundColor="DeepSkyBlue"
-            TextColor="Black"
-            FontSize="Large"
-            VerticalOptions="Center"/>
+                x:Name="BtnAddController"
+                BackgroundColor="DeepSkyBlue"
+                FontSize="Large"
+                HorizontalOptions="CenterAndExpand"
+                Text="Enter"
+                TextColor="Black"
+                VerticalOptions="Center" />
         </Frame>
 
         <StackLayout Orientation="Horizontal">
             <Button
-            x:Name="BtnBackAddConnectionScreen"
-            BackgroundColor="DeepSkyBlue"
-            Clicked="BtnBackAddConnectionScreen_OnClicked"
-            IsVisible="False"
-            Text="Back"
-            HorizontalOptions="Start"
-            TextColor="White"
-            VerticalOptions="End" />
-        <Button
-            x:Name="BtnAdvancedConnectionScreen"
-            BackgroundColor="DeepSkyBlue"
-            HorizontalOptions="EndAndExpand"
-            IsVisible="true"
-            Text="Advanced"
-            TextColor="White"
-            VerticalOptions="End" />
+                x:Name="BtnBackAddConnectionScreen"
+                BackgroundColor="DeepSkyBlue"
+                Clicked="BtnBackAddConnectionScreen_OnClicked"
+                HorizontalOptions="Start"
+                IsVisible="False"
+                Text="Back"
+                TextColor="White"
+                VerticalOptions="End" />
+            <Button
+                x:Name="BtnAdvancedConnectionScreen"
+                BackgroundColor="DeepSkyBlue"
+                HorizontalOptions="EndAndExpand"
+                IsVisible="true"
+                Text="Advanced"
+                TextColor="White"
+                VerticalOptions="End" />
         </StackLayout>
     </FlexLayout>
 

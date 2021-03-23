@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.IrrigationController;
+using Pump.Layout;
+using Rg.Plugins.Popup.Services;
+using Xamarin.Forms;
 
 namespace Pump.FirebaseDatabase
 {
@@ -263,88 +268,100 @@ namespace Pump.FirebaseDatabase
                     var result = await _FirebaseClient
                         .Child(getConnectedPi() + "/ManualSchedule")
                         .PostAsync(manual);
-                    return result.Key;
+                    manual.ID = result.Key;
                 }
 
                 await _FirebaseClient
                     .Child(getConnectedPi() + "/ManualSchedule/" + manual.ID)
                     .PutAsync(manual);
-                return manual.ID;
+                
+                var notificationResult = string.Empty;
+
+                var firebaseReplyListener = ManualScheduleLiveObserver(notificationResult, manual.ID);
+
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15) && string.IsNullOrEmpty(notificationResult))
+                {
+                    await Task.Delay(500);
+                }
+                stopwatch.Stop();
+
+                if (string.IsNullOrEmpty(notificationResult))
+                    notificationResult = "No Reply$We never got a reply back\nWould you like to keep your changes?$Revert";
+
+                firebaseReplyListener.Dispose();
+                return notificationResult;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return "Error!$Somewhere something went wrong\n" + e.Message;
             }
 
 
         }
-        public async Task<string> DeleteManualSchedule()
+        public async Task<string> DeleteManualSchedule(ManualSchedule manual)
         {
             try
             {
-                var firebaseManualScheduleDetail = await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule")
-                    .OnceAsync<JObject>();
+                var notificationResult = string.Empty;
 
-                var keyList = firebaseManualScheduleDetail.Select(scheduleInfoDetail =>
-                    scheduleInfoDetail.Key).ToList();
+                var firebaseReplyListener = ManualScheduleLiveObserver(notificationResult, manual.ID);
 
                 await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule")
+                    .Child(getConnectedPi() + "/ManualSchedule/" + manual.ID)
                     .DeleteAsync();
 
-                return keyList[0];
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                
+                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15) && string.IsNullOrEmpty(notificationResult))
+                {
+                    await Task.Delay(500);
+                }
+                stopwatch.Stop();
+
+                if (string.IsNullOrEmpty(notificationResult))
+                    notificationResult = "Cleared!$We never got a reply back";
+                
+                firebaseReplyListener.Dispose();
+                return notificationResult;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return "Error!$Somewhere something went wrong\n" + e.Message; 
             }
-            
         }
-        public ManualSchedule GetJsonManualSchedulesToObjectList(JObject scheduleDetailObject, string key)
+
+
+        private IDisposable ManualScheduleLiveObserver(string notificationResult, string id)
         {
-            try
-            {
-                var manualSchedule = new ManualSchedule()
+            var firebaseReplyListener = _FirebaseClient
+                .Child(getConnectedPi()).Child("Status")
+                .AsObservable<ControllerStatus>()
+                .Subscribe(x =>
                 {
-                    EndTime = long.Parse(scheduleDetailObject["EndTime"].ToString()),
-                    RunWithSchedule = scheduleDetailObject["RunWithSchedule"].ToString() == "1"
-                };
-
-                var manualScheduleDetailList = new List<ManualScheduleEquipment>();
-                if (scheduleDetailObject.ContainsKey("ManualDetails"))
-                {
-
-
-                    foreach (var scheduleDuration in (JObject)scheduleDetailObject["ManualDetails"])
+                    try
                     {
-                        manualScheduleDetailList.Add(
-                            new ManualScheduleEquipment
-                            {
-                                id_Equipment = scheduleDetailObject["ManualDetails"][scheduleDuration.Key]["id_Equipment"].ToString()
-                            });
+                        if(x.Object == null)
+                            return;
+                        var result = x.Object;
+                        result.ID = x.Key;
+                        if (x.Key == id && string.IsNullOrEmpty(notificationResult) && result.Code == "success")
+                        {
+                            notificationResult = result.Operation + '$' + result.Code;
+                        }
                     }
-
-                    manualSchedule.ManualDetails = manualScheduleDetailList;
-                    return manualSchedule;
-                }
-                else
-                {
-                    var result = Task.Run(DeleteManualSchedule).Result;
-                    return null;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-
-
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                });
+            return firebaseReplyListener;
         }
-
 
         //Equipment
         public async Task<string> SetEquipment(Equipment equipment)
@@ -399,24 +416,8 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-        public Alive GetJsonLastOnRequest(JObject aliveObject, Alive alive)
-        {
-            try
-            {
-                if (aliveObject.ContainsKey("RequestedTime"))
-                    alive.RequestedTime = long.Parse(aliveObject["RequestedTime"].ToString());
-                if (aliveObject.ContainsKey("ResponseTime"))
-                    alive.ResponseTime = long.Parse(aliveObject["ResponseTime"].ToString());
-                
-                return alive;
-            }
-            catch
-            {
-                return null;
-            }
-        }
 
-        //Sensor
+    //Sensor
         public async Task<string> SetSensor(Sensor sensor)
         {
             try
@@ -505,7 +506,17 @@ namespace Pump.FirebaseDatabase
                 Console.WriteLine(e);
                 return null;
             }
+        }
 
+        public async Task<string> Descript(object entity)
+        {
+            if (entity.GetType() == typeof(ManualSchedule))
+            {
+                ManualSchedule manualSchedule = (ManualSchedule) entity;
+                return manualSchedule.DeleteAwaiting ? await DeleteManualSchedule(manualSchedule) : await SetManualSchedule(manualSchedule);
+            }
+
+            return "";
         }
     }
 }

@@ -6,6 +6,7 @@ using Pump.Database;
 using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Pump.SocketController;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -17,13 +18,15 @@ namespace Pump.Layout.Dashboard
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private SettingPageHomeScreen _settingPageHomeScreen;
+        private SocketPicker _socketPicker;
         private bool _hasSentUpdateRequest;
         private bool _firstRun = true;
         
         private readonly DatabaseController _databaseController = new DatabaseController();
-        public HomeScreen(ObservableIrrigation observableIrrigation)
+        public HomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {
             _observableIrrigation = observableIrrigation;
+            _socketPicker = socketPicker;
             InitializeComponent();
             if (Device.RuntimePlatform == Device.iOS)
             {
@@ -65,7 +68,7 @@ namespace Pump.Layout.Dashboard
         private void SetUpNavigationPage()
         {
             var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableIrrigation);
-            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableIrrigation);
+            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableIrrigation, _socketPicker);
             var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableIrrigation);
             var scheduleHomeScreen = new ScheduleHomeScreen(_observableIrrigation);
             _settingPageHomeScreen = new SettingPageHomeScreen(_observableIrrigation);
@@ -197,7 +200,7 @@ namespace Pump.Layout.Dashboard
                     // ignored
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(4000);
             }
         }
 

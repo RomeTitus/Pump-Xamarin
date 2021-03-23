@@ -34,12 +34,17 @@ namespace Pump
             if (pumpConnection != null)
             {
                 _pumpConnection = pumpConnection;
-                BtnNewController.IsVisible = false;
+                NewControllerStackLayout.IsVisible = false;
+                ConnectionTypePickerStackLayout.IsVisible = true;
                 PopulateElements();
                 ConnectionPicker.SelectedIndexChanged += ConnectionPickerOnSelectedIndexChanged;
             }
             else
-                BtnNewController.IsVisible = true;
+            {
+                ConnectionTypePickerStackLayout.IsVisible = false;
+                NewControllerStackLayout.IsVisible = true;
+            }
+                
             
 
             if (firstConnection) return;

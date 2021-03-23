@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Firebase.Database.Query;
 using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -23,12 +20,13 @@ namespace Pump.Layout.Dashboard
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly PumpConnection _pumpConnection;
         private FloatingScreenScroll _floatingScreenScroll;
-        private bool? _firebaseHasReplied = false;
+        private SocketPicker _socketPicker;
 
-        public ManualScheduleHomeScreen(ObservableIrrigation observableIrrigation)
+        public ManualScheduleHomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableIrrigation = observableIrrigation;
+            _socketPicker = socketPicker;
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             new Thread(GetManualElementsReady).Start();
         }
@@ -128,10 +126,10 @@ namespace Pump.Layout.Dashboard
                 }
                 else
                 {
-                    //Populate :/
+                    //Populate
                     ButtonStopManual.IsEnabled = true;
                     ButtonStartManual.Text = "UPDATE";
-                    MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_observableIrrigation.ManualScheduleList[0].EndTime) - DateTime.UtcNow);
+                    MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(GetSelectedManualSchedule().EndTime) - DateTime.UtcNow);
                     
                 }
             }
@@ -270,12 +268,7 @@ namespace Pump.Layout.Dashboard
             }
         }
 
-        private void ButtonStartManual_Clicked(object sender, EventArgs e)
-        {
-            new Thread(StartManualSchedule).Start();
-        }
-
-        private void StartManualSchedule()
+        private async void ButtonStartManual_Clicked(object sender, EventArgs e)
         {
             var equipmentList = ScrollViewManualPump.Children.ToList().ToList();
             equipmentList.AddRange(ScrollViewManualZone.Children.ToList());
@@ -286,13 +279,8 @@ namespace Pump.Layout.Dashboard
                 Device.BeginInvokeOnMainThread(() => { DisplayAlert("Incomplete Operation", "Please Make sure that the Time and Equipment are selected correctly", "Understood"); });
                 return;
             }
-
-            var auth = new Authentication();
+            
             var duration = MaskedEntryTime.Text.Split(':');
-            _firebaseHasReplied = null;
-
-
-
             var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault(x =>
                 x.ManualDetails.Any(y => selectedEquipment.Contains(y.id_Equipment)));
 
@@ -311,113 +299,43 @@ namespace Pump.Layout.Dashboard
                     TimeSpan.FromHours(long.Parse(duration[0])), TimeSpan.FromMinutes(long.Parse(duration[1])));
                 manualSchedule.RunWithSchedule = SwitchRunWithSchedule.IsToggled;
                 manualSchedule.ManualDetails = selectedEquipment
-                    .Select(queue => new ManualScheduleEquipment {id_Equipment = queue}).ToList();
+                    .Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList();
             }
-            
-            
 
-
-
-            var key = Task.Run(() => auth.SetManualSchedule(manualSchedule)).Result;
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi()).Child("Status")
-                .AsObservable<ControllerStatus>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (x.Key != key || _firebaseHasReplied == false)
-                            return;
-                        _firebaseHasReplied = true;
-                        PopupNavigation.Instance.PopAsync();
-                        var result = x.Object;
-                        result.ID = x.Key;
-                        Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-
-            var stopwatch = new Stopwatch();
             var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
-            PopupNavigation.Instance.PushAsync(floatingScreenScreen);
-            stopwatch.Start();
+            await PopupNavigation.Instance.PushAsync(floatingScreenScreen);
 
-            while (stopwatch.Elapsed < TimeSpan.FromSeconds(20))
-            {
-                Thread.Sleep(500);
-            }
-            stopwatch.Stop();
-
-
-            if (_firebaseHasReplied != null) return;
-            {
-                PopupNavigation.Instance.PopAsync();
-                _firebaseHasReplied = false;
-                Device.BeginInvokeOnMainThread(async () => { if(await DisplayAlert("No Reply :/", "We never got a reply back\nWould you like to keep your changes?", "Revert", "I'm a Dev"))
-                    await Task.Run(() => auth.DeleteManualSchedule());});
-            }
+            var notification = await _socketPicker.SendCommand(manualSchedule);
+            await PopupNavigation.Instance.PopAllAsync();
+            var controllerStatus = new ControllerStatus(notification);
             
-        }
-
-        private void ButtonStopManual_Clicked(object sender, EventArgs e)
-        {
-            new Thread(StopManualSchedule).Start();
-        }
-
-        private void StopManualSchedule()
-        {
-            _firebaseHasReplied = null;
-            var auth = new Authentication();
-            var key = Task.Run(() => auth.DeleteManualSchedule()).Result;
-
-            auth._FirebaseClient
-                .Child(auth.getConnectedPi()).Child("Status")
-                .AsObservable<ControllerStatus>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        if (x.Key != key || _firebaseHasReplied == false)
-                            return;
-                        _firebaseHasReplied = true;
-
-                        PopupNavigation.Instance.PopAsync();
-                        var result = x.Object;
-                        result.ID = x.Key;
-                        if (result.Code == "success")
-                        {
-                            Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-                            return;
-                        }
-                        Device.BeginInvokeOnMainThread(() => { DisplayAlert(result.Operation, result.Code, "Understood"); });
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-
-            var stopwatch = new Stopwatch();
-            var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
-            PopupNavigation.Instance.PushAsync(floatingScreenScreen);
-            stopwatch.Start();
-
-            while (stopwatch.Elapsed < TimeSpan.FromSeconds(15))
+            if(controllerStatus.Accept == null)
+                await DisplayAlert(controllerStatus.Operation, controllerStatus.Code, "Understood");
+            else
             {
-                Thread.Sleep(500);
+                if (!await DisplayAlert(controllerStatus.Operation, controllerStatus.Code, controllerStatus.Accept,
+                    "Understood")) return;
+                manualSchedule.DeleteAwaiting = true;
+                await _socketPicker.SendCommand(manualSchedule);
             }
-            stopwatch.Stop();
-
-            if (_firebaseHasReplied != null) return;
-            PopupNavigation.Instance.PopAsync();
-            _firebaseHasReplied = false;
-            Device.BeginInvokeOnMainThread(() => { DisplayAlert("Cleared!", "We never got a reply back", "Understood"); });
+                
         }
-        
+
+        private async void ButtonStopManual_Clicked(object sender, EventArgs e)
+        {
+            var manualSchedule = GetSelectedManualSchedule();
+            manualSchedule.DeleteAwaiting = true;
+            var floatingScreenScreen = new FloatingScreen { CloseWhenBackgroundIsClicked = false };
+            await PopupNavigation.Instance.PushAsync(floatingScreenScreen);
+
+            var notification = await _socketPicker.SendCommand(manualSchedule);
+            await PopupNavigation.Instance.PopAllAsync();
+            var controllerStatus = new ControllerStatus(notification);
+
+            if (controllerStatus.Accept == null)
+                await DisplayAlert(controllerStatus.Operation, controllerStatus.Code, "Understood");
+        }
+
 
         private void ScrollViewManualZoneTap_Tapped(object sender, EventArgs e)
         {
@@ -457,6 +375,28 @@ namespace Pump.Layout.Dashboard
             _floatingScreenScroll = new FloatingScreenScroll {IsStackLayout = false};
             _floatingScreenScroll.SetFloatingScreen(equipment);
             PopupNavigation.Instance.PushAsync(_floatingScreenScroll);
+        }
+
+        private ManualSchedule GetSelectedManualSchedule()
+        {
+            ManualSchedule selectedManualSchedule = null;
+
+            foreach (var manualSchedule in _observableIrrigation.ManualScheduleList)
+            {
+                foreach (var manualDetail in manualSchedule.ManualDetails)
+                {
+                    if (_observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments
+                        .Contains(manualDetail.id_Equipment))
+                    {
+                        selectedManualSchedule = manualSchedule;
+                        break;
+                    }
+                    if (selectedManualSchedule != null)
+                        break;
+                }
+            }
+
+            return selectedManualSchedule;
         }
     }
 }

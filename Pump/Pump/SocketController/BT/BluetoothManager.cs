@@ -195,7 +195,7 @@ namespace Pump.SocketController.BT
         private async Task<byte[]> WriteToBle(byte[] bytesToSend,  int timeout = 0)
         {
             await _loadedCharacteristic.WriteAsync(bytesToSend);
-            Thread.Sleep(timeout);
+            await Task.Delay(timeout);
             var result = await _loadedCharacteristic.ReadAsync();
             if (Encoding.ASCII.GetString(result, 0, result.Length) == Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
                 throw new Exception("Controller did not reply back using BlueTooth \n reboot required");
