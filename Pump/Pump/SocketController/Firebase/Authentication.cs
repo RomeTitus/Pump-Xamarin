@@ -116,7 +116,7 @@ namespace Pump.FirebaseDatabase
             }
             
         }
-        public async void DeleteSchedule(Schedule schedule)
+        public async Task<string> DeleteSchedule(Schedule schedule)
         {
             try
             {
@@ -129,59 +129,9 @@ namespace Pump.FirebaseDatabase
                 Console.WriteLine(e);
 
             }
-        }
-        public Schedule GetJsonSchedulesToObjectList(JObject scheduleDetailObject, string key)
-        {
-            try
-            {
-                var schedule = new Schedule
-                {
-                    ID = key,
-                    NAME = scheduleDetailObject["NAME"].ToString(),
-                    TIME = scheduleDetailObject["TIME"].ToString(),
-                    WEEK = scheduleDetailObject["WEEK"].ToString(),
-                    id_Pump = scheduleDetailObject["id_Pump"].ToString(),
-                    isActive = scheduleDetailObject["isActive"].ToString()
-                };
-                try
-                {
-                    var scheduleDetailList = scheduleDetailObject["ScheduleDetails"]
-                        .Select(scheduleDuration => new ScheduleDetail
-                        {
-                            id_Equipment = scheduleDuration["id_Equipment"]
-                                .ToString(),
-                            DURATION = scheduleDuration["DURATION"]
-                                .ToString()
-                        })
-                        .ToList();
-                    schedule.ScheduleDetails = scheduleDetailList;
 
-                }
-                catch
-                {
-                    var scheduleDetailList = new List<ScheduleDetail>();
-                    foreach (var scheduleDuration in (JObject)scheduleDetailObject["ScheduleDetails"])
-                        scheduleDetailList.Add(
-                            new ScheduleDetail
-                            {
-                                ID = scheduleDuration.Key,
-                                id_Equipment = scheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["id_Equipment"]
-                                    .ToString(),
-                                DURATION = scheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["DURATION"]
-                                    .ToString()
-                            });
-                    schedule.ScheduleDetails = scheduleDetailList;
-                }
-                
-                return schedule;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
+            return null;
         }
-
         //CustomSchedule
         public async Task<string> SetCustomSchedule(CustomSchedule schedule)
         {
@@ -514,6 +464,11 @@ namespace Pump.FirebaseDatabase
             {
                 ManualSchedule manualSchedule = (ManualSchedule) entity;
                 return manualSchedule.DeleteAwaiting ? await DeleteManualSchedule(manualSchedule) : await SetManualSchedule(manualSchedule);
+            }
+            else if (entity.GetType() == typeof(Schedule))
+            {
+                Schedule schedule = (Schedule)entity;
+                return schedule.DeleteAwaiting ? await DeleteSchedule(schedule) : await SetSchedule(schedule);
             }
 
             return "";

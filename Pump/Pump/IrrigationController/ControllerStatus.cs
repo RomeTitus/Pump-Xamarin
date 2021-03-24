@@ -9,25 +9,34 @@ namespace Pump.IrrigationController
     {
         public ControllerStatus(string notification)
         {
-            var notificationList = notification.Split('$');
-            if (notificationList.Length == 1)
+            if (notification != null)
             {
-                Code = notificationList[0];
-                Operation = "Not supplied";
-                Accept = null;
+                var notificationList = notification.Split('$');
+                if (notificationList.Length == 1)
+                {
+                    Code = notificationList[0];
+                    Operation = "Not supplied";
+                    Accept = null;
 
-            }
-            else if (notificationList.Length == 2)
-            {
-                Code = notificationList[0];
-                Operation = notificationList[1];
-                Accept = null;
-            }
-            else if (notificationList.Length == 3)
-            {
-                Code = notificationList[0];
-                Operation = notificationList[1];
-                Accept = notificationList[2];
+                }
+                else if (notificationList.Length == 2)
+                {
+                    Code = notificationList[0];
+                    Operation = notificationList[1];
+                    Accept = null;
+                }
+                else if (notificationList.Length == 3)
+                {
+                    Code = notificationList[0];
+                    Operation = notificationList[1];
+                    Accept = notificationList[2];
+                }
+                else
+                {
+                    Code = "Not supplied";
+                    Operation = "Not supplied";
+                    Accept = null;
+                }
             }
             else
             {

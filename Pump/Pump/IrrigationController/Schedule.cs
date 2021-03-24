@@ -15,6 +15,8 @@ namespace Pump.IrrigationController
 
         [JsonIgnore]
         public string ID { get; set; }
+        [JsonIgnore]
+        public bool DeleteAwaiting { get; set; }
         public string NAME { get; set; }
         public string TIME { get; set; }
         public string WEEK { get; set; }

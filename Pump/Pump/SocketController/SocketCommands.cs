@@ -57,16 +57,34 @@ namespace Pump.SocketController
 
         public static JObject DeleteManualSchedule(ManualSchedule manualSchedule)
         {
-            var createSubControllerCommand = new JObject { { nameof(ManualSchedule), new JObject() }, { "Task", new JObject { { "IsMaster", false } } } };
-            createSubControllerCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, new JObject()}};
-            return createSubControllerCommand;
+            var deleteManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject() } };
+            deleteManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, new JObject()}};
+            return deleteManualScheduleCommand;
         }
 
         public static JObject SetManualSchedule(ManualSchedule manualSchedule)
         {
-            var createSubControllerCommand = new JObject { { nameof(ManualSchedule), new JObject()}};
-            createSubControllerCommand[nameof(ManualSchedule)] = new JObject { { GenerateKey(20), JToken.FromObject(manualSchedule) } };
-            return createSubControllerCommand;
+            if (manualSchedule.ID == null)
+                manualSchedule.ID = GenerateKey(20);
+            var setManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject()}};
+            setManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, JToken.FromObject(manualSchedule) } };
+            return setManualScheduleCommand;
+        }
+
+        public static JObject DeleteSchedule(Schedule schedule)
+        {
+            var deleteScheduleCommand = new JObject { { nameof(Schedule), new JObject() }};
+            deleteScheduleCommand[nameof(Schedule)] = new JObject { { schedule.ID, new JObject() } };
+            return deleteScheduleCommand;
+        }
+
+        public static JObject SetSchedule(Schedule schedule)
+        {
+            if (schedule.ID == null)
+                schedule.ID = GenerateKey(20);
+            var setScheduleCommand = new JObject { { nameof(Schedule), new JObject() } };
+            setScheduleCommand[nameof(Schedule)] = new JObject { { schedule.ID, JToken.FromObject(schedule) } };
+            return setScheduleCommand;
         }
 
         public static JObject Descript(object entity)
@@ -75,6 +93,11 @@ namespace Pump.SocketController
             {
                 ManualSchedule manualSchedule = (ManualSchedule)entity;
                 return manualSchedule.DeleteAwaiting ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule);
+            }
+            else if (entity.GetType() == typeof(Schedule))
+            {
+                Schedule schedule = (Schedule)entity;
+                return schedule.DeleteAwaiting ? DeleteSchedule(schedule) : SetSchedule(schedule);
             }
 
             return null;

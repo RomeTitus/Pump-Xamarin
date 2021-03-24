@@ -11,6 +11,7 @@ using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -24,10 +25,12 @@ namespace Pump.Layout
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
         private ViewScheduleSummary _viewSchedule;
         private readonly PumpConnection _pumpConnection;
+        private readonly SocketPicker _socketPicker;
 
-        public ScheduleHomeScreen(ObservableIrrigation observableIrrigation)
+        public ScheduleHomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {
             _observableIrrigation = observableIrrigation;
+            _socketPicker = socketPicker;
             InitializeComponent();
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             new Thread(LoadScheduleStatus).Start();
@@ -220,11 +223,13 @@ namespace Pump.Layout
             deleteConfirm.GetDeleteButton().Clicked += DeleteConfirmButton_Tapped;
         }
 
-        private void DeleteConfirmButton_Tapped(object sender, EventArgs e)
+        private async void DeleteConfirmButton_Tapped(object sender, EventArgs e)
         {
-            PopupNavigation.Instance.PopAsync();
+            await PopupNavigation.Instance.PopAsync();
             var delete = (Button)sender;
-            new Authentication().DeleteSchedule(new Schedule { ID = delete.AutomationId });
+            var schedule = _observableIrrigation.ScheduleList.First(x => x.ID == delete.AutomationId);
+            schedule.DeleteAwaiting = true;
+            await _socketPicker.SendCommand(schedule);
         }
 
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
@@ -236,7 +241,7 @@ namespace Pump.Layout
                     "You are missing the equipment that is needed to create a schedule", "Understood");
         }
 
-        private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
+        private async void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
         {
             var scheduleSwitch = (Switch)sender;
             try
@@ -249,22 +254,21 @@ namespace Pump.Layout
                 else
                     updateSchedule.isActive = "0";
 
-                new Thread(() => ChangeScheduleState(updateSchedule))
-                    .Start();
+                await ChangeScheduleState(updateSchedule);
             }
             catch
             {
-                DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE",
+                await DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE",
                     "Understood");
             }
         }
 
-        private void ChangeScheduleState(Schedule _schedule)
+        private async Task ChangeScheduleState(Schedule schedule)
         {
-            var viewScheduleScreen = ScrollViewScheduleDetail.Children.First(x => (((ViewScheduleSettingSummary)x).Schedule.ID == _schedule.ID));
+            var viewScheduleScreen = ScrollViewScheduleDetail.Children.First(x => (((ViewScheduleSettingSummary)x).Schedule.ID == schedule.ID));
             var viewSchedule = (ViewScheduleSettingSummary) viewScheduleScreen;
             
-            viewSchedule.Schedule = _schedule;
+            viewSchedule.Schedule = schedule;
 
             Device.BeginInvokeOnMainThread(() =>
             {
@@ -274,7 +278,7 @@ namespace Pump.Layout
             });
             
             //TODO Needs Confirmation that The Pi got it and its running :)
-            var key = Task.Run(() => new Authentication().SetSchedule(_schedule)).Result;
+            var key = await _socketPicker.SendCommand(schedule);
 
         }
     }

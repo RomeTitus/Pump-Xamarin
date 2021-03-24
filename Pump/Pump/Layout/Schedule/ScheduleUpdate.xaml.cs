@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -19,11 +18,13 @@ namespace Pump.Layout
         private Schedule _schedule;
         private readonly List<string> _pumpIdList = new List<string>();
         private ViewSchedulePumpTime _pumpSelectedTime;
+        private readonly SocketPicker _socketPicker;
 
-        public ScheduleUpdate(List<Equipment> equipmentList, Schedule schedule = null)
+        public ScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker, Schedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;
+            _socketPicker = socketPicker;
             if (schedule == null)
                 schedule = new Schedule();
             _schedule = schedule;
@@ -191,7 +192,7 @@ namespace Pump.Layout
             Navigation.PopModalAsync();
         }
 
-        private void ButtonUpdateSchedule_OnClicked(object sender, EventArgs e)
+        private async void ButtonUpdateSchedule_OnClicked(object sender, EventArgs e)
         {
 
 
@@ -200,7 +201,7 @@ namespace Pump.Layout
 
             if (!string.IsNullOrWhiteSpace(notification))
             {
-                DisplayAlert("Incomplete", notification, "Understood");
+                await DisplayAlert("Incomplete", notification, "Understood");
             }
             else
             {
@@ -214,13 +215,14 @@ namespace Pump.Layout
                 if (scheduleDetail.Count > 0)
                 {
                     _schedule.ScheduleDetails = scheduleDetail;
-                    var key = Task.Run(() => new Authentication().SetSchedule(_schedule)).Result;
-                    Navigation.PopModalAsync();
+                    await _socketPicker.SendCommand(_schedule);
+                    
+                    await Navigation.PopModalAsync();
                 }
                 else
                 {
                     var floatingScreen = new FloatingScreen();
-                    PopupNavigation.Instance.PushAsync(floatingScreen);
+                    await PopupNavigation.Instance.PushAsync(floatingScreen);
                     _pumpSelectedTime = new ViewSchedulePumpTime(_schedule, _equipmentList.First(x => x.ID == _schedule.id_Pump));
                     _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
                     floatingScreen.SetFloatingScreen(new List<object> { _pumpSelectedTime });
@@ -307,17 +309,17 @@ namespace Pump.Layout
             return (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.GetMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
         }
 
-        private void UpdateSchedulePumpDuration_Pressed(object sender, EventArgs e)
+        private async void UpdateSchedulePumpDuration_Pressed(object sender, EventArgs e)
         {
             var notification = "";
             notification += SendSelectedPumpValidate(notification, PumpPicker.Items[PumpPicker.SelectedIndex]);
             if (!string.IsNullOrWhiteSpace(notification))
             {
-                DisplayAlert("Incomplete", notification, "Understood");
+                await DisplayAlert("Incomplete", notification, "Understood");
             }
             else
             {
-                PopupNavigation.Instance.PopAsync();
+                await PopupNavigation.Instance.PopAsync();
                 _schedule.ScheduleDetails = new List<ScheduleDetail>
                 {
                     new ScheduleDetail()
@@ -326,11 +328,11 @@ namespace Pump.Layout
                         DURATION = _pumpSelectedTime.getPumpDurationTime().Text
                     }
                 };
-                var key = Task.Run(() => new Authentication().SetSchedule(_schedule)).Result;
+                await _socketPicker.SendCommand(_schedule);
             }
 
-            Navigation.PopModalAsync();
-            Navigation.PopModalAsync();
+            await Navigation.PopModalAsync();
+            await Navigation.PopModalAsync();
         }
         
 

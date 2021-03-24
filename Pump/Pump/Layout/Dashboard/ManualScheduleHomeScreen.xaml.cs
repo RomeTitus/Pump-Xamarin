@@ -20,7 +20,7 @@ namespace Pump.Layout.Dashboard
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly PumpConnection _pumpConnection;
         private FloatingScreenScroll _floatingScreenScroll;
-        private SocketPicker _socketPicker;
+        private readonly SocketPicker _socketPicker;
 
         public ManualScheduleHomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {

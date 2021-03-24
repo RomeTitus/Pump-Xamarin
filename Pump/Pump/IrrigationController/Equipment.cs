@@ -12,6 +12,8 @@ namespace Pump.IrrigationController
         }
         [JsonIgnore]
         public string ID { get; set; }
+        [JsonIgnore]
+        public bool DeleteAwaiting { get; set; }
         public string AttachedSubController { get; set; }
         public List<AttachedSensor> AttachedSensor { get; set; }
         public string NAME { get; set; }
