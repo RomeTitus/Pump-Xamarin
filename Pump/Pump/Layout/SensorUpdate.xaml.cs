@@ -8,6 +8,7 @@ using Pump.Class;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -23,11 +24,13 @@ namespace Pump.Layout
         private List<Sensor> _sensorList;
         private readonly List<string> _sensorTypesList = new List<string>{"Pressure Sensor"};
         private readonly Sensor _sensor;
-        private Site _site;
+        private readonly Site _site;
+        private readonly SocketPicker _socketPicker;
 
-        public SensorUpdate(List<Sensor> sensorList, List<SubController> subControllerList, List<Equipment> equipmentList, Site site, Sensor sensor = null)
+        public SensorUpdate(List<Sensor> sensorList, List<SubController> subControllerList, List<Equipment> equipmentList, Site site, SocketPicker socketPicker, Sensor sensor = null)
         {
             InitializeComponent();
+            _socketPicker = socketPicker;
             _sensorList = sensorList;
             _subControllerList = subControllerList;
             _equipmentList = equipmentList;
@@ -46,6 +49,9 @@ namespace Pump.Layout
         {
             SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
             SensorName.Text = _sensor.NAME;
+
+            
+
             SystemPicker.Items.Add("Main");
             SystemPicker.SelectedIndex = 0;
             var index = 1;
@@ -61,6 +67,18 @@ namespace Pump.Layout
             {
                 ScrollViewAttachedEquipment.Children.Add(new ViewAttachedEquipment(equipment, _sensor));
             }
+
+            index = 0;
+            foreach (var sensor in _sensorTypesList)
+            {
+                SensorTypePicker.Items.Add(sensor);
+                if (_sensor.TYPE == sensor)
+                    SensorTypePicker.SelectedIndex = index;
+                index++;
+            }
+
+            if (SensorTypePicker.SelectedIndex == -1)
+                SensorTypePicker.SelectedIndex = 0;
         }
 
         private void UpdateGpioPicker()
@@ -136,7 +154,8 @@ namespace Pump.Layout
                 {
                     _sensor.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex - 1].ID;
                 }
-                var sensorKey = await new Authentication().SetSensor(_sensor);
+
+                var sensorKey = await _socketPicker.SendCommand(_sensor);
                 await UpdateSensorToSite(sensorKey);
 
                 foreach (var scrollViewEquipment in ScrollViewAttachedEquipment.Children)
@@ -159,8 +178,9 @@ namespace Pump.Layout
                             _equipmentList.First(x => x.ID == viewEquipment._equipment.ID).AttachedSensor.Add(newAttachedSensor);
                         }
                     }
-                    var equipmentKey = Task.Run(() => new Authentication().SetEquipment(_equipmentList.First(x => x.ID == viewEquipment._equipment.ID))).Result;
-                    Navigation.PopModalAsync();
+
+                    await _socketPicker.SendCommand(_equipmentList.First(x => x.ID == viewEquipment._equipment.ID));
+                    await Navigation.PopModalAsync();
                 }
             }
             
@@ -218,7 +238,7 @@ namespace Pump.Layout
             if (_site.Attachments.Contains(key))
                 return;
             _site.Attachments.Add(key);
-            var siteKey = await new Authentication().SetSite(_site);
+            await _socketPicker.SendCommand(_site);
         }
     }
 }

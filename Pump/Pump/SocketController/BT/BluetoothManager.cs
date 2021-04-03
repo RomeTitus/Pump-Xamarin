@@ -159,7 +159,7 @@ namespace Pump.SocketController.BT
             var partNumber = 0;
             while (fullData == false)
             {
-                /*
+                
                 var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
 
                 
@@ -172,7 +172,7 @@ namespace Pump.SocketController.BT
                     {
                         // ignored
                     }
-                */
+                
                 var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
 
                 var finalBytesReceived = new byte[0];
@@ -180,7 +180,7 @@ namespace Pump.SocketController.BT
                 for (var i = 0; i < bytes.Count; i+= 508)
                 {
                     var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;                   
-                    //sendingBytes.InsertRange(0, key);
+                    sendingBytes.InsertRange(0, key);
                     finalBytesReceived = await WriteToBle(sendingBytes.ToArray(), timeout);
                 }
 

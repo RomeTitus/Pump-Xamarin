@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Database.Table;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump.Layout
+namespace Pump.Layout.Dashboard
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CustomScheduleHomeScreen : ContentPage
@@ -22,11 +22,13 @@ namespace Pump.Layout
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
         private ViewCustomScheduleSummary _viewSchedule;
         private readonly PumpConnection _pumpConnection;
+        private readonly SocketPicker _socketPicker;
 
-        public CustomScheduleHomeScreen(ObservableIrrigation observableIrrigation)
+        public CustomScheduleHomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {
-            _observableIrrigation = observableIrrigation;
             InitializeComponent();
+            _observableIrrigation = observableIrrigation;
+            _socketPicker = socketPicker;
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             new Thread(LoadCustomScheduleStatus).Start();
         }
@@ -152,32 +154,27 @@ namespace Pump.Layout
             ViewScheduleSummary(scheduleSwitch.AutomationId);
         }
 
-        private void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
+        private async void ScheduleSwitch_Toggled(object sender, ToggledEventArgs e)
         {
             var scheduleSwitch = (Switch)sender;
             try
             {
                 var updateSchedule = _observableIrrigation.CustomScheduleList.First(x => x.ID == scheduleSwitch.AutomationId);
 
-                if (scheduleSwitch.IsToggled)
-                    updateSchedule.StartTime = ScheduleTime.GetUnixTimeStampUtcNow();
-                else
-                    updateSchedule.StartTime = 0;
+                updateSchedule.StartTime = scheduleSwitch.IsToggled ? ScheduleTime.GetUnixTimeStampUtcNow() : 0;
 
-                new Thread(() => ChangeCustomScheduleState(updateSchedule))
-                    .Start();
+                await ChangeCustomScheduleState(updateSchedule);
+
             }
             catch
             {
-                DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE",
+                await DisplayAlert("Warning!!!", "This switch failed to parse it's ID \n COULD NOT CHANGE SCHEDULE STATE",
                     "Understood");
             }
         }
 
-        private void ChangeCustomScheduleState(CustomSchedule schedule)
+        private async Task ChangeCustomScheduleState(CustomSchedule schedule)
         {
-
-
             foreach (var view in ScrollViewCustomScheduleDetail.Children)
             {
                 var viewCustomSchedule = (ViewCustomSchedule)view;
@@ -192,7 +189,7 @@ namespace Pump.Layout
                 });
             }
             //TODO Needs Confirmation that The Pi got it and its running :)
-            var key = Task.Run(() => new Authentication().SetCustomSchedule(schedule)).Result;
+            await _socketPicker.SendCommand(schedule);
         }
 
         private void ViewScheduleSummary(string id)
@@ -258,7 +255,7 @@ namespace Pump.Layout
         {
 
                 if (_observableIrrigation.EquipmentList.Count > 0)
-                    Navigation.PushModalAsync(new CustomScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
+                    Navigation.PushModalAsync(new CustomScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), _socketPicker));
                 else
                     DisplayAlert("Cannot Create a Schedule",
                         "You are missing the equipment that is needed to create a schedule", "Understood");
@@ -270,7 +267,7 @@ namespace Pump.Layout
             PopupNavigation.Instance.PopAsync();
             var edit = (Button)sender;
             var customSchedule = _observableIrrigation.CustomScheduleList.First(schedule => schedule.ID == edit.AutomationId);
-            Navigation.PushModalAsync(new CustomScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), customSchedule));
+            Navigation.PushModalAsync(new CustomScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), _socketPicker, customSchedule));
         }
 
         private void DeleteButton_Tapped(object sender, EventArgs e)
@@ -282,14 +279,15 @@ namespace Pump.Layout
             deleteConfirm.GetDeleteButton().Clicked += DeleteConfirmButton_Tapped;
         }
 
-        private void DeleteConfirmButton_Tapped(object sender, EventArgs e)
+        private async void DeleteConfirmButton_Tapped(object sender, EventArgs e)
         {
-            PopupNavigation.Instance.PopAsync();
+            await PopupNavigation.Instance.PopAsync();
             var delete = (Button)sender;
-            new Authentication().DeleteCustomSchedule(new CustomSchedule { ID = delete.AutomationId });
+            await _socketPicker.SendCommand(new CustomSchedule {ID = delete.AutomationId, DeleteAwaiting = true});
+
         }
 
-        private void SkipCustomSchedule_Tapped(object sender, EventArgs e)
+        private async void SkipCustomSchedule_Tapped(object sender, EventArgs e)
         {
             var gridEquipmentAndTime = (Grid)sender;
             int.TryParse(gridEquipmentAndTime.AutomationId, out var selectIndex);
@@ -304,8 +302,7 @@ namespace Pump.Layout
             
             var selectedCustomScheduleDetails = customScheduleDetails[selectIndex];
 
-            Device.BeginInvokeOnMainThread(async () =>
-            {
+            
                 if (!await DisplayAlert("Are you sure?",
                     "You have selected " + _observableIrrigation.EquipmentList.First(x => x.ID == selectedCustomScheduleDetails.id_Equipment).NAME  + "\nConfirm to skip to this zone ?", "Confirm",
                     "cancel")) return;
@@ -317,9 +314,9 @@ namespace Pump.Layout
                     _viewSchedule.CustomSchedule.StartTime =
                         (Int32)(startTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                     _viewSchedule.UpdateScheduleSummary();
-                    ChangeCustomScheduleState(_viewSchedule.CustomSchedule);
+                    await ChangeCustomScheduleState(_viewSchedule.CustomSchedule);
                 }
-            });
+           
         }
     }
 }

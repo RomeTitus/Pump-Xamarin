@@ -8,6 +8,7 @@ using Pump.Database;
 using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -17,15 +18,15 @@ namespace Pump.Layout
     public partial class EquipmentUpdate : ContentPage
     {
         private readonly List<SubController> _subControllerList;
-        private List<Equipment> _equipmentList;
+        private readonly List<Equipment> _equipmentList;
         private List<long> _avalibleGpio;
-        private Site _site;
-        private PumpConnection _pumpConnection;
+        private readonly Site _site;
         private readonly Equipment _equipment;
-
-        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList, Site site, Equipment equipment = null)
+        private readonly SocketPicker _socketPicker;
+        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList, Site site, SocketPicker socketPicker, Equipment equipment = null)
         {
             InitializeComponent();
+            _socketPicker = socketPicker;
             _site = site;
             _equipmentList = equipmentList;
             _subControllerList = subControllerList;
@@ -178,7 +179,7 @@ namespace Pump.Layout
                 if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
                     _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
                 _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0 ? null : _subControllerList[SystemPicker.SelectedIndex - 1].ID;
-                var key = await new Authentication().SetEquipment(_equipment);
+                var key = await _socketPicker.SendCommand(_equipment);
                 await UpdateEquipmentToSite(key);
                 //
 
@@ -191,7 +192,7 @@ namespace Pump.Layout
             if(_site.Attachments.Contains(key))
                 return;
             _site.Attachments.Add(key);
-            var siteKey = await new Authentication().SetSite(_site);
+            await _socketPicker.SendCommand(_site);
         }
         private void ButtonBack_OnClicked(object sender, EventArgs e)
         {

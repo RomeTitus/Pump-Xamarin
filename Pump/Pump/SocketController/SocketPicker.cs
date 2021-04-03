@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.EventArgs;
 using Pump.Class;
 using Pump.Database;

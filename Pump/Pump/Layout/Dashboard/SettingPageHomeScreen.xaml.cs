@@ -1,5 +1,6 @@
 ﻿using System;
 using Pump.IrrigationController;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -9,8 +10,10 @@ namespace Pump.Layout
     public partial class SettingPageHomeScreen : ContentPage
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        public SettingPageHomeScreen(ObservableIrrigation observableIrrigation)
+        private readonly SocketPicker _socketPicker;
+        public SettingPageHomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {
+            _socketPicker = socketPicker;
             _observableIrrigation = observableIrrigation;
             InitializeComponent();
         }
@@ -34,7 +37,7 @@ namespace Pump.Layout
 
         private void BtnEquipmentDetail_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation));
+            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation, _socketPicker));
         }
 
         public Button GetSiteButton()

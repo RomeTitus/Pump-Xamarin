@@ -266,24 +266,6 @@ namespace Pump.IrrigationController
                     observableIrrigation.SubControllerList[index] = subControllerEditSate.Values.First();
                 }
             }
-
-
-            /*
-            _subscribeAlive = auth._FirebaseClient
-                .Child(auth.getConnectedPi() + "/Alive")
-                .AsObservable<Alive>()
-                .Subscribe(x =>
-                {
-                    try
-                    {
-                        _observableIrrigation.AliveList[0] = x.Object;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                });
-            */
         }
 
         public static Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>, List<Dictionary<EditState, Equipment>>, 

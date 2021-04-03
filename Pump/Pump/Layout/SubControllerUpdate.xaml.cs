@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,10 +14,12 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SubControllerUpdate : ContentPage
     {
-        private SubController _subController;
-        public SubControllerUpdate(SubController subController = null)
+        private readonly SubController _subController;
+        private readonly SocketPicker _socketPicker;
+        public SubControllerUpdate(SocketPicker socketPicker, SubController subController = null)
         {
             InitializeComponent();
+            _socketPicker = socketPicker;
             if (subController == null)
             {
                 _subController = new SubController();
@@ -59,7 +62,7 @@ namespace Pump.Layout
         private async void ButtonUpdateSubController_OnClicked(object sender, EventArgs e)
         {
             SetSubControllerVariables();
-            var key = await new Authentication().SetSubController(_subController);
+            await _socketPicker.SendCommand(_subController);
             await Navigation.PopModalAsync();
         }
     }

@@ -211,7 +211,7 @@ namespace Pump.Layout
             PopupNavigation.Instance.PopAsync();
             var edit = (Button)sender;
             var schedule = _observableIrrigation.ScheduleList.First(x => x.ID == edit.AutomationId);
-            Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), schedule));
+            Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), _socketPicker, schedule));
         }
 
         private void DeleteButton_Tapped(object sender, EventArgs e)
@@ -235,7 +235,7 @@ namespace Pump.Layout
         private void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
         {
             if (_observableIrrigation.EquipmentList.Count > 0)
-                Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList()));
+                Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList(), _socketPicker));
             else
                 DisplayAlert("Cannot Create a Schedule",
                     "You are missing the equipment that is needed to create a schedule", "Understood");

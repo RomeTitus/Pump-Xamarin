@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using EmbeddedImages;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -20,9 +21,11 @@ namespace Pump.Layout
         private readonly List<Equipment> _equipmentList;
         private readonly List<Sensor> _sensorList;
         private readonly Site _site;
-        public SiteUpdate(List<Sensor> sensorList, List<Equipment> equipmentList, Site site = null)
+        private readonly SocketPicker _socketPicker;
+        public SiteUpdate(List<Sensor> sensorList, List<Equipment> equipmentList, SocketPicker socketPicker, Site site = null)
         {
             InitializeComponent();
+            _socketPicker = socketPicker;
             if (site == null)
             {
                 site = new Site();
@@ -35,7 +38,7 @@ namespace Pump.Layout
             PopulateScreen();
         }
 
-        private void ButtonUpdateSite_OnClicked(object sender, EventArgs e)
+        private async void ButtonUpdateSite_OnClicked(object sender, EventArgs e)
         {
             _site.NAME = SiteName.Text;
             _site.Description = SiteDescription.Text;
@@ -47,9 +50,8 @@ namespace Pump.Layout
                     _site.Attachments.Add(stackLayout.AutomationId);
             }
 
-            var key = Task.Run(() => new Authentication().SetSite(_site)).Result;
-            Navigation.PopModalAsync();
-
+            await _socketPicker.SendCommand(_site);
+            await Navigation.PopModalAsync();
         }
 
         private void ButtonBack_OnClicked(object sender, EventArgs e)

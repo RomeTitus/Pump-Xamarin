@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,9 +17,11 @@ namespace Pump.Layout
         private readonly List<Equipment> _equipmentList;
         private CustomSchedule _customSchedule;
         private readonly List<string> _pumpIdList = new List<string>();
-        public CustomScheduleUpdate(List<Equipment> equipmentList, CustomSchedule schedule = null)
+        private readonly SocketPicker _socketPicker;
+        public CustomScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker, CustomSchedule schedule = null)
         {
             InitializeComponent();
+            _socketPicker = socketPicker;
             _equipmentList = equipmentList;
             if (schedule != null)
             {
@@ -126,14 +129,14 @@ namespace Pump.Layout
 
             return scheduleDetailList;
         }
-        private void ButtonCreateCustomSchedule_OnClicked(object sender, EventArgs e)
+        private async void ButtonCreateCustomSchedule_OnClicked(object sender, EventArgs e)
         {
             var notification = CustomScheduleValidate();
             notification = SendSelectedZonesValidate(notification);
 
             if (!string.IsNullOrWhiteSpace(notification))
             {
-                DisplayAlert("Incomplete", notification, "Understood");
+                await DisplayAlert("Incomplete", notification, "Understood");
             }
             else
             {
@@ -147,16 +150,16 @@ namespace Pump.Layout
                 if (scheduleDetail.Count > 0)
                 {
                     _customSchedule.ScheduleDetails = scheduleDetail;
-                    var key = Task.Run(() => new Authentication().SetCustomSchedule(_customSchedule)).Result;
-                    Navigation.PopModalAsync();
+                    await _socketPicker.SendCommand(_customSchedule);
+                    await Navigation.PopModalAsync();
                 }
                 else
-                    DisplayAlert("Incomplete", "\u2022 One or more zones are required!", "Understood");
+                    await DisplayAlert("Incomplete", "\u2022 One or more zones are required!", "Understood");
             }
         }
-        private void ButtonBack_OnClicked(object sender, EventArgs e)
+        private async void ButtonBack_OnClicked(object sender, EventArgs e)
         {
-            Navigation.PopModalAsync();
+            await Navigation.PopModalAsync();
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using EmbeddedImages;
 using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Essentials;
@@ -18,9 +18,9 @@ namespace Pump.Layout.Dashboard
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private SettingPageHomeScreen _settingPageHomeScreen;
-        private SocketPicker _socketPicker;
+        private readonly SocketPicker _socketPicker;
         private bool _hasSentUpdateRequest;
-        private bool _firstRun = true;
+        private bool _firstRun;
         
         private readonly DatabaseController _databaseController = new DatabaseController();
         public HomeScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
@@ -69,9 +69,9 @@ namespace Pump.Layout.Dashboard
         {
             var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableIrrigation);
             var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableIrrigation, _socketPicker);
-            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableIrrigation);
-            var scheduleHomeScreen = new ScheduleHomeScreen(_observableIrrigation);
-            _settingPageHomeScreen = new SettingPageHomeScreen(_observableIrrigation);
+            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableIrrigation, _socketPicker);
+            var scheduleHomeScreen = new ScheduleHomeScreen(_observableIrrigation, _socketPicker);
+            _settingPageHomeScreen = new SettingPageHomeScreen(_observableIrrigation, _socketPicker);
             var navigationScheduleStatusHomeScreen = new NavigationPage(scheduleStatusHomeScreen)
             {
                 IconImageSource = ImageSource.FromResource(
@@ -156,7 +156,7 @@ namespace Pump.Layout.Dashboard
             });
         }
 
-        private void MonitorConnectionStatus()
+        private async void MonitorConnectionStatus()
         {
             while (true)
             {
@@ -165,8 +165,12 @@ namespace Pump.Layout.Dashboard
                     if (!_hasSentUpdateRequest)
                     {
 
-                        if(!_firstRun)
+                        if (!_firstRun)
+                        {
+                            _firstRun = true;
                             LastOnline();
+                        }
+                            
 
                         if (_observableIrrigation.AliveList[0] != null)
                         {
@@ -175,7 +179,7 @@ namespace Pump.Layout.Dashboard
                             if (_observableIrrigation.AliveList[0] == null ||
                                 _observableIrrigation.AliveList[0].ResponseTime == 0)
                             {
-                                new Authentication().SetAlive(_observableIrrigation.AliveList[0]);
+                                await _socketPicker.SendCommand(_observableIrrigation.AliveList[0]);
                                 _hasSentUpdateRequest = true;
                             }
                             else
@@ -183,14 +187,14 @@ namespace Pump.Layout.Dashboard
                                 var now = ScheduleTime.GetUnixTimeStampUtcNow();
                                 if (_observableIrrigation.AliveList[0].ResponseTime < (now - 60))
                                 {
-                                    new Authentication().SetAlive(_observableIrrigation.AliveList[0]);
+                                    await _socketPicker.SendCommand(_observableIrrigation.AliveList[0]);
                                     _hasSentUpdateRequest = true;
                                 }
                             }
                         }
                         else
                         {
-                            new Authentication().SetAlive(_observableIrrigation.AliveList[0]);
+                            await _socketPicker.SendCommand(_observableIrrigation.AliveList[0]);
                             _hasSentUpdateRequest = true;
                         }
                     }
@@ -200,7 +204,7 @@ namespace Pump.Layout.Dashboard
                     // ignored
                 }
 
-                Thread.Sleep(4000);
+                await Task.Delay(4000);
             }
         }
 

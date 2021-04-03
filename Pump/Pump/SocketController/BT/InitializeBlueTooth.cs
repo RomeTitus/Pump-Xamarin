@@ -95,7 +95,7 @@ namespace Pump.SocketController.BT
                     await BlueToothManager.StartScanning();
                     break;
                 }
-                await Task.Delay(15000);
+                //await Task.Delay(15000);
             }
         }
 

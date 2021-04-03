@@ -53,9 +53,8 @@ namespace Pump.Layout
 
         private async void _notificationEvent_OnNotificationConnectionUpdate(object sender, NotificationEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(async () => {
-                await DisplayAlert(e.Header, e.Main, e.ButtonText);
-            });
+            
+            await DisplayAlert(e.Header, e.Main, e.ButtonText);
             
         }
 
@@ -100,11 +99,11 @@ namespace Pump.Layout
                 (current, site) => current.Where(x => !site.Attachments.Contains(x.ID)).ToList());
 
 
-            Navigation.PushModalAsync(new SiteUpdate(sensors, equipments));
+            Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, _socketPicker));
         }
         private void BtnAddSubController_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new SubControllerUpdate());
+            Navigation.PushModalAsync(new SubControllerUpdate(_socketPicker));
         }
 
         private void PopulateSensorAndEquipmentEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -264,7 +263,7 @@ namespace Pump.Layout
                         (current, sites) => current.Where(x => !sites.Attachments.Contains(x.ID)).ToList());
                     sensors.AddRange(_observableIrrigation.SensorList.Where(x => site.Attachments.Contains(x.ID)));
 
-                    await Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, site));
+                    await Navigation.PushModalAsync(new SiteUpdate(sensors, equipments,_socketPicker, site));
                 }
                 else if(action == "Select")
                 {
@@ -280,7 +279,11 @@ namespace Pump.Layout
                     if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + site.NAME, "Delete",
                         "Cancel"))
-                        await Task.Run(() => new Authentication().DeleteSite(site));
+                    {
+                        site.DeleteAwaiting = true;
+                        await _socketPicker.SendCommand(site);
+
+                    }
                 }
             });
         }
@@ -434,13 +437,17 @@ namespace Pump.Layout
 
                 if (action == "Update")
                 {
-                    await Navigation.PushModalAsync(new SubControllerUpdate(subController));
+                    await Navigation.PushModalAsync(new SubControllerUpdate(_socketPicker, subController));
                 }
                 else if(action == "Delete")
                 {
                     if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + subController.NAME, "Delete",
-                        "Cancel")) return;
+                        "Cancel"))
+                    {
+                        subController.DeleteAwaiting = true;
+                        await _socketPicker.SendCommand(subController);
+                    }
                 }
             });
         }

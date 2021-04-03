@@ -28,6 +28,7 @@ namespace Pump.FirebaseDatabase
 
         }
 
+        private string _notificationResult;
         public FirebaseClient _FirebaseClient { get; }
 
 
@@ -133,7 +134,7 @@ namespace Pump.FirebaseDatabase
             return null;
         }
         //CustomSchedule
-        public async Task<string> SetCustomSchedule(CustomSchedule schedule)
+        private async Task<string> SetCustomSchedule(CustomSchedule schedule)
         {
             try
             {
@@ -156,7 +157,8 @@ namespace Pump.FirebaseDatabase
                 return null;
             }
         }
-        public async void DeleteCustomSchedule(CustomSchedule schedule)
+
+        private async Task<string> DeleteCustomSchedule(CustomSchedule schedule)
         {
             try
             {
@@ -168,48 +170,10 @@ namespace Pump.FirebaseDatabase
             {
                 Console.WriteLine(e);
             }
+            return null;
         }
-        public CustomSchedule GetJsonCustomSchedulesToObjectList(JObject customScheduleDetailObject, string key)
-        {
-            try
-            {
-                var schedule = new CustomSchedule
-                {
-                    ID = key,
-                    NAME = customScheduleDetailObject["NAME"].ToString(),
-                    id_Pump = customScheduleDetailObject["id_Pump"].ToString()
-                };
-
-                if (customScheduleDetailObject.ContainsKey("StartTime"))
-                    schedule.StartTime = long.Parse(customScheduleDetailObject["StartTime"].ToString());
-
-                if (customScheduleDetailObject.ContainsKey("isActive"))
-                    schedule.StartTime = long.Parse(customScheduleDetailObject["isActive"].ToString());
-
-
-                var scheduleDetailList = new List<ScheduleDetail>();
-                foreach (var scheduleDuration in (JObject)customScheduleDetailObject["ScheduleDetails"])
-                    scheduleDetailList.Add(
-                        new ScheduleDetail
-                        {
-                            ID = scheduleDuration.Key,
-                            id_Equipment = customScheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["id_Equipment"]
-                                .ToString(),
-                            DURATION = customScheduleDetailObject["ScheduleDetails"][scheduleDuration.Key]["DURATION"]
-                                .ToString()
-                        });
-                schedule.ScheduleDetails = scheduleDetailList;
-                return schedule;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-        }
-
         //ManualSchedule
-        public async Task<string> SetManualSchedule(ManualSchedule manual)
+        private async Task<string> SetManualSchedule(ManualSchedule manual)
         {
             try
             {
@@ -220,29 +184,34 @@ namespace Pump.FirebaseDatabase
                         .PostAsync(manual);
                     manual.ID = result.Key;
                 }
+                else
+                {
+                    await _FirebaseClient
+                        .Child(getConnectedPi() + "/ManualSchedule/" + manual.ID)
+                        .PutAsync(manual);
+                }
 
-                await _FirebaseClient
-                    .Child(getConnectedPi() + "/ManualSchedule/" + manual.ID)
-                    .PutAsync(manual);
-                
-                var notificationResult = string.Empty;
 
-                var firebaseReplyListener = ManualScheduleLiveObserver(notificationResult, manual.ID);
+
+                _notificationResult = string.Empty;
+
+                var firebaseReplyListener = ManualScheduleLiveObserver(manual.ID);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15) && string.IsNullOrEmpty(notificationResult))
+                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15) && string.IsNullOrEmpty(_notificationResult))
                 {
                     await Task.Delay(500);
                 }
                 stopwatch.Stop();
 
-                if (string.IsNullOrEmpty(notificationResult))
-                    notificationResult = "No Reply$We never got a reply back\nWould you like to keep your changes?$Revert";
+                if (string.IsNullOrEmpty(_notificationResult))
+                    _notificationResult = "No Reply$We never got a reply back\nWould you like to keep your changes?$Revert";
 
                 firebaseReplyListener.Dispose();
-                return notificationResult;
+                await DeleteStatus(manual.ID);
+                return _notificationResult;
             }
             catch (Exception e)
             {
@@ -252,32 +221,35 @@ namespace Pump.FirebaseDatabase
 
 
         }
-        public async Task<string> DeleteManualSchedule(ManualSchedule manual)
+
+        private async Task<string> DeleteManualSchedule(ManualSchedule manual)
         {
             try
             {
-                var notificationResult = string.Empty;
+                _notificationResult = string.Empty;
 
-                var firebaseReplyListener = ManualScheduleLiveObserver(notificationResult, manual.ID);
-
+                
                 await _FirebaseClient
                     .Child(getConnectedPi() + "/ManualSchedule/" + manual.ID)
                     .DeleteAsync();
 
+                var firebaseReplyListener = ManualScheduleLiveObserver(manual.ID);
+
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 
-                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15) && string.IsNullOrEmpty(notificationResult))
+                while (stopwatch.Elapsed < TimeSpan.FromSeconds(15) && string.IsNullOrEmpty(_notificationResult))
                 {
                     await Task.Delay(500);
                 }
                 stopwatch.Stop();
 
-                if (string.IsNullOrEmpty(notificationResult))
-                    notificationResult = "Cleared!$We never got a reply back";
+                if (string.IsNullOrEmpty(_notificationResult))
+                    _notificationResult = "Cleared!$We never got a reply back";
                 
                 firebaseReplyListener.Dispose();
-                return notificationResult;
+                await DeleteStatus(manual.ID);
+                return _notificationResult;
             }
             catch (Exception e)
             {
@@ -286,8 +258,21 @@ namespace Pump.FirebaseDatabase
             }
         }
 
-
-        private IDisposable ManualScheduleLiveObserver(string notificationResult, string id)
+        private async Task DeleteStatus(string statusId)
+        {
+            try
+            {
+                
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Status/" + statusId)
+                    .DeleteAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+        private IDisposable ManualScheduleLiveObserver(string id)
         {
             var firebaseReplyListener = _FirebaseClient
                 .Child(getConnectedPi()).Child("Status")
@@ -300,9 +285,9 @@ namespace Pump.FirebaseDatabase
                             return;
                         var result = x.Object;
                         result.ID = x.Key;
-                        if (x.Key == id && string.IsNullOrEmpty(notificationResult) && result.Code == "success")
+                        if (x.Key == id && string.IsNullOrEmpty(_notificationResult) && !string.IsNullOrEmpty(result.Code))
                         {
-                            notificationResult = result.Operation + '$' + result.Code;
+                            _notificationResult = result.Operation + '$' + result.Code;
                         }
                     }
                     catch (Exception e)
@@ -337,7 +322,7 @@ namespace Pump.FirebaseDatabase
                 return null;
             }
         }
-        public async void DeleteEquipment(Equipment equipment)
+        public async Task<string> DeleteEquipment(Equipment equipment)
         {
             try
             {
@@ -349,10 +334,11 @@ namespace Pump.FirebaseDatabase
             {
                 Console.WriteLine(e);
             }
+            return null;
         }
 
         //Status
-        public async void SetAlive(Alive alive)
+        public async Task<string> SetAlive(Alive alive)
         {
             try
             {
@@ -362,9 +348,11 @@ namespace Pump.FirebaseDatabase
             }
             catch
             {
-                return;
+               
             }
-            
+
+            return null;
+
         }
 
     //Sensor
@@ -392,6 +380,21 @@ namespace Pump.FirebaseDatabase
             }
         }
 
+        public async Task<string> DeleteSensor(Sensor sensor)
+        {
+            try
+            {
+                await _FirebaseClient
+                    .Child(getConnectedPi() + "/Sensor/" + sensor.ID)
+                    .DeleteAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return null;
+        }
         //Site
         public async Task<string> SetSite(Site site)
         {
@@ -417,7 +420,7 @@ namespace Pump.FirebaseDatabase
             }
         }
 
-        public async void DeleteSite(Site site)
+        public async Task<string> DeleteSite(Site site)
         {
             try
             {
@@ -429,6 +432,8 @@ namespace Pump.FirebaseDatabase
             {
                 Console.WriteLine(e);
             }
+
+            return null;
         }
 
 
@@ -470,7 +475,31 @@ namespace Pump.FirebaseDatabase
                 Schedule schedule = (Schedule)entity;
                 return schedule.DeleteAwaiting ? await DeleteSchedule(schedule) : await SetSchedule(schedule);
             }
-
+            else if (entity.GetType() == typeof(CustomSchedule))
+            {
+                CustomSchedule customSchedule = (CustomSchedule)entity;
+                return customSchedule.DeleteAwaiting ? await DeleteCustomSchedule(customSchedule) : await SetCustomSchedule(customSchedule);
+            }
+            else if (entity.GetType() == typeof(Equipment))
+            {
+                Equipment equipment = (Equipment)entity;
+                return equipment.DeleteAwaiting ? await DeleteEquipment(equipment) : await SetEquipment(equipment);
+            }
+            else if (entity.GetType() == typeof(Sensor))
+            {
+                Sensor sensor = (Sensor)entity;
+                return sensor.DeleteAwaiting ? await DeleteSensor(sensor) : await SetSensor(sensor);
+            }
+            else if (entity.GetType() == typeof(Site))
+            {
+                Site site = (Site)entity;
+                return site.DeleteAwaiting ? await DeleteSite(site) : await SetSite(site);
+            }
+            else if (entity.GetType() == typeof(Alive))
+            {
+                Alive alive = (Alive)entity;
+                return await SetAlive(alive);
+            }
             return "";
         }
     }

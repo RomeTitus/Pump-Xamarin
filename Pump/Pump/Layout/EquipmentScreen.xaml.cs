@@ -9,6 +9,7 @@ using Pump.Droid.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,11 +20,14 @@ namespace Pump.Layout
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly PumpConnection _pumpConnection;
+        private readonly SocketPicker _socketPicker;
 
-        public EquipmentScreen(ObservableIrrigation observableIrrigation)
+        public EquipmentScreen(ObservableIrrigation observableIrrigation, SocketPicker socketPicker)
         {
-            _observableIrrigation = observableIrrigation;
             InitializeComponent();
+            _observableIrrigation = observableIrrigation;
+            _socketPicker = socketPicker;
+            
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             new Thread(LoadScreens).Start();
         }
@@ -238,51 +242,56 @@ namespace Pump.Layout
 
         
 
-        private void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
+        private async void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
         {
             var viewEquipment = (StackLayout)sender;
             var equipment = _observableIrrigation.EquipmentList.First(x => x.ID == viewEquipment.AutomationId);
-            Device.BeginInvokeOnMainThread(async () =>
-            {
-                var action = await DisplayActionSheet("You have selected " + equipment.NAME, 
-                    "Cancel", null, "Update", "Delete");
-                if(action == null) return;
+            
+            var action = await DisplayActionSheet("You have selected " + equipment.NAME, 
+                "Cancel", null, "Update", "Delete");
+            if(action == null) return;
 
-                if (action == "Update")
+            if (action == "Update")
+            {
+                await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.SiteList.ToList().First(x =>x.ID == _pumpConnection.SiteSelectedId), _socketPicker, equipment));
+            }
+            else if(action == "Delete")
+            {
+                if (await DisplayAlert("Are you sure?",
+                    "Confirm to delete " + equipment.NAME, "Delete",
+                    "Cancel"))
                 {
-                    await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.SiteList.ToList().First(x =>x.ID == _pumpConnection.SiteSelectedId), equipment));
+                    equipment.DeleteAwaiting = true;
+                    await _socketPicker.SendCommand(equipment);
                 }
-                else if(action == "Delete")
-                {
-                    if (await DisplayAlert("Are you sure?",
-                        "Confirm to delete " + equipment.NAME, "Delete",
-                        "Cancel"))
-                        await Task.Run(() => new Authentication().DeleteEquipment(equipment));
-                }
-            });
+            }
+            
         }
 
-        private void ViewSensorScreen_Tapped(object sender, EventArgs e)
+        private async void ViewSensorScreen_Tapped(object sender, EventArgs e)
         {
             var viewSensor = (StackLayout)sender;
             var sensor = _observableIrrigation.SensorList.First(x => x.ID == viewSensor.AutomationId);
-            Device.BeginInvokeOnMainThread(async () =>
-            {
+            
                 var action = await DisplayActionSheet("You have selected " + sensor.NAME,
                     "Cancel", null, "Update", "Delete");
                 if (action == null) return;
 
                 if (action == "Update")
                 {
-                    await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId), sensor));
+                    await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId), _socketPicker, sensor));
                 }
                 else
                 {
                     if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + sensor.NAME, "Delete",
-                        "Cancel")) return;
+                        "Cancel"))
+                    {
+                        sensor.DeleteAwaiting = true;
+                        await _socketPicker.SendCommand(sensor);
+                    }
                 }
-            });
+            
         }
 
         private void BtnBack_OnPressed(object sender, EventArgs e)
@@ -292,12 +301,12 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId)));
+            Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId), _socketPicker));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId)));
+            Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(), _observableIrrigation.SubControllerList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.SiteList.ToList().First(x => x.ID == _pumpConnection.SiteSelectedId), _socketPicker));
         }
     }
 }
