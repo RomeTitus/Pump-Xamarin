@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Pump.Droid.Database.Table;
+using Pump.Database.Table;
 using Xamarin.Essentials;
 
 namespace Pump.SocketController.BT
@@ -98,13 +98,13 @@ namespace Pump.SocketController.BT
             sender.Send(bytesToSend);
             await Task.Delay(timeout);
             // Receive the response from the remote device.
-            var bytes = new byte[1024];
+            var bytes = new byte[512];
             var bytesRec = sender.Receive(bytes);
             var shrinkBytes = new List<byte>();
             
             for (var i = 0; i < bytesRec; i++)
             {
-                shrinkBytes.Append(bytes[i]);
+                shrinkBytes.Add(bytes[i]);
             }
 
             var result = shrinkBytes.ToArray();

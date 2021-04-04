@@ -1,30 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SQLite;
 
-namespace Pump.Droid.Database.Table
+namespace Pump.Database.Table
 {
     public class PumpConnection
     {
-        public List<string> ConnectionTypeList = new List<string>() { "Cloud", "Network", "BlueTooth" };
+        public readonly List<string> ConnectionTypeList = new List<string>() { "Cloud", "Network", "BlueTooth" };
 
         public PumpConnection()
         {
-        }
-
-        public PumpConnection(string Name, string Mac, string InternalPath, int InternalPort, string ExternalPath,
-            int ExternalPort)
-        {
-            this.Name = Name;
-            this.Mac = Mac;
-            this.InternalPath = InternalPath;
-            this.InternalPort = InternalPort;
-            this.ExternalPath = ExternalPath;
-            this.ExternalPort = ExternalPort;
+            IDeviceGuid = Guid.Empty;
         }
 
         [PrimaryKey] [AutoIncrement] public int ID { get; set; }
         public string Name { get; set; }
         public string Mac { get; set; }
+        public Guid IDeviceGuid { get; set; }
         public int ConnectionType { get; set; }
         public string InternalPath { get; set; }
         public int InternalPort { get; set; }

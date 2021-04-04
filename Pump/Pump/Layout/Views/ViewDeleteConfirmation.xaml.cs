@@ -19,7 +19,7 @@ namespace Pump.Layout.Views
             ScheduleName.Text = schedule.NAME;
             DeleteScheduleButton.AutomationId = schedule.ID;
         }
-        public ViewDeleteConfirmation(Schedule schedule)
+        public ViewDeleteConfirmation(IrrigationController.Schedule schedule)
         {
             InitializeComponent();
             ScheduleName.Text = schedule.NAME;

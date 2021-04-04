@@ -1,16 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
-<ContentPage
-    x:Class="Pump.Layout.ScheduleStatusHomeScreen"
+<ContentView
+    x:Class="Pump.Layout.Dashboard.ScheduleStatusHomeScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-    xmlns:local="clr-namespace:EmbeddedImages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:views="clr-namespace:Pump.Layout.Views"
-    Title="Schedule Summary"
     mc:Ignorable="d">
-    <ContentPage.Content>
+    <ContentView.Content>
         <ScrollView>
             <FlexLayout
                 Margin="20"
@@ -28,11 +25,11 @@
 
                     <Frame
                         BackgroundColor="White"
-                        CornerRadius="10"
                         BorderColor="Black"
+                        CornerRadius="10"
                         HasShadow="True"
                         HorizontalOptions="FillAndExpand">
-                        <ScrollView HeightRequest="100">
+                        <ScrollView HeightRequest="120">
                             <StackLayout x:Name="ScrollViewScheduleStatus">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer x:Name="ScrollViewScheduleStatusTap" Tapped="ScrollViewScheduleStatusTap_OnTapped" />
@@ -45,12 +42,9 @@
                                     IsVisible="True"
                                     VerticalOptions="Center" />
                             </StackLayout>
-
                         </ScrollView>
                     </Frame>
-
                 </StackLayout>
-
                 <StackLayout>
                     <Label
                         FontSize="Subtitle"
@@ -61,13 +55,10 @@
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
-                        HasShadow="True"
                         CornerRadius="10"
+                        HasShadow="True"
                         HorizontalOptions="FillAndExpand">
-
-
-                        <ScrollView HeightRequest="100">
-
+                        <ScrollView HeightRequest="120">
                             <StackLayout x:Name="ScrollViewQueueStatus">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer x:Name="ScrollViewQueueStatusTap" Tapped="ScrollViewQueueStatusTap_OnTapped" />
@@ -80,12 +71,8 @@
                                     IsVisible="True"
                                     VerticalOptions="Center" />
                             </StackLayout>
-
                         </ScrollView>
-
-
                     </Frame>
-
                 </StackLayout>
                 <StackLayout>
                     <Label
@@ -94,8 +81,12 @@
                         Text="Sensor Status"
                         TextColor="White"
                         TextDecorations="Underline" />
-                    <Frame BackgroundColor="White" BorderColor="Black" CornerRadius="10" HasShadow="True">
-                        <ScrollView HeightRequest="100">
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        CornerRadius="10"
+                        HasShadow="True">
+                        <ScrollView HeightRequest="120">
                             <StackLayout x:Name="ScrollViewSensorStatus">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer x:Name="ScrollViewSensorStatusTap" Tapped="ScrollViewSensorStatusTap_OnTapped" />
@@ -113,5 +104,5 @@
                 </StackLayout>
             </FlexLayout>
         </ScrollView>
-    </ContentPage.Content>
-</ContentPage>
+    </ContentView.Content>
+</ContentView>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using Pump.Droid.Database.Table;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -11,47 +11,51 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSiteSummary : ContentView
     {
-        public readonly Site _site;
-        public readonly Sensor _sensor;
-        public readonly List<Schedule> _schedules;
-        public readonly List<CustomSchedule> _customSchedules;
-        public readonly List<Equipment> _equipments;
-        public readonly List<ManualSchedule> _manualSchedules;
+        public readonly Site Site;
+        public readonly Sensor Sensor;
+        public List<IrrigationController.Schedule> Schedules;
+        public List<CustomSchedule> CustomSchedules;
+        public List<Equipment> Equipments;
+        public List<ManualSchedule> ManualSchedules;
 
 
-        public ViewSiteSummary(Site site, Sensor sensor, List<Schedule> schedules, List<CustomSchedule> customSchedules, List<Equipment> equipments, List<ManualSchedule> manualSchedules)
+        public ViewSiteSummary(Site site, Sensor sensor, List<IrrigationController.Schedule> schedules, List<CustomSchedule> customSchedules, List<Equipment> equipments, List<ManualSchedule> manualSchedules)
         {
             InitializeComponent();
-            _site = site;
-            _sensor = sensor;
-            _schedules = schedules;
-            _customSchedules = customSchedules;
-            _equipments = equipments;
-            _manualSchedules = manualSchedules;
-            AutomationId = _site.ID;
-            StackLayoutSiteSummary.AutomationId = _site.ID;
+            Site = site;
+            Sensor = sensor;
+            Schedules = schedules;
+            CustomSchedules = customSchedules;
+            Equipments = equipments;
+            ManualSchedules = manualSchedules;
+            AutomationId = Site.ID;
+            StackLayoutSiteSummary.AutomationId = Site.ID;
             Populate();
         }
         public void Populate()
         {
-            LabelSiteName.Text = _site.NAME;
-            LabelSiteDescription.Text = _site.Description;
+            bool scheduleRunning = false;
+            LabelSiteName.Text = Site.NAME;
+            LabelSiteDescription.Text = Site.Description;
 
-            if (_customSchedules.Any(customSchedule =>  _site.Attachments.Contains(customSchedule.id_Pump) && RunningCustomSchedule.GetCustomScheduleDetailRunning(customSchedule) != null))
-                SetScheduleRunning(true);
+            if (CustomSchedules.Any(customSchedule => Site.Attachments.Contains(customSchedule.id_Pump) &&
+                                                      RunningCustomSchedule.GetCustomScheduleDetailRunning(
+                                                          customSchedule) != null))
+                scheduleRunning = true;
             
             
-            if(new RunningSchedule(_schedules.Where(x => _site.Attachments.Contains(x.id_Pump)), _equipments).GetRunningSchedule().ToList().Any())
-                SetScheduleRunning(true);
-
-            var manualSchedule = _manualSchedules.FirstOrDefault(x => x.ManualDetails.Any(z => _site.Attachments.Contains(z.id_Equipment)));
+            if(new RunningSchedule(Schedules.Where(x => Site.Attachments.Contains(x.id_Pump)), Equipments).GetRunningSchedule().ToList().Any())
+                scheduleRunning = true;
+            
+            var manualSchedule = ManualSchedules.FirstOrDefault(x => x.ManualDetails.Any(z => Site.Attachments.Contains(z.id_Equipment)));
             if(manualSchedule != null)
-                SetScheduleRunning(true);
+                scheduleRunning = true;
+            SetScheduleRunning(scheduleRunning);
 
-            if (_sensor != null)
+            if (Sensor != null)
             {
 
-                if (_sensor.TYPE == "Pressure Sensor")
+                if (Sensor.TYPE == "Pressure Sensor")
                 {
                     PressureSensor();
                 }
@@ -61,7 +65,7 @@ namespace Pump.Layout.Views
 
         private void PressureSensor()
         {
-            var reading = Convert.ToDouble(_sensor.LastReading);
+            var reading = Convert.ToDouble(Sensor.LastReading, CultureInfo.InvariantCulture);
 
             var voltage = reading * 5.0 / 1024.0;
 

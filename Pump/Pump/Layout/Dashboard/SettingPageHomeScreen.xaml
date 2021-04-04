@@ -1,16 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
-<ContentPage
-    x:Class="Pump.Layout.SettingPageHomeScreen"
+<ContentView
+    x:Class="Pump.Layout.Dashboard.SettingPageHomeScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:d="http://xamarin.com/schemas/2014/forms/design"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Settings"
     mc:Ignorable="d">
-    <ContentPage.Content>
+    <ContentView.Content>
 
-        <StackLayout VerticalOptions="Center" Padding="20,0,20,10">
+        <StackLayout Padding="20,0,20,10" VerticalOptions="Center">
             <Button
                 x:Name="BtnSites"
                 BackgroundColor="DeepSkyBlue"
@@ -19,25 +18,6 @@
                 TextColor="White"
                 VerticalOptions="Center" />
             <Button
-                x:Name="BtnConnectionDetail"
-                BackgroundColor="DeepSkyBlue"
-                CornerRadius="10"
-                IsVisible="False"
-                Pressed="BtnConnectionDetail_OnPressed"
-                Text="Connection Detail"
-                TextColor="White"
-                VerticalOptions="Center" />
-            <Button
-                x:Name="BtnScheduleDetail"
-                BackgroundColor="DeepSkyBlue"
-                CornerRadius="10"
-                IsVisible="False"
-                Pressed="BtnScheduleDetail_OnPressed"
-                Text="Schedule Edit/Delete"
-                TextColor="White"
-                VerticalOptions="Center" />
-            <Button
-                x:Name="BtnEquipmentDetail"
                 BackgroundColor="DeepSkyBlue"
                 CornerRadius="10"
                 Pressed="BtnEquipmentDetail_OnPressed"
@@ -45,16 +25,14 @@
                 TextColor="White"
                 VerticalOptions="Center" />
             <Button
-                x:Name="BtnGraphSummary"
                 BackgroundColor="DeepSkyBlue"
                 CornerRadius="10"
-                IsVisible="False"
-                Pressed="BtnGraphSummary_OnPressed"
-                Text="View Graphs"
+                Pressed="BtnRecordSummary_OnPressed"
+                Text="View Recording"
                 TextColor="White"
                 VerticalOptions="Center" />
 
 
         </StackLayout>
-    </ContentPage.Content>
-</ContentPage>
+    </ContentView.Content>
+</ContentView>

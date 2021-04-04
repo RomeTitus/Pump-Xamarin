@@ -19,7 +19,7 @@
                     x:Name="LabelSensorName"
                     FontSize="Large"
                     HorizontalOptions="Start"
-                    Text="My Foodies Garden and a long Text"
+                    Text=""
                     VerticalOptions="Center" />
                 <Label
                     x:Name="LabelPin"

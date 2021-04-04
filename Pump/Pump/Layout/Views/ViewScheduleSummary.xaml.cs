@@ -10,9 +10,9 @@ namespace Pump.Layout.Views
     public partial class ViewScheduleSummary : ContentView
     {
         private readonly List<Equipment> _equipmentList;
-        private readonly Schedule _schedule;
+        private readonly IrrigationController.Schedule _schedule;
 
-        public ViewScheduleSummary(Schedule schedule, List<Equipment> equipmentList)
+        public ViewScheduleSummary(IrrigationController.Schedule schedule, List<Equipment> equipmentList)
         {
             InitializeComponent();
             _schedule = schedule;
@@ -23,13 +23,13 @@ namespace Pump.Layout.Views
         private void SetScheduleSummary()
         {
             labelScheduleTime.Text = _schedule.TIME;
-            LabelPumpName.Text = _equipmentList.First(x => x.ID == _schedule.id_Pump).NAME;
+            LabelPumpName.Text = _equipmentList.FirstOrDefault(x => x.ID == _schedule.id_Pump)?.NAME;
             labelScheduleName.Text = _schedule.NAME;
             SetWeek();
             foreach (var scheduleDetail in _schedule.ScheduleDetails)
             {
                 ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail,
-                    _equipmentList.First(x => x.ID == scheduleDetail.id_Equipment), true));
+                    _equipmentList.FirstOrDefault(x => x?.ID == scheduleDetail.id_Equipment), true));
             }
         }
         private void SetWeek()

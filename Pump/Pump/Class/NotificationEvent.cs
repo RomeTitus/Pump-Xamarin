@@ -6,16 +6,16 @@ namespace Pump.Class
 {
     public class NotificationEvent
     {
-        public delegate void NotificationUpdateHandler(object sender, NotificationEventArgs e);
-        public event NotificationUpdateHandler OnNotificationUpdate;
+        public delegate void StatusUpdateHandler(object sender, ControllerEventArgs e);
+        public event StatusUpdateHandler OnUpdateStatus;
 
-        public void Notification(string header, string main, string buttonText)
+        public void UpdateStatus(string status = null)
         {
             // Make sure someone is listening to event
-            if (OnNotificationUpdate == null) return;
+            if (OnUpdateStatus == null) return;
 
-            var args = new NotificationEventArgs(header, main, buttonText);
-            OnNotificationUpdate(this, args);
+            var args = new ControllerEventArgs(status);
+            OnUpdateStatus(this, args);
         }
     }
 }

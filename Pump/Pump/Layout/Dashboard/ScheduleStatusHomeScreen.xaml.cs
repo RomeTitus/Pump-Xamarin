@@ -1,69 +1,36 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
+using Newtonsoft.Json.Linq;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.Threading.Tasks;
-using Pump.Database;
-using Pump.Droid.Database.Table;
-using Rg.Plugins.Popup.Services;
 
-namespace Pump.Layout
+namespace Pump.Layout.Dashboard
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ScheduleStatusHomeScreen : ContentPage
+    public partial class ScheduleStatusHomeScreen : ContentView
     {
-        private readonly PumpConnection _pumpConnection;
-        private readonly ObservableIrrigation _observableIrrigation;
+        private readonly ObservableSiteIrrigation _observableIrrigation;
         private const double PopUpSize = 1.5;
 
-        public ScheduleStatusHomeScreen(ObservableIrrigation observableIrrigation)
+        public ScheduleStatusHomeScreen(ObservableSiteIrrigation observableIrrigation)
         {
-            _observableIrrigation = observableIrrigation;
             InitializeComponent(); 
-            _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
-            Task.Run(PopulateScheduleStatusElements);
+            _observableIrrigation = observableIrrigation;
+            SubscribeToEvents();
         }
 
-        private void PopulateScheduleStatusElements()
+        private void SubscribeToEvents()
         {
-            bool hasSubscribed = false;
-            bool scheduleHasRun = false;
-            bool sensorHasRun = false;
-            while (!hasSubscribed)
-            {
-                try
-                {
-                    if (!_observableIrrigation.EquipmentList.Contains(null) && !_observableIrrigation.ScheduleList.Contains(null) && !_observableIrrigation.ManualScheduleList.Contains(null) && !_observableIrrigation.ScheduleList.Contains(null) && !_observableIrrigation.CustomScheduleList.Contains(null))
-                    {
-                        hasSubscribed = true;
-                    }
-
-                    if (!_observableIrrigation.EquipmentList.Contains(null) && !_observableIrrigation.ScheduleList.Contains(null) && !_observableIrrigation.ManualScheduleList.Contains(null)
-                        && !_observableIrrigation.CustomScheduleList.Contains(null) && scheduleHasRun == false)
-                    {
-                        scheduleHasRun = true;
-                        _observableIrrigation.EquipmentList.CollectionChanged += ActiveAndQueScheduleEvent;
-                        _observableIrrigation.ScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
-                        _observableIrrigation.ManualScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
-                        _observableIrrigation.CustomScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
-                        Device.InvokeOnMainThreadAsync(ActiveAndQueSchedule);
-                    }
-                    if (!_observableIrrigation.SensorList.Contains(null) && sensorHasRun == false)
-                    {
-                        sensorHasRun = true;
-                        _observableIrrigation.SensorList.CollectionChanged += SensorStatusEvent;
-                        Device.InvokeOnMainThreadAsync(SensorStatus);
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-                Thread.Sleep(100);
-            }
+            _observableIrrigation.EquipmentList.CollectionChanged += ActiveAndQueScheduleEvent;
+            _observableIrrigation.ScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
+            _observableIrrigation.ManualScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
+            _observableIrrigation.CustomScheduleList.CollectionChanged += ActiveAndQueScheduleEvent;
+            ActiveAndQueSchedule();
+            _observableIrrigation.SensorList.CollectionChanged += SensorStatusEvent;
+            SensorStatus();
         }
 
         private void ActiveAndQueScheduleEvent(object sender,
@@ -75,9 +42,10 @@ namespace Pump.Layout
         {
             try
             { 
-                if (_observableIrrigation.ManualScheduleList.Contains(null) || _observableIrrigation.EquipmentList.Contains(null) || _observableIrrigation.ScheduleList.Contains(null)) return;
                 ScreenCleanupForSchedule();
-                var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault(x => x.ManualDetails.Any(z => _observableIrrigation.SiteList.First(r => r.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(z.id_Equipment)));
+                if (!_observableIrrigation.LoadedAllData()) return;
+                
+                var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault();
 
                 if (manualSchedule != null)
                 {
@@ -89,8 +57,8 @@ namespace Pump.Layout
                     }
                 }
 
-                var runningScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetRunningSchedule().ToList();
-                var activeCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)).ToList(), _observableIrrigation.EquipmentList.ToList());
+                var runningScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList, _observableIrrigation.EquipmentList).GetRunningSchedule().ToList();
+                var activeCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList());
                 runningScheduleList.AddRange(new RunningCustomSchedule().GetRunningCustomSchedule(activeCustomScheduleList));
 
                 if (runningScheduleList.Any())
@@ -112,12 +80,13 @@ namespace Pump.Layout
                     }
                 else
                 {
-                    ScrollViewScheduleStatus.Children.Add(new ViewEmptySchedule("No Active Schedules"));
+                    if(ScrollViewScheduleStatus.Children.Count == 0)
+                        ScrollViewScheduleStatus.Children.Add(new ViewEmptySchedule("No Active Schedules"));
                 }
                 
                 
-                var queScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetQueSchedule().ToList();
-                var queCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)).ToList(), _observableIrrigation.EquipmentList.ToList());
+                var queScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList, _observableIrrigation.EquipmentList).GetQueSchedule().ToList();
+                var queCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList());
                 queScheduleList.AddRange(new RunningCustomSchedule().GetQueCustomSchedule(queCustomScheduleList));
 
                 if (queScheduleList.Any())
@@ -139,19 +108,20 @@ namespace Pump.Layout
                     }
                 else
                 {
-                    ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Queued Schedules"));
+                    if(ScrollViewQueueStatus.Children.Count == 0)
+                        ScrollViewQueueStatus.Children.Add(new ViewEmptySchedule("No Queued Schedules"));
                 }
 
             }
-            catch
-            {
-
+            catch (Exception e){
+                ScrollViewQueueStatus.Children.Add(new ViewException(e));
+                ScrollViewScheduleStatus.Children.Add(new ViewException(e));
             }
         }
 
         private void SensorStatusEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(SensorStatus);
+            SensorStatus();
         }
         private void SensorStatus()
         {
@@ -159,8 +129,8 @@ namespace Pump.Layout
             try
             {
                 if (_observableIrrigation.SensorList.Contains(null)) return;
-                if (_observableIrrigation.SensorList.Any(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)))
-                    foreach (var sensor in _observableIrrigation.SensorList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)))
+                if (_observableIrrigation.SensorList.Any())
+                    foreach (var sensor in _observableIrrigation.SensorList)
                     {
                         var viewSensor = ScrollViewSensorStatus.Children.FirstOrDefault(x =>
                             x.AutomationId == sensor.ID);
@@ -180,12 +150,13 @@ namespace Pump.Layout
                     }
                 else
                 {
-                    ScrollViewSensorStatus.Children.Add(new ViewEmptySchedule("No Sensors Here"));
+                    if(ScrollViewSensorStatus.Children.Count == 0)    
+                        ScrollViewSensorStatus.Children.Add(new ViewEmptySchedule("No Sensors Here"));
                 }
             }
-            catch
+            catch(Exception e)
             {
-                // ignored
+                ScrollViewSensorStatus.Children.Add(new ViewException(e));
             }
 
             
@@ -195,20 +166,20 @@ namespace Pump.Layout
         {
             try
             {
-                if (!_observableIrrigation.ScheduleList.Contains(null) && !_observableIrrigation.EquipmentList.Contains(null))
+                if (_observableIrrigation.LoadedAllData())
                 {
-                    var runningScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetRunningSchedule().ToList();
-                    var activeCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)).ToList(), _observableIrrigation.EquipmentList.ToList());
+                    var runningScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList, _observableIrrigation.EquipmentList).GetRunningSchedule().ToList();
+                    var activeCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList());
                     runningScheduleList.AddRange(new RunningCustomSchedule().GetRunningCustomSchedule(activeCustomScheduleList));
-
-
-                    var queScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetQueSchedule().ToList();
+                    
+                    var queScheduleList = new RunningSchedule(_observableIrrigation.ScheduleList, _observableIrrigation.EquipmentList).GetQueSchedule().ToList();
                     queScheduleList.AddRange(new RunningCustomSchedule().GetQueCustomSchedule(activeCustomScheduleList));
 
                     var itemsThatAreOnDisplay = runningScheduleList.Select(x => x.Id).ToList();
-                    itemsThatAreOnDisplay.AddRange(_observableIrrigation.ManualScheduleList.Select(x => x.ID));
+                    itemsThatAreOnDisplay.AddRange(_observableIrrigation.ManualScheduleList.Select(x => x?.ID));
+                    
                     if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
 
                     for (var index = 0; index < ScrollViewScheduleStatus.Children.Count; index++)
@@ -220,9 +191,9 @@ namespace Pump.Layout
                         index--;
                     }
 
-                    itemsThatAreOnDisplay = queScheduleList.Select(x => x.Id).ToList();
+                    itemsThatAreOnDisplay = queScheduleList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
 
                     for (var index = 0; index < ScrollViewQueueStatus.Children.Count; index++)
@@ -236,8 +207,6 @@ namespace Pump.Layout
                 }
                 else
                 {
-                    ScrollViewScheduleStatus.Children.Clear();
-                    ScrollViewQueueStatus.Children.Clear();
                     var loadingIcon = new ActivityIndicator
                     {
                         AutomationId = "ActivityIndicatorSiteLoading",
@@ -247,8 +216,20 @@ namespace Pump.Layout
                         IsVisible = true,
                         VerticalOptions = LayoutOptions.Center
                     };
-                    ScrollViewScheduleStatus.Children.Add(loadingIcon);
-                    ScrollViewQueueStatus.Children.Add(loadingIcon);
+
+                    if (ScrollViewScheduleStatus.Children.Count > 0 ||
+                        ScrollViewScheduleStatus.Children.First().AutomationId != "ActivityIndicatorSiteLoading")
+                    {
+                        ScrollViewScheduleStatus.Children.Clear();
+                        ScrollViewScheduleStatus.Children.Add(loadingIcon);
+                    }
+                    
+                    if (ScrollViewQueueStatus.Children.Count > 0 ||
+                        ScrollViewQueueStatus.Children.First().AutomationId != "ActivityIndicatorSiteLoading")
+                    {
+                        ScrollViewQueueStatus.Children.Clear();
+                        ScrollViewQueueStatus.Children.Add(loadingIcon);
+                    }
                 }
             }
             catch
@@ -261,11 +242,11 @@ namespace Pump.Layout
         {
             try
             {
-                if (!_observableIrrigation.SensorList.Contains(null))
+                if (_observableIrrigation.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableIrrigation.SensorList.Select(x => x.ID).ToList();
+                    var itemsThatAreOnDisplay = _observableIrrigation.SensorList.Select(x => x?.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
                     for (var index = 0; index < ScrollViewSensorStatus.Children.Count; index++)
                     {
@@ -278,6 +259,8 @@ namespace Pump.Layout
                 }
                 else
                 {
+                    if (ScrollViewSensorStatus.Children.Count == 1 && ScrollViewSensorStatus.Children.First().AutomationId == "ActivityIndicatorSiteLoading")
+                        return;
                     ScrollViewSensorStatus.Children.Clear();
                     var loadingIcon = new ActivityIndicator
                     {
@@ -301,11 +284,16 @@ namespace Pump.Layout
 
         private void ScrollViewScheduleStatusTap_OnTapped(object sender, EventArgs e)
         {
-            if (_observableIrrigation.ScheduleList.Contains(null))
+            if (_observableIrrigation.ScheduleList.Contains(null) && _observableIrrigation.CustomScheduleList.Contains(null))
                 return;
-            var runningStatusViews = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetRunningSchedule().ToList()
+            var runningStatusViews = new RunningSchedule(_observableIrrigation.ScheduleList, _observableIrrigation.EquipmentList).GetRunningSchedule().ToList()
                 .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
-            var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault(x => x.ManualDetails.Any(z => _observableIrrigation.SiteList.First(r => r.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(z.id_Equipment)));
+
+            var activeCustomScheduleList = new RunningCustomSchedule().GetRunningCustomSchedule(new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList()))
+                .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
+            runningStatusViews.AddRange(activeCustomScheduleList);
+            
+            var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault(x => x.ManualDetails.Any());
             
             if (manualSchedule != null)
                 runningStatusViews.Insert(0, new ViewManualSchedule(manualSchedule));
@@ -322,8 +310,16 @@ namespace Pump.Layout
         {
             if (_observableIrrigation.ScheduleList.Contains(null))
                 return;
-            var queueStatusViews = new RunningSchedule(_observableIrrigation.ScheduleList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.id_Pump)), _observableIrrigation.EquipmentList).GetQueSchedule().ToList()
-                .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList(); 
+            var queueStatusViews = new RunningSchedule(_observableIrrigation.ScheduleList, _observableIrrigation.EquipmentList).GetQueSchedule().ToList()
+                .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
+
+
+
+            var queCustomScheduleList = new RunningCustomSchedule().GetQueCustomSchedule(new RunningCustomSchedule().GetActiveCustomSchedule(_observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList()))
+                .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
+            
+            queueStatusViews.AddRange(queCustomScheduleList);
+
             if (queueStatusViews.Count == 0)
                 queueStatusViews.Add(new ViewEmptySchedule("No Que Schedules", PopUpSize));
            
@@ -335,7 +331,7 @@ namespace Pump.Layout
         {
             if (_observableIrrigation.SensorList.Contains(null))
                 return;
-            var sensorStatusViews = _observableIrrigation.SensorList.Where(x => _observableIrrigation.SiteList.First(y => y.ID == _pumpConnection.SiteSelectedId).Attachments.Contains(x.ID)).ToList().Select(sensor => new ViewSensorDetail(sensor, PopUpSize)).Cast<View>().ToList();
+            var sensorStatusViews = _observableIrrigation.SensorList.ToList().Select(sensor => new ViewSensorDetail(sensor, PopUpSize)).Cast<View>().ToList();
 
             if (sensorStatusViews.Count == 0)
                 sensorStatusViews.Add(new ViewEmptySchedule("No Sensors Here", PopUpSize));

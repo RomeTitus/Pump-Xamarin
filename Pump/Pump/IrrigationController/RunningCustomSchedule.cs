@@ -12,8 +12,6 @@ namespace Pump.IrrigationController
         public List<ActiveSchedule> GetActiveCustomSchedule(List<CustomSchedule> customScheduleList, List<Equipment> equipmentList)
         {
             var activeScheduleList = new List<ActiveSchedule>();
-
-
             foreach (var schedule in customScheduleList)
             {
 
@@ -29,10 +27,10 @@ namespace Pump.IrrigationController
                             IdEquipment = scheduleDetails.id_Equipment
                         };
                         activeSchedule.NameEquipment =
-                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdEquipment)?.NAME;
+                            equipmentList.FirstOrDefault(x => x?.ID == activeSchedule.IdEquipment)?.NAME;
                         activeSchedule.IdPump = schedule.id_Pump;
                         activeSchedule.NamePump =
-                            equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdPump)?.NAME;
+                            equipmentList.FirstOrDefault(x => x?.ID == activeSchedule.IdPump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
 
                         //gets Next Schedule Start Time
@@ -147,14 +145,30 @@ namespace Pump.IrrigationController
 
         public List<ActiveSchedule> GetRunningCustomSchedule(List<ActiveSchedule> activeScheduleList)
         {
-            return activeScheduleList.Where(activeSchedule =>
+            var activeCustomSchedule =  activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime < DateTime.UtcNow && activeSchedule.EndTime > DateTime.UtcNow).ToList();
+
+            foreach (var activeSchedule in activeCustomSchedule)
+            {
+                activeSchedule.StartTime = activeSchedule.StartTime.ToLocalTime();
+                activeSchedule.EndTime = activeSchedule.EndTime.ToLocalTime();
+            }
+
+            return activeCustomSchedule;
         }
 
         public List<ActiveSchedule> GetQueCustomSchedule(List<ActiveSchedule> activeScheduleList)
         {
-            return activeScheduleList.Where(activeSchedule =>
+            var queueCustomSchedule =  activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime > DateTime.UtcNow && activeSchedule.StartTime < DateTime.UtcNow.AddDays(1)).ToList();
+
+            foreach (var activeSchedule in queueCustomSchedule)
+            {
+                activeSchedule.StartTime = activeSchedule.StartTime.ToLocalTime();
+                activeSchedule.EndTime = activeSchedule.EndTime.ToLocalTime();
+            }
+
+            return queueCustomSchedule;
         }
     }
 }

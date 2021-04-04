@@ -22,26 +22,23 @@
     </pages:PopupPage.Animation>
 
     <!--  You can use any elements here which are extended from Xamarin.Forms.View  -->
-    <Frame CornerRadius="10" 
-       BackgroundColor="Azure"    
-       OutlineColor="Black" 
-       Margin="20">
+    <Frame
+        Margin="20,60,20,60"
+        BackgroundColor="Azure"
+        CornerRadius="10"
+        OutlineColor="Black">
 
         <StackLayout
-                x:Name="ViewFloatingPage"
-                Margin="12"
-                BackgroundColor="Aqua"
-                HeightRequest="600"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                WidthRequest="300">
+            x:Name="ViewFloatingPage"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="FillAndExpand">
             <ActivityIndicator
-                    x:Name="ActivityIndicatiorScreen"
-                    HorizontalOptions="Center"
-                    IsEnabled="true"
-                    IsRunning="True"
-                    IsVisible="True"
-                    VerticalOptions="Center" />
+                x:Name="ActivityIndicatiorScreen"
+                HorizontalOptions="Center"
+                IsEnabled="true"
+                IsRunning="True"
+                IsVisible="True"
+                VerticalOptions="Center" />
         </StackLayout>
     </Frame>
 </pages:PopupPage>

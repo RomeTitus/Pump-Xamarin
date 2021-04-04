@@ -12,22 +12,22 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewEquipmentSummary : ContentView
     {
-        public readonly Equipment _equipment;
+        public Equipment Equipment;
         public ViewEquipmentSummary(Equipment equipment)
         {
             InitializeComponent();
-            _equipment = equipment;
-            stackLayoutEquipmentSummary.AutomationId = _equipment.ID;
+            Equipment = equipment;
+            stackLayoutEquipmentSummary.AutomationId = Equipment.ID;
             Populate();
         }
 
         public void Populate()
         {
-            LabelEquipmentName.Text = _equipment.NAME;
-            LabelPin.Text = "Pin: " + _equipment.GPIO;
-            if(_equipment.DirectOnlineGPIO != null)
-                LabelPin.Text += "-" + _equipment.DirectOnlineGPIO;
-            if(_equipment.isPump)
+            LabelEquipmentName.Text = Equipment.NAME;
+            LabelPin.Text = "Pin: " + Equipment.GPIO;
+            if(Equipment.DirectOnlineGPIO != null)
+                LabelPin.Text += "-" + Equipment.DirectOnlineGPIO;
+            if(Equipment.isPump)
                 EquipmentImage.Source = ImageSource.FromResource(
                     "Pump.Icons.activePump.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly);

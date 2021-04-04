@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database;
-using Pump.Droid.Database.Table;
-using Pump.FirebaseDatabase;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
@@ -18,50 +16,38 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SiteScreen : ContentPage
     {
+        //INotificationManager notificationManager;
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly ObservableIrrigation _observableIrrigation;
         private HomeScreen _homeScreen;
         private readonly SocketPicker _socketPicker;
-        private readonly ControllerEvent _controllerEvent;
         private readonly NotificationEvent _notificationEvent;
+        private bool _loadedHomeScreen;
 
         public SiteScreen()
         {
             InitializeComponent();
             _observableIrrigation = new ObservableIrrigation();
             SetEvents();
-            
-            _controllerEvent = new ControllerEvent();
-            _controllerEvent.OnUpdateStatus += NewSelectedController;
-
             _notificationEvent = new NotificationEvent();
-            _notificationEvent.OnNotificationUpdate += _notificationEvent_OnNotificationConnectionUpdate;
-
-
-            _socketPicker = new SocketPicker(_observableIrrigation, _notificationEvent);
+            _notificationEvent.OnUpdateStatus += NewSelectedNotification;
+            _socketPicker = new SocketPicker(_observableIrrigation);
             ControllerPicker.SelectedIndexChanged += _socketPicker.ConnectionPicker_OnSelectedIndexChanged;
-
             PopulateControllers();
-
-
             var dbController = new DatabaseController();
             if (!dbController.GetControllerConnectionList().Any())
                 SetupNewController();
-            else if (!string.IsNullOrEmpty(dbController.GetControllerConnectionSelection().SiteSelectedId))
-                StartHomePage();
-        }
-
-        private async void _notificationEvent_OnNotificationConnectionUpdate(object sender, NotificationEventArgs e)
-        {
             
-            await DisplayAlert(e.Header, e.Main, e.ButtonText);
-            
+            //notificationManager = DependencyService.Get<INotificationManager>();
+            //notificationManager.NotificationReceived += (sender, eventArgs) =>
+            //{
+            //    var evtData = (NotificationEventArgs)eventArgs;
+            //    ShowNotification(evtData.Title, evtData.Message, evtData.ControllerName);
+            //};
         }
 
         private void SetEvents()
         {
-            _observableIrrigation.SensorList.CollectionChanged += PopulateSensorAndEquipmentEvent;
-            _observableIrrigation.EquipmentList.CollectionChanged += PopulateSensorAndEquipmentEvent;
             _observableIrrigation.SensorList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.EquipmentList.CollectionChanged += PopulateSiteEvent;
             _observableIrrigation.ScheduleList.CollectionChanged += PopulateSiteEvent;
@@ -92,11 +78,11 @@ namespace Pump.Layout
         {
             var equipmentList = _observableIrrigation.EquipmentList.ToList();
             var equipments = _observableIrrigation.SiteList.Aggregate(equipmentList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x.ID)).ToList());
+                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
 
             var sensorList = _observableIrrigation.SensorList.ToList();
             var sensors = _observableIrrigation.SiteList.Aggregate(sensorList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x.ID)).ToList());
+                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
 
 
             Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, _socketPicker));
@@ -104,17 +90,6 @@ namespace Pump.Layout
         private void BtnAddSubController_OnPressed(object sender, EventArgs e)
         {
             Navigation.PushModalAsync(new SubControllerUpdate(_socketPicker));
-        }
-
-        private void PopulateSensorAndEquipmentEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                if (!_observableIrrigation.SensorList.Contains(null) && !_observableIrrigation.EquipmentList.Contains(null))
-                    BtnAddSite.IsEnabled = true;
-                else
-                    BtnAddSite.IsEnabled = false;
-            });
         }
 
         private void PopulateSiteEvent(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -127,10 +102,18 @@ namespace Pump.Layout
             ScreenCleanupForSite();
             try
             {
-                if (!_observableIrrigation.SiteList.Contains(null) && !_observableIrrigation.SensorList.Contains(null) && !_observableIrrigation.ScheduleList.Contains(null) &&
-                    !_observableIrrigation.CustomScheduleList.Contains(null) && !_observableIrrigation.ManualScheduleList.Contains(null) && _observableIrrigation.SiteList.Any())
+                if (_observableIrrigation.LoadedAllData())
                 {
+                    BtnAddSite.IsEnabled = true;
+                    var selectedSiteId = new DatabaseController().GetControllerConnectionSelection().SiteSelectedId;
+                    if (!string.IsNullOrEmpty(selectedSiteId) && _loadedHomeScreen == false && _observableIrrigation.SiteList.Count == 1)
+                    {
+                        _loadedHomeScreen = true;
+                        StartHomePage(selectedSiteId);
+                    }
+
                     if (_observableIrrigation.SiteList.Any())
+                    {
                         foreach (var site in _observableIrrigation.SiteList)
                         {
                             var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
@@ -138,39 +121,51 @@ namespace Pump.Layout
                             if (viewSite != null)
                             {
                                 var viewScheduleStatus = (ViewSiteSummary)viewSite;
-                                viewScheduleStatus._site.NAME = site.NAME;
-                                viewScheduleStatus._site.Description = site.Description;
+                                viewScheduleStatus.Site.NAME = site.NAME;
+                                viewScheduleStatus.Site.Description = site.Description;
+                                if(viewScheduleStatus.Sensor != null)
+                                    viewScheduleStatus.Sensor.LastReading = _observableIrrigation.SensorList.FirstOrDefault(x => x.ID == viewScheduleStatus.Sensor.ID)?.LastReading;
+                                viewScheduleStatus.Schedules = _observableIrrigation.ScheduleList.ToList();
+                                viewScheduleStatus.CustomSchedules =
+                                    _observableIrrigation.CustomScheduleList.ToList();
+                                viewScheduleStatus.Equipments = _observableIrrigation.EquipmentList.ToList();
+                                viewScheduleStatus.ManualSchedules =
+                                    _observableIrrigation.ManualScheduleList.ToList();
                                 viewScheduleStatus.Populate();
                             }
                             else
                             {
-                                var viewSiteSummary = new ViewSiteSummary(site, _observableIrrigation.SensorList.FirstOrDefault(x => site.Attachments.Contains(x.ID)), _observableIrrigation.ScheduleList.ToList(), _observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.ManualScheduleList.ToList());
+                                var viewSiteSummary = new ViewSiteSummary(site, _observableIrrigation.SensorList.FirstOrDefault(x => site.Attachments.Contains(x?.ID) && x?.TYPE == "Pressure Sensor"), _observableIrrigation.ScheduleList.ToList(), _observableIrrigation.CustomScheduleList.ToList(), _observableIrrigation.EquipmentList.ToList(), _observableIrrigation.ManualScheduleList.ToList());
                                 ScrollViewSite.Children.Add(viewSiteSummary);
                                 viewSiteSummary.GetTapGestureRecognizer().Tapped += ViewSiteScreen_Tapped;
                             }
                         }
+                        SetSelectedSite();
+                    }
                     else
                     {
-                        ScrollViewSite.Children.Add(new ViewEmptySchedule("No Sites Here"));
+                        if(ScrollViewSite.Children.Count == 0)    
+                            ScrollViewSite.Children.Add(new ViewEmptySchedule("No Sites Here"));
                     }
-                }
+                }else
+                    BtnAddSite.IsEnabled = false;
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                ScrollViewSite.Children.Add(new ViewException(e));
             }
 
-            SetSelectedSite();
+            
         }
 
-        private void SetSelectedSite()
+        private string SetSelectedSite()
         {
             var connection = new DatabaseController().GetControllerConnectionSelection();
 
             try
             {
                 if (_observableIrrigation.SiteList.Contains(null))
-                    return;
+                    return null;
                 if (string.IsNullOrEmpty(connection.SiteSelectedId))
                 {
                     var site = _observableIrrigation.SiteList.First();
@@ -196,18 +191,20 @@ namespace Pump.Layout
                 }
                 
             }
+            return connection.SiteSelectedId;
         }
 
         private void ScreenCleanupForSite()
         {
             try
             {
+                //Uses Sites to Display Elements on the Screen
                 if (!_observableIrrigation.SiteList.Contains(null))
                 {
+                    var itemsThatAreOnDisplay = _observableIrrigation.SiteList.Select(x => x?.ID).ToList();
 
-                    var itemsThatAreOnDisplay = _observableIrrigation.SiteList.Select(x => x.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
                     for (var index = 0; index < ScrollViewSite.Children.Count; index++)
                     {
@@ -220,6 +217,8 @@ namespace Pump.Layout
                 }
                 else
                 {
+                    if (ScrollViewSite.Children.Count == 1 && ScrollViewSite.Children.First().AutomationId == "ActivityIndicatorSiteLoading")
+                        return;
                     ScrollViewSite.Children.Clear();
                     var loadingIcon = new ActivityIndicator
                     {
@@ -243,7 +242,7 @@ namespace Pump.Layout
         private void ViewSiteScreen_Tapped(object sender, EventArgs e)
         {
             var viewSite = (StackLayout)sender;
-            var site = _observableIrrigation.SiteList.First(x => x.ID == viewSite.AutomationId);
+            var site = _observableIrrigation.SiteList.First(x => x?.ID == viewSite.AutomationId);
             Device.BeginInvokeOnMainThread(async () =>
             {
                 var action = await DisplayActionSheet("You have selected " + site.NAME,
@@ -255,13 +254,13 @@ namespace Pump.Layout
 
                     var equipmentList = _observableIrrigation.EquipmentList.ToList();
                     var equipments = _observableIrrigation.SiteList.Aggregate(equipmentList,
-                        (current, sites) => current.Where(x => !sites.Attachments.Contains(x.ID)).ToList());
-                    equipments.AddRange(_observableIrrigation.EquipmentList.Where(x => site.Attachments.Contains(x.ID)));
+                        (current, sites) => current.Where(x => !sites.Attachments.Contains(x?.ID)).ToList());
+                    equipments.AddRange(_observableIrrigation.EquipmentList.Where(x => site.Attachments.Contains(x?.ID)));
 
                     var sensorList = _observableIrrigation.SensorList.ToList();
                     var sensors = _observableIrrigation.SiteList.Aggregate(sensorList,
-                        (current, sites) => current.Where(x => !sites.Attachments.Contains(x.ID)).ToList());
-                    sensors.AddRange(_observableIrrigation.SensorList.Where(x => site.Attachments.Contains(x.ID)));
+                        (current, sites) => current.Where(x => !sites.Attachments.Contains(x?.ID)).ToList());
+                    sensors.AddRange(_observableIrrigation.SensorList.Where(x => site.Attachments.Contains(x?.ID)));
 
                     await Navigation.PushModalAsync(new SiteUpdate(sensors, equipments,_socketPicker, site));
                 }
@@ -270,8 +269,7 @@ namespace Pump.Layout
                     var controller = _controllerList[ControllerPicker.SelectedIndex];
                     controller.SiteSelectedId = site.ID;
                     new DatabaseController().UpdateControllerConnection(controller);
-                    SetSelectedSite();
-                    StartHomePage();
+                    StartHomePage(SetSelectedSite());
                     
                 }
                 else if (action == "Delete")
@@ -290,53 +288,47 @@ namespace Pump.Layout
 
         private void SetupNewController()
         {
-            var connectionScreen = new ExistingController(true, _controllerEvent);
+            var connectionScreen = new ExistingController(true, _notificationEvent);
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
 
         private async void BtnAddController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new ExistingController(false, _controllerEvent);
+            var connectionScreen = new ExistingController(false, _notificationEvent);
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             await Navigation.PushModalAsync(connectionScreen);
         }
 
         private void BtnEditController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new ExistingController(false, _controllerEvent, new DatabaseController().GetControllerConnectionSelection());
+            var connectionScreen = new ExistingController(false, _notificationEvent, new DatabaseController().GetControllerConnectionSelection());
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
 
         private async void BtnDeleteController_OnPressed_(object sender, EventArgs e)
         {
-            var Result = await DisplayAlert("Are you Sure?", "Confirm to delete " + _controllerList[ControllerPicker.SelectedIndex].Name, "Delete", "Cancel");
-            if (Result)
-            {
-                new DatabaseController().DeleteControllerConnection(_controllerList[ControllerPicker.SelectedIndex]);
-                PopulateControllers();
-            }
-            
+            var result = await DisplayAlert("Are you Sure?", "Confirm to delete " + _controllerList[ControllerPicker.SelectedIndex].Name, "Delete", "Cancel");
+            if (!result) return;
+            new DatabaseController().DeleteControllerConnection(_controllerList[ControllerPicker.SelectedIndex]);
+            PopulateControllers();
+
         }
 
-        public Picker GetControllerPicker()
-        {
-            return ControllerPicker;
-        }
-
-        private void StartHomePage()
+        private void StartHomePage(string siteId)
         {
             try
             {
-                _homeScreen = new HomeScreen(_observableIrrigation, _socketPicker);
+                var observableSiteIrrigation = new ObservableSiteIrrigation(_observableIrrigation, _observableIrrigation.SiteList.First(x => x.ID == siteId));
+                _homeScreen = new HomeScreen(_observableIrrigation,observableSiteIrrigation, _socketPicker);
                 _homeScreen.GetSiteButton().Pressed += BtnHomeScreenSite_OnPressed;
                 Navigation.PushModalAsync(_homeScreen);
 
             }
             catch
             {
-
+                // ignored
             }
         }
 
@@ -391,9 +383,9 @@ namespace Pump.Layout
             {
                 if (!_observableIrrigation.SubControllerList.Contains(null))
                 {
-                    var itemsThatAreOnDisplay = _observableIrrigation.SubControllerList.Select(x => x.ID).ToList();
+                    var itemsThatAreOnDisplay = _observableIrrigation.SubControllerList.Select(x => x?.ID).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).ID);
+                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
                     for (var index = 0; index < ScrollViewSubController.Children.Count; index++)
                     {
                         var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
@@ -428,7 +420,7 @@ namespace Pump.Layout
         private void ViewSubControllerScreen_Tapped(object sender, EventArgs e)
         {
             var viewSubController = (StackLayout)sender;
-            var subController = _observableIrrigation.SubControllerList.First(x => x.ID == viewSubController.AutomationId);
+            var subController = _observableIrrigation.SubControllerList.First(x => x?.ID == viewSubController.AutomationId);
             Device.BeginInvokeOnMainThread(async () =>
             {
                 var action = await DisplayActionSheet("You have selected " + subController.NAME,
@@ -470,7 +462,7 @@ namespace Pump.Layout
                 _homeScreen = null;
         }
 
-        private void NewSelectedController(object sender, ControllerEventArgs e)
+        private void NewSelectedNotification(object sender, ControllerEventArgs e)
         {
             PopulateControllers();
         }

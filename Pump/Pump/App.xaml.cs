@@ -17,6 +17,10 @@ namespace Pump
         public App()
         {
             InitializeComponent();
+            Device.SetFlags(new[] {
+                "CarouselView_Experimental",
+                "IndicatorView_Experimental"
+            });
             MainPage = new SiteScreen();
             
         }

@@ -21,13 +21,22 @@
             HorizontalOptions="FillAndExpand"
             Orientation="Horizontal"
             VerticalOptions="StartAndExpand">
-            <Label
-                x:Name="LableSensorType"
-                Margin="10,0,0,0"
-                FontSize="16"
-                HorizontalOptions="Start"
-                Text="Sensor Type"
-                VerticalOptions="CenterAndExpand" />
+            <StackLayout>
+                <Label
+                    x:Name="LabelSensorType"
+                    Margin="10,0,0,0"
+                    FontSize="16"
+                    HorizontalOptions="Start"
+                    Text="Sensor Type"
+                    VerticalOptions="CenterAndExpand" />
+                <Label
+                    x:Name="LabelSensorLastUpdated"
+                    Margin="10,0,0,0"
+                    FontSize="12"
+                    HorizontalOptions="Start"
+                    Text="Date Not Provided"
+                    VerticalOptions="CenterAndExpand" />
+            </StackLayout>
 
             <StackLayout
                 Margin="0,0,10,0"

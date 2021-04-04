@@ -116,88 +116,84 @@
 
             </StackLayout>
         </Frame>
-        <StackLayout Padding="0,0,0,15" IsVisible="false">
-            <Label
-                FontAttributes="Bold"
-                FontSize="Large"
-                HorizontalOptions="Center"
-                Text="OR"
-                TextColor="Red"
-                TextDecorations="Underline"
-                VerticalOptions="Center" />
-        </StackLayout>
-
-        <Frame
-            BackgroundColor="White"
-            BorderColor="Black"
-            HorizontalOptions="FillAndExpand"
-            IsVisible="false">
-            <StackLayout Orientation="Horizontal">
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand">
-
-
-                    <StackLayout>
-
-                        <Label
-                            x:Name="LabelTxtInternalConnection"
-                            HorizontalOptions="Center"
-                            Text="Internal Connection"
-                            VerticalOptions="Center" />
-
-                        <Editor
-                            x:Name="TxtInternalConnection"
-                            FontSize="Small"
-                            HorizontalOptions="Fill" />
-
-
-                        <Label
-                            x:Name="LabelInternalPort"
-                            HorizontalOptions="Center"
-                            Text="Internal Port" />
-
-                        <Editor
-                            x:Name="TxtInternalPort"
-                            FontSize="Small"
-                            HorizontalOptions="Fill"
-                            Keyboard="Numeric" />
-
-                    </StackLayout>
-                </Frame>
-                <Frame BackgroundColor="White" BorderColor="Black">
-
-                    <StackLayout>
-                        <Label
-                            x:Name="LabelExternalConnection"
-                            HorizontalOptions="Center"
-                            Text="External Connection"
-                            VerticalOptions="Center" />
-
-                        <Editor
-                            x:Name="TxtExternalConnection"
-                            FontSize="Small"
-                            HorizontalOptions="Fill"
-                            VerticalOptions="Center" />
-
-                        <Label
-                            x:Name="LabelExternalPort"
-                            FontSize="Small"
-                            HorizontalOptions="Center"
-                            Text="External Port"
-                            VerticalOptions="Center" />
-
-                        <Editor
-                            x:Name="TxtExternalPort"
-                            FontSize="Small"
-                            HorizontalOptions="Fill"
-                            Keyboard="Numeric"
-                            VerticalOptions="Center" />
-                    </StackLayout>
-                </Frame>
+        <StackLayout x:Name="StackLayoutLocalConnection" IsVisible="False">
+            <StackLayout Padding="0,0,0,15">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="Large"
+                    HorizontalOptions="Center"
+                    Text="Network"
+                    TextColor="White"
+                    TextDecorations="Underline"
+                    VerticalOptions="Center" />
             </StackLayout>
-        </Frame>
+            <Frame
+                BackgroundColor="White"
+                BorderColor="Black"
+                HorizontalOptions="FillAndExpand">
+                <StackLayout Orientation="Horizontal">
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        HorizontalOptions="FillAndExpand">
+                        <StackLayout>
+                            <Label
+                                x:Name="LabelTxtInternalConnection"
+                                HorizontalOptions="Center"
+                                Text="Internal Connection"
+                                VerticalOptions="Center" />
+                            <Editor
+                                x:Name="TxtInternalConnection"
+                                FontSize="Small"
+                                HorizontalOptions="Fill" />
+
+
+                            <Label
+                                x:Name="LabelInternalPort"
+                                HorizontalOptions="Center"
+                                Text="Internal Port" />
+
+                            <Editor
+                                x:Name="TxtInternalPort"
+                                FontSize="Small"
+                                HorizontalOptions="Fill"
+                                Keyboard="Numeric" />
+
+                        </StackLayout>
+                    </Frame>
+                    <Frame BackgroundColor="White" BorderColor="Black">
+
+                        <StackLayout>
+                            <Label
+                                x:Name="LabelExternalConnection"
+                                HorizontalOptions="Center"
+                                Text="External Connection"
+                                VerticalOptions="Center" />
+
+                            <Editor
+                                x:Name="TxtExternalConnection"
+                                FontSize="Small"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Center" />
+
+                            <Label
+                                x:Name="LabelExternalPort"
+                                FontSize="Small"
+                                HorizontalOptions="Center"
+                                Text="External Port"
+                                VerticalOptions="Center" />
+
+                            <Editor
+                                x:Name="TxtExternalPort"
+                                FontSize="Small"
+                                HorizontalOptions="Fill"
+                                Keyboard="Numeric"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
 
 
         <Frame BackgroundColor="DeepSkyBlue" BorderColor="Gainsboro">
@@ -227,9 +223,10 @@
             <Button
                 x:Name="BtnAdvancedConnectionScreen"
                 BackgroundColor="DeepSkyBlue"
+                Clicked="BtnAdvancedConnectionScreen_OnClicked"
                 HorizontalOptions="EndAndExpand"
                 IsVisible="true"
-                Text="Advanced"
+                Text="Show Network"
                 TextColor="White"
                 VerticalOptions="End" />
         </StackLayout>

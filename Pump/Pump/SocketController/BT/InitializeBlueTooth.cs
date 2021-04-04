@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Plugin.BLE.Abstractions.Contracts;
-using Plugin.BLE.Abstractions.Exceptions;
 using Pump.Database;
-using Pump.Droid.Database.Table;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.BT
@@ -16,60 +14,76 @@ namespace Pump.SocketController.BT
     {
         private readonly ObservableIrrigation _observableIrrigation;
         public readonly BluetoothManager BlueToothManager;
+        public readonly Stopwatch RequestIrrigationTimer;
+        public bool RequestNow;
         private readonly PumpConnection _pumpConnection;
-        private bool _isAlive;
+        private bool _isSubscribed;
         public InitializeBlueTooth(ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
+            RequestIrrigationTimer = new Stopwatch();
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             BlueToothManager = new BluetoothManager();
-        }
-        
-        private async void PopulateBlueToothDeviceEvent(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var controllerBle =
-                BlueToothManager.DeviceList.FirstOrDefault(x => x.NativeDevice.ToString() == _pumpConnection.Mac);
-            if (controllerBle != null && _isAlive == false)
-                await ConnectToDevice(controllerBle);
         }
 
         public async Task SubscribeBle()
         {
-            BlueToothManager.DeviceList.CollectionChanged += PopulateBlueToothDeviceEvent;
-            BlueToothManager.AdapterBle.ScanTimeoutElapsed += AdapterBLE_ScanTimeoutElapsed;
-            await BlueToothManager.StartScanning();
-        }
-
-        private async void AdapterBLE_ScanTimeoutElapsed(object sender, EventArgs e)
-        {
-            if (!_isAlive)
+            while (true)
             {
-                await BlueToothManager.StartScanning();
+                _isSubscribed = true;
+                if (_pumpConnection.IDeviceGuid != Guid.Empty)
+                    await ConnectToDevice(_pumpConnection.IDeviceGuid);
+                else
+                {
+                    await BlueToothManager.StartScanning();
+                    do
+                    {
+                        var iDevice =
+                            BlueToothManager.DeviceList.FirstOrDefault(x =>
+                                x.NativeDevice.ToString() == _pumpConnection.Mac);
+                        if (iDevice == null)
+                            await Task.Delay(500);
+                        else
+                        {
+                            await ConnectToDevice(iDevice.Id);
+                        }
+                    } while (BlueToothManager.AdapterBle.IsScanning);
+
+                    if (_isSubscribed) continue;
+                }
+                break;
             }
         }
 
         public void Disposable()
         {
-            _isAlive = false;
-            BlueToothManager.DeviceList.CollectionChanged -= PopulateBlueToothDeviceEvent;
-            BlueToothManager.AdapterBle.ScanTimeoutElapsed -= AdapterBLE_ScanTimeoutElapsed;
+            _isSubscribed = false;
         }
 
-        private async Task ConnectToDevice(IDevice iDevice)
+        private async Task ConnectToDevice(Guid deviceId)
         {
-            await BlueToothManager.StopScanning();
-            _isAlive = true;
-
+            RequestIrrigationTimer.Start();
             var oldIrrigationTuple =
                 new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>>
                     (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(), new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
-            
-            while (_isAlive)
+            RequestNow = true;
+            while (_isSubscribed)
             {
+                while (CanRequestIrrigationData())
+                {
+                    await Task.Delay(500);
+                }
+
                 try
                 {
-                    await BlueToothManager.ConnectToDevice(iDevice);
-                    
+                    if (BlueToothManager.BleDevice == null)
+                    {
+                        //new Thread(() => BlueToothManager.ConnectToKnownDevice(deviceId)).Start();
+                        await BlueToothManager.ConnectToKnownDevice(deviceId);
+                        RequestIrrigationTimer.Restart();
+                        continue;
+                    }
+
                     var irrigationJObject = JObject.Parse(await GetIrrigationData());
                     
                     var irrigationTuple = IrrigationConvert.IrrigationJObjectToList(irrigationJObject);
@@ -81,21 +95,14 @@ namespace Pump.SocketController.BT
                     IrrigationConvert.UpdateObservableIrrigation(_observableIrrigation, irrigationTupleEditState);
                     oldIrrigationTuple = irrigationTuple;
                 }
-                catch (DeviceConnectionException ex)
+                catch (Exception)
                 {
-                    _isAlive = false;
+                    _isSubscribed = false;
+                    RequestIrrigationTimer.Stop();
                     OnConnectionLost();
-                    await BlueToothManager.StartScanning();
                     break;
                 }
-                catch (Exception ex)
-                {
-                    _isAlive = false;
-                    OnConnectionLost();
-                    await BlueToothManager.StartScanning();
-                    break;
-                }
-                //await Task.Delay(15000);
+                RequestIrrigationTimer.Restart();
             }
         }
 
@@ -126,6 +133,18 @@ namespace Pump.SocketController.BT
             return await BlueToothManager.SendAndReceiveToBle(SocketCommands.AllTogether());
         }
 
+        private bool CanRequestIrrigationData()
+        {
+            if (!RequestNow)
+            {
+                return RequestIrrigationTimer.Elapsed <= TimeSpan.FromSeconds(15);
+            }
+
+            RequestNow = false;
+            RequestIrrigationTimer.Restart();
+            return false;
+
+        }
 
     }
 }

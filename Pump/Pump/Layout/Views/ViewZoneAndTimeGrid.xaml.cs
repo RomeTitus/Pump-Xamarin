@@ -14,7 +14,7 @@ namespace Pump.Layout.Views
         public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet = false)
         {
             InitializeComponent();
-            _equipment = equipment;
+            _equipment = equipment ?? new Equipment{NAME = "Unknown Zone"};
             _scheduleDetail = scheduleDetail;
             LabelZoneTime.AutomationId = _equipment.ID;
             LabelZoneName.Text = _equipment.NAME;

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using nexus.core;
 using Pump.Class;
 using Pump.Database;
-using Pump.Droid.Database.Table;
+using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.Layout;
 using Pump.SocketController;
+using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 
@@ -23,14 +22,14 @@ namespace Pump
         private readonly PumpConnection _pumpConnection = new PumpConnection();
         private double _height;
         private double _width;
-        private readonly ControllerEvent _controllerEvent;
+        private readonly NotificationEvent _notificationEvent;
 
-        public ExistingController(bool firstConnection, ControllerEvent controllerEvent, PumpConnection pumpConnection = null)
+        public ExistingController(bool firstConnection, NotificationEvent notificationEvent, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
             FrameAddSystemTap.Tapped += FrameAddSystemTap_Tapped;
-            _controllerEvent = controllerEvent;
-            _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
+            _notificationEvent = notificationEvent;
+            _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             if (pumpConnection != null)
             {
                 _pumpConnection = pumpConnection;
@@ -71,7 +70,11 @@ namespace Pump
 
         private void PopulateElements()
         {
-            ConnectionPicker.Items.AddAll(_pumpConnection.ConnectionTypeList);
+            foreach (var ConnectionType in _pumpConnection.ConnectionTypeList)
+            {
+                ConnectionPicker.Items.Add(ConnectionType);
+            }
+            
             ConnectionPicker.SelectedIndex = _pumpConnection.ConnectionType;
 
             TxtControllerName.Text = _pumpConnection.Name;
@@ -293,7 +296,7 @@ namespace Pump
         {
             var databaseController = new DatabaseController();
             databaseController.UpdateControllerConnection(pumpConnection);
-            _controllerEvent.NewControllerConnection();
+            _notificationEvent.UpdateStatus();
         }
 
        
@@ -330,11 +333,25 @@ namespace Pump
 
         private void BtnNewController_OnClicked(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new BlueToothScan(_controllerEvent));
+            Navigation.PushModalAsync(new BlueToothScan(_notificationEvent));
         }
-        private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
+        private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
         {
             await Navigation.PopModalAsync();
+        }
+
+        private void BtnAdvancedConnectionScreen_OnClicked(object sender, EventArgs e)
+        {
+            StackLayoutLocalConnection.IsVisible = !StackLayoutLocalConnection.IsVisible;
+            
+            if (StackLayoutLocalConnection.IsVisible)
+            {
+                BtnAdvancedConnectionScreen.Text = "Hide Network";
+            }
+            else
+            {
+                BtnAdvancedConnectionScreen.Text = "Show Network";
+            }
         }
     }
 }

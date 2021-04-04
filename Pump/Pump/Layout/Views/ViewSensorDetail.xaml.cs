@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using EmbeddedImages;
+using Pump.Class;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -27,19 +28,25 @@ namespace Pump.Layout.Views
             Sensor = sensor;
             AutomationId = Sensor.ID;
             this.HeightRequest = 150 * size;
-            LableSensorType.FontSize *= size;
+            LabelSensorType.FontSize *= size;
             LabelSensorName.FontSize *= size;
             PopulateSensor();
         }
 
         public void PopulateSensor()
         {
-            LableSensorType.Text = Sensor.TYPE;
+            LabelSensorType.Text = Sensor.TYPE;
             LabelSensorName.Text = Sensor.NAME;
-            
-            if (Sensor.TYPE == "Pressure Sensor")
+            if(Sensor.LastUpdated != null)
+                LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime().ToString(CultureInfo.InvariantCulture);
+            switch (Sensor.TYPE)
             {
-                PressureSensor();
+                case "Pressure Sensor":
+                    PressureSensor();
+                    break;
+                case "Temperature Sensor":
+                    TemperatureSensor();
+                    break;
             }
 
             if (_oldImage != _image)
@@ -54,13 +61,13 @@ namespace Pump.Layout.Views
 
         private void PressureSensor()
         {
-            var reading = Convert.ToDouble(Sensor.LastReading);
+            var reading = Convert.ToDouble(Sensor.LastReading, CultureInfo.InvariantCulture);
             
             var voltage = reading * 5.0 / 1024.0;
 
-            var pressure_pascal = 3.0 * (voltage - 0.47) * 1000000.0;
+            var pressurePascal = 3.0 * (voltage - 0.47) * 1000000.0;
 
-            var bars = pressure_pascal / 10e5;
+            var bars = pressurePascal / 10e5;
 
             try
             {
@@ -79,6 +86,24 @@ namespace Pump.Layout.Views
             {
                 LableSensorStatus.Text = "Could Not Read Pressure :/";
                 _image = "Pump.Icons.PressureLow.png";
+            }
+        }
+
+        private void TemperatureSensor()
+        {
+            try
+            {
+                var reading = Convert.ToDouble(Sensor.LastReading, CultureInfo.InvariantCulture);
+
+                _image = reading > 8 ? "Pump.Icons.Temp_High.png" : "Pump.Icons.Temp_Low.png";
+                LableSensorStatus.Text = Sensor.LastReading + "°C";
+                
+                    
+            }
+            catch
+            {
+                LableSensorStatus.Text = "Could Not Read Temperature :/";
+                _image = "Pump.Icons.Temp_Unknown.png";
             }
         }
     }

@@ -7,24 +7,21 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using nexus.core;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
+using Pump.Database;
 
 namespace Pump.SocketController.BT
 {
     public class BluetoothManager
     {
         private ICharacteristic _loadedCharacteristic = null;
-        public const string IrrigationServiceCode = "00000001-710e-4a5b-8d75-3e5b444bc3cf";
-        #region Singleton
-        private static readonly Lazy<BluetoothManager> lazyBluetoothManager = new Lazy<BluetoothManager>(() => new BluetoothManager());
-        public static BluetoothManager Instance
-        {
-            get { return lazyBluetoothManager.Value; }
-
-        }
-        #endregion
+        private const string IrrigationServiceCode = "00000001-710e-4a5b-8d75-3e5b444bc3cf";
+        
+        //#region Singleton
+        //private static readonly Lazy<BluetoothManager> LazyBluetoothManager = new Lazy<BluetoothManager>(() => new BluetoothManager());
+        //public static BluetoothManager Instance => LazyBluetoothManager.Value;
+        //#endregion
         
         public IAdapter AdapterBle { get; set; }
         public IDevice BleDevice { get; set; }
@@ -68,12 +65,64 @@ namespace Pump.SocketController.BT
             }
         }
 
-        public async Task ConnectToDevice(IDevice device)
+        public async Task<bool> ConnectToKnownDevice(Guid deviceId)
         {
+            var cancellationToken = new CancellationTokenSource();
+            cancellationToken.CancelAfter(10000);
             if (BleDevice == null)
             {
-                await AdapterBle.ConnectToDeviceAsync(device);
-                BleDevice = device;
+                try
+                {
+                    var result = await AdapterBle.ConnectToKnownDeviceAsync(deviceId, cancellationToken: cancellationToken.Token);
+                    BleDevice = result;
+                    SaveIDevice(BleDevice);
+                }
+                catch(Exception)
+                {
+                    cancellationToken.Dispose();
+                }
+                
+                //await AdapterBle.ConnectToDeviceAsync(device);
+                
+            }
+
+            return BleDevice != null;
+        }
+
+        public async Task<bool> ConnectToDevice(IDevice device)
+        {
+            var cancellationToken = new CancellationTokenSource();
+            cancellationToken.CancelAfter(15000);
+            if (BleDevice == null)
+            {
+                try
+                {
+                    await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+                    BleDevice = device;
+                    SaveIDevice(BleDevice);
+                }
+                catch (Exception)
+                {
+                    cancellationToken.Dispose();
+                }
+
+            }
+
+            return BleDevice != null;
+        }
+
+        private void SaveIDevice(IDevice iDevice)
+        {
+            if(iDevice == null)
+                return;
+            var currentController = new DatabaseController().GetControllerConnectionSelection();
+            if(iDevice.NativeDevice.ToString() == currentController.Mac)
+            {
+                if (currentController.IDeviceGuid != iDevice.Id)
+                {
+                    currentController.IDeviceGuid = iDevice.Id;
+                    new DatabaseController().UpdateControllerConnection(currentController);
+                }
             }
         }
 
@@ -82,6 +131,7 @@ namespace Pump.SocketController.BT
             if (AdapterBle.IsScanning)
             {
                 Debug.WriteLine("Still scanning, stopping the scan");
+                
                 await AdapterBle.StopScanningForDevicesAsync();
             }
         }
@@ -110,7 +160,7 @@ namespace Pump.SocketController.BT
             Debug.WriteLine("Timeout", "Bluetooth scan timeout elapsed");
         }
 
-        public async Task DisconnectDevice()
+        private async Task DisconnectDevice()
         {
             if (BleDevice != null)
             {
@@ -145,7 +195,7 @@ namespace Pump.SocketController.BT
             if (_loadedCharacteristic == null)
             {
                 var services = await BleDevice.GetServicesAsync();
-                if (services == null)
+                if (services == null || !services.Any())
                     return null;
                 var characteristics = await services[0].GetCharacteristicsAsync();
                 _loadedCharacteristic = characteristics[0];
@@ -156,13 +206,10 @@ namespace Pump.SocketController.BT
 
             var fullData = false;
             var bleReplyBytes = new List<byte>();
+            var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
             var partNumber = 0;
             while (fullData == false)
             {
-                
-                var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
-
-                
                 if (dataToSend.ContainsKey("Task"))
                     try
                     {
@@ -172,22 +219,23 @@ namespace Pump.SocketController.BT
                     {
                         // ignored
                     }
-                
-                var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
 
+                var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
                 var finalBytesReceived = new byte[0];
                 //Sending Large amounts of Data :/
                 for (var i = 0; i < bytes.Count; i+= 508)
                 {
-                    var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;                   
+                    var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;
+                    
                     sendingBytes.InsertRange(0, key);
+                    
                     finalBytesReceived = await WriteToBle(sendingBytes.ToArray(), timeout);
                 }
 
-                partNumber++;
                 bleReplyBytes.AddRange(finalBytesReceived);
                 if (finalBytesReceived.Length != 512)
                     fullData = true;
+                partNumber++;
             }
             return ConvertForApplication(Encoding.ASCII.GetString(bleReplyBytes.ToArray(), 0, bleReplyBytes.Count));
         }
@@ -198,7 +246,7 @@ namespace Pump.SocketController.BT
             await Task.Delay(timeout);
             var result = await _loadedCharacteristic.ReadAsync();
             if (Encoding.ASCII.GetString(result, 0, result.Length) == Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
-                throw new Exception("Controller did not reply back using BlueTooth \n reboot required");
+                throw new Exception("Controller did not reply back using BlueTooth \n Reboot required");
             return result;
         }
     }

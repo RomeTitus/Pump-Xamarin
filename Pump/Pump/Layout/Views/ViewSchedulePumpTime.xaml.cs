@@ -10,9 +10,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSchedulePumpTime : ContentView
     {
-        private Schedule _schedule;
+        private IrrigationController.Schedule _schedule;
         private  Equipment _equipment;
-        public ViewSchedulePumpTime(Schedule schedule, Equipment equipment)
+        public ViewSchedulePumpTime(IrrigationController.Schedule schedule, Equipment equipment)
         {
             InitializeComponent();
             _schedule = schedule;
@@ -27,7 +27,7 @@ namespace Pump.Layout.Views
             PopupNavigation.Instance.PopAsync();
         }
 
-        public MaskedEntry getPumpDurationTime()
+        public MaskedEntry GetPumpDurationTime()
         {
             return MaskedEntryTime;
         }
@@ -35,11 +35,6 @@ namespace Pump.Layout.Views
         public Button GetPumpDurationButton()
         {
             return ButtonEditSchedulePump;
-        }
-
-        public Picker getPumpPicker()
-        {
-            return PumpPicker;
         }
     }
 }

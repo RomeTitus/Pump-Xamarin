@@ -16,6 +16,7 @@
     <None Remove="Icons\CustomSchedule.png" />
     <None Remove="Icons\FieldSun.png" />
     <None Remove="Icons\Home.png" />
+    <None Remove="Icons\Icons.rar" />
     <None Remove="Icons\Logo.jpg" />
     <None Remove="Icons\Logo.png" />
     <None Remove="Icons\ManualSchedule.png" />
@@ -25,20 +26,30 @@
     <None Remove="Icons\pump.jpg" />
     <None Remove="Icons\rain.png" />
     <None Remove="Icons\setting.png" />
+    <None Remove="Icons\Signal_1.png" />
+    <None Remove="Icons\Signal_2.png" />
+    <None Remove="Icons\Signal_3.png" />
+    <None Remove="Icons\Signal_4.png" />
+    <None Remove="Icons\Signal_5.png" />
+    <None Remove="Icons\Signal_NoSignal.png" />
     <None Remove="Icons\sprinkler.jpg" />
     <None Remove="Icons\SwitchController.png" />
+    <None Remove="Icons\Temp_High.png" />
+    <None Remove="Icons\Temp_Low.png" />
+    <None Remove="Icons\Temp_Unknown.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ble.net" Version="1.2.1" />
-    <PackageReference Include="FirebaseDatabase.net" Version="4.0.5" />
+    <PackageReference Include="FirebaseDatabase.net" Version="4.0.6" />
     <PackageReference Include="LiteDB" Version="5.0.10" />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.11" />
-    <PackageReference Include="MvvmCross" Version="7.1.2" />
-    <PackageReference Include="MvvmCross.Plugin.BLE" Version="2.2.0-pre2" />
+    <PackageReference Include="Microcharts.Forms" Version="1.0.0-preview1" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12" />
     <PackageReference Include="Plugin.BLE" Version="2.2.0-pre2" />
-    <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.10" />
+    <PackageReference Include="Plugin.FirebasePushNotification" Version="3.3.16-beta" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.12" />
+    <PackageReference Include="SkiaSharp.Views.Forms" Version="2.80.2" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.0-beta" />
+    <PackageReference Include="Xamarin.CommunityToolkit" Version="1.2.0-pre2" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     <PackageReference Include="Xamarin.Forms.MaskedEntry" Version="1.0.0" />
@@ -58,11 +69,29 @@
     <EmbeddedResource Include="Icons\pump.jpg" />
     <EmbeddedResource Include="Icons\rain.png" />
     <EmbeddedResource Include="Icons\setting.png" />
+    <EmbeddedResource Include="Icons\Signal_1.png" />
+    <EmbeddedResource Include="Icons\Signal_2.png" />
+    <EmbeddedResource Include="Icons\Signal_3.png" />
+    <EmbeddedResource Include="Icons\Signal_4.png" />
+    <EmbeddedResource Include="Icons\Signal_5.png" />
+    <EmbeddedResource Include="Icons\Signal_NoSignal.png" />
     <EmbeddedResource Include="Icons\sprinkler.jpg" />
     <EmbeddedResource Include="Icons\SwitchController.png" />
+    <EmbeddedResource Include="Icons\Temp_High.png" />
+    <EmbeddedResource Include="Icons\Temp_Low.png" />
+    <EmbeddedResource Include="Icons\Temp_Unknown.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Microsoft.UI.Xaml">
+      <HintPath>..\..\..\..\..\.nuget\packages\microsoft.ui.xaml\2.4.3\lib\uap10.0\Microsoft.UI.Xaml.winmd</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Layout\ChartEntryFilterScreen.xaml.cs">
+      <DependentUpon>ChartEntryFilterScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Layout\ExistingController.xaml.cs">
       <DependentUpon>ExistingController.xaml</DependentUpon>
     </Compile>
@@ -129,7 +158,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Layout\ConnectionScreen.xaml">
+    <EmbeddedResource Update="Layout\ChartEntryFilterScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\FloatingScreen.xaml">
@@ -148,6 +177,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Dashboard\SettingPageHomeScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Layout\RecordScreen.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Layout\Schedule\CustomScheduleUpdate.xaml">

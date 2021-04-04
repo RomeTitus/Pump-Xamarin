@@ -13,13 +13,13 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class BlueToothScan : ContentPage
     {
-        private ControllerEvent _controllerEvent;
-        private BluetoothManager _bluetoothManager;
-        public BlueToothScan(ControllerEvent controllerEvent)
+        private readonly NotificationEvent _notificationEvent;
+        private readonly BluetoothManager _bluetoothManager;
+        public BlueToothScan(NotificationEvent notificationEvent)
         {
             InitializeComponent();
-            _controllerEvent = controllerEvent;
-            _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
+            _notificationEvent = notificationEvent;
+            _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             _bluetoothManager = new BluetoothManager();
             _bluetoothManager.DeviceList.CollectionChanged += PopulateBluetoothDeviceEvent;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
@@ -51,7 +51,7 @@ namespace Pump.Layout
         {
             var viewBlueTooth = (StackLayout) sender;
             var blueToothDevice =
-                _bluetoothManager.DeviceList.First(x => x.Id.ToString() == viewBlueTooth.AutomationId);
+                _bluetoothManager.DeviceList.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
 
             var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
                 "Accept", "Cancel");
@@ -63,7 +63,7 @@ namespace Pump.Layout
                     var isController = await _bluetoothManager.IsController();
                     if (isController)
                     {
-                        await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _controllerEvent));
+                        await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
                     }
                     else
                         await DisplayAlert("Irrigation", "Not verified controller", "Understood");
@@ -134,7 +134,7 @@ namespace Pump.Layout
             BtnScan.Text = "Start Scan";
         }
 
-        private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
+        private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
         {
             await Navigation.PopModalAsync();
         }

@@ -9,25 +9,34 @@ using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump.Layout
+namespace Pump.Layout.Schedule
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScheduleUpdate : ContentPage
     {
         private readonly List<Equipment> _equipmentList;
-        private Schedule _schedule;
+        private IrrigationController.Schedule _schedule;
         private readonly List<string> _pumpIdList = new List<string>();
         private ViewSchedulePumpTime _pumpSelectedTime;
         private readonly SocketPicker _socketPicker;
 
-        public ScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker, Schedule schedule = null)
+        public ScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker, IrrigationController.Schedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;
             _socketPicker = socketPicker;
-            if (schedule == null)
-                schedule = new Schedule();
             _schedule = schedule;
+            if (_schedule == null)
+                _schedule = new IrrigationController.Schedule();
+            else
+            {
+                ButtonCreateSchedule.Text = "SAVE";
+                ScheduleName.Text = _schedule.NAME;
+                MaskedEntryTime.Text = _schedule.TIME;
+                var selectWeekThread = new Thread(SetSelectedWeek);
+                selectWeekThread.Start();
+            }
+            
 
             //SetUpWeekDays(); //Not sure where this should go
             new Thread(SetUpWeekDays).Start();
@@ -36,14 +45,6 @@ namespace Pump.Layout
             ButtonCreateSchedule.IsEnabled = true;
             PumpPicker.IsEnabled = true;
             
-            if (schedule != null)
-            {
-                ButtonCreateSchedule.Text = "SAVE";
-                ScheduleName.Text = _schedule.NAME;
-                MaskedEntryTime.Text = _schedule.TIME;
-                var selectWeekThread = new Thread(SetSelectedWeek);
-                selectWeekThread.Start();
-            }
 
         }
 
@@ -72,10 +73,10 @@ namespace Pump.Layout
                     ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail, equipment, true));
                 }
             }
-            catch
+            catch (Exception e)
             {
                 ScrollViewZoneDetail.Children.Clear();
-                ScrollViewZoneDetail.Children.Add(new ViewException());
+                ScrollViewZoneDetail.Children.Add(new ViewException(e));
             }
         }
 
@@ -206,7 +207,7 @@ namespace Pump.Layout
             else
             {
                 if (_schedule == null)
-                    _schedule = new Schedule();
+                    _schedule = new IrrigationController.Schedule();
                 _schedule.NAME = ScheduleName.Text;
                 _schedule.id_Pump = _pumpIdList[PumpPicker.SelectedIndex];
                 _schedule.TIME = MaskedEntryTime.Text;
@@ -223,7 +224,7 @@ namespace Pump.Layout
                 {
                     var floatingScreen = new FloatingScreen();
                     await PopupNavigation.Instance.PushAsync(floatingScreen);
-                    _pumpSelectedTime = new ViewSchedulePumpTime(_schedule, _equipmentList.First(x => x.ID == _schedule.id_Pump));
+                    _pumpSelectedTime = new ViewSchedulePumpTime(_schedule, _equipmentList.First(x => x?.ID == _schedule.id_Pump));
                     _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
                     floatingScreen.SetFloatingScreen(new List<object> { _pumpSelectedTime });
                 }
@@ -325,7 +326,7 @@ namespace Pump.Layout
                     new ScheduleDetail()
                     {
                         id_Equipment = _pumpIdList[PumpPicker.SelectedIndex],
-                        DURATION = _pumpSelectedTime.getPumpDurationTime().Text
+                        DURATION = _pumpSelectedTime.GetPumpDurationTime().Text
                     }
                 };
                 await _socketPicker.SendCommand(_schedule);
@@ -338,15 +339,15 @@ namespace Pump.Layout
 
         private string SendSelectedPumpValidate(string notification, string pumpName)
         {
-            if (!string.IsNullOrWhiteSpace(_pumpSelectedTime.getPumpDurationTime().Text) &&
-                _pumpSelectedTime.getPumpDurationTime().Text.Length >= 4) return notification;
+            if (!string.IsNullOrWhiteSpace(_pumpSelectedTime.GetPumpDurationTime().Text) &&
+                _pumpSelectedTime.GetPumpDurationTime().Text.Length >= 4) return notification;
             if (string.IsNullOrWhiteSpace(notification))
                 notification = "\u2022 " + pumpName + " time format is incorrect";
             else
                 notification += "\n\u2022 " + pumpName + " time format is incorrect";
 
-            _pumpSelectedTime.getPumpDurationTime().TextColor = Color.Red;
-            _pumpSelectedTime.getPumpDurationTime().PlaceholderColor = Color.Red;
+            _pumpSelectedTime.GetPumpDurationTime().TextColor = Color.Red;
+            _pumpSelectedTime.GetPumpDurationTime().PlaceholderColor = Color.Red;
 
             return notification;
         }

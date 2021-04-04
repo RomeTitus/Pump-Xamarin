@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Plugin.BLE.Abstractions.Contracts;
-using Plugin.BLE.Abstractions.Exceptions;
 using Pump.Database;
-using Pump.Droid.Database.Table;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.BT
@@ -15,58 +12,81 @@ namespace Pump.SocketController.BT
     class InitializeNetwork
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        public readonly NetworkManager _networkManager;
+        public readonly NetworkManager NetworkManager;
+        public readonly Stopwatch RequestIrrigationTimer;
         private readonly PumpConnection _pumpConnection;
-        private bool _isAlive;
+        private bool _isSubscribed;
+        public bool RequestNow;
         public InitializeNetwork(ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
+            RequestIrrigationTimer = new Stopwatch();
             _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
-            _networkManager = new NetworkManager();
+            NetworkManager = new NetworkManager();
         }
 
 
         public async Task SubscribeNetwork()
         {
+            _isSubscribed = true;
             await ConnectToDevice();
         }
 
         public void Disposable()
         {
-            _isAlive = false;
+            _isSubscribed = false;
         }
+
 
         private async Task ConnectToDevice()
         {
-            _isAlive = true;
-
+            RequestIrrigationTimer.Start();
             var oldIrrigationTuple =
                 new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>>
                     (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(), new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
-            
-            while (_isAlive)
+            RequestNow = true;
+            while (_isSubscribed)
             {
+                while (CanRequestIrrigationData())
+                {
+                    await Task.Delay(500);
+                }
+
                 try
                 {
                     var irrigationJObject = JObject.Parse(await GetIrrigationData());
-                    
+
                     var irrigationTuple = IrrigationConvert.IrrigationJObjectToList(irrigationJObject);
 
                     var irrigationTupleEditState =
                         IrrigationConvert.CheckUpdatedStatus(irrigationTuple, oldIrrigationTuple);
 
-                    
+
                     IrrigationConvert.UpdateObservableIrrigation(_observableIrrigation, irrigationTupleEditState);
                     oldIrrigationTuple = irrigationTuple;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    _isAlive = false;
+                    _isSubscribed = false;
+                    RequestIrrigationTimer.Stop();
                     OnConnectionLost();
                     break;
                 }
-                await Task.Delay(15000);
+                RequestIrrigationTimer.Restart();
             }
+        }
+
+        private bool CanRequestIrrigationData()
+        {
+            if (!RequestNow)
+            {
+                return RequestIrrigationTimer.Elapsed <= TimeSpan.FromSeconds(15);
+            }
+
+            RequestNow = false;
+            RequestIrrigationTimer.Restart();
+            return false;
+
         }
 
         private void OnConnectionLost()
@@ -93,7 +113,7 @@ namespace Pump.SocketController.BT
 
         private async Task<string> GetIrrigationData()
         {
-            return await _networkManager.SendAndReceiveToNetwork(SocketCommands.AllTogether(), _pumpConnection);
+            return await NetworkManager.SendAndReceiveToNetwork(SocketCommands.AllTogether(), _pumpConnection);
         }
 
 

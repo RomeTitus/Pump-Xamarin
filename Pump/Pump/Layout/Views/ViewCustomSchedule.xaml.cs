@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Pump.Class;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -12,10 +10,11 @@ namespace Pump.Layout.Views
     public partial class ViewCustomSchedule : ContentView
     {
         public CustomSchedule Schedule { get; set; }
-        public Equipment Equipment { get; set; }
+        public Equipment Equipment { get;}
         public ViewCustomSchedule(CustomSchedule schedule, Equipment equipment)
         {
             InitializeComponent();
+            AutomationId = schedule.ID;
             Schedule = schedule;
             Equipment = equipment;
             Populate();
@@ -48,7 +47,8 @@ namespace Pump.Layout.Views
 
             labelScheduleName.Text = Schedule.NAME;
             
-            LabelPumpName.Text = Equipment.NAME;
+            if(Equipment != null)
+                LabelPumpName.Text = Equipment.NAME;
             
 
         }

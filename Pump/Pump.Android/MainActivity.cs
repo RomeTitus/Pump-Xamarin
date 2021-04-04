@@ -1,20 +1,24 @@
 ﻿using Android;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
 using Rg.Plugins.Popup.Services;
 using Android.Util;
-using nexus.protocols.ble;
+using Plugin.FirebasePushNotification;
+using Pump.Droid.Notification;
+using Pump.Notification;
+using Xamarin.Forms;
 using ConnectionResult = Android.Gms.Common.ConnectionResult;
 
 namespace Pump.Droid
 {
-    [Activity(Label = "Pump", Icon = "@drawable/Logo", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Pump", Icon = "@drawable/Logo", Theme = "@style/MainTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        private readonly string[] Permissions =
+        private readonly string[] _permissions =
         {
             Manifest.Permission.Bluetooth,
             Manifest.Permission.BluetoothAdmin,
@@ -23,44 +27,27 @@ namespace Pump.Droid
         };
 
         public const string TAG = "MainActivity";
-        internal static readonly string CHANNEL_ID = "my_notification_channel";
         protected override void OnCreate(Bundle savedInstanceState)
         {
-
-            TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
-
             base.OnCreate(savedInstanceState);
-
             
-
-
-            if (Intent.Extras != null)
+            if (Intent?.Extras != null)
             {
-                foreach (var key in Intent.Extras.KeySet())
+                foreach (var key in Intent?.Extras?.KeySet())
                 {
-                    if (key == null) continue;
                     var value = Intent.Extras.GetString(key);
-                    Log.Debug(TAG, "Key: {0} Value: {1}", key, value);
+                    Log.Debug(TAG, "Key: {0} Value: {1}", key, value ?? string.Empty);
                 }
             }
             Rg.Plugins.Popup.Popup.Init(this);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            //TODO fix this
-            try
-            {
-                BluetoothLowEnergyAdapter.Init(this);
-            }
-            catch
-            {
-                //ignore
-            }
-            
+            Forms.Init(this, savedInstanceState);
+
             CheckPermissions();
             IsPlayServicesAvailable();
             LoadApplication(new App());
-            
+            FirebasePushNotificationManager.ProcessIntent(this, Intent);
+
         }
 
 
@@ -68,7 +55,7 @@ namespace Pump.Droid
         {
             bool minimumPermissionsGranted = true;
 
-            foreach (string permission in Permissions)
+            foreach (string permission in _permissions)
             {
                 if (CheckSelfPermission(permission) != Permission.Granted)
                 {
@@ -79,7 +66,7 @@ namespace Pump.Droid
             // If any of the minimum permissions aren't granted, we request them from the user
             if (!minimumPermissionsGranted)
             {
-                RequestPermissions(Permissions, 0);
+                RequestPermissions(_permissions, 0);
             }
         }
 
@@ -109,9 +96,23 @@ namespace Pump.Droid
             return true;
         }
 
+        protected override void OnNewIntent(Intent intent)
+        {
+            base.OnNewIntent(intent);
+            FirebasePushNotificationManager.ProcessIntent(this, intent);
+            CreateNotificationFromIntent(intent);
+        }
 
-       
-
+        void CreateNotificationFromIntent(Intent intent)
+        {
+            if (intent?.Extras != null)
+            {
+                string title = intent.GetStringExtra(AndroidNotificationManager.TitleKey);
+                string message = intent.GetStringExtra(AndroidNotificationManager.MessageKey);
+                string controllerName = intent.GetStringExtra(AndroidNotificationManager.ControllerNameKey);
+                DependencyService.Get<INotificationManager>().ReceiveNotification(title, message, controllerName);
+            }
+        }
 
         public override void OnBackPressed()
         {

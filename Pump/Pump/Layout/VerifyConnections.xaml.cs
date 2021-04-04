@@ -28,14 +28,12 @@ namespace Pump.Layout
         public void InternalSuccess()
         {
             LabelInternalConnection.Text = "Internal Connection was successful";
-            new DatabaseController().SetActivityStatus(new ActivityStatus(true));
             success = true;
         }
 
         public void ExternalSuccess()
         {
             LabelExternalConnection.Text = "External Connection was successful";
-            new DatabaseController().SetActivityStatus(new ActivityStatus(true));
             success = true;
         }
 

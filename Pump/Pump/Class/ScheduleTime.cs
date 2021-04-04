@@ -5,34 +5,6 @@ namespace Pump.Class
 {
     internal class ScheduleTime
     {
-        public static string TimeDiffNow(string time)
-        {
-            try
-            {
-
-                var datetime = Convert.ToDateTime(time);
-
-                var dateDiff = datetime - DateTime.Now;
-                var hour = Convert.ToInt32(Math.Floor(Convert.ToDouble(dateDiff.TotalHours.ToString(CultureInfo.InvariantCulture))));
-                var minute = Math.Ceiling(Convert.ToDouble(dateDiff.Minutes.ToString()));
-                if (Convert.ToDouble(dateDiff.Seconds.ToString()) > 0) minute += 1;
-                var stringHour = hour.ToString();
-                var stringMinute = minute.ToString(CultureInfo.InvariantCulture);
-
-                if (minute < 10)
-                    stringMinute = "0" + minute;
-
-                if (hour < 10)
-                    stringHour = "0" + hour;
-
-                return stringHour + ":" + stringMinute;
-            }
-            catch (Exception)
-            {
-                return time;
-            }
-        }
-
         public static string ConvertTimeSpanToString(TimeSpan timeSpan)
         {
             string hour;

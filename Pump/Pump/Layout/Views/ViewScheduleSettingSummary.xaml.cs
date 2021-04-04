@@ -9,13 +9,14 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleSettingSummary : ContentView
     {
-        public Schedule Schedule;
-        public readonly Equipment _equipment;
-        public ViewScheduleSettingSummary(Schedule schedule, Equipment equipment)
+        public IrrigationController.Schedule Schedule;
+        public readonly Equipment Equipment;
+        public ViewScheduleSettingSummary(IrrigationController.Schedule schedule, Equipment equipment)
         {
             InitializeComponent();
             Schedule = schedule;
-            _equipment = equipment;
+            Equipment = equipment ?? new Equipment();
+            AutomationId = schedule.ID;
             switchScheduleIsActive.AutomationId = Schedule.ID;
             StackLayoutViewSchedule.AutomationId = Schedule.ID;
             Populate();
@@ -26,7 +27,7 @@ namespace Pump.Layout.Views
             labelScheduleName.Text = Schedule.NAME;
             labelScheduleTime.Text = Schedule.TIME;
             
-            LabelPumpName.Text = _equipment.NAME;
+            LabelPumpName.Text = Equipment.NAME;
             
             switchScheduleIsActive.IsToggled = !Schedule.isActive.Contains("0");
             SetWeek();

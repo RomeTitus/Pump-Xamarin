@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace Pump.Droid.Database.Table
+namespace Pump.Database.Table
 {
     public class PumpSelection
     {

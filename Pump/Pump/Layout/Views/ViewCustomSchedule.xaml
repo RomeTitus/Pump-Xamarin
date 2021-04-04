@@ -40,7 +40,7 @@
                     <Image HeightRequest="15" Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
-                        Text="Big Pump"
+                        Text="Unknown"
                         VerticalOptions="Center" />
                 </StackLayout>
 

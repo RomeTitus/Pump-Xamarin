@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.IrrigationController;
@@ -172,52 +177,72 @@ namespace Pump.SocketController
             if (entity.GetType() == typeof(ManualSchedule))
             {
                 ManualSchedule manualSchedule = (ManualSchedule)entity;
-                return manualSchedule.DeleteAwaiting ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule);
+                return CleanJObject(manualSchedule.DeleteAwaiting ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule));
             }
 
             if (entity.GetType() == typeof(Schedule))
             {
                 Schedule schedule = (Schedule)entity;
-                return schedule.DeleteAwaiting ? DeleteSchedule(schedule) : SetSchedule(schedule);
+                return CleanJObject(schedule.DeleteAwaiting ? DeleteSchedule(schedule) : SetSchedule(schedule));
             }
 
             if (entity.GetType() == typeof(CustomSchedule))
             {
                 CustomSchedule customSchedule = (CustomSchedule)entity;
-                return customSchedule.DeleteAwaiting ? DeleteCustomSchedule(customSchedule) : SetCustomSchedule(customSchedule);
+                return CleanJObject(customSchedule.DeleteAwaiting ? DeleteCustomSchedule(customSchedule) : SetCustomSchedule(customSchedule));
             }
 
             if (entity.GetType() == typeof(Equipment))
             {
                 Equipment equipment = (Equipment)entity;
-                return equipment.DeleteAwaiting ? DeleteEquipment(equipment) : SetEquipment(equipment);
+                return CleanJObject(equipment.DeleteAwaiting ? DeleteEquipment(equipment) : SetEquipment(equipment));
             }
 
             if (entity.GetType() == typeof(Sensor))
             {
                 Sensor sensor = (Sensor)entity;
-                return sensor.DeleteAwaiting ? DeleteSensor(sensor) : SetSensor(sensor);
+                return CleanJObject(sensor.DeleteAwaiting ? DeleteSensor(sensor) : SetSensor(sensor));
             }
 
             if (entity.GetType() == typeof(Site))
             {
                 Site site = (Site)entity;
-                return site.DeleteAwaiting ? DeleteSite(site) : SetSite(site);
+                return CleanJObject(site.DeleteAwaiting ? DeleteSite(site) : SetSite(site));
             }
 
             if (entity.GetType() == typeof(SubController))
             {
                 SubController subController = (SubController)entity;
-                return subController.DeleteAwaiting ? DeleteSubController(subController) : SetSubController(subController);
+                return CleanJObject(subController.DeleteAwaiting ? DeleteSubController(subController) : SetSubController(subController));
             }
             //TODO see how this will work with BlueTooth / Socket
             if (entity.GetType() == typeof(Alive))
             {
                 Alive alive = (Alive)entity;
-                return (JObject) ScheduleTime.GetUnixTimeStampUtcNow();
+                return CleanJObject((JObject) ScheduleTime.GetUnixTimeStampUtcNow());
             }
 
             return null;
+            
+        }
+
+        private static JObject CleanJObject(JObject jObject)
+        {
+            foreach (var type in jObject)
+            {
+                var typeKey = jObject[type.Key];
+                foreach (var jToken in typeKey.First.First.ToList())
+                {
+                    var properties = (JProperty) jToken;
+                    var result = properties.Value.ToString();
+                    if (string.IsNullOrEmpty(result) ||  result == "[]")
+                    {
+                        jToken.Remove();
+                    }
+                }
+            }
+
+            return jObject;
         }
     }
 }

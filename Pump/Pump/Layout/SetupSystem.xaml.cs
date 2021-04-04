@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.Database;
-using Pump.Droid.Database.Table;
+using Pump.Database.Table;
 using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Pump.SocketController.BT;
+using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -26,13 +27,13 @@ namespace Pump.Layout
         private List<WiFiContainer> _wiFiContainers;
         private WiFiContainer _selectedWiFiContainer;
         private ViewBasicAlert _viewBasicAlert;
-        private readonly ControllerEvent _controllerEvent;
-        public SetupSystem(BluetoothManager blueToothManager, ControllerEvent controllerEvent)
+        private readonly NotificationEvent _notificationEvent;
+        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
         {
             InitializeComponent();
             _blueToothManage = blueToothManager;
-            _controllerEvent = controllerEvent;
-            _controllerEvent.OnUpdateStatus += _controllerEvent_OnNewController;
+            _notificationEvent = notificationEvent;
+            _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             IsMain.CheckedChanged += IsMain_CheckedChanged;
             PopulateControllers();
         }
@@ -84,7 +85,7 @@ namespace Pump.Layout
             try
             {
                 var tapGestureRecognizerWiFi = (StackLayout)sender;
-                _selectedWiFiContainer = _wiFiContainers.FirstOrDefault(x => x.ssid == tapGestureRecognizerWiFi.AutomationId);
+                _selectedWiFiContainer = _wiFiContainers.FirstOrDefault(x => x?.ssid == tapGestureRecognizerWiFi.AutomationId);
 
                 if (_selectedWiFiContainer != null)
                 {
@@ -158,7 +159,7 @@ namespace Pump.Layout
             for (var i = 0; i < _controllerList.Count; i++)
             {
                 ControllerPicker.Items.Add(string.IsNullOrEmpty(_controllerList[i].Name) ? "Name is missing" : _controllerList[i].Name);
-                if (_controllerList[i].ID == selectedController.ID)
+                if (_controllerList[i]?.ID == selectedController?.ID)
                     ControllerPicker.SelectedIndex = i;
             }
 
@@ -219,7 +220,7 @@ namespace Pump.Layout
                 }
                 new DatabaseController().UpdateControllerConnection(pumpController);
                 await DisplayAlert("Setup", result, "Understood");
-                _controllerEvent.NewControllerConnection();
+                _notificationEvent.UpdateStatus();
             }
         }
 
@@ -257,7 +258,7 @@ namespace Pump.Layout
             await DisplayAlert("Setup", result, "Understood");
 
             
-            _controllerEvent.NewControllerConnection();
+            _notificationEvent.UpdateStatus();
         
         }
 
@@ -289,7 +290,7 @@ namespace Pump.Layout
             await Navigation.PopModalAsync();
         }
 
-        private async void _controllerEvent_OnNewController(object sender, ControllerEventArgs e)
+        private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
         {
             await Navigation.PopModalAsync();
         }

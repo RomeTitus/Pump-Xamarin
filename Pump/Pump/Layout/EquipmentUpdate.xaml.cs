@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Pump.Class;
-using Pump.Database;
-using Pump.Droid.Database.Table;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -179,8 +175,8 @@ namespace Pump.Layout
                 if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
                     _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
                 _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0 ? null : _subControllerList[SystemPicker.SelectedIndex - 1].ID;
-                var key = await _socketPicker.SendCommand(_equipment);
-                await UpdateEquipmentToSite(key);
+                await _socketPicker.SendCommand(_equipment);
+                await UpdateEquipmentToSite(_equipment.ID);
                 //
 
                 await Navigation.PopModalAsync();

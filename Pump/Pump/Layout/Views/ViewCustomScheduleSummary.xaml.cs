@@ -30,7 +30,7 @@ namespace Pump.Layout.Views
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
+                var timeLeft = (TimeSpan) (endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
@@ -38,11 +38,13 @@ namespace Pump.Layout.Views
             {
                 LabelPumpName.Text = equipment.NAME;
             }
+
             labelScheduleName.Text = CustomSchedule.NAME;
 
-            foreach (ViewZoneAndTimeGrid scheduleGrid in ScrollViewZoneDetail.Children)
+            foreach (var view in ScrollViewZoneDetail.Children)
             {
-                
+                var scheduleGrid = (ViewZoneAndTimeGrid) view;
+
                 scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
                 {
@@ -58,7 +60,7 @@ namespace Pump.Layout.Views
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
+                var timeLeft = (TimeSpan) (endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
@@ -70,13 +72,13 @@ namespace Pump.Layout.Views
             labelScheduleName.Text = CustomSchedule.NAME;
 
             var index = 0;
-            for (var i = 0; i < CustomSchedule.Repeat+1; i++)
+            for (var i = 0; i < CustomSchedule.Repeat + 1; i++)
             {
                 foreach (var scheduleEquipment in CustomSchedule.ScheduleDetails)
                 {
-                    scheduleEquipment.ID = index.ToString(); 
+                    scheduleEquipment.ID = index.ToString();
                     var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
-                        _equipmentList.First(x => x.ID == scheduleEquipment.id_Equipment),
+                        _equipmentList.FirstOrDefault(x => x.ID == scheduleEquipment.id_Equipment),
                         true);
                     _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
                     scheduleGrid.SetBackGroundColor(Color.Yellow);
@@ -100,14 +102,14 @@ namespace Pump.Layout.Views
 
         public Button GetButtonEdit()
         {
-            if(ButtonEdit.AutomationId == null)
+            if (ButtonEdit.AutomationId == null)
                 ButtonEdit.AutomationId = CustomSchedule.ID;
             return ButtonEdit;
         }
 
         public Button GetButtonDelete()
         {
-            if(ButtonDelete.AutomationId == null)
+            if (ButtonDelete.AutomationId == null)
                 ButtonDelete.AutomationId = CustomSchedule.ID;
             return ButtonDelete;
         }

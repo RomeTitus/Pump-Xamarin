@@ -101,7 +101,7 @@
 
                     </ScrollView>
                 </Frame>
-                <StackLayout>
+                <StackLayout IsVisible="False">
                     <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                         <Label
                             FontSize="Subtitle"
@@ -120,7 +120,10 @@
                             TextColor="White"
                             VerticalOptions="Center" />
                     </StackLayout>
-                    <Frame BackgroundColor="White" BorderColor="Black" CornerRadius="10">
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        CornerRadius="10">
                         <ScrollView HeightRequest="100">
                             <StackLayout x:Name="ScrollViewSubController">
                                 <StackLayout.GestureRecognizers>

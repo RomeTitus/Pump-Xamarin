@@ -43,8 +43,9 @@ namespace Pump.Layout
             _site.NAME = SiteName.Text;
             _site.Description = SiteDescription.Text;
             _site.Attachments.Clear();
-            foreach (StackLayout stackLayout in ScrollViewSiteSelection.Children)
+            foreach (var view in ScrollViewSiteSelection.Children)
             {
+                var stackLayout = (StackLayout) view;
                 var checkBox = (CheckBox) stackLayout.Children[0];
                 if(checkBox.IsChecked)
                     _site.Attachments.Add(stackLayout.AutomationId);

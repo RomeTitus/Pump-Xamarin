@@ -41,10 +41,10 @@ namespace Pump.IrrigationController
                             Id = schedule.ID + scheduleDetails.id_Equipment, Name = schedule.NAME, IdEquipment = scheduleDetails.id_Equipment
                         };
                         activeSchedule.NameEquipment =
-                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdEquipment)?.NAME;
+                            _equipmentList.FirstOrDefault(x => x?.ID == activeSchedule.IdEquipment)?.NAME;
                         activeSchedule.IdPump = schedule.id_Pump;
                         activeSchedule.NamePump =
-                            _equipmentList.FirstOrDefault(x => x.ID == activeSchedule.IdPump)?.NAME;
+                            _equipmentList.FirstOrDefault(x => x?.ID == activeSchedule.IdPump)?.NAME;
                         activeSchedule.StartTime = startTimeDateTime;
                         activeSchedule.Week = schedule.WEEK;
                         var durationHour = scheduleDetails.DURATION.Split(':').First();

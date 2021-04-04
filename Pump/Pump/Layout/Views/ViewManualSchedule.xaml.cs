@@ -17,35 +17,36 @@ namespace Pump.Layout.Views
             _manualSchedule = manual;
             AutomationId = _manualSchedule.ID;
             SetManualText();
-            SetUpTimerEvent();
-        }
-
-        private void SetUpTimerEvent()
-        {
-            _timer = new System.Timers.Timer {AutoReset = false};
-            _timer.Elapsed += (timer_Elapsed);
-            _timer.Interval = GetInterval();
-            _timer.Start();
         }
 
         private void SetManualText()
         {
             LableManual.Text = _manualSchedule.RunWithSchedule ? "Manual Running with Schedule" : "Manual Running without Schedule";
 
-            LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.UtcNow);
+            timer_Elapsed(null, null);
+            StartEvent();
+            //LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.UtcNow);
         }
-
-        private static double GetInterval()
+        
+        private void StartEvent()
         {
-            var now = DateTime.Now;
-            return ((60 - now.Second) * 1000 - now.Millisecond);
+            _timer = new System.Timers.Timer(1000); // 1 seconds
+            _timer.Elapsed += timer_Elapsed;
+            _timer.Enabled = true;
         }
-
-        private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        
+        void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            LableManualTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.UtcNow);
-            _timer.Interval = GetInterval();
-            _timer.Start();
+            
+            string duration;
+            
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    var span = ScheduleTime.FromUnixTimeStampUtc(_manualSchedule.EndTime) - DateTime.UtcNow;
+                    duration = $"Time left: {span:hh\\:mm\\:ss}";
+                    LableManualTime.Text = duration;
+                });
+
         }
     }
 }

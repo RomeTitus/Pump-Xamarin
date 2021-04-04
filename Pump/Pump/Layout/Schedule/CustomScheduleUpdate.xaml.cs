@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump.Layout
+namespace Pump.Layout.Schedule
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CustomScheduleUpdate : ContentPage
@@ -63,10 +61,10 @@ namespace Pump.Layout
                     ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail, equipment, true));
                 }
             }
-            catch
+            catch (Exception e)
             {
                 ScrollViewZoneDetail.Children.Clear();
-                ScrollViewZoneDetail.Children.Add(new ViewException());
+                ScrollViewZoneDetail.Children.Add(new ViewException(e));
             }
         }
         private string CustomScheduleValidate()

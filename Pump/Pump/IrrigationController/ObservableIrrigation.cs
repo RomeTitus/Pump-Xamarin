@@ -4,6 +4,7 @@ namespace Pump.IrrigationController
 {
     public class ObservableIrrigation
     {
+        public bool IsDisposable = false;
         public readonly ObservableCollection<Equipment> EquipmentList = new ObservableCollection<Equipment> { null };
         public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor> { null };
         public readonly ObservableCollection<ManualSchedule> ManualScheduleList = new ObservableCollection<ManualSchedule> { null };
@@ -12,6 +13,13 @@ namespace Pump.IrrigationController
         public readonly ObservableCollection<Site> SiteList = new ObservableCollection<Site> { null };
         public readonly ObservableCollection<Alive> AliveList = new ObservableCollection<Alive> { null };
         public readonly ObservableCollection<SubController> SubControllerList = new ObservableCollection<SubController> { null };
-        
+
+
+        public bool LoadedAllData()
+        {
+            if (IsDisposable)
+                return false;
+            return !EquipmentList.Contains(null) && !SensorList.Contains(null) && !ManualScheduleList.Contains(null) && !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null) && !SiteList.Contains(null) && !AliveList.Contains(null) && !SubControllerList.Contains(null);
+        }
     }
 }

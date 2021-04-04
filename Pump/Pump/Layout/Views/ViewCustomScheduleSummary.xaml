@@ -4,7 +4,7 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
-    <StackLayout Margin="5" HeightRequest="600">
+    <StackLayout Margin="5" VerticalOptions="FillAndExpand">
         <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand">
             <StackLayout Orientation="Horizontal">
                 <Label
@@ -30,7 +30,7 @@
                 <Label
                     x:Name="LabelPumpName"
                     FontSize="Large"
-                    Text="Big Pump"
+                    Text="Unknown Pump"
                     VerticalOptions="Center" />
             </StackLayout>
         </StackLayout>
