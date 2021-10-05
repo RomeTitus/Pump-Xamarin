@@ -15,7 +15,8 @@ namespace Pump.IrrigationController
         public string BTmac { get; set; }
         public string IpAdress { get; set; }
         public int Port { get; set; }
-        public int Key { get; set; }
+        public int IncomingKey { get; set; }
+        public List<int> OutgoingKey { get; set; }
         public bool UseLoRa { get; set; }
     }
 }

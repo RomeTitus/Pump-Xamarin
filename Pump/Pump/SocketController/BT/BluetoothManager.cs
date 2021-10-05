@@ -15,31 +15,22 @@ namespace Pump.SocketController.BT
 {
     public class BluetoothManager
     {
-        private ICharacteristic _loadedCharacteristic = null;
-        private const string IrrigationServiceCode = "00000001-710e-4a5b-8d75-3e5b444bc3cf";
-        
-        //#region Singleton
-        //private static readonly Lazy<BluetoothManager> LazyBluetoothManager = new Lazy<BluetoothManager>(() => new BluetoothManager());
-        //public static BluetoothManager Instance => LazyBluetoothManager.Value;
-        //#endregion
-        
-        public IAdapter AdapterBle { get; set; }
-        public IDevice BleDevice { get; set; }
-
-        public ObservableCollection<IDevice> DeviceList { get; set; }
-
+        private ICharacteristic _loadedCharacteristic;
+        private const string IrrigationServiceCode = "D9AB1E08-07C8-4CB0-B36B-256D3A0C0F16";
+        public IAdapter AdapterBle { get; private set; }
+        public IDevice BleDevice { get; private set; }
+        public ObservableCollection<IDevice> IrrigationDeviceBt { get; private set; }
         public BluetoothManager()
         {
             AdapterBle = CrossBluetoothLE.Current.Adapter;
-            DeviceList = new ObservableCollection<IDevice>();
+            IrrigationDeviceBt = new ObservableCollection<IDevice>();
 
             AdapterBle.DeviceDiscovered += Adapter_DeviceDiscovered;
             AdapterBle.DeviceConnected += Adapter_DeviceConnected;
             AdapterBle.DeviceDisconnected += Adapter_DeviceDisconnected;
             AdapterBle.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
-
-            
-            AdapterBle.ScanTimeout = 10000;
+            //30 Seconds spent Scanning
+            AdapterBle.ScanTimeout = 30000;
         }
 
         public async Task StartScanning()
@@ -47,22 +38,21 @@ namespace Pump.SocketController.BT
             await StartScanning(Guid.Empty);
         }
 
-        async Task StartScanning(Guid forService)
+        public async Task StartScanning(Guid forService)
         {
             if (AdapterBle.IsScanning)
             {
                 await AdapterBle.StopScanningForDevicesAsync();
                 Debug.WriteLine("adapter.StopScanningForDevices()");
             }
-            else
-            {
-                DeviceList.Clear();
-                AdapterBle.ScanMode = ScanMode.LowPower;
-                await DisconnectDevice();
-                await AdapterBle.StartScanningForDevicesAsync();
-                
-                Debug.WriteLine("adapter.StartScanningForDevices(" + forService + ")");
-            }
+            
+            if(IrrigationDeviceBt.Any())
+                IrrigationDeviceBt.Clear();
+            AdapterBle.ScanMode = ScanMode.Balanced;
+            //await DisconnectDevice(); //TODO Can we not Connect to two at once? Bummer....
+            await AdapterBle.StartScanningForDevicesAsync();
+            //Debug.WriteLine("adapter.StartScanningForDevices(" + forService + ")");
+            
         }
 
         public async Task<bool> ConnectToKnownDevice(Guid deviceId)
@@ -92,21 +82,13 @@ namespace Pump.SocketController.BT
         public async Task<bool> ConnectToDevice(IDevice device)
         {
             var cancellationToken = new CancellationTokenSource();
-            cancellationToken.CancelAfter(15000);
-            if (BleDevice == null)
-            {
-                try
-                {
-                    await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
-                    BleDevice = device;
-                    SaveIDevice(BleDevice);
-                }
-                catch (Exception)
-                {
-                    cancellationToken.Dispose();
-                }
-
-            }
+            cancellationToken.CancelAfter(23000);
+            if (BleDevice != null) return BleDevice != null;
+            
+            await AdapterBle.StopScanningForDevicesAsync();
+            await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+            BleDevice = device;
+            SaveIDevice(BleDevice);
 
             return BleDevice != null;
         }
@@ -116,7 +98,7 @@ namespace Pump.SocketController.BT
             if(iDevice == null)
                 return;
             var currentController = new DatabaseController().GetControllerConnectionSelection();
-            if(iDevice.NativeDevice.ToString() == currentController.Mac)
+            if(currentController != null && iDevice.NativeDevice.ToString() == currentController.Mac)
             {
                 if (currentController.IDeviceGuid != iDevice.Id)
                 {
@@ -126,19 +108,9 @@ namespace Pump.SocketController.BT
             }
         }
 
-        public async Task StopScanning()
-        {
-            if (AdapterBle.IsScanning)
-            {
-                Debug.WriteLine("Still scanning, stopping the scan");
-                
-                await AdapterBle.StopScanningForDevicesAsync();
-            }
-        }
-
         void Adapter_DeviceDiscovered(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
         {
-            DeviceList.Add(e.Device);
+            IrrigationDeviceBt.Add(e.Device);
         }
 
         void Adapter_DeviceConnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
@@ -146,9 +118,9 @@ namespace Pump.SocketController.BT
             Debug.WriteLine("Device already connected");
         }
 
-        void Adapter_DeviceDisconnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
+        async void Adapter_DeviceDisconnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
         {
-            //await DisconnectDevice();
+            await DisconnectDevice();
             _loadedCharacteristic = null;
             //DeviceDisconnectedEvent?.Invoke(sender,e);
             Debug.WriteLine("Device already disconnected");

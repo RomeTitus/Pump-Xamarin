@@ -27,11 +27,11 @@ namespace Pump.Layout
             else
             {
                 _subController = subController;
-                Populate();
+                PopulateSubController();
             }
         }
 
-        private void Populate()
+        private void PopulateSubController()
         {
             LabelHeading.Text = "Update Sub Controller";
             ButtonUpdateSubController.Text = "Update";
@@ -42,7 +42,14 @@ namespace Pump.Layout
             SubControllerIp.Text = _subController.IpAdress;
             SubControllerPort.Text = _subController.Port.ToString();
             SubControllerLoRa.IsChecked = _subController.UseLoRa;
-            SubControllerKey.Text = _subController.Key.ToString();
+            IncomingKey.Text = _subController.IncomingKey.ToString();
+            for (int i = 0; i < _subController.OutgoingKey?.Count; i++)
+            {
+                OutgoingKey.Text += _subController.OutgoingKey[i].ToString();
+                if (i != _subController.OutgoingKey.Count - 1)
+                    OutgoingKey.Text += ",";
+            }
+            
         }
         private void ButtonBack_OnClicked(object sender, EventArgs e)
         {
@@ -56,13 +63,14 @@ namespace Pump.Layout
             _subController.IpAdress = SubControllerIp.Text;
             _subController.Port = int.Parse(SubControllerPort.Text);
             _subController.UseLoRa = SubControllerLoRa.IsChecked;
-            _subController.Key = int.Parse(SubControllerKey.Text);
+            _subController.IncomingKey = int.Parse(IncomingKey.Text);
+            _subController.OutgoingKey = OutgoingKey.Text.Split(',').Select(int.Parse).ToList();
         }
 
         private async void ButtonUpdateSubController_OnClicked(object sender, EventArgs e)
         {
             SetSubControllerVariables();
-            await _socketPicker.SendCommand(_subController);
+            await _socketPicker.SendCommand(_subController, false);
             await Navigation.PopModalAsync();
         }
     }

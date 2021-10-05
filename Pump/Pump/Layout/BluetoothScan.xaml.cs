@@ -21,7 +21,7 @@ namespace Pump.Layout
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             _bluetoothManager = new BluetoothManager();
-            _bluetoothManager.DeviceList.CollectionChanged += PopulateBluetoothDeviceEvent;
+            _bluetoothManager.IrrigationDeviceBt.CollectionChanged += PopulateBluetoothDeviceEvent;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
             BtnScan_OnClicked(new object(), new EventArgs());
         }
@@ -51,7 +51,7 @@ namespace Pump.Layout
         {
             var viewBlueTooth = (StackLayout) sender;
             var blueToothDevice =
-                _bluetoothManager.DeviceList.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
+                _bluetoothManager.IrrigationDeviceBt.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
 
             var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
                 "Accept", "Cancel");
@@ -79,7 +79,7 @@ namespace Pump.Layout
         private void PopulateBluetoothDevice()
         {
             ScreenCleanup();
-            foreach (var bluetooth in _bluetoothManager.DeviceList)
+            foreach (var bluetooth in _bluetoothManager.IrrigationDeviceBt)
             {
                 var existingView = false;
                 foreach (var view in ScrollViewSetupSystem.Children)
@@ -93,16 +93,12 @@ namespace Pump.Layout
                         existingViewBluetoothSummary.Populate();
                         break;
                     }
-
                 }
-
                 if (existingView) continue;
                 var blueToothView = new ViewBluetoothSummary(bluetooth);
                 blueToothView.GetTapGestureRecognizer().Tapped += ViewSiteScreen_Tapped;
                 ScrollViewSetupSystem.Children.Add(blueToothView);
             }
-
-            
         }
 
         private void ScreenCleanup()
@@ -110,7 +106,7 @@ namespace Pump.Layout
             foreach (var viewBlueTooth in ScrollViewSetupSystem.Children)
             {
                 var existingView = false;
-                foreach (var bluetooth in _bluetoothManager.DeviceList)
+                foreach (var bluetooth in _bluetoothManager.IrrigationDeviceBt)
                 {
                     if (viewBlueTooth.GetType() != typeof(ViewBluetoothSummary)) continue;
                     var existingViewBluetoothSummary = (ViewBluetoothSummary)viewBlueTooth;
@@ -121,9 +117,7 @@ namespace Pump.Layout
                         existingViewBluetoothSummary.Populate();
                         break;
                     }
-
                 }
-
                 if (existingView) continue;
                 ScrollViewSetupSystem.Children.Remove(viewBlueTooth);
             }

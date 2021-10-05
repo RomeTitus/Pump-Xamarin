@@ -31,6 +31,12 @@ namespace Pump.SocketController
             var wiFiScan = new JObject { { "Task", "WiFiScan" } };
             return wiFiScan;
         }
+        
+        public static JObject ConnectionInfo()
+        {
+            var wiFiScan = new JObject { { "Task", "ConnectionInfo" } };
+            return wiFiScan;
+        }
 
         public static JObject WiFiConnect(JObject wiFiConnect)
         {

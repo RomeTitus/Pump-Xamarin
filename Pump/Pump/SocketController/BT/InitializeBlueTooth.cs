@@ -39,7 +39,7 @@ namespace Pump.SocketController.BT
                     do
                     {
                         var iDevice =
-                            BlueToothManager.DeviceList.FirstOrDefault(x =>
+                            BlueToothManager.IrrigationDeviceBt.FirstOrDefault(x =>
                                 x.NativeDevice.ToString() == _pumpConnection.Mac);
                         if (iDevice == null)
                             await Task.Delay(500);

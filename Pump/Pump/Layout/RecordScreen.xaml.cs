@@ -68,14 +68,17 @@ namespace Pump.Layout
             {
                 var random = new Random();
                 var color = $"#{random.Next(0x1000000):X6}";
-                _chartEntries.Add(new ChartEntry(record.Duration)
-                {
-                    Label = _observableIrrigation.EquipmentList.First(x => x.ID == record.id_Equipment).NAME,
-                    ValueLabel = record.Duration.ToString(),
-                    Color = SKColor.Parse(color),
-                    TextColor = SKColor.Parse(color),
-                    ValueLabelColor = SKColor.Parse(color)
-                });
+                var equipment = _observableIrrigation.EquipmentList.FirstOrDefault(x => x.ID == record.id_Equipment);
+                if(equipment != null)
+                    _chartEntries.Add(new ChartEntry(record.Duration)
+                    {
+                    
+                        Label = equipment.NAME,
+                        ValueLabel = record.Duration.ToString(),
+                        Color = SKColor.Parse(color),
+                        TextColor = SKColor.Parse(color),
+                        ValueLabelColor = SKColor.Parse(color)
+                    });
             }
             RecordChartView.Chart = new BarChart{Entries = _chartEntries, BackgroundColor = SKColor.Parse("#00bfff"), LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30, ValueLabelTextSize = 30};
         }

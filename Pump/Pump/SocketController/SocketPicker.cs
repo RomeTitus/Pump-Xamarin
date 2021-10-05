@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout;
 using Pump.SocketController.BT;
@@ -149,5 +148,9 @@ namespace Pump.SocketController
             });
         }
 
+        public BluetoothManager BluetoothManager()
+        {
+            return _initializeBlueTooth.BlueToothManager;
+        }
     }
 }

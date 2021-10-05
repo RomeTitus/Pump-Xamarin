@@ -138,18 +138,34 @@
                         CharacterSpacing="1"
                         FontSize="Large"
                         HorizontalOptions="Start"
-                        Text="Communication Key"
+                        Text="Incoming Key"
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Editor
-                        x:Name="SubControllerKey"
+                        x:Name="IncomingKey"
                         Margin="0,0,17,0"
                         AutoSize="TextChanges"
                         FontSize="Large"
                         HorizontalOptions="EndAndExpand"
-                        IsEnabled="False"
                         Keyboard="Numeric"
-                        MaxLength="99"
+                        MaxLength="2"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Outgoing Key"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="OutgoingKey"
+                        Margin="0,0,17,0"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
                         Scale="1"
                         TextColor="White"
                         WidthRequest="180" />

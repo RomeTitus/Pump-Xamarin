@@ -63,12 +63,21 @@
                                 CharacterSpacing="1"
                                 FontSize="Large"
                                 HorizontalOptions="Center"
-                                Text="WiFi Connection"
+                                Text="Network Connection"
                                 TextColor="White"
                                 VerticalOptions="Center" />
+                            <ActivityIndicator
+                                x:Name="SetUpSystemActivityIndicator"
+                                AutomationId="ActivityIndicatorEquipmentLoading"
+                                HorizontalOptions="Center"
+                                IsEnabled="true"
+                                IsRunning="True"
+                                IsVisible="True"
+                                VerticalOptions="Center"
+                                Color="Black" />
                             <Label
                                 x:Name="LabelWiFi"
-                                Margin="0,10,0,0"
+                                Margin="10,10,0,0"
                                 CharacterSpacing="1"
                                 FontSize="Large"
                                 HorizontalOptions="Center"
@@ -83,10 +92,11 @@
 
                             <Label
                                 x:Name="LabelIP"
-                                Margin="0,10,0,0"
+                                Margin="10,10,0,0"
                                 CharacterSpacing="1"
-                                FontSize="Large"
+                                FontSize="Medium"
                                 HorizontalOptions="Center"
+                                IsVisible="False"
                                 TextColor="White"
                                 TextDecorations="Underline"
                                 VerticalOptions="Center"
@@ -175,7 +185,10 @@
                         x:Name="ButtonCreate"
                         Clicked="ButtonCreate_OnClicked"
                         Text="Create" />
-                    <Button x:Name="ButtonBack" Text="Back" Clicked="ButtonBack_OnClicked"/>
+                    <Button
+                        x:Name="ButtonBack"
+                        Clicked="ButtonBack_OnClicked"
+                        Text="Back" />
                 </StackLayout>
             </StackLayout>
         </ScrollView>

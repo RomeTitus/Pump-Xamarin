@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Threading.Tasks;
+using Plugin.BLE.Abstractions.Contracts;
 using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
-using Pump.FirebaseDatabase;
-using Pump.Layout;
+using Pump.Layout.Views;
 using Pump.SocketController;
+using Pump.SocketController.BT;
 using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 
-namespace Pump
+namespace Pump.Layout
 {
     public partial class ExistingController : ContentPage
     {
@@ -23,13 +26,18 @@ namespace Pump
         private double _height;
         private double _width;
         private readonly NotificationEvent _notificationEvent;
+        private readonly BluetoothManager _bluetoothManager;
 
-        public ExistingController(bool firstConnection, NotificationEvent notificationEvent, PumpConnection pumpConnection = null)
+        public ExistingController(bool firstConnection, NotificationEvent notificationEvent, BluetoothManager bluetoothManager, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
+            //_bluetoothManager = bluetoothManager;
+            _bluetoothManager = new BluetoothManager();
+            BtScan();
             FrameAddSystemTap.Tapped += FrameAddSystemTap_Tapped;
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
+            
             if (pumpConnection != null)
             {
                 _pumpConnection = pumpConnection;
@@ -52,6 +60,59 @@ namespace Pump
 
         }
 
+        private async void BtScan()
+        {
+            
+            _bluetoothManager.IrrigationDeviceBt.CollectionChanged += (_, args) =>
+            {
+                if (args.Action == NotifyCollectionChangedAction.Add)
+                {
+                    foreach (IDevice bluetoothDevice in args.NewItems)
+                    {
+                        var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
+                            blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
+                            ScrollViewSetupSystem.Children.Add(blueToothView);
+                    }
+                }
+            };
+            await _bluetoothManager.StartScanning(Guid.Empty);
+        }
+
+        private async void BlueToothDeviceTapped(object sender, EventArgs e)
+        {
+            var viewBlueTooth = (StackLayout) sender;
+            var blueToothDevice =
+                _bluetoothManager.IrrigationDeviceBt.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
+            var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
+                "Accept", "Cancel");
+            if (result)
+            {
+                try
+                {
+                    var loadingScreen = new VerifyConnections {CloseWhenBackgroundIsClicked = false};
+                    await PopupNavigation.Instance.PushAsync(loadingScreen);
+                    await _bluetoothManager.ConnectToDevice(blueToothDevice);
+                    
+                    await PopupNavigation.Instance.PopAllAsync();
+
+                    if (!await _bluetoothManager.IsController())
+                    {
+                        if (!await DisplayAlert("Irrigation", "Not verified controller", "Continue", "Cancel"))
+                            return;
+                    }
+                    
+                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
+                }
+
+                catch (Exception exception)
+                {
+                    await PopupNavigation.Instance.PopAllAsync();
+                    await DisplayAlert("Connect Exception!", exception.Message, "Understood");
+                }
+
+            }
+        }
+
         private void FrameAddSystemTap_Tapped(object sender, EventArgs e)
         {
             AddIrrigationController();
@@ -70,9 +131,9 @@ namespace Pump
 
         private void PopulateElements()
         {
-            foreach (var ConnectionType in _pumpConnection.ConnectionTypeList)
+            foreach (var connectionType in _pumpConnection.ConnectionTypeList)
             {
-                ConnectionPicker.Items.Add(ConnectionType);
+                ConnectionPicker.Items.Add(connectionType);
             }
             
             ConnectionPicker.SelectedIndex = _pumpConnection.ConnectionType;
@@ -85,7 +146,6 @@ namespace Pump
             TxtControllerCode.Text = _pumpConnection.Mac;
             TxtControllerCode.IsEnabled = false;
             BtnAddController.Text = "Update";
-            BtnNewController.IsVisible = false;
         }
 
         private void AddIrrigationController()
@@ -330,11 +390,7 @@ namespace Pump
         {
            return FrameAddSystemTap;
         }
-
-        private void BtnNewController_OnClicked(object sender, EventArgs e)
-        {
-            Navigation.PushModalAsync(new BlueToothScan(_notificationEvent));
-        }
+        
         private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
         {
             await Navigation.PopModalAsync();

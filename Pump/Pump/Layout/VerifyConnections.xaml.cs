@@ -10,7 +10,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class VerifyConnections : PopupPage
     {
-        private bool success;
+        private bool _success;
 
         public VerifyConnections()
         {
@@ -28,19 +28,19 @@ namespace Pump.Layout
         public void InternalSuccess()
         {
             LabelInternalConnection.Text = "Internal Connection was successful";
-            success = true;
+            _success = true;
         }
 
         public void ExternalSuccess()
         {
             LabelExternalConnection.Text = "External Connection was successful";
-            success = true;
+            _success = true;
         }
 
         public void FirebaseSuccess()
         {
             LabelFirebaseConnection.Text = "Online Connection was successful";
-            success = true;
+            _success = true;
         }
 
         public void InternalFailed()
@@ -60,7 +60,7 @@ namespace Pump.Layout
 
         private void Button_OnClicked(object sender, EventArgs e)
         {
-            if (success)
+            if (_success)
             {
                 PopupNavigation.Instance.PopAsync();
                 Navigation.PopModalAsync();

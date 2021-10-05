@@ -101,7 +101,7 @@
 
                     </ScrollView>
                 </Frame>
-                <StackLayout IsVisible="False">
+                <StackLayout IsVisible="True">
                     <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                         <Label
                             FontSize="Subtitle"
@@ -134,7 +134,6 @@
                                     HorizontalOptions="Center"
                                     IsEnabled="true"
                                     IsRunning="True"
-                                    IsVisible="True"
                                     VerticalOptions="Center" />
                             </StackLayout>
                         </ScrollView>

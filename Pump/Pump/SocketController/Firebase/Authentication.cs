@@ -203,7 +203,7 @@ namespace Pump.SocketController.Firebase
 
                 _controllerStatus = new ControllerStatus();
 
-                var firebaseReplyListener = ManualScheduleLiveObserver(manual.ID, notificationEvent);
+                var firebaseReplyListener = NotificationLiveObserver(manual.ID, notificationEvent);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -225,7 +225,7 @@ namespace Pump.SocketController.Firebase
                 }
 
                 firebaseReplyListener.Dispose();
-                //await DeleteStatus(manual.ID);
+                await DeleteStatus(manual.ID);
                 return _controllerStatus.Body;
             }
             catch (Exception e)
@@ -248,7 +248,7 @@ namespace Pump.SocketController.Firebase
                     .DeleteAsync();
 
                 notificationEvent.UpdateStatus("Complete\nController Received....");
-                var firebaseReplyListener = ManualScheduleLiveObserver(manual.ID, notificationEvent);
+                var firebaseReplyListener = NotificationLiveObserver(manual.ID, notificationEvent);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -291,7 +291,7 @@ namespace Pump.SocketController.Firebase
                 Console.WriteLine(e);
             }
         }
-        private IDisposable ManualScheduleLiveObserver(string id, NotificationEvent notificationEvent)
+        private IDisposable NotificationLiveObserver(string id, NotificationEvent notificationEvent)
         {
             var firebaseReplyListener = FirebaseClient
                 .Child(GetConnectedPi()).Child("ControllerStatus")
@@ -474,31 +474,98 @@ namespace Pump.SocketController.Firebase
 
 
         //SubController
-        public async Task<string> SetSubController(SubController subController)
+        public async Task<string> SetSubController(SubController subController, NotificationEvent notificationEvent)
         {
             try
             {
+                notificationEvent.UpdateStatus("Uploading....");
                 if (subController.ID == null)
                 {
                     var result = await FirebaseClient
                         .Child(GetConnectedPi() + "/SubController")
                         .PostAsync(subController);
                     subController.ID = result.Key;
-                    return result.Key;
+                    //return result.Key;
                 }
 
                 await FirebaseClient
                     .Child(GetConnectedPi() + "/SubController/" + subController.ID)
                     .PutAsync(subController);
-                return subController.ID;
+                //return subController.ID;
+                notificationEvent.UpdateStatus("Complete\nController Received....");
+                _controllerStatus = new ControllerStatus();
+
+                var firebaseReplyListener = NotificationLiveObserver(subController.ID, notificationEvent);
+
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                while (_controllerStatus.IsComplete == null || _controllerStatus.IsComplete == false)
+                {
+                    if (stopwatch.Elapsed > TimeSpan.FromSeconds(15) && _controllerStatus.IsComplete == null)
+                        break;
+                    await Task.Delay(100);
+                }
+                stopwatch.Stop();
+
+                if (_controllerStatus.IsComplete == null)
+                {
+                    notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
+                }
+
+                firebaseReplyListener.Dispose();
+                await DeleteStatus(subController.ID);
+                return _controllerStatus.Body;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return "Error!$Somewhere something went wrong\n" + e.Message;
             }
         }
 
+        private async Task<string> DeleteSubController(SubController subController, NotificationEvent notificationEvent)
+        {
+            try
+            {
+                _controllerStatus = new ControllerStatus();
+                notificationEvent.UpdateStatus("Uploading....");
+                
+                foreach (var mac in GetAllConnectedPi())
+                {
+                    await FirebaseClient
+                        .Child(mac + "/SubController/" + subController.ID)
+                        .DeleteAsync();
+                }
+                notificationEvent.UpdateStatus("Complete\nController Received....");
+                var firebaseReplyListener = NotificationLiveObserver(subController.ID, notificationEvent);
+
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                while (_controllerStatus.IsComplete == null || _controllerStatus.IsComplete == false)
+                {
+                    if (stopwatch.Elapsed > TimeSpan.FromSeconds(15) && _controllerStatus.IsComplete == null)
+                        break;
+                    await Task.Delay(100);
+                }
+                stopwatch.Stop();
+
+                if (_controllerStatus.IsComplete == null)
+                {
+                    notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
+                }
+                    
+                firebaseReplyListener.Dispose();
+                await DeleteStatus(subController.ID);
+                return _controllerStatus.Body;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return "Error!$Somewhere something went wrong\n" + e.Message; 
+            }
+        }
+        
         //NotificationToken
         private async Task<string> SetNotificationToken(NotificationToken notificationToken)
         {
@@ -527,7 +594,6 @@ namespace Pump.SocketController.Firebase
             }
             return null;
         }
-
         private async Task<string> DeleteNotificationToken(NotificationToken notificationToken)
         {
             try
@@ -608,6 +674,11 @@ namespace Pump.SocketController.Firebase
             {
                 var notificationToken = (NotificationToken)entity;
                 return notificationToken.DeleteAwaiting ? await DeleteNotificationToken(notificationToken) : await SetNotificationToken(notificationToken);
+            }
+            else if (entity.GetType() == typeof(SubController))
+            {
+                var subController = (SubController)entity;
+                return subController.DeleteAwaiting ? await DeleteSubController(subController, notificationEvent) : await SetSubController(subController, notificationEvent);
             }
             return "";
         }

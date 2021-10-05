@@ -36,6 +36,7 @@ namespace Pump.Layout
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             IsMain.CheckedChanged += IsMain_CheckedChanged;
             PopulateControllers();
+            Task.FromResult(GetConnectionInfo());
         }
 
 
@@ -49,12 +50,11 @@ namespace Pump.Layout
 
         private async void WiFiLabel_OnTapped(object sender, EventArgs e)
         {
-            var result = "";
             try
             {
                 var loadingScreen = new VerifyConnections {CloseWhenBackgroundIsClicked = false};
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
-                result = await ScanWiFi();
+                var result = await ScanWiFi();
                 await PopupNavigation.Instance.PopAllAsync();
 
                 if (SocketExceptions.CheckException(result))
@@ -117,7 +117,7 @@ namespace Pump.Layout
             if(_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.GetEditableText()))
                 _selectedWiFiContainer.passkey = _viewBasicAlert.GetEditableText();
 
-            LabelWiFi.Text = _selectedWiFiContainer.ssid;
+            //LabelWiFi.Text = _selectedWiFiContainer.ssid;
 
             await PopupNavigation.Instance.PopAllAsync();
 
@@ -125,8 +125,7 @@ namespace Pump.Layout
             await PopupNavigation.Instance.PushAsync(loadingScreen);
             var result = await ConnectToWifi(_selectedWiFiContainer);
             await PopupNavigation.Instance.PopAllAsync();
-            LabelIP.IsVisible = true;
-            LabelIP.Text = result;
+            await GetConnectionInfo(result);
         }
 
         private List<WiFiContainer> DictToWiFiContainer(string Dict)
@@ -166,6 +165,41 @@ namespace Pump.Layout
             if (!_controllerList.Any())
             {
                 IsMain.IsEnabled = false;
+            }
+        }
+        
+        private async Task GetConnectionInfo(string result = null)
+        {
+            try
+            {
+                if(result == null)
+                    result = await _blueToothManage.SendAndReceiveToBle(SocketCommands.ConnectionInfo());
+                var networkDetailObject = JObject.Parse(result);
+                LabelIP.IsVisible = true;
+                foreach (var networkDetail in networkDetailObject)
+                {
+                    var networkType = networkDetail.Key;
+                    var networkIpAddress = networkDetail.Value.Value<string>();
+                    string networkInfo;   
+                    if (networkIpAddress.Contains("\n"))
+                    {
+                        LabelWiFi.Text = networkIpAddress.Split('\n').First();
+                        
+                        networkInfo = networkType + " - " + networkIpAddress.Split('\n').Last();
+                    }
+                    else
+                    {
+                        networkInfo = networkType + " - " + networkIpAddress;
+                    }
+
+                    if (LabelIP.Text != null && LabelIP.Text.Any())
+                        LabelIP.Text = LabelIP.Text + "\n";
+                    LabelIP.Text = LabelIP.Text + networkInfo;
+                }
+            }
+            finally
+            {
+                SetUpSystemActivityIndicator.IsVisible = false;
             }
         }
 
@@ -235,18 +269,20 @@ namespace Pump.Layout
             {
                 BTmac = _blueToothManage.BleDevice.NativeDevice.ToString(),
                 NAME = TxtControllerName.Text,
-                Key = randomKey,
+                IncomingKey = randomKey,
+                OutgoingKey = new List<int>{randomKey},
                 IpAdress = LabelIP.Text,
                 Port = 8080,
                 UseLoRa = !IsMain.IsChecked
             };
             
-            var subControllerId = await new Authentication(pumpConnection.Mac).SetSubController(mainController);
+            var subControllerId = await new Authentication(pumpConnection.Mac).SetSubController(mainController, new NotificationEvent());
 
             var subController = new SubController {
                 BTmac = irrigationSelf.BTmac, 
                 Port = irrigationSelf.Port, 
-                Key = randomKey, 
+                IncomingKey = randomKey, 
+                OutgoingKey = new List<int>{randomKey},
                 NAME = "Main Controller", 
                 IpAdress = irrigationSelf.IpAdress,
                 UseLoRa = !IsMain.IsChecked,

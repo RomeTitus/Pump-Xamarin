@@ -37,13 +37,6 @@ namespace Pump.Layout
             var dbController = new DatabaseController();
             if (!dbController.GetControllerConnectionList().Any())
                 SetupNewController();
-            
-            //notificationManager = DependencyService.Get<INotificationManager>();
-            //notificationManager.NotificationReceived += (sender, eventArgs) =>
-            //{
-            //    var evtData = (NotificationEventArgs)eventArgs;
-            //    ShowNotification(evtData.Title, evtData.Message, evtData.ControllerName);
-            //};
         }
 
         private void SetEvents()
@@ -288,21 +281,21 @@ namespace Pump.Layout
 
         private void SetupNewController()
         {
-            var connectionScreen = new ExistingController(true, _notificationEvent);
+            var connectionScreen = new ExistingController(true, _notificationEvent, _socketPicker.BluetoothManager());
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
 
         private async void BtnAddController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new ExistingController(false, _notificationEvent);
+            var connectionScreen = new ExistingController(false, _notificationEvent, _socketPicker.BluetoothManager());
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             await Navigation.PushModalAsync(connectionScreen);
         }
 
         private void BtnEditController_OnPressed(object sender, EventArgs e)
         {
-            var connectionScreen = new ExistingController(false, _notificationEvent, new DatabaseController().GetControllerConnectionSelection());
+            var connectionScreen = new ExistingController(false, _notificationEvent, _socketPicker.BluetoothManager(), new DatabaseController().GetControllerConnectionSelection());
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
             Navigation.PushModalAsync(connectionScreen);
         }
