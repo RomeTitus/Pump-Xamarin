@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using Pump.Database;
-using Pump.Database.Table;
-using Pump.FirebaseDatabase;
-using Pump.IrrigationController;
-using Pump.Layout;
-using Pump.SocketController;
+﻿using Pump.Layout;
 using Xamarin.Forms;
 
 namespace Pump
@@ -17,15 +8,13 @@ namespace Pump
         public App()
         {
             InitializeComponent();
-            Device.SetFlags(new[] {
+            Device.SetFlags(new[]
+            {
                 "CarouselView_Experimental",
                 "IndicatorView_Experimental"
             });
             MainPage = new SiteScreen();
-            
         }
-
-        
 
 
         protected override void OnStart()
@@ -35,7 +24,7 @@ namespace Pump
 
         protected override void OnSleep()
         {
-           // _databaseController.SetActivityStatus(new ActivityStatus(false));
+            // _databaseController.SetActivityStatus(new ActivityStatus(false));
         }
 
         protected override void OnResume()

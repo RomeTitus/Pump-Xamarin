@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Pump.Layout.Views;
 using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;

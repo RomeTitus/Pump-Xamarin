@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace Pump.Class
 {
@@ -24,6 +23,7 @@ namespace Pump.Class
         {
             return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp);
         }
+
         public static DateTime FromUnixTimeStampUtc(long unixTimeStamp)
         {
             return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp);
@@ -33,14 +33,15 @@ namespace Pump.Class
         {
             return (int)(DateTime.Now.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
+
         public static int GetUnixTimeStampUtcNow()
         {
             return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
+
         public static int GetUnixTimeStampUtcNow(TimeSpan hours, TimeSpan minutes)
         {
-            return (int) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Add(hours).Add(minutes).TotalSeconds;
-
+            return (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Add(hours).Add(minutes).TotalSeconds;
         }
     }
 }

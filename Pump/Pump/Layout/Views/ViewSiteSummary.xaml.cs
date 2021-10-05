@@ -11,15 +11,16 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSiteSummary : ContentView
     {
-        public readonly Site Site;
         public readonly Sensor Sensor;
-        public List<IrrigationController.Schedule> Schedules;
+        public readonly Site Site;
         public List<CustomSchedule> CustomSchedules;
         public List<Equipment> Equipments;
         public List<ManualSchedule> ManualSchedules;
+        public List<IrrigationController.Schedule> Schedules;
 
 
-        public ViewSiteSummary(Site site, Sensor sensor, List<IrrigationController.Schedule> schedules, List<CustomSchedule> customSchedules, List<Equipment> equipments, List<ManualSchedule> manualSchedules)
+        public ViewSiteSummary(Site site, Sensor sensor, List<IrrigationController.Schedule> schedules,
+            List<CustomSchedule> customSchedules, List<Equipment> equipments, List<ManualSchedule> manualSchedules)
         {
             InitializeComponent();
             Site = site;
@@ -32,6 +33,7 @@ namespace Pump.Layout.Views
             StackLayoutSiteSummary.AutomationId = Site.ID;
             Populate();
         }
+
         public void Populate()
         {
             bool scheduleRunning = false;
@@ -42,24 +44,25 @@ namespace Pump.Layout.Views
                                                       RunningCustomSchedule.GetCustomScheduleDetailRunning(
                                                           customSchedule) != null))
                 scheduleRunning = true;
-            
-            
-            if(new RunningSchedule(Schedules.Where(x => Site.Attachments.Contains(x.id_Pump)), Equipments).GetRunningSchedule().ToList().Any())
+
+
+            if (new RunningSchedule(Schedules.Where(x => Site.Attachments.Contains(x.id_Pump)), Equipments)
+                .GetRunningSchedule().ToList().Any())
                 scheduleRunning = true;
-            
-            var manualSchedule = ManualSchedules.FirstOrDefault(x => x.ManualDetails.Any(z => Site.Attachments.Contains(z.id_Equipment)));
-            if(manualSchedule != null)
+
+            var manualSchedule =
+                ManualSchedules.FirstOrDefault(x =>
+                    x.ManualDetails.Any(z => Site.Attachments.Contains(z.id_Equipment)));
+            if (manualSchedule != null)
                 scheduleRunning = true;
             SetScheduleRunning(scheduleRunning);
 
             if (Sensor != null)
             {
-
                 if (Sensor.TYPE == "Pressure Sensor")
                 {
                     PressureSensor();
                 }
-
             }
         }
 

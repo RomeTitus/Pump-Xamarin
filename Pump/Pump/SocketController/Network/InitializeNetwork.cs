@@ -12,11 +12,12 @@ namespace Pump.SocketController.BT
     class InitializeNetwork
     {
         private readonly ObservableIrrigation _observableIrrigation;
+        private readonly PumpConnection _pumpConnection;
         public readonly NetworkManager NetworkManager;
         public readonly Stopwatch RequestIrrigationTimer;
-        private readonly PumpConnection _pumpConnection;
         private bool _isSubscribed;
         public bool RequestNow;
+
         public InitializeNetwork(ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
@@ -42,8 +43,10 @@ namespace Pump.SocketController.BT
         {
             RequestIrrigationTimer.Start();
             var oldIrrigationTuple =
-                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>>
-                    (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(), new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
+                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                    List<Site>, List<SubController>>
+                (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(),
+                    new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
             RequestNow = true;
             while (_isSubscribed)
             {
@@ -72,6 +75,7 @@ namespace Pump.SocketController.BT
                     OnConnectionLost();
                     break;
                 }
+
                 RequestIrrigationTimer.Restart();
             }
         }
@@ -86,7 +90,6 @@ namespace Pump.SocketController.BT
             RequestNow = false;
             RequestIrrigationTimer.Restart();
             return false;
-
         }
 
         private void OnConnectionLost()
@@ -108,14 +111,11 @@ namespace Pump.SocketController.BT
             _observableIrrigation.SiteList.Add(null);
             _observableIrrigation.SubControllerList.Add(null);
             _observableIrrigation.AliveList.Add(null);
-            
         }
 
         private async Task<string> GetIrrigationData()
         {
             return await NetworkManager.SendAndReceiveToNetwork(SocketCommands.AllTogether(), _pumpConnection);
         }
-
-
     }
 }

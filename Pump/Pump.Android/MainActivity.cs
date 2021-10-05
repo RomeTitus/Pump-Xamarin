@@ -5,19 +5,24 @@ using Android.Content.PM;
 using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
-using Rg.Plugins.Popup.Services;
 using Android.Util;
 using Plugin.FirebasePushNotification;
 using Pump.Droid.Notification;
 using Pump.Notification;
+using Rg.Plugins.Popup;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
-using ConnectionResult = Android.Gms.Common.ConnectionResult;
+using Xamarin.Forms.Platform.Android;
+using Platform = Xamarin.Essentials.Platform;
 
 namespace Pump.Droid
 {
-    [Activity(Label = "Pump", Icon = "@drawable/Logo", Theme = "@style/MainTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    [Activity(Label = "Pump", Icon = "@drawable/Logo", Theme = "@style/MainTheme", MainLauncher = true,
+        LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    public class MainActivity : FormsAppCompatActivity
     {
+        public const string TAG = "MainActivity";
+
         private readonly string[] _permissions =
         {
             Manifest.Permission.Bluetooth,
@@ -26,11 +31,10 @@ namespace Pump.Droid
             Manifest.Permission.AccessFineLocation
         };
 
-        public const string TAG = "MainActivity";
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            
+
             if (Intent?.Extras != null)
             {
                 foreach (var key in Intent?.Extras?.KeySet())
@@ -39,15 +43,15 @@ namespace Pump.Droid
                     Log.Debug(TAG, "Key: {0} Value: {1}", key, value ?? string.Empty);
                 }
             }
-            Rg.Plugins.Popup.Popup.Init(this);
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+
+            Popup.Init(this);
+            Platform.Init(this, savedInstanceState);
             Forms.Init(this, savedInstanceState);
 
             CheckPermissions();
             IsPlayServicesAvailable();
             LoadApplication(new App());
             FirebasePushNotificationManager.ProcessIntent(this, Intent);
-
         }
 
 
@@ -70,9 +74,10 @@ namespace Pump.Droid
             }
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
+            [GeneratedEnum] Permission[] grantResults)
         {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -89,6 +94,7 @@ namespace Pump.Droid
                     Log.Debug(TAG, "This device is not supported");
                     Finish();
                 }
+
                 return false;
             }
 
@@ -116,17 +122,10 @@ namespace Pump.Droid
 
         public override void OnBackPressed()
         {
-            if (Rg.Plugins.Popup.Popup.SendBackPressed(base.OnBackPressed))
+            if (Popup.SendBackPressed(base.OnBackPressed))
             {
-                PopupNavigation.Instance.PopAsync(); 
-            }
-            else
-            {
-                // Do something if there are not any pages in the `PopupStack`
+                PopupNavigation.Instance.PopAsync();
             }
         }
-
-
-
     }
 }

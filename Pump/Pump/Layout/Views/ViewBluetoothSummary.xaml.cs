@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using EmbeddedImages;
 using Plugin.BLE.Abstractions.Contracts;
 using Xamarin.Forms;
@@ -15,6 +10,7 @@ namespace Pump.Layout.Views
     public partial class ViewBluetoothSummary : ContentView
     {
         public IDevice BluetoothDevice;
+
         public ViewBluetoothSummary(IDevice bluetoothDevice)
         {
             InitializeComponent();

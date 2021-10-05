@@ -17,18 +17,22 @@ namespace Pump.Layout
 {
     public partial class ExistingController : ContentPage
     {
-        private bool? _internalConnection;
-        private bool? _externalConnection;
-        private bool? _firebaseConnection;
-        private string _mac;
-        private readonly VerifyConnections _loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
-        private readonly PumpConnection _pumpConnection = new PumpConnection();
-        private double _height;
-        private double _width;
-        private readonly NotificationEvent _notificationEvent;
         private readonly BluetoothManager _bluetoothManager;
 
-        public ExistingController(bool firstConnection, NotificationEvent notificationEvent, BluetoothManager bluetoothManager, PumpConnection pumpConnection = null)
+        private readonly VerifyConnections _loadingScreen = new VerifyConnections
+            { CloseWhenBackgroundIsClicked = false };
+
+        private readonly NotificationEvent _notificationEvent;
+        private readonly PumpConnection _pumpConnection = new PumpConnection();
+        private bool? _externalConnection;
+        private bool? _firebaseConnection;
+        private double _height;
+        private bool? _internalConnection;
+        private string _mac;
+        private double _width;
+
+        public ExistingController(bool firstConnection, NotificationEvent notificationEvent,
+            BluetoothManager bluetoothManager, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
             //_bluetoothManager = bluetoothManager;
@@ -37,7 +41,7 @@ namespace Pump.Layout
             FrameAddSystemTap.Tapped += FrameAddSystemTap_Tapped;
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
-            
+
             if (pumpConnection != null)
             {
                 _pumpConnection = pumpConnection;
@@ -51,18 +55,14 @@ namespace Pump.Layout
                 ConnectionTypePickerStackLayout.IsVisible = false;
                 NewControllerStackLayout.IsVisible = true;
             }
-                
-            
+
 
             if (firstConnection) return;
             BtnBackAddConnectionScreen.IsVisible = true;
-            
-
         }
 
         private async void BtScan()
         {
-            
             _bluetoothManager.IrrigationDeviceBt.CollectionChanged += (_, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
@@ -70,8 +70,8 @@ namespace Pump.Layout
                     foreach (IDevice bluetoothDevice in args.NewItems)
                     {
                         var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
-                            blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
-                            ScrollViewSetupSystem.Children.Add(blueToothView);
+                        blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
+                        ScrollViewSetupSystem.Children.Add(blueToothView);
                     }
                 }
             };
@@ -80,7 +80,7 @@ namespace Pump.Layout
 
         private async void BlueToothDeviceTapped(object sender, EventArgs e)
         {
-            var viewBlueTooth = (StackLayout) sender;
+            var viewBlueTooth = (StackLayout)sender;
             var blueToothDevice =
                 _bluetoothManager.IrrigationDeviceBt.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
             var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
@@ -89,10 +89,10 @@ namespace Pump.Layout
             {
                 try
                 {
-                    var loadingScreen = new VerifyConnections {CloseWhenBackgroundIsClicked = false};
+                    var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
                     await _bluetoothManager.ConnectToDevice(blueToothDevice);
-                    
+
                     await PopupNavigation.Instance.PopAllAsync();
 
                     if (!await _bluetoothManager.IsController())
@@ -100,7 +100,7 @@ namespace Pump.Layout
                         if (!await DisplayAlert("Irrigation", "Not verified controller", "Continue", "Cancel"))
                             return;
                     }
-                    
+
                     await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
                 }
 
@@ -109,7 +109,6 @@ namespace Pump.Layout
                     await PopupNavigation.Instance.PopAllAsync();
                     await DisplayAlert("Connect Exception!", exception.Message, "Understood");
                 }
-
             }
         }
 
@@ -120,14 +119,13 @@ namespace Pump.Layout
 
         private void ConnectionPickerOnSelectedIndexChanged(object sender, EventArgs e)
         {
-            if(ConnectionPicker.SelectedIndex == -1)
+            if (ConnectionPicker.SelectedIndex == -1)
                 return;
             _pumpConnection.ConnectionType = ConnectionPicker.SelectedIndex;
             new DatabaseController().UpdateControllerConnection(_pumpConnection);
             //TODO Throw event to change connection Type otherwise user needs to reload application
         }
 
-        
 
         private void PopulateElements()
         {
@@ -135,7 +133,7 @@ namespace Pump.Layout
             {
                 ConnectionPicker.Items.Add(connectionType);
             }
-            
+
             ConnectionPicker.SelectedIndex = _pumpConnection.ConnectionType;
 
             TxtControllerName.Text = _pumpConnection.Name;
@@ -203,9 +201,8 @@ namespace Pump.Layout
                     try
                     {
                         _firebaseConnection =
-                            Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result.Object;
-
-
+                            Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result
+                                .Object;
                     }
                     catch
                     {
@@ -248,7 +245,7 @@ namespace Pump.Layout
                     notification = "\u2022 Controller name required";
                 else
                     notification += "\n\u2022 Controller name required";
-                LabelControllerName.TextColor = Color.Red; 
+                LabelControllerName.TextColor = Color.Red;
             }
 
             if (string.IsNullOrEmpty(TxtControllerCode.Text))
@@ -283,7 +280,6 @@ namespace Pump.Layout
                 else
                     notification += "\n\u2022 Controller Code required";
                 LabelControllerCode.TextColor = Color.Red;
-
             }
 
             if (internalConnection == null || !code && internalConnection == false && externalConnection == false)
@@ -329,7 +325,6 @@ namespace Pump.Layout
             }
 
             return notification;
-
         }
 
         private bool CheckSocket(string host, int port)
@@ -348,6 +343,7 @@ namespace Pump.Layout
             {
                 return false;
             }
+
             return false;
         }
 
@@ -359,14 +355,13 @@ namespace Pump.Layout
             _notificationEvent.UpdateStatus();
         }
 
-       
 
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height);
-            if (width == this._width && height == this._height) return;
-            this._width = width;
-            this._height = height;
+            if (width == _width && height == _height) return;
+            _width = width;
+            _height = height;
             if (width > height)
             {
                 LayoutAddController.Direction = FlexDirection.Row;
@@ -388,9 +383,9 @@ namespace Pump.Layout
 
         public TapGestureRecognizer GetUpdateButton()
         {
-           return FrameAddSystemTap;
+            return FrameAddSystemTap;
         }
-        
+
         private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
         {
             await Navigation.PopModalAsync();
@@ -399,7 +394,7 @@ namespace Pump.Layout
         private void BtnAdvancedConnectionScreen_OnClicked(object sender, EventArgs e)
         {
             StackLayoutLocalConnection.IsVisible = !StackLayoutLocalConnection.IsVisible;
-            
+
             if (StackLayoutLocalConnection.IsVisible)
             {
                 BtnAdvancedConnectionScreen.Text = "Hide Network";

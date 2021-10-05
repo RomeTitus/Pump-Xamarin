@@ -32,6 +32,7 @@ namespace Pump.Layout.Views
                     _equipmentList.FirstOrDefault(x => x?.ID == scheduleDetail.id_Equipment), true));
             }
         }
+
         private void SetWeek()
         {
             if (_schedule.WEEK.Contains("SUNDAY"))

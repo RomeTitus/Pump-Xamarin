@@ -13,11 +13,12 @@ namespace Pump.SocketController.BT
     class InitializeBlueTooth
     {
         private readonly ObservableIrrigation _observableIrrigation;
+        private readonly PumpConnection _pumpConnection;
         public readonly BluetoothManager BlueToothManager;
         public readonly Stopwatch RequestIrrigationTimer;
-        public bool RequestNow;
-        private readonly PumpConnection _pumpConnection;
         private bool _isSubscribed;
+        public bool RequestNow;
+
         public InitializeBlueTooth(ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
@@ -51,6 +52,7 @@ namespace Pump.SocketController.BT
 
                     if (_isSubscribed) continue;
                 }
+
                 break;
             }
         }
@@ -64,8 +66,10 @@ namespace Pump.SocketController.BT
         {
             RequestIrrigationTimer.Start();
             var oldIrrigationTuple =
-                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>>
-                    (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(), new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
+                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                    List<Site>, List<SubController>>
+                (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(),
+                    new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
             RequestNow = true;
             while (_isSubscribed)
             {
@@ -85,13 +89,13 @@ namespace Pump.SocketController.BT
                     }
 
                     var irrigationJObject = JObject.Parse(await GetIrrigationData());
-                    
+
                     var irrigationTuple = IrrigationConvert.IrrigationJObjectToList(irrigationJObject);
 
                     var irrigationTupleEditState =
                         IrrigationConvert.CheckUpdatedStatus(irrigationTuple, oldIrrigationTuple);
 
-                    
+
                     IrrigationConvert.UpdateObservableIrrigation(_observableIrrigation, irrigationTupleEditState);
                     oldIrrigationTuple = irrigationTuple;
                 }
@@ -102,6 +106,7 @@ namespace Pump.SocketController.BT
                     OnConnectionLost();
                     break;
                 }
+
                 RequestIrrigationTimer.Restart();
             }
         }
@@ -125,7 +130,6 @@ namespace Pump.SocketController.BT
             _observableIrrigation.SiteList.Add(null);
             _observableIrrigation.SubControllerList.Add(null);
             _observableIrrigation.AliveList.Add(null);
-            
         }
 
         private async Task<string> GetIrrigationData()
@@ -143,8 +147,6 @@ namespace Pump.SocketController.BT
             RequestNow = false;
             RequestIrrigationTimer.Restart();
             return false;
-
         }
-
     }
 }

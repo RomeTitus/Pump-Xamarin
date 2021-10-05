@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Pump.IrrigationController;
+﻿using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.MaskedEntry;
 using Xamarin.Forms.Xaml;
@@ -11,10 +10,11 @@ namespace Pump.Layout.Views
     {
         private readonly Equipment _equipment;
         private readonly ScheduleDetail _scheduleDetail;
+
         public ViewZoneAndTimeGrid(ScheduleDetail scheduleDetail, Equipment equipment, bool isTimeSet = false)
         {
             InitializeComponent();
-            _equipment = equipment ?? new Equipment{NAME = "Unknown Zone"};
+            _equipment = equipment ?? new Equipment { NAME = "Unknown Zone" };
             _scheduleDetail = scheduleDetail;
             LabelZoneTime.AutomationId = _equipment.ID;
             LabelZoneName.Text = _equipment.NAME;

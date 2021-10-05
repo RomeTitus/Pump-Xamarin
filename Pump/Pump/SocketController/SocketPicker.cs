@@ -15,13 +15,14 @@ namespace Pump.SocketController
 {
     public class SocketPicker
     {
+        private readonly InitializeBlueTooth _initializeBlueTooth;
         private readonly InitializeFirebase _initializeFirebase;
         private readonly InitializeNetwork _initializeNetwork;
-        private readonly InitializeBlueTooth _initializeBlueTooth;
-        private readonly ObservableIrrigation _observableIrrigation;
         private readonly NotificationEvent _notificationEvent;
-        private FloatingScreenScroll _floatingScreenScreen;
+        private readonly ObservableIrrigation _observableIrrigation;
         private Label _activityLabel;
+        private FloatingScreenScroll _floatingScreenScreen;
+
         public SocketPicker(ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
@@ -34,7 +35,7 @@ namespace Pump.SocketController
         public SocketPicker()
         {
         }
-        
+
 
         public async void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
         {
@@ -53,7 +54,7 @@ namespace Pump.SocketController
             _observableIrrigation.IsDisposable = true;
             var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
 
-            if(pumpConnection.ConnectionType == 0)
+            if (pumpConnection.ConnectionType == 0)
                 _initializeFirebase.Disposable();
             else if (pumpConnection.ConnectionType == 1)
                 _initializeNetwork.Disposable();
@@ -77,75 +78,85 @@ namespace Pump.SocketController
 
             _observableIrrigation.IsDisposable = false;
         }
+
         public async Task<string> SendCommand(object sendObject, bool runInBackground = true)
         {
             var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
-            var buttonClosed = new Button { Text = "Close", VerticalOptions = LayoutOptions.EndAndExpand, HorizontalOptions = LayoutOptions.StartAndExpand, WidthRequest = 280, IsEnabled = false };
+            var buttonClosed = new Button
+            {
+                Text = "Close", VerticalOptions = LayoutOptions.EndAndExpand,
+                HorizontalOptions = LayoutOptions.StartAndExpand, WidthRequest = 280, IsEnabled = false
+            };
 
-            _activityLabel = new Label{HorizontalOptions = LayoutOptions.CenterAndExpand, FontSize = 15};
-            var activityIndicator = new ActivityIndicator { Margin = new Thickness(0,20,0,20), HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.StartAndExpand, Color = Color.Black, IsVisible = true, IsRunning = true};
+            _activityLabel = new Label { HorizontalOptions = LayoutOptions.CenterAndExpand, FontSize = 15 };
+            var activityIndicator = new ActivityIndicator
+            {
+                Margin = new Thickness(0, 20, 0, 20), HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.StartAndExpand, Color = Color.Black, IsVisible = true, IsRunning = true
+            };
             if (runInBackground == false)
             {
                 _floatingScreenScreen = new FloatingScreenScroll { CloseWhenBackgroundIsClicked = false };
                 _notificationEvent.OnUpdateStatus += NotificationEventOnUpdateStatus;
-                buttonClosed.Clicked += (sender, args) =>
-                {
-                    PopupNavigation.Instance.PopAsync();
-                };
+                buttonClosed.Clicked += (sender, args) => { PopupNavigation.Instance.PopAsync(); };
                 object connectionStatusStackLayout = new StackLayout
                 {
                     HeightRequest = 550,
                     WidthRequest = 400,
                     VerticalOptions = LayoutOptions.StartAndExpand,
                     HorizontalOptions = LayoutOptions.StartAndExpand,
-                    Children = { new Label{Text = sendObject.GetType().ToString().Split('.').Last(), FontSize = 24, Margin = new Thickness(0,0,0,20)} ,
-                        _activityLabel, activityIndicator, buttonClosed }
-                    
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = sendObject.GetType().ToString().Split('.').Last(), FontSize = 24,
+                            Margin = new Thickness(0, 0, 0, 20)
+                        },
+                        _activityLabel, activityIndicator, buttonClosed
+                    }
                 };
 
-                
-                _floatingScreenScreen.SetFloatingScreen(new List<object> {connectionStatusStackLayout});
+
+                _floatingScreenScreen.SetFloatingScreen(new List<object> { connectionStatusStackLayout });
                 await PopupNavigation.Instance.PushAsync(_floatingScreenScreen);
-                
             }
 
             string result;
             switch (pumpConnection?.ConnectionType)
             {
                 case 0:
-                    result =  await new Authentication().Descript(sendObject, _notificationEvent);
+                    result = await new Authentication().Descript(sendObject, _notificationEvent);
                     break;
                 case 1:
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
-                    result =  await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(SocketCommands.Descript(sendObject), pumpConnection);
+                    result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
+                        SocketCommands.Descript(sendObject), pumpConnection);
                     break;
                 case 2:
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();
-                    result =  await _initializeBlueTooth?.BlueToothManager.SendAndReceiveToBle(SocketCommands.Descript(sendObject));
+                    result = await _initializeBlueTooth?.BlueToothManager.SendAndReceiveToBle(
+                        SocketCommands.Descript(sendObject));
                     _initializeBlueTooth.RequestNow = true;
                     break;
                 default:
-                    result =  "Unknown Operation/Could not Identify user operations";
+                    result = "Unknown Operation/Could not Identify user operations";
                     break;
             }
 
             buttonClosed.IsEnabled = true;
             activityIndicator.IsVisible = false;
-            if(_notificationEvent != null)
+            if (_notificationEvent != null)
                 _notificationEvent.OnUpdateStatus -= NotificationEventOnUpdateStatus;
             return result;
         }
 
         private void NotificationEventOnUpdateStatus(object sender, ControllerEventArgs e)
         {
-            if(_activityLabel == null)
+            if (_activityLabel == null)
                 return;
-            
-            Device.InvokeOnMainThreadAsync( () =>
-            {
-                _activityLabel.Text += e.Status;
-            });
+
+            Device.InvokeOnMainThreadAsync(() => { _activityLabel.Text += e.Status; });
         }
 
         public BluetoothManager BluetoothManager()

@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage
     x:Class="Pump.Layout.SiteScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -23,7 +24,8 @@
                 CornerRadius="30"
                 HorizontalOptions="Fill">
                 <StackLayout Orientation="Horizontal">
-                    <Image HeightRequest="18" Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                    <Image HeightRequest="18"
+                           Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
                     <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand" />
 
                 </StackLayout>

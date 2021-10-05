@@ -7,8 +7,10 @@ namespace Pump.IrrigationController
 {
     static class IrrigationConvert
     {
-        public static Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>>  IrrigationJObjectToList(JObject irrigationJObject)
-        {                
+        public static
+            Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>,
+                List<SubController>> IrrigationJObjectToList(JObject irrigationJObject)
+        {
             var customScheduleList = new List<CustomSchedule>();
             var scheduleList = new List<Schedule>();
             var equipmentList = new List<Equipment>();
@@ -22,7 +24,9 @@ namespace Pump.IrrigationController
                 foreach (var jToken in irrigationJObject[nameof(CustomSchedule)])
                 {
                     var customScheduleJToken = (JProperty)jToken;
-                    var customScheduleObject = (CustomSchedule)irrigationJObject[nameof(CustomSchedule)][customScheduleJToken.Name].ToObject(typeof(CustomSchedule));
+                    var customScheduleObject =
+                        (CustomSchedule)irrigationJObject[nameof(CustomSchedule)][customScheduleJToken.Name]
+                            .ToObject(typeof(CustomSchedule));
                     customScheduleObject.ID = customScheduleJToken.Name;
                     customScheduleList.Add(customScheduleObject);
                 }
@@ -33,7 +37,8 @@ namespace Pump.IrrigationController
                 foreach (var jToken in irrigationJObject[nameof(Schedule)])
                 {
                     var scheduleJToken = (JProperty)jToken;
-                    var scheduleObject = (Schedule)irrigationJObject[nameof(Schedule)][scheduleJToken.Name].ToObject(typeof(Schedule));
+                    var scheduleObject = (Schedule)irrigationJObject[nameof(Schedule)][scheduleJToken.Name]
+                        .ToObject(typeof(Schedule));
                     scheduleObject.ID = scheduleJToken.Name;
                     scheduleList.Add(scheduleObject);
                 }
@@ -44,7 +49,8 @@ namespace Pump.IrrigationController
                 foreach (var jToken in irrigationJObject[nameof(Equipment)])
                 {
                     var equipmentJToken = (JProperty)jToken;
-                    var equipmentObject = (Equipment)irrigationJObject[nameof(Equipment)][equipmentJToken.Name].ToObject(typeof(Equipment));
+                    var equipmentObject = (Equipment)irrigationJObject[nameof(Equipment)][equipmentJToken.Name]
+                        .ToObject(typeof(Equipment));
                     equipmentObject.ID = equipmentJToken.Name;
                     equipmentList.Add(equipmentObject);
                 }
@@ -55,7 +61,9 @@ namespace Pump.IrrigationController
                 foreach (var jToken in irrigationJObject[nameof(ManualSchedule)])
                 {
                     var manualScheduleJToken = (JProperty)jToken;
-                    var manualScheduleObject = (ManualSchedule)irrigationJObject[nameof(ManualSchedule)][manualScheduleJToken.Name].ToObject(typeof(ManualSchedule));
+                    var manualScheduleObject =
+                        (ManualSchedule)irrigationJObject[nameof(ManualSchedule)][manualScheduleJToken.Name]
+                            .ToObject(typeof(ManualSchedule));
                     manualScheduleObject.ID = manualScheduleJToken.Name;
                     manualScheduleList.Add(manualScheduleObject);
                 }
@@ -66,7 +74,8 @@ namespace Pump.IrrigationController
                 foreach (var jToken in irrigationJObject[nameof(Sensor)])
                 {
                     var sensorJToken = (JProperty)jToken;
-                    var sensorObject = (Sensor)irrigationJObject[nameof(Sensor)][sensorJToken.Name].ToObject(typeof(Sensor));
+                    var sensorObject =
+                        (Sensor)irrigationJObject[nameof(Sensor)][sensorJToken.Name].ToObject(typeof(Sensor));
                     sensorObject.ID = sensorJToken.Name;
                     sensorList.Add(sensorObject);
                 }
@@ -89,20 +98,26 @@ namespace Pump.IrrigationController
                 foreach (var jToken in irrigationJObject[nameof(SubController)])
                 {
                     var subControllerJToken = (JProperty)jToken;
-                    var subControllerObject = (SubController)irrigationJObject[nameof(SubController)][subControllerJToken.Name].ToObject(typeof(SubController));
+                    var subControllerObject =
+                        (SubController)irrigationJObject[nameof(SubController)][subControllerJToken.Name]
+                            .ToObject(typeof(SubController));
                     subControllerObject.ID = subControllerJToken.Name;
                     subControllerList.Add(subControllerObject);
                 }
             }
-            
-            return new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>>
-                (customScheduleList, scheduleList, equipmentList, manualScheduleList, sensorList, siteList, subControllerList);
+
+            return new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                List<Site>, List<SubController>>
+            (customScheduleList, scheduleList, equipmentList, manualScheduleList, sensorList, siteList,
+                subControllerList);
         }
 
-        public static void UpdateObservableIrrigation(ObservableIrrigation observableIrrigation, Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>, List<Dictionary<EditState, Equipment>>,
-            List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>, List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>> irrigationTupleEditState)
+        public static void UpdateObservableIrrigation(ObservableIrrigation observableIrrigation,
+            Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
+                List<Dictionary<EditState, Equipment>>,
+                List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
+                List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>> irrigationTupleEditState)
         {
-
             if (observableIrrigation.CustomScheduleList.Count > 0 && observableIrrigation.CustomScheduleList[0] == null)
                 observableIrrigation.CustomScheduleList.Clear();
 
@@ -266,9 +281,15 @@ namespace Pump.IrrigationController
             }
         }
 
-        public static Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>, List<Dictionary<EditState, Equipment>>, 
-            List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>, List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>> 
-            CheckUpdatedStatus(Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>> newIrrigationTuple, Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>, List<SubController>> oldIrrigationTuple)
+        public static Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
+                List<Dictionary<EditState, Equipment>>,
+                List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
+                List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>>
+            CheckUpdatedStatus(
+                Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                    List<Site>, List<SubController>> newIrrigationTuple,
+                Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                    List<Site>, List<SubController>> oldIrrigationTuple)
         {
             var customScheduleEditState = CheckUpdatedStatus(newIrrigationTuple.Item1, oldIrrigationTuple.Item1);
             var scheduleEditState = CheckUpdatedStatus(newIrrigationTuple.Item2, oldIrrigationTuple.Item2);
@@ -278,24 +299,32 @@ namespace Pump.IrrigationController
             var siteEditState = CheckUpdatedStatus(newIrrigationTuple.Item6, oldIrrigationTuple.Item6);
             var subControllerEditState = CheckUpdatedStatus(newIrrigationTuple.Item7, oldIrrigationTuple.Item7);
 
-            return new Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>, List<Dictionary<EditState, Equipment>>,
-                List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>, List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>>
-                (customScheduleEditState, scheduleEditState, equipmentEditState, manualScheduleEditState, sensorEditState, siteEditState, subControllerEditState);
+            return new Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
+                List<Dictionary<EditState, Equipment>>,
+                List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
+                List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>>
+            (customScheduleEditState, scheduleEditState, equipmentEditState, manualScheduleEditState,
+                sensorEditState, siteEditState, subControllerEditState);
         }
 
 
-        private static List<Dictionary<EditState, CustomSchedule>> CheckUpdatedStatus(List<CustomSchedule> newCustomScheduleList, List<CustomSchedule> oldCustomScheduleList)
+        private static List<Dictionary<EditState, CustomSchedule>> CheckUpdatedStatus(
+            List<CustomSchedule> newCustomScheduleList, List<CustomSchedule> oldCustomScheduleList)
         {
             var customScheduleState = new List<Dictionary<EditState, CustomSchedule>>();
-            
-            foreach (var customSchedules in oldCustomScheduleList.Where(x => newCustomScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+
+            foreach (var customSchedules in oldCustomScheduleList.Where(x =>
+                newCustomScheduleList.Select(y => y.ID).Contains(x.ID) == false))
             {
-                customScheduleState.Add(new Dictionary<EditState, CustomSchedule> {{EditState.Deleted, customSchedules}});
+                customScheduleState.Add(new Dictionary<EditState, CustomSchedule>
+                    { { EditState.Deleted, customSchedules } });
             }
 
-            foreach (var customSchedules in newCustomScheduleList.Where(x => oldCustomScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var customSchedules in newCustomScheduleList.Where(x =>
+                oldCustomScheduleList.Select(y => y.ID).Contains(x.ID) == false))
             {
-                customScheduleState.Add(new Dictionary<EditState, CustomSchedule> { { EditState.Created, customSchedules } });
+                customScheduleState.Add(new Dictionary<EditState, CustomSchedule>
+                    { { EditState.Created, customSchedules } });
             }
 
             foreach (var newCustomSchedule in newCustomScheduleList)
@@ -305,7 +334,8 @@ namespace Pump.IrrigationController
                     if (!string.Equals(JObject.FromObject(oldCustomSchedule).ToString(),
                         JObject.FromObject(oldCustomSchedule).ToString(), StringComparison.Ordinal))
                     {
-                        customScheduleState.Add(new Dictionary<EditState, CustomSchedule> {{ EditState.Updated, newCustomSchedule }});
+                        customScheduleState.Add(new Dictionary<EditState, CustomSchedule>
+                            { { EditState.Updated, newCustomSchedule } });
                     }
                 }
             }
@@ -313,16 +343,19 @@ namespace Pump.IrrigationController
             return customScheduleState;
         }
 
-        private static List<Dictionary<EditState, Schedule>> CheckUpdatedStatus(List<Schedule> newScheduleList, List<Schedule> oldScheduleList)
+        private static List<Dictionary<EditState, Schedule>> CheckUpdatedStatus(List<Schedule> newScheduleList,
+            List<Schedule> oldScheduleList)
         {
             var scheduleState = new List<Dictionary<EditState, Schedule>>();
 
-            foreach (var schedules in oldScheduleList.Where(x => newScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var schedules in oldScheduleList.Where(x =>
+                newScheduleList.Select(y => y.ID).Contains(x.ID) == false))
             {
                 scheduleState.Add(new Dictionary<EditState, Schedule> { { EditState.Deleted, schedules } });
             }
 
-            foreach (var schedules in newScheduleList.Where(x => oldScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var schedules in newScheduleList.Where(x =>
+                oldScheduleList.Select(y => y.ID).Contains(x.ID) == false))
             {
                 scheduleState.Add(new Dictionary<EditState, Schedule> { { EditState.Created, schedules } });
             }
@@ -342,16 +375,19 @@ namespace Pump.IrrigationController
             return scheduleState;
         }
 
-        private static List<Dictionary<EditState, Equipment>> CheckUpdatedStatus(List<Equipment> newEquipmentList, List<Equipment> oldEquipmentList)
+        private static List<Dictionary<EditState, Equipment>> CheckUpdatedStatus(List<Equipment> newEquipmentList,
+            List<Equipment> oldEquipmentList)
         {
             var equipmentState = new List<Dictionary<EditState, Equipment>>();
 
-            foreach (var equipments in oldEquipmentList.Where(x => newEquipmentList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var equipments in oldEquipmentList.Where(x =>
+                newEquipmentList.Select(y => y.ID).Contains(x.ID) == false))
             {
                 equipmentState.Add(new Dictionary<EditState, Equipment> { { EditState.Deleted, equipments } });
             }
 
-            foreach (var equipments in newEquipmentList.Where(x => oldEquipmentList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var equipments in newEquipmentList.Where(x =>
+                oldEquipmentList.Select(y => y.ID).Contains(x.ID) == false))
             {
                 equipmentState.Add(new Dictionary<EditState, Equipment> { { EditState.Created, equipments } });
             }
@@ -363,7 +399,8 @@ namespace Pump.IrrigationController
                     if (!string.Equals(JObject.FromObject(oldEquipment).ToString(),
                         JObject.FromObject(oldEquipment).ToString(), StringComparison.Ordinal))
                     {
-                        equipmentState.Add(new Dictionary<EditState, Equipment> { { EditState.Updated, newEquipment } });
+                        equipmentState.Add(new Dictionary<EditState, Equipment>
+                            { { EditState.Updated, newEquipment } });
                     }
                 }
             }
@@ -371,18 +408,23 @@ namespace Pump.IrrigationController
             return equipmentState;
         }
 
-        private static List<Dictionary<EditState, ManualSchedule>> CheckUpdatedStatus(List<ManualSchedule> newManualScheduleList, List<ManualSchedule> oldManualScheduleList)
+        private static List<Dictionary<EditState, ManualSchedule>> CheckUpdatedStatus(
+            List<ManualSchedule> newManualScheduleList, List<ManualSchedule> oldManualScheduleList)
         {
             var manualScheduleState = new List<Dictionary<EditState, ManualSchedule>>();
 
-            foreach (var manualSchedules in oldManualScheduleList.Where(x => newManualScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var manualSchedules in oldManualScheduleList.Where(x =>
+                newManualScheduleList.Select(y => y.ID).Contains(x.ID) == false))
             {
-                manualScheduleState.Add(new Dictionary<EditState, ManualSchedule> { { EditState.Deleted, manualSchedules } });
+                manualScheduleState.Add(new Dictionary<EditState, ManualSchedule>
+                    { { EditState.Deleted, manualSchedules } });
             }
 
-            foreach (var manualSchedules in newManualScheduleList.Where(x => oldManualScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var manualSchedules in newManualScheduleList.Where(x =>
+                oldManualScheduleList.Select(y => y.ID).Contains(x.ID) == false))
             {
-                manualScheduleState.Add(new Dictionary<EditState, ManualSchedule> { { EditState.Created, manualSchedules } });
+                manualScheduleState.Add(new Dictionary<EditState, ManualSchedule>
+                    { { EditState.Created, manualSchedules } });
             }
 
             foreach (var newManualSchedule in newManualScheduleList)
@@ -392,7 +434,8 @@ namespace Pump.IrrigationController
                     if (!string.Equals(JObject.FromObject(oldManualSchedule).ToString(),
                         JObject.FromObject(oldManualSchedule).ToString(), StringComparison.Ordinal))
                     {
-                        manualScheduleState.Add(new Dictionary<EditState, ManualSchedule> { { EditState.Updated, newManualSchedule } });
+                        manualScheduleState.Add(new Dictionary<EditState, ManualSchedule>
+                            { { EditState.Updated, newManualSchedule } });
                     }
                 }
             }
@@ -400,7 +443,8 @@ namespace Pump.IrrigationController
             return manualScheduleState;
         }
 
-        private static List<Dictionary<EditState, Sensor>> CheckUpdatedStatus(List<Sensor> newSensorList, List<Sensor> oldSensorList)
+        private static List<Dictionary<EditState, Sensor>> CheckUpdatedStatus(List<Sensor> newSensorList,
+            List<Sensor> oldSensorList)
         {
             var sensorState = new List<Dictionary<EditState, Sensor>>();
 
@@ -429,7 +473,8 @@ namespace Pump.IrrigationController
             return sensorState;
         }
 
-        private static List<Dictionary<EditState, Site>> CheckUpdatedStatus(List<Site> newSiteList, List<Site> oldSiteList)
+        private static List<Dictionary<EditState, Site>> CheckUpdatedStatus(List<Site> newSiteList,
+            List<Site> oldSiteList)
         {
             var siteState = new List<Dictionary<EditState, Site>>();
 
@@ -457,18 +502,24 @@ namespace Pump.IrrigationController
 
             return siteState;
         }
-        private static List<Dictionary<EditState, SubController>> CheckUpdatedStatus(List<SubController> newSubControllerList, List<SubController> oldSubControllerList)
+
+        private static List<Dictionary<EditState, SubController>> CheckUpdatedStatus(
+            List<SubController> newSubControllerList, List<SubController> oldSubControllerList)
         {
             var subControllerState = new List<Dictionary<EditState, SubController>>();
 
-            foreach (var subControllers in oldSubControllerList.Where(x => newSubControllerList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var subControllers in oldSubControllerList.Where(x =>
+                newSubControllerList.Select(y => y.ID).Contains(x.ID) == false))
             {
-                subControllerState.Add(new Dictionary<EditState, SubController> { { EditState.Deleted, subControllers } });
+                subControllerState.Add(new Dictionary<EditState, SubController>
+                    { { EditState.Deleted, subControllers } });
             }
 
-            foreach (var subControllers in newSubControllerList.Where(x => oldSubControllerList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var subControllers in newSubControllerList.Where(x =>
+                oldSubControllerList.Select(y => y.ID).Contains(x.ID) == false))
             {
-                subControllerState.Add(new Dictionary<EditState, SubController> { { EditState.Created, subControllers } });
+                subControllerState.Add(new Dictionary<EditState, SubController>
+                    { { EditState.Created, subControllers } });
             }
 
             foreach (var newSubController in newSubControllerList)
@@ -478,7 +529,8 @@ namespace Pump.IrrigationController
                     if (!string.Equals(JObject.FromObject(oldSubController).ToString(),
                         JObject.FromObject(oldSubController).ToString(), StringComparison.Ordinal))
                     {
-                        subControllerState.Add(new Dictionary<EditState, SubController> { { EditState.Updated, newSubController } });
+                        subControllerState.Add(new Dictionary<EditState, SubController>
+                            { { EditState.Updated, newSubController } });
                     }
                 }
             }
@@ -494,4 +546,3 @@ namespace Pump.IrrigationController
         Deleted
     }
 }
-

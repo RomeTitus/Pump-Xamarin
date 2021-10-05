@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Rg.Plugins.Popup.Services;
@@ -15,6 +12,7 @@ namespace Pump.Layout
     public partial class AvailableWiFi : ContentPage
     {
         private List<WiFiContainer> _WiFiContainers;
+
         public AvailableWiFi(List<WiFiContainer> WiFiContainers)
         {
             InitializeComponent();

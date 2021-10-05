@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -12,11 +8,12 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewBasicAlert : ContentView
     {
-        private readonly string _title;
-        private readonly string _message;
         private readonly string _accept;
         private readonly string _cancel;
+        private readonly string _message;
+        private readonly string _title;
         public readonly bool Editable;
+
         public ViewBasicAlert(string title, string message, string accept, string cancel, bool editable = false)
         {
             InitializeComponent();
@@ -29,7 +26,8 @@ namespace Pump.Layout.Views
             Populate();
         }
 
-        public ViewBasicAlert(string title, string message,string subMessage, string accept, string cancel, bool editable)
+        public ViewBasicAlert(string title, string message, string subMessage, string accept, string cancel,
+            bool editable)
         {
             InitializeComponent();
             BasicAlertEnter.IsVisible = editable;

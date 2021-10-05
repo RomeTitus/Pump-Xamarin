@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Pump.Class;
 
 namespace Pump.IrrigationController
 {
     class RunningCustomSchedule
     {
-
-        public List<ActiveSchedule> GetActiveCustomSchedule(List<CustomSchedule> customScheduleList, List<Equipment> equipmentList)
+        public List<ActiveSchedule> GetActiveCustomSchedule(List<CustomSchedule> customScheduleList,
+            List<Equipment> equipmentList)
         {
             var activeScheduleList = new List<ActiveSchedule>();
             foreach (var schedule in customScheduleList)
             {
-
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(schedule.StartTime);
-                for (var i = 0; i < schedule.Repeat+1; i++)
+                for (var i = 0; i < schedule.Repeat + 1; i++)
                 {
                     foreach (var scheduleDetails in schedule.ScheduleDetails)
                     {
@@ -42,9 +40,8 @@ namespace Pump.IrrigationController
                         activeScheduleList.Add(activeSchedule);
                     }
                 }
-                    
             }
-            
+
             var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
             return sortedList;
         }
@@ -56,7 +53,7 @@ namespace Pump.IrrigationController
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
                 var currentTime = DateTime.UtcNow;
                 var index = 0;
-                for (var i = 0; i < customScheduleList.Repeat+1; i++)
+                for (var i = 0; i < customScheduleList.Repeat + 1; i++)
                 {
                     foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
@@ -86,7 +83,7 @@ namespace Pump.IrrigationController
             try
             {
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
-                for (var i = 0; i < customScheduleList.Repeat+1; i++)
+                for (var i = 0; i < customScheduleList.Repeat + 1; i++)
                 {
                     foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
@@ -105,16 +102,18 @@ namespace Pump.IrrigationController
             {
                 // ignored
             }
+
             return null;
         }
 
-        public static DateTime? GetCustomScheduleRunningTimeForEquipment(CustomSchedule customScheduleList, int selectIndex)
+        public static DateTime? GetCustomScheduleRunningTimeForEquipment(CustomSchedule customScheduleList,
+            int selectIndex)
         {
             try
             {
                 var startTimeDateTime = DateTime.UtcNow;
                 var index = 0;
-                for (var i = 0; i < customScheduleList.Repeat+1; i++)
+                for (var i = 0; i < customScheduleList.Repeat + 1; i++)
                 {
                     foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
@@ -133,7 +132,6 @@ namespace Pump.IrrigationController
                         index++;
                     }
                 }
-
             }
             catch
             {
@@ -145,7 +143,7 @@ namespace Pump.IrrigationController
 
         public List<ActiveSchedule> GetRunningCustomSchedule(List<ActiveSchedule> activeScheduleList)
         {
-            var activeCustomSchedule =  activeScheduleList.Where(activeSchedule =>
+            var activeCustomSchedule = activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime < DateTime.UtcNow && activeSchedule.EndTime > DateTime.UtcNow).ToList();
 
             foreach (var activeSchedule in activeCustomSchedule)
@@ -159,8 +157,9 @@ namespace Pump.IrrigationController
 
         public List<ActiveSchedule> GetQueCustomSchedule(List<ActiveSchedule> activeScheduleList)
         {
-            var queueCustomSchedule =  activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime > DateTime.UtcNow && activeSchedule.StartTime < DateTime.UtcNow.AddDays(1)).ToList();
+            var queueCustomSchedule = activeScheduleList.Where(activeSchedule =>
+                    activeSchedule.StartTime > DateTime.UtcNow && activeSchedule.StartTime < DateTime.UtcNow.AddDays(1))
+                .ToList();
 
             foreach (var activeSchedule in queueCustomSchedule)
             {
@@ -172,4 +171,3 @@ namespace Pump.IrrigationController
         }
     }
 }
-

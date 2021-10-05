@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using Pump.Database;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
-using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -19,6 +15,7 @@ namespace Pump.Layout.Views
             ScheduleName.Text = schedule.NAME;
             DeleteScheduleButton.AutomationId = schedule.ID;
         }
+
         public ViewDeleteConfirmation(IrrigationController.Schedule schedule)
         {
             InitializeComponent();

@@ -15,17 +15,18 @@ namespace Pump.SocketController.Firebase
     internal class Authentication
     {
         private readonly string _blueTooth;
+        private ControllerStatus _controllerStatus;
+        private string _oldBody = string.Empty;
+
         public Authentication(string blueTooth = null)
         {
             _blueTooth = blueTooth;
-            FirebaseClient = new FirebaseClient("https://pump-25eee.firebaseio.com/");//, new FirebaseOptions
+            FirebaseClient = new FirebaseClient("https://pump-25eee.firebaseio.com/"); //, new FirebaseOptions
             //{
             //    OfflineDatabaseFactory = (t, s) => new OfflineDatabase(t, s)
             //});
-
         }
-        private string _oldBody = string.Empty;
-        private ControllerStatus _controllerStatus;
+
         public FirebaseClient FirebaseClient { get; }
 
 
@@ -43,7 +44,6 @@ namespace Pump.SocketController.Firebase
             {
                 return "";
             }
-           
         }
 
         public List<string> GetAllConnectedPi()
@@ -63,7 +63,6 @@ namespace Pump.SocketController.Firebase
         {
             try
             {
-
                 var firebaseSelf = await FirebaseClient
                     .Child(GetConnectedPi() + "/SelfSetup")
                     .OnceAsync<IrrigationSelf>();
@@ -81,12 +80,11 @@ namespace Pump.SocketController.Firebase
         {
             try
             {
-                
                 var firebaseExist = await FirebaseClient
                     .Child(path + "/MasterStatus")
                     .OnceAsync<bool>();
 
-               
+
                 return firebaseExist.Count > 0 ? firebaseExist.FirstOrDefault(o => o.Object) : null;
             }
             catch (Exception e)
@@ -94,10 +92,9 @@ namespace Pump.SocketController.Firebase
                 Console.WriteLine(e);
                 return null;
             }
-            
         }
 
-        
+
         //Schedule
         private async Task<string> SetSchedule(Schedule schedule)
         {
@@ -123,6 +120,7 @@ namespace Pump.SocketController.Firebase
                 return null;
             }
         }
+
         private async Task<string> DeleteSchedule(Schedule schedule)
         {
             try
@@ -134,11 +132,11 @@ namespace Pump.SocketController.Firebase
             catch (Exception e)
             {
                 Console.WriteLine(e);
-
             }
 
             return null;
         }
+
         //CustomSchedule
         private async Task<string> SetCustomSchedule(CustomSchedule schedule)
         {
@@ -177,8 +175,10 @@ namespace Pump.SocketController.Firebase
             {
                 Console.WriteLine(e);
             }
+
             return null;
         }
+
         //ManualSchedule
         private async Task<string> SetManualSchedule(ManualSchedule manual, NotificationEvent notificationEvent)
         {
@@ -198,8 +198,9 @@ namespace Pump.SocketController.Firebase
                         .Child(GetConnectedPi() + "/ManualSchedule/" + manual.ID)
                         .PutAsync(manual);
                 }
+
                 notificationEvent.UpdateStatus("Complete\nController Received....");
-                
+
 
                 _controllerStatus = new ControllerStatus();
 
@@ -213,6 +214,7 @@ namespace Pump.SocketController.Firebase
                         break;
                     await Task.Delay(100);
                 }
+
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
@@ -233,8 +235,6 @@ namespace Pump.SocketController.Firebase
                 Console.WriteLine(e);
                 return "Error!$Somewhere something went wrong\n" + e.Message;
             }
-
-
         }
 
         private async Task<string> DeleteManualSchedule(ManualSchedule manual, NotificationEvent notificationEvent)
@@ -259,13 +259,14 @@ namespace Pump.SocketController.Firebase
                         break;
                     await Task.Delay(100);
                 }
+
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
                 {
                     notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
                 }
-                    
+
                 firebaseReplyListener.Dispose();
                 await DeleteStatus(manual.ID);
                 return _controllerStatus.Body;
@@ -273,7 +274,7 @@ namespace Pump.SocketController.Firebase
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return "Error!$Somewhere something went wrong\n" + e.Message; 
+                return "Error!$Somewhere something went wrong\n" + e.Message;
             }
         }
 
@@ -281,7 +282,6 @@ namespace Pump.SocketController.Firebase
         {
             try
             {
-                
                 await FirebaseClient
                     .Child(GetConnectedPi() + "/Status/" + statusId)
                     .DeleteAsync();
@@ -291,6 +291,7 @@ namespace Pump.SocketController.Firebase
                 Console.WriteLine(e);
             }
         }
+
         private IDisposable NotificationLiveObserver(string id, NotificationEvent notificationEvent)
         {
             var firebaseReplyListener = FirebaseClient
@@ -306,20 +307,20 @@ namespace Pump.SocketController.Firebase
                         result.ID = x.Key;
                         if (x.Key == id)
                         {
-                                //TODO Clear this up
-                                int pos = result.Body.IndexOf(_oldBody, StringComparison.Ordinal);
-                                if (pos >= 0)
-                                {
-                                    string strDiff = result.Body.Remove(pos, _oldBody.Length);
-                                    notificationEvent.UpdateStatus(strDiff);
-                                }
-                                else
-                                    notificationEvent.UpdateStatus(result.Body);
+                            //TODO Clear this up
+                            int pos = result.Body.IndexOf(_oldBody, StringComparison.Ordinal);
+                            if (pos >= 0)
+                            {
+                                string strDiff = result.Body.Remove(pos, _oldBody.Length);
+                                notificationEvent.UpdateStatus(strDiff);
+                            }
+                            else
+                                notificationEvent.UpdateStatus(result.Body);
 
-                                _oldBody = result.Body;
+                            _oldBody = result.Body;
 
-                                _controllerStatus.Body = result.Body;
-                                _controllerStatus.IsComplete = result.IsComplete;
+                            _controllerStatus.Body = result.Body;
+                            _controllerStatus.IsComplete = result.IsComplete;
                         }
                     }
                     catch (Exception e)
@@ -368,6 +369,7 @@ namespace Pump.SocketController.Firebase
             {
                 Console.WriteLine(e);
             }
+
             return null;
         }
 
@@ -386,7 +388,6 @@ namespace Pump.SocketController.Firebase
             }
 
             return null;
-
         }
 
         //Sensor
@@ -430,6 +431,7 @@ namespace Pump.SocketController.Firebase
 
             return null;
         }
+
         //Site
         private async Task<string> SetSite(Site site)
         {
@@ -505,6 +507,7 @@ namespace Pump.SocketController.Firebase
                         break;
                     await Task.Delay(100);
                 }
+
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
@@ -529,13 +532,14 @@ namespace Pump.SocketController.Firebase
             {
                 _controllerStatus = new ControllerStatus();
                 notificationEvent.UpdateStatus("Uploading....");
-                
+
                 foreach (var mac in GetAllConnectedPi())
                 {
                     await FirebaseClient
                         .Child(mac + "/SubController/" + subController.ID)
                         .DeleteAsync();
                 }
+
                 notificationEvent.UpdateStatus("Complete\nController Received....");
                 var firebaseReplyListener = NotificationLiveObserver(subController.ID, notificationEvent);
 
@@ -548,13 +552,14 @@ namespace Pump.SocketController.Firebase
                         break;
                     await Task.Delay(100);
                 }
+
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
                 {
                     notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
                 }
-                    
+
                 firebaseReplyListener.Dispose();
                 await DeleteStatus(subController.ID);
                 return _controllerStatus.Body;
@@ -562,10 +567,10 @@ namespace Pump.SocketController.Firebase
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return "Error!$Somewhere something went wrong\n" + e.Message; 
+                return "Error!$Somewhere something went wrong\n" + e.Message;
             }
         }
-        
+
         //NotificationToken
         private async Task<string> SetNotificationToken(NotificationToken notificationToken)
         {
@@ -592,8 +597,10 @@ namespace Pump.SocketController.Firebase
             {
                 Console.WriteLine(e);
             }
+
             return null;
         }
+
         private async Task<string> DeleteNotificationToken(NotificationToken notificationToken)
         {
             try
@@ -604,7 +611,6 @@ namespace Pump.SocketController.Firebase
                         .Child(mac + "/NotificationToken/" + notificationToken.ID)
                         .DeleteAsync();
                 }
-                
             }
             catch (Exception e)
             {
@@ -614,16 +620,16 @@ namespace Pump.SocketController.Firebase
             return null;
         }
 
-        public async Task<IReadOnlyCollection<FirebaseObject<JObject>>> GetRecordingBetweenDates(long startFrom, long endOn)
+        public async Task<IReadOnlyCollection<FirebaseObject<JObject>>> GetRecordingBetweenDates(long startFrom,
+            long endOn)
         {
             try
             {
-
                 var readings = await FirebaseClient
-                    .Child(GetConnectedPi() + "/Record/").OrderBy("$key").StartAt(startFrom.ToString).EndAt(endOn.ToString)
+                    .Child(GetConnectedPi() + "/Record/").OrderBy("$key").StartAt(startFrom.ToString)
+                    .EndAt(endOn.ToString)
                     .OnceAsync<JObject>();
                 return readings;
-
             }
             catch (Exception e)
             {
@@ -637,49 +643,66 @@ namespace Pump.SocketController.Firebase
         {
             if (entity.GetType() == typeof(ManualSchedule))
             {
-                var manualSchedule = (ManualSchedule) entity;
-                return manualSchedule.DeleteAwaiting ? await DeleteManualSchedule(manualSchedule, notificationEvent) : await SetManualSchedule(manualSchedule, notificationEvent);
+                var manualSchedule = (ManualSchedule)entity;
+                return manualSchedule.DeleteAwaiting
+                    ? await DeleteManualSchedule(manualSchedule, notificationEvent)
+                    : await SetManualSchedule(manualSchedule, notificationEvent);
             }
-            else if (entity.GetType() == typeof(Schedule))
+
+            if (entity.GetType() == typeof(Schedule))
             {
                 var schedule = (Schedule)entity;
                 return schedule.DeleteAwaiting ? await DeleteSchedule(schedule) : await SetSchedule(schedule);
             }
-            else if (entity.GetType() == typeof(CustomSchedule))
+
+            if (entity.GetType() == typeof(CustomSchedule))
             {
                 var customSchedule = (CustomSchedule)entity;
-                return customSchedule.DeleteAwaiting ? await DeleteCustomSchedule(customSchedule) : await SetCustomSchedule(customSchedule);
+                return customSchedule.DeleteAwaiting
+                    ? await DeleteCustomSchedule(customSchedule)
+                    : await SetCustomSchedule(customSchedule);
             }
-            else if (entity.GetType() == typeof(Equipment))
+
+            if (entity.GetType() == typeof(Equipment))
             {
                 var equipment = (Equipment)entity;
                 return equipment.DeleteAwaiting ? await DeleteEquipment(equipment) : await SetEquipment(equipment);
             }
-            else if (entity.GetType() == typeof(Sensor))
+
+            if (entity.GetType() == typeof(Sensor))
             {
                 var sensor = (Sensor)entity;
                 return sensor.DeleteAwaiting ? await DeleteSensor(sensor) : await SetSensor(sensor);
             }
-            else if (entity.GetType() == typeof(Site))
+
+            if (entity.GetType() == typeof(Site))
             {
                 var site = (Site)entity;
                 return site.DeleteAwaiting ? await DeleteSite(site) : await SetSite(site);
             }
-            else if (entity.GetType() == typeof(Alive))
+
+            if (entity.GetType() == typeof(Alive))
             {
                 var alive = (Alive)entity;
                 return await SetAlive(alive);
             }
-            else if (entity.GetType() == typeof(NotificationToken))
+
+            if (entity.GetType() == typeof(NotificationToken))
             {
                 var notificationToken = (NotificationToken)entity;
-                return notificationToken.DeleteAwaiting ? await DeleteNotificationToken(notificationToken) : await SetNotificationToken(notificationToken);
+                return notificationToken.DeleteAwaiting
+                    ? await DeleteNotificationToken(notificationToken)
+                    : await SetNotificationToken(notificationToken);
             }
-            else if (entity.GetType() == typeof(SubController))
+
+            if (entity.GetType() == typeof(SubController))
             {
                 var subController = (SubController)entity;
-                return subController.DeleteAwaiting ? await DeleteSubController(subController, notificationEvent) : await SetSubController(subController, notificationEvent);
+                return subController.DeleteAwaiting
+                    ? await DeleteSubController(subController, notificationEvent)
+                    : await SetSubController(subController, notificationEvent);
             }
+
             return "";
         }
     }

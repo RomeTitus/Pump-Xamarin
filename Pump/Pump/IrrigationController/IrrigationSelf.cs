@@ -1,5 +1,4 @@
-﻿
-namespace Pump.IrrigationController
+﻿namespace Pump.IrrigationController
 {
     class IrrigationSelf
     {

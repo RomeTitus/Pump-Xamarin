@@ -5,7 +5,7 @@
         public MainPage()
         {
             InitializeComponent();
-            
+
             LoadApplication(new Pump.App());
         }
     }

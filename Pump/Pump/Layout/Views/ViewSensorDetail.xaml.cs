@@ -15,6 +15,7 @@ namespace Pump.Layout.Views
         public readonly Sensor Sensor;
         private string _image = "";
         private string _oldImage = "";
+
         public ViewSensorDetail(Sensor sensor)
         {
             InitializeComponent();
@@ -22,12 +23,13 @@ namespace Pump.Layout.Views
             AutomationId = Sensor.ID;
             PopulateSensor();
         }
+
         public ViewSensorDetail(Sensor sensor, double size)
         {
             InitializeComponent();
             Sensor = sensor;
             AutomationId = Sensor.ID;
-            this.HeightRequest = 150 * size;
+            HeightRequest = 150 * size;
             LabelSensorType.FontSize *= size;
             LabelSensorName.FontSize *= size;
             PopulateSensor();
@@ -37,8 +39,9 @@ namespace Pump.Layout.Views
         {
             LabelSensorType.Text = Sensor.TYPE;
             LabelSensorName.Text = Sensor.NAME;
-            if(Sensor.LastUpdated != null)
-                LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime().ToString(CultureInfo.InvariantCulture);
+            if (Sensor.LastUpdated != null)
+                LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime()
+                    .ToString(CultureInfo.InvariantCulture);
             switch (Sensor.TYPE)
             {
                 case "Pressure Sensor":
@@ -56,13 +59,12 @@ namespace Pump.Layout.Views
                     _image,
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly);
             }
-            
         }
 
         private void PressureSensor()
         {
             var reading = Convert.ToDouble(Sensor.LastReading, CultureInfo.InvariantCulture);
-            
+
             var voltage = reading * 5.0 / 1024.0;
 
             var pressurePascal = 3.0 * (voltage - 0.47) * 1000000.0;
@@ -97,8 +99,6 @@ namespace Pump.Layout.Views
 
                 _image = reading > 8 ? "Pump.Icons.Temp_High.png" : "Pump.Icons.Temp_Low.png";
                 LableSensorStatus.Text = Sensor.LastReading + "°C";
-                
-                    
             }
             catch
             {

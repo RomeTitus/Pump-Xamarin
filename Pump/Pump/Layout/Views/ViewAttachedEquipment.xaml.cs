@@ -12,8 +12,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewAttachedEquipment : ContentView
     {
-        public readonly Equipment Equipment;
         private readonly Sensor _sensor;
+        public readonly Equipment Equipment;
+
         public ViewAttachedEquipment(Equipment equipment, Sensor sensor)
         {
             InitializeComponent();
@@ -37,7 +38,6 @@ namespace Pump.Layout.Views
                 SensorThresholdHigh.Text = attachedSensor.ThresholdHigh.ToString(CultureInfo.InvariantCulture);
                 SensorThresholdTimer.Text = attachedSensor.ThresholdTimer.ToString(CultureInfo.InvariantCulture);
             }
-                
         }
 
         public AttachedSensor GetAttachedSensorDetail()
@@ -57,7 +57,7 @@ namespace Pump.Layout.Views
 
         private void EquipmentCheckBox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            var equipmentCheckBox = (CheckBox) sender;
+            var equipmentCheckBox = (CheckBox)sender;
             SensorDetail.IsVisible = equipmentCheckBox.IsChecked;
         }
 

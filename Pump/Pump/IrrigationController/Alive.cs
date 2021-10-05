@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Pump.IrrigationController
+﻿namespace Pump.IrrigationController
 {
     public class Alive
     {

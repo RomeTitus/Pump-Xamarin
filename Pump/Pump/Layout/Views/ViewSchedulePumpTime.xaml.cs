@@ -10,8 +10,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSchedulePumpTime : ContentView
     {
+        private Equipment _equipment;
         private IrrigationController.Schedule _schedule;
-        private  Equipment _equipment;
+
         public ViewSchedulePumpTime(IrrigationController.Schedule schedule, Equipment equipment)
         {
             InitializeComponent();

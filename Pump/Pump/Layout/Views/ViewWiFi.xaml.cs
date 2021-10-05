@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Pump.IrrigationController;
+﻿using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,6 +8,7 @@ namespace Pump.Layout.Views
     public partial class ViewWiFi : ContentView
     {
         private WiFiContainer _wiFiContainer;
+
         public ViewWiFi(WiFiContainer wiFiContainer)
         {
             InitializeComponent();

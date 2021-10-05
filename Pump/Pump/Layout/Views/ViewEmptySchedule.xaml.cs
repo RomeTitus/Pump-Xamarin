@@ -1,5 +1,4 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout.Views
@@ -15,6 +14,7 @@ namespace Pump.Layout.Views
                 EmptyScheduleLabel.FontSize *= size.Value;
                 HeightRequest = 150 * size.Value;
             }
+
             EmptyScheduleLabel.Text = text;
             Populate();
         }
@@ -22,7 +22,6 @@ namespace Pump.Layout.Views
         private void Populate()
         {
             AutomationId = "-849";
-            
         }
     }
 }

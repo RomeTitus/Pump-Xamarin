@@ -1,12 +1,12 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
+using Android.Provider;
 using Android.Runtime;
-using System;
-using System.Collections.Generic;
 using Android.Util;
 using Newtonsoft.Json.Linq;
 using Plugin.FirebasePushNotification;
+using Pump.IrrigationController;
 using Pump.SocketController;
-using Application = Android.App.Application;
 
 namespace Pump.Droid.Notification
 {
@@ -68,7 +68,7 @@ namespace Pump.Droid.Notification
 #endif
 */
 #if DEBUG
-            FirebasePushNotificationManager.Initialize(this,new AndroidNotificationManager(), true,false);
+            FirebasePushNotificationManager.Initialize(this, new AndroidNotificationManager(), true, false);
 #else
 	            FirebasePushNotificationManager.Initialize(this, new AndroidNotificationManager(), false, false);
 #endif
@@ -91,7 +91,6 @@ namespace Pump.Droid.Notification
                         var body = jObject.Value<string>("body") ?? "Not Provided";
                         var BtMac = jObject.Value<string>("BTmac") ?? "Not Provided";
                         new AndroidNotificationManager().SendNotification(title, body, BtMac);
-
                     }
                     catch
                     {
@@ -104,21 +103,20 @@ namespace Pump.Droid.Notification
                 }
             };
 
-            
+
             CrossFirebasePushNotification.Current.OnTokenRefresh += async (s, p) =>
             {
-                if(string.IsNullOrEmpty(p.Token))
+                if (string.IsNullOrEmpty(p.Token))
                     return;
-                var notification = new IrrigationController.NotificationToken
+                var notification = new NotificationToken
                 {
-                    ID = Android.Provider.Settings.Secure.GetString(Context.ContentResolver,
-                        Android.Provider.Settings.Secure.AndroidId),
+                    ID = Settings.Secure.GetString(Context.ContentResolver,
+                        Settings.Secure.AndroidId),
                     Token = p.Token
                 };
-                Log.Info("PumpNotification", $"NewToken: { p.Token}");
+                Log.Info("PumpNotification", $"NewToken: {p.Token}");
                 var result = await new SocketPicker().SendCommand(notification);
             };
-            
         }
     }
 }

@@ -13,10 +13,12 @@ namespace Pump.Layout.Schedule
     public partial class CustomScheduleUpdate : ContentPage
     {
         private readonly List<Equipment> _equipmentList;
-        private CustomSchedule _customSchedule;
         private readonly List<string> _pumpIdList = new List<string>();
         private readonly SocketPicker _socketPicker;
-        public CustomScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker, CustomSchedule schedule = null)
+        private CustomSchedule _customSchedule;
+
+        public CustomScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker,
+            CustomSchedule schedule = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
@@ -25,16 +27,17 @@ namespace Pump.Layout.Schedule
             {
                 ScheduleName.Text = schedule.NAME;
                 ButtonCreateCustomSchedule.Text = "SAVE";
-                
-            }else
+            }
+            else
                 schedule = new CustomSchedule();
+
             _customSchedule = schedule;
             MaskedEntryRepeat.Text = _customSchedule.Repeat.ToString();
             PopulateEquipment();
             ButtonCreateCustomSchedule.IsEnabled = true;
             CustomPumpPicker.IsEnabled = true;
         }
-        
+
         private void PopulateEquipment()
         {
             foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump))
@@ -43,8 +46,9 @@ namespace Pump.Layout.Schedule
                 _pumpIdList.Add(equipment.ID);
                 if (_customSchedule.id_Pump != null && _customSchedule.id_Pump == equipment.ID)
                 {
-                    CustomPumpPicker.SelectedIndex = (CustomPumpPicker.Items.Count -1);
+                    CustomPumpPicker.SelectedIndex = (CustomPumpPicker.Items.Count - 1);
                 }
+
                 if (CustomPumpPicker.SelectedIndex == -1 && CustomPumpPicker.Items.Count > 0)
                     CustomPumpPicker.SelectedIndex = 0;
             }
@@ -67,6 +71,7 @@ namespace Pump.Layout.Schedule
                 ScrollViewZoneDetail.Children.Add(new ViewException(e));
             }
         }
+
         private string CustomScheduleValidate()
         {
             var notification = "";
@@ -89,7 +94,7 @@ namespace Pump.Layout.Schedule
                     notification += "\n\u2022 Select a pump";
                 CustomPumpPicker.BackgroundColor = Color.Red;
             }
-            
+
             if (MaskedEntryRepeat.Text.Length == 0)
             {
                 if (notification.Length < 1)
@@ -98,8 +103,10 @@ namespace Pump.Layout.Schedule
                     notification += "\n\u2022 Select repeat amount";
                 CustomPumpPicker.BackgroundColor = Color.Red;
             }
+
             return notification;
         }
+
         private string SendSelectedZonesValidate(string notification)
         {
             foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
@@ -116,6 +123,7 @@ namespace Pump.Layout.Schedule
 
             return notification;
         }
+
         private List<ScheduleDetail> GetSelectedZonesList()
         {
             var scheduleDetailList = (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children
@@ -127,6 +135,7 @@ namespace Pump.Layout.Schedule
 
             return scheduleDetailList;
         }
+
         private async void ButtonCreateCustomSchedule_OnClicked(object sender, EventArgs e)
         {
             var notification = CustomScheduleValidate();
@@ -155,6 +164,7 @@ namespace Pump.Layout.Schedule
                     await DisplayAlert("Incomplete", "\u2022 One or more zones are required!", "Understood");
             }
         }
+
         private async void ButtonBack_OnClicked(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();

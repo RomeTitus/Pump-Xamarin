@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using EmbeddedImages;
 using Pump.Class;
 using Pump.Database;
-using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.CommunityToolkit.UI.Views;
@@ -17,14 +16,14 @@ namespace Pump.Layout.Dashboard
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : ContentPage
     {
+        private readonly DatabaseController _databaseController = new DatabaseController();
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly ObservableSiteIrrigation _observableSiteIrrigation;
-        private SettingPageHomeScreen _settingPageHomeScreen;
         private readonly SocketPicker _socketPicker;
-        
-        private readonly DatabaseController _databaseController = new DatabaseController();
-        
-        public HomeScreen(ObservableIrrigation observableIrrigation,ObservableSiteIrrigation observableSiteIrrigation, SocketPicker socketPicker)
+        private SettingPageHomeScreen _settingPageHomeScreen;
+
+        public HomeScreen(ObservableIrrigation observableIrrigation, ObservableSiteIrrigation observableSiteIrrigation,
+            SocketPicker socketPicker)
         {
             _observableIrrigation = observableIrrigation;
             _observableSiteIrrigation = observableSiteIrrigation;
@@ -32,7 +31,6 @@ namespace Pump.Layout.Dashboard
             InitializeComponent();
             if (Device.RuntimePlatform == Device.iOS)
             {
-                
             }
 
             subscribeToOnlineStatus(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -48,8 +46,9 @@ namespace Pump.Layout.Dashboard
             var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableSiteIrrigation, _socketPicker);
             var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableSiteIrrigation, _socketPicker);
             var scheduleHomeScreen = new ScheduleHomeScreen(_observableSiteIrrigation, _socketPicker);
-            _settingPageHomeScreen = new SettingPageHomeScreen(_observableIrrigation, _observableSiteIrrigation, _socketPicker);
-            
+            _settingPageHomeScreen =
+                new SettingPageHomeScreen(_observableIrrigation, _observableSiteIrrigation, _socketPicker);
+
             var navigationScheduleStatusHomeScreen = new TabViewItem
             {
                 Content = scheduleStatusHomeScreen,
@@ -99,7 +98,7 @@ namespace Pump.Layout.Dashboard
                     "Pump.Icons.setting.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
-            
+
             TabViewHome.TabItems.Add(navigationScheduleStatusHomeScreen);
             TabViewHome.TabItems.Add(navigationManualScheduleHomeScreen);
             TabViewHome.TabItems.Add(navigationCustomScheduleHomeScreen);
@@ -112,16 +111,18 @@ namespace Pump.Layout.Dashboard
         {
             return _settingPageHomeScreen.GetSiteButton();
         }
-        
+
         private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (_observableIrrigation.AliveList.Any() && !_observableIrrigation.AliveList.Contains(null))
             {
-
                 var result = await ConnectionSuccessful();
-                Device.BeginInvokeOnMainThread(() => {
-                    SignalImage.Source = ImageSource.FromResource(result ? "Pump.Icons.Signal_5.png" : "Pump.Icons.Signal_NoSignal.png", typeof(ImageResourceExtention).GetTypeInfo().Assembly);
-                    BackgroundColor = result ? Color.DeepSkyBlue: Color.Crimson;
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    SignalImage.Source = ImageSource.FromResource(
+                        result ? "Pump.Icons.Signal_5.png" : "Pump.Icons.Signal_NoSignal.png",
+                        typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                    BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
                 });
             }
         }
@@ -149,13 +150,16 @@ namespace Pump.Layout.Dashboard
                 var aliveStatus = _observableIrrigation.AliveList.First();
 
                 //No Point in trying to request OnlineStatus if someone else has already tried and failed 1-delay seconds ago
-                if (aliveStatus.ResponseTime < aliveStatus.RequestedTime - delay && aliveStatus.RequestedTime > now - delay && !requestedOnlineStatus)
+                if (aliveStatus.ResponseTime < aliveStatus.RequestedTime - delay &&
+                    aliveStatus.RequestedTime > now - delay && !requestedOnlineStatus)
                 {
                     _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
                     return false;
                 }
 
-                if (aliveStatus.ResponseTime <= now - 600 && aliveStatus.ResponseTime >= aliveStatus.RequestedTime) // 10 Minutes before We try Request Online Status Again
+                if (aliveStatus.ResponseTime <= now - 600 &&
+                    aliveStatus.ResponseTime >=
+                    aliveStatus.RequestedTime) // 10 Minutes before We try Request Online Status Again
                 {
                     aliveStatus.RequestedTime = now;
                     requestedOnlineStatus = true;
@@ -170,7 +174,8 @@ namespace Pump.Layout.Dashboard
 
                 now = ScheduleTime.GetUnixTimeStampUtcNow();
                 var count1 = count;
-                Device.BeginInvokeOnMainThread(() => {
+                Device.BeginInvokeOnMainThread(() =>
+                {
                     SignalImage.Source = ImageSource.FromResource(
                         "Pump.Icons.Signal_" + count1 + ".png",
                         typeof(ImageResourceExtention).GetTypeInfo().Assembly);

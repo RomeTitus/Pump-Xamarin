@@ -13,7 +13,8 @@
         }
 
         public string verifyConnection()
-        { //TODO FIX THIS WHEN SOCKETS ARE WORKING AGAIN
+        {
+            //TODO FIX THIS WHEN SOCKETS ARE WORKING AGAIN
             //return Send(commands.getMacAddress(), host, port);
             return "Fix This";
         }

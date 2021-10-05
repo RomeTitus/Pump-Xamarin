@@ -6,7 +6,7 @@ namespace Pump.Database.Table
 {
     public class PumpConnection
     {
-        public readonly List<string> ConnectionTypeList = new List<string>() { "Cloud", "Network", "BlueTooth" };
+        public readonly List<string> ConnectionTypeList = new List<string> { "Cloud", "Network", "BlueTooth" };
 
         public PumpConnection()
         {

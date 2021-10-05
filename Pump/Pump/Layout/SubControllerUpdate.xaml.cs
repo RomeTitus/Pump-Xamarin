@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -14,8 +10,9 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SubControllerUpdate : ContentPage
     {
-        private readonly SubController _subController;
         private readonly SocketPicker _socketPicker;
+        private readonly SubController _subController;
+
         public SubControllerUpdate(SocketPicker socketPicker, SubController subController = null)
         {
             InitializeComponent();
@@ -49,8 +46,8 @@ namespace Pump.Layout
                 if (i != _subController.OutgoingKey.Count - 1)
                     OutgoingKey.Text += ",";
             }
-            
         }
+
         private void ButtonBack_OnClicked(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();

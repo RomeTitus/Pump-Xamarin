@@ -46,7 +46,7 @@ namespace Pump.SocketController
             var bytes = new byte[1024];
             // Connect to Remote EndPoint  
             sender.Connect(host, port);
-            
+
             // Encode the data string into a byte array.
             var msg = Encoding.ASCII.GetBytes(message);
             // Send the data through the socket.
@@ -54,7 +54,7 @@ namespace Pump.SocketController
 
             // Receive the response from the remote device.
             var bytesRec = sender.Receive(bytes);
-            
+
 
             // Release the socket.    
             sender.Shutdown(SocketShutdown.Both);

@@ -9,6 +9,7 @@ namespace Pump.Layout
     public partial class FloatingScreenScroll : PopupPage
     {
         public bool IsStackLayout = true;
+
         public FloatingScreenScroll(double hightRequest = 600)
         {
             InitializeComponent();
@@ -17,8 +18,9 @@ namespace Pump.Layout
 
         public void SetFloatingScreen(IEnumerable<object> screens)
         {
-            if(IsStackLayout)
-                foreach (View screen in screens) ScrollViewFloatingPage.Children.Add(screen);
+            if (IsStackLayout)
+                foreach (View screen in screens)
+                    ScrollViewFloatingPage.Children.Add(screen);
             else
             {
                 var flexLayout = new FlexLayout

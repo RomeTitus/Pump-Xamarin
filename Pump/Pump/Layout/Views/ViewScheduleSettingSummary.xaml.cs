@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -9,8 +8,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewScheduleSettingSummary : ContentView
     {
-        public IrrigationController.Schedule Schedule;
         public readonly Equipment Equipment;
+        public IrrigationController.Schedule Schedule;
+
         public ViewScheduleSettingSummary(IrrigationController.Schedule schedule, Equipment equipment)
         {
             InitializeComponent();
@@ -26,16 +26,15 @@ namespace Pump.Layout.Views
         {
             labelScheduleName.Text = Schedule.NAME;
             labelScheduleTime.Text = Schedule.TIME;
-            
+
             LabelPumpName.Text = Equipment.NAME;
-            
+
             switchScheduleIsActive.IsToggled = !Schedule.isActive.Contains("0");
             SetWeek();
         }
 
         private void SetWeek()
         {
-            
             if (Schedule.WEEK.Contains("SUNDAY"))
             {
                 LabelSunday.TextColor = Color.Black;

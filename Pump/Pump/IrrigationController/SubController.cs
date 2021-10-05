@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
     public class SubController
     {
-        [JsonIgnore]
-        public string ID { get; set; }
-        [JsonIgnore]
-        public bool DeleteAwaiting { get; set; }
+        [JsonIgnore] public string ID { get; set; }
+
+        [JsonIgnore] public bool DeleteAwaiting { get; set; }
+
         public string NAME { get; set; }
         public string BTmac { get; set; }
         public string IpAdress { get; set; }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
@@ -10,10 +9,11 @@ namespace Pump.IrrigationController
         {
             AttachedEquipment = new List<AttachedSensor>();
         }
-        [JsonIgnore]
-        public string ID { get; set; }
-        [JsonIgnore]
-        public bool DeleteAwaiting { get; set; }
+
+        [JsonIgnore] public string ID { get; set; }
+
+        [JsonIgnore] public bool DeleteAwaiting { get; set; }
+
         public string LastReading { get; set; }
         public string Key { get; set; }
         public string NAME { get; set; }
@@ -22,8 +22,5 @@ namespace Pump.IrrigationController
         public string AttachedSubController { get; set; }
         public long? LastUpdated { get; set; }
         public List<AttachedSensor> AttachedEquipment { get; set; }
-
-
-       
     }
 }

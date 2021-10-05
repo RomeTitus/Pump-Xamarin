@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using EmbeddedImages;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -13,6 +10,7 @@ namespace Pump.Layout.Views
     public partial class ViewEquipmentSummary : ContentView
     {
         public Equipment Equipment;
+
         public ViewEquipmentSummary(Equipment equipment)
         {
             InitializeComponent();
@@ -25,9 +23,9 @@ namespace Pump.Layout.Views
         {
             LabelEquipmentName.Text = Equipment.NAME;
             LabelPin.Text = "Pin: " + Equipment.GPIO;
-            if(Equipment.DirectOnlineGPIO != null)
+            if (Equipment.DirectOnlineGPIO != null)
                 LabelPin.Text += "-" + Equipment.DirectOnlineGPIO;
-            if(Equipment.isPump)
+            if (Equipment.isPump)
                 EquipmentImage.Source = ImageSource.FromResource(
                     "Pump.Icons.activePump.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly);
@@ -37,7 +35,5 @@ namespace Pump.Layout.Views
         {
             return StackLayoutViewEquipmentTapGesture;
         }
-
-
     }
 }

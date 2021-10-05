@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using EmbeddedImages;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -22,7 +16,9 @@ namespace Pump.Layout
         private readonly List<Sensor> _sensorList;
         private readonly Site _site;
         private readonly SocketPicker _socketPicker;
-        public SiteUpdate(List<Sensor> sensorList, List<Equipment> equipmentList, SocketPicker socketPicker, Site site = null)
+
+        public SiteUpdate(List<Sensor> sensorList, List<Equipment> equipmentList, SocketPicker socketPicker,
+            Site site = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
@@ -31,7 +27,7 @@ namespace Pump.Layout
                 site = new Site();
                 ButtonUpdateSite.Text = "Create";
             }
-                
+
             _site = site;
             _sensorList = sensorList;
             _equipmentList = equipmentList;
@@ -45,9 +41,9 @@ namespace Pump.Layout
             _site.Attachments.Clear();
             foreach (var view in ScrollViewSiteSelection.Children)
             {
-                var stackLayout = (StackLayout) view;
-                var checkBox = (CheckBox) stackLayout.Children[0];
-                if(checkBox.IsChecked)
+                var stackLayout = (StackLayout)view;
+                var checkBox = (CheckBox)stackLayout.Children[0];
+                if (checkBox.IsChecked)
                     _site.Attachments.Add(stackLayout.AutomationId);
             }
 
@@ -89,11 +85,11 @@ namespace Pump.Layout
                     HorizontalOptions = LayoutOptions.StartAndExpand,
                     Children =
                     {
-                        new CheckBox {HorizontalOptions = LayoutOptions.Start, IsChecked = isSelected},
+                        new CheckBox { HorizontalOptions = LayoutOptions.Start, IsChecked = isSelected },
                         new Image
                         {
                             HorizontalOptions = LayoutOptions.Start,
-                            HeightRequest= 40,
+                            HeightRequest = 40,
                             Source = ImageSource.FromResource(
                                 image,
                                 typeof(ImageResourceExtention).GetTypeInfo().Assembly)
@@ -119,11 +115,11 @@ namespace Pump.Layout
                     HorizontalOptions = LayoutOptions.StartAndExpand,
                     Children =
                     {
-                        new CheckBox {HorizontalOptions = LayoutOptions.Start, IsChecked = isSelected},
+                        new CheckBox { HorizontalOptions = LayoutOptions.Start, IsChecked = isSelected },
                         new Image
                         {
                             HorizontalOptions = LayoutOptions.Start,
-                            HeightRequest= 40,
+                            HeightRequest = 40,
                             Source = ImageSource.FromResource(
                                 image,
                                 typeof(ImageResourceExtention).GetTypeInfo().Assembly)
@@ -137,9 +133,8 @@ namespace Pump.Layout
                 }
             );
         }
-
-
     }
+
     public static class SavedImage
     {
         public const string Pump = "Pump.Icons.activePump.png";

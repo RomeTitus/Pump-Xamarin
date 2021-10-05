@@ -5,8 +5,8 @@ namespace Pump.IrrigationController
 {
     public class ActiveSchedule
     {
-        [JsonIgnore]
-        public string Id { get; set; }
+        [JsonIgnore] public string Id { get; set; }
+
         public string Name { get; set; }
         public string IdPump { get; set; }
         public string NamePump { get; set; }

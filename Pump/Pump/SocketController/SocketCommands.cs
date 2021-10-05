@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.IrrigationController;
@@ -31,7 +27,7 @@ namespace Pump.SocketController
             var wiFiScan = new JObject { { "Task", "WiFiScan" } };
             return wiFiScan;
         }
-        
+
         public static JObject ConnectionInfo()
         {
             var wiFiScan = new JObject { { "Task", "ConnectionInfo" } };
@@ -40,8 +36,8 @@ namespace Pump.SocketController
 
         public static JObject WiFiConnect(JObject wiFiConnect)
         {
-            var wiFiCommand = new JObject{{ "Task", new JObject()}};
-            wiFiCommand["Task"] = new JObject{{ "WiFiConnect", new JObject()}};
+            var wiFiCommand = new JObject { { "Task", new JObject() } };
+            wiFiCommand["Task"] = new JObject { { "WiFiConnect", new JObject() } };
             wiFiCommand["Task"]["WiFiConnect"] = wiFiConnect;
             return wiFiCommand;
         }
@@ -56,21 +52,22 @@ namespace Pump.SocketController
 
         public static JObject SetupSubController(SubController subController, string id)
         {
-            var createSubControllerCommand = new JObject { { "SubController", new JObject() } , { "Task", new JObject{{ "IsMaster", false }}}};
-            createSubControllerCommand["SubController"] = new JObject { { id,  JToken.FromObject(subController)}};
+            var createSubControllerCommand = new JObject
+                { { "SubController", new JObject() }, { "Task", new JObject { { "IsMaster", false } } } };
+            createSubControllerCommand["SubController"] = new JObject { { id, JToken.FromObject(subController) } };
             return createSubControllerCommand;
         }
 
         public static JObject AllTogether()
         {
-            var collectAllTogether = new JObject { { "Task", new JObject {{"AllTogether", true}}}};
+            var collectAllTogether = new JObject { { "Task", new JObject { { "AllTogether", true } } } };
             return collectAllTogether;
         }
 
         private static JObject DeleteManualSchedule(ManualSchedule manualSchedule)
         {
             var deleteManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject() } };
-            deleteManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, new JObject()}};
+            deleteManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, new JObject() } };
             return deleteManualScheduleCommand;
         }
 
@@ -78,14 +75,15 @@ namespace Pump.SocketController
         {
             if (manualSchedule.ID == null)
                 manualSchedule.ID = GenerateKey(20);
-            var setManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject()}};
-            setManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, JToken.FromObject(manualSchedule) } };
+            var setManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject() } };
+            setManualScheduleCommand[nameof(ManualSchedule)] = new JObject
+                { { manualSchedule.ID, JToken.FromObject(manualSchedule) } };
             return setManualScheduleCommand;
         }
 
         private static JObject DeleteSchedule(Schedule schedule)
         {
-            var deleteScheduleCommand = new JObject { { nameof(Schedule), new JObject() }};
+            var deleteScheduleCommand = new JObject { { nameof(Schedule), new JObject() } };
             deleteScheduleCommand[nameof(Schedule)] = new JObject { { schedule.ID, new JObject() } };
             return deleteScheduleCommand;
         }
@@ -98,6 +96,7 @@ namespace Pump.SocketController
             setScheduleCommand[nameof(Schedule)] = new JObject { { schedule.ID, JToken.FromObject(schedule) } };
             return setScheduleCommand;
         }
+
         private static JObject DeleteCustomSchedule(CustomSchedule customSchedule)
         {
             var deleteCustomScheduleCommand = new JObject { { nameof(CustomSchedule), new JObject() } };
@@ -110,7 +109,8 @@ namespace Pump.SocketController
             if (customSchedule.ID == null)
                 customSchedule.ID = GenerateKey(20);
             var setCustomScheduleCommand = new JObject { { nameof(CustomSchedule), new JObject() } };
-            setCustomScheduleCommand[nameof(CustomSchedule)] = new JObject { { customSchedule.ID, JToken.FromObject(customSchedule) } };
+            setCustomScheduleCommand[nameof(CustomSchedule)] = new JObject
+                { { customSchedule.ID, JToken.FromObject(customSchedule) } };
             return setCustomScheduleCommand;
         }
 
@@ -174,7 +174,8 @@ namespace Pump.SocketController
             if (subController.ID == null)
                 subController.ID = GenerateKey(20);
             var setSubControllerCommand = new JObject { { nameof(SubController), new JObject() } };
-            setSubControllerCommand[nameof(SubController)] = new JObject { { subController.ID, JToken.FromObject(subController) } };
+            setSubControllerCommand[nameof(SubController)] = new JObject
+                { { subController.ID, JToken.FromObject(subController) } };
             return setSubControllerCommand;
         }
 
@@ -183,7 +184,9 @@ namespace Pump.SocketController
             if (entity.GetType() == typeof(ManualSchedule))
             {
                 ManualSchedule manualSchedule = (ManualSchedule)entity;
-                return CleanJObject(manualSchedule.DeleteAwaiting ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule));
+                return CleanJObject(manualSchedule.DeleteAwaiting
+                    ? DeleteManualSchedule(manualSchedule)
+                    : SetManualSchedule(manualSchedule));
             }
 
             if (entity.GetType() == typeof(Schedule))
@@ -195,7 +198,9 @@ namespace Pump.SocketController
             if (entity.GetType() == typeof(CustomSchedule))
             {
                 CustomSchedule customSchedule = (CustomSchedule)entity;
-                return CleanJObject(customSchedule.DeleteAwaiting ? DeleteCustomSchedule(customSchedule) : SetCustomSchedule(customSchedule));
+                return CleanJObject(customSchedule.DeleteAwaiting
+                    ? DeleteCustomSchedule(customSchedule)
+                    : SetCustomSchedule(customSchedule));
             }
 
             if (entity.GetType() == typeof(Equipment))
@@ -219,17 +224,19 @@ namespace Pump.SocketController
             if (entity.GetType() == typeof(SubController))
             {
                 SubController subController = (SubController)entity;
-                return CleanJObject(subController.DeleteAwaiting ? DeleteSubController(subController) : SetSubController(subController));
+                return CleanJObject(subController.DeleteAwaiting
+                    ? DeleteSubController(subController)
+                    : SetSubController(subController));
             }
+
             //TODO see how this will work with BlueTooth / Socket
             if (entity.GetType() == typeof(Alive))
             {
                 Alive alive = (Alive)entity;
-                return CleanJObject((JObject) ScheduleTime.GetUnixTimeStampUtcNow());
+                return CleanJObject((JObject)ScheduleTime.GetUnixTimeStampUtcNow());
             }
 
             return null;
-            
         }
 
         private static JObject CleanJObject(JObject jObject)
@@ -239,9 +246,9 @@ namespace Pump.SocketController
                 var typeKey = jObject[type.Key];
                 foreach (var jToken in typeKey.First.First.ToList())
                 {
-                    var properties = (JProperty) jToken;
+                    var properties = (JProperty)jToken;
                     var result = properties.Value.ToString();
-                    if (string.IsNullOrEmpty(result) ||  result == "[]")
+                    if (string.IsNullOrEmpty(result) || result == "[]")
                     {
                         jToken.Remove();
                     }

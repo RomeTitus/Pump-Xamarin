@@ -6,9 +6,22 @@ namespace Pump.IrrigationController
 {
     public class ObservableSiteIrrigation
     {
+        private readonly ObservableIrrigation _observableIrrigation;
 
         private readonly Site _site;
-        private readonly ObservableIrrigation _observableIrrigation;
+
+        public readonly ObservableCollection<CustomSchedule> CustomScheduleList =
+            new ObservableCollection<CustomSchedule>();
+
+        public readonly ObservableCollection<Equipment> EquipmentList = new ObservableCollection<Equipment>();
+
+        public readonly ObservableCollection<ManualSchedule> ManualScheduleList =
+            new ObservableCollection<ManualSchedule>();
+
+        public readonly ObservableCollection<Schedule> ScheduleList = new ObservableCollection<Schedule>();
+        public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor>();
+        public readonly ObservableCollection<Site> SiteList = new ObservableCollection<Site>();
+
         public ObservableSiteIrrigation(ObservableIrrigation observableIrrigation, Site site)
         {
             _site = site;
@@ -18,32 +31,42 @@ namespace Pump.IrrigationController
             {
                 EquipmentList.Add(equipment);
             }
+
             observableIrrigation.EquipmentList.CollectionChanged += EquipmentListOnCollectionChanged;
 
             foreach (var sensor in observableIrrigation.SensorList.Where(x => _site.Attachments.Contains(x?.ID)))
             {
                 SensorList.Add(sensor);
             }
-            observableIrrigation.SensorList.CollectionChanged +=SensorListOnCollectionChanged;
 
-            foreach (var manualSchedule in observableIrrigation.ManualScheduleList.Where(x => x.ManualDetails.Any(y => _site.Attachments.Contains(y.id_Equipment))))
+            observableIrrigation.SensorList.CollectionChanged += SensorListOnCollectionChanged;
+
+            foreach (var manualSchedule in observableIrrigation.ManualScheduleList.Where(x =>
+                x.ManualDetails.Any(y => _site.Attachments.Contains(y.id_Equipment))))
             {
                 ManualScheduleList.Add(manualSchedule);
             }
-            observableIrrigation.ManualScheduleList.CollectionChanged +=ManualScheduleListOnCollectionChanged;
+
+            observableIrrigation.ManualScheduleList.CollectionChanged += ManualScheduleListOnCollectionChanged;
 
 
-            foreach (var schedule in observableIrrigation.ScheduleList.Where(x => x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) || _site.Attachments.Contains(x.id_Pump)))
+            foreach (var schedule in observableIrrigation.ScheduleList.Where(x =>
+                x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) ||
+                _site.Attachments.Contains(x.id_Pump)))
             {
                 ScheduleList.Add(schedule);
             }
-            observableIrrigation.ScheduleList.CollectionChanged +=ScheduleListOnCollectionChanged;
+
+            observableIrrigation.ScheduleList.CollectionChanged += ScheduleListOnCollectionChanged;
 
 
-            foreach (var customSchedule in observableIrrigation.CustomScheduleList.Where(x => x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) || _site.Attachments.Contains(x.id_Pump)))
+            foreach (var customSchedule in observableIrrigation.CustomScheduleList.Where(x =>
+                x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) ||
+                _site.Attachments.Contains(x.id_Pump)))
             {
                 CustomScheduleList.Add(customSchedule);
             }
+
             observableIrrigation.CustomScheduleList.CollectionChanged += CustomScheduleListOnCollectionChanged;
 
 
@@ -51,6 +74,7 @@ namespace Pump.IrrigationController
             {
                 SiteList.Add(addedSite);
             }
+
             observableIrrigation.SiteList.CollectionChanged += SiteListOnCollectionChanged;
         }
 
@@ -65,36 +89,43 @@ namespace Pump.IrrigationController
                     ManualScheduleList.Clear();
                     ScheduleList.Clear();
                     CustomScheduleList.Clear();
-                    
+
                     break;
                 case NotifyCollectionChangedAction.Add:
                 {
                     foreach (Site newItem in e.NewItems)
                     {
                         //TODO Is This Even Possible
-                        if(_site.ID != newItem?.ID) continue;
+                        if (_site.ID != newItem?.ID) continue;
                         SiteList.Add(newItem);
-                        foreach (var equipment in _observableIrrigation.EquipmentList.Where(x => _site.Attachments.Contains(x?.ID)))
+                        foreach (var equipment in _observableIrrigation.EquipmentList.Where(x =>
+                            _site.Attachments.Contains(x?.ID)))
                         {
                             EquipmentList.Add(equipment);
                         }
 
-                        foreach (var sensor in _observableIrrigation.SensorList.Where(x => _site.Attachments.Contains(x?.ID)))
+                        foreach (var sensor in _observableIrrigation.SensorList.Where(x =>
+                            _site.Attachments.Contains(x?.ID)))
                         {
                             SensorList.Add(sensor);
                         }
 
-                        foreach (var manualSchedule in _observableIrrigation.ManualScheduleList.Where(x => x.ManualDetails.Any(y => _site.Attachments.Contains(y.id_Equipment))))
+                        foreach (var manualSchedule in _observableIrrigation.ManualScheduleList.Where(x =>
+                            x.ManualDetails.Any(y => _site.Attachments.Contains(y.id_Equipment))))
                         {
                             ManualScheduleList.Add(manualSchedule);
                         }
 
-                        foreach (var schedule in _observableIrrigation.ScheduleList.Where(x => x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) || _site.Attachments.Contains(x.id_Pump)))
+                        foreach (var schedule in _observableIrrigation.ScheduleList.Where(x =>
+                            x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) ||
+                            _site.Attachments.Contains(x.id_Pump)))
                         {
                             ScheduleList.Add(schedule);
                         }
 
-                        foreach (var customSchedule in _observableIrrigation.CustomScheduleList.Where(x => x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) || _site.Attachments.Contains(x.id_Pump)))
+                        foreach (var customSchedule in _observableIrrigation.CustomScheduleList.Where(x =>
+                            x.ScheduleDetails.Any(y => _site.Attachments.Contains(y.id_Equipment)) ||
+                            _site.Attachments.Contains(x.id_Pump)))
                         {
                             CustomScheduleList.Add(customSchedule);
                         }
@@ -106,49 +137,59 @@ namespace Pump.IrrigationController
                 {
                     foreach (Site newItem in e.NewItems)
                     {
-                        if(_site.ID != newItem.ID) continue;
+                        if (_site.ID != newItem.ID) continue;
                         _site.Attachments = newItem.Attachments;
                         _site.Description = newItem.Description;
                         _site.NAME = newItem.NAME;
-                        
+
                         //Could Be Add or remove
                         var replaceElement = SiteList.FirstOrDefault(x => x?.ID == newItem.ID);
                         if (replaceElement == null) continue;
-                        
+
                         SiteList[SiteList.IndexOf(replaceElement)] = newItem;
-                        
+
                         //Equipment
-                        var newEquipments = _observableIrrigation.EquipmentList.Where(x => _site.Attachments.Contains(x?.ID) && EquipmentList.Select(y => y.ID).Contains(x?.ID) == false).ToList();
-                        var removeEquipments = EquipmentList.Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
+                        var newEquipments = _observableIrrigation.EquipmentList.Where(x =>
+                            _site.Attachments.Contains(x?.ID) &&
+                            EquipmentList.Select(y => y.ID).Contains(x?.ID) == false).ToList();
+                        var removeEquipments = EquipmentList.Where(x => _site.Attachments.Contains(x?.ID) == false)
+                            .ToList();
                         foreach (var equipment in newEquipments)
                         {
                             EquipmentList.Add(equipment);
                         }
-                        
+
                         foreach (var removeEquipment in removeEquipments)
                         {
                             EquipmentList.Remove(removeEquipment);
                         }
-                        
+
                         //Sensor
-                        var newSensors = _observableIrrigation.SensorList.Where(x => _site.Attachments.Contains(x?.ID) && SensorList.Select(y => y.ID).Contains(x?.ID) == false).ToList();
+                        var newSensors = _observableIrrigation.SensorList.Where(x =>
+                                _site.Attachments.Contains(x?.ID) &&
+                                SensorList.Select(y => y.ID).Contains(x?.ID) == false)
+                            .ToList();
                         var removeSensors = SensorList.Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
-                        
+
                         foreach (var sensor in newSensors)
                         {
                             SensorList.Add(sensor);
                         }
-                        
+
                         foreach (var removeSensor in removeSensors)
                         {
                             SensorList.Remove(removeSensor);
                         }
-                        
-                        
+
+
                         //Schedule
-                        var newSchedules = _observableIrrigation.ScheduleList.Where(x => _site.Attachments.Contains(x.id_Pump) || x.ScheduleDetails.Any(detail => _site.Attachments.Contains(detail.id_Equipment)) && ScheduleList.Select(y => y.ID).Contains(x.ID) == false).ToList();
-                        var removeSchedules = ScheduleList.Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
-                       
+                        var newSchedules = _observableIrrigation.ScheduleList.Where(x =>
+                            _site.Attachments.Contains(x.id_Pump) ||
+                            x.ScheduleDetails.Any(detail => _site.Attachments.Contains(detail.id_Equipment)) &&
+                            ScheduleList.Select(y => y.ID).Contains(x.ID) == false).ToList();
+                        var removeSchedules = ScheduleList.Where(x => _site.Attachments.Contains(x?.ID) == false)
+                            .ToList();
+
                         foreach (var schedule in newSchedules)
                         {
                             ScheduleList.Add(schedule);
@@ -158,10 +199,14 @@ namespace Pump.IrrigationController
                         {
                             ScheduleList.Remove(removeSchedule);
                         }
-                 
+
                         //CustomSchedule
-                        var newCustomSchedules = _observableIrrigation.CustomScheduleList.Where(x => _site.Attachments.Contains(x.id_Pump) || x.ScheduleDetails.Any(detail => _site.Attachments.Contains(detail.id_Equipment)) && CustomScheduleList.Select(y => y.ID).Contains(x.ID) == false).ToList();
-                        var removeCustomSchedules = CustomScheduleList.Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
+                        var newCustomSchedules = _observableIrrigation.CustomScheduleList.Where(x =>
+                            _site.Attachments.Contains(x.id_Pump) ||
+                            x.ScheduleDetails.Any(detail => _site.Attachments.Contains(detail.id_Equipment)) &&
+                            CustomScheduleList.Select(y => y.ID).Contains(x.ID) == false).ToList();
+                        var removeCustomSchedules = CustomScheduleList
+                            .Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
 
                         foreach (var customSchedule in newCustomSchedules)
                         {
@@ -172,11 +217,14 @@ namespace Pump.IrrigationController
                         {
                             CustomScheduleList.Remove(removeCustomSchedule);
                         }
-                        
+
                         //ManualSchedule
-                        var newManualSchedules = _observableIrrigation.ManualScheduleList.Where(x => x.ManualDetails.Any(detail => _site.Attachments.Contains(detail.id_Equipment)) && ManualScheduleList.Select(y => y.ID).Contains(x.ID) == false).ToList();
-                        var removeManualSchedules = ManualScheduleList.Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
-                       
+                        var newManualSchedules = _observableIrrigation.ManualScheduleList.Where(x =>
+                            x.ManualDetails.Any(detail => _site.Attachments.Contains(detail.id_Equipment)) &&
+                            ManualScheduleList.Select(y => y.ID).Contains(x.ID) == false).ToList();
+                        var removeManualSchedules = ManualScheduleList
+                            .Where(x => _site.Attachments.Contains(x?.ID) == false).ToList();
+
                         foreach (var manualSchedule in newManualSchedules)
                         {
                             ManualScheduleList.Add(manualSchedule);
@@ -187,30 +235,31 @@ namespace Pump.IrrigationController
                             ManualScheduleList.Remove(removeManualSchedule);
                         }
                     }
-                    
+
                     break;
                 }
                 case NotifyCollectionChangedAction.Remove:
                 {
                     foreach (Site oldItem in e.OldItems)
                     {
-                        if(_site.ID != oldItem.ID) continue;
-                        
+                        if (_site.ID != oldItem.ID) continue;
+
                         SiteList.Remove(oldItem);
-                        
+
                         SiteList.Clear();
                         EquipmentList.Clear();
                         SensorList.Clear();
                         ManualScheduleList.Clear();
                         ScheduleList.Clear();
                         CustomScheduleList.Clear();
-                        
+
                         EquipmentList.Add(null);
                         SensorList.Add(null);
                         ManualScheduleList.Add(null);
                         ScheduleList.Add(null);
                         CustomScheduleList.Add(null);
                     }
+
                     break;
                 }
             }
@@ -227,7 +276,9 @@ namespace Pump.IrrigationController
                 {
                     foreach (CustomSchedule newItem in e.NewItems)
                     {
-                        if(newItem != null && (_site.Attachments.Contains(newItem.id_Pump) || newItem.ScheduleDetails.Any(x => _site.Attachments.Contains(x.id_Equipment))))
+                        if (newItem != null && (_site.Attachments.Contains(newItem.id_Pump) ||
+                                                newItem.ScheduleDetails.Any(x =>
+                                                    _site.Attachments.Contains(x.id_Equipment))))
                             CustomScheduleList.Add(newItem);
                     }
 
@@ -237,7 +288,8 @@ namespace Pump.IrrigationController
                 {
                     foreach (CustomSchedule newItem in e.NewItems)
                     {
-                        if(!_site.Attachments.Contains(newItem.id_Pump) || !newItem.ScheduleDetails.Any(x => _site.Attachments.Contains(x.id_Equipment))) continue;
+                        if (!_site.Attachments.Contains(newItem.id_Pump) ||
+                            !newItem.ScheduleDetails.Any(x => _site.Attachments.Contains(x.id_Equipment))) continue;
 
                         var replaceElement = CustomScheduleList.FirstOrDefault(x => x?.ID == newItem.ID);
                         if (replaceElement != null)
@@ -269,7 +321,9 @@ namespace Pump.IrrigationController
                 {
                     foreach (Schedule newItem in e.NewItems)
                     {
-                        if(newItem != null && (_site.Attachments.Contains(newItem.id_Pump) || newItem.ScheduleDetails.Any(x => _site.Attachments.Contains(x.id_Equipment))))
+                        if (newItem != null && (_site.Attachments.Contains(newItem.id_Pump) ||
+                                                newItem.ScheduleDetails.Any(x =>
+                                                    _site.Attachments.Contains(x.id_Equipment))))
                             ScheduleList.Add(newItem);
                     }
 
@@ -279,7 +333,8 @@ namespace Pump.IrrigationController
                 {
                     foreach (Schedule newItem in e.NewItems)
                     {
-                        if(!_site.Attachments.Contains(newItem.id_Pump) || !newItem.ScheduleDetails.Any(x => _site.Attachments.Contains(x.id_Equipment))) continue;
+                        if (!_site.Attachments.Contains(newItem.id_Pump) ||
+                            !newItem.ScheduleDetails.Any(x => _site.Attachments.Contains(x.id_Equipment))) continue;
 
                         var replaceElement = ScheduleList.FirstOrDefault(x => x?.ID == newItem.ID);
                         if (replaceElement != null)
@@ -312,7 +367,8 @@ namespace Pump.IrrigationController
                 {
                     foreach (ManualSchedule newItem in e.NewItems)
                     {
-                        if(newItem != null && newItem.ManualDetails.Any(x => _site.Attachments.Contains(x.id_Equipment)))
+                        if (newItem != null &&
+                            newItem.ManualDetails.Any(x => _site.Attachments.Contains(x.id_Equipment)))
                             ManualScheduleList.Add(newItem);
                     }
 
@@ -353,7 +409,7 @@ namespace Pump.IrrigationController
                 {
                     foreach (Sensor newItem in e.NewItems)
                     {
-                        if(newItem != null && _site.Attachments.Contains(newItem.ID))
+                        if (newItem != null && _site.Attachments.Contains(newItem.ID))
                             SensorList.Add(newItem);
                     }
 
@@ -394,7 +450,7 @@ namespace Pump.IrrigationController
                 {
                     foreach (Equipment newItem in e.NewItems)
                     {
-                        if(newItem != null && _site.Attachments.Contains(newItem.ID))
+                        if (newItem != null && _site.Attachments.Contains(newItem.ID))
                             EquipmentList.Add(newItem);
                     }
 
@@ -424,17 +480,10 @@ namespace Pump.IrrigationController
             }
         }
 
-        public readonly ObservableCollection<Equipment> EquipmentList = new ObservableCollection<Equipment>();
-        public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor>();
-        public readonly ObservableCollection<ManualSchedule> ManualScheduleList = new ObservableCollection<ManualSchedule>();
-        public readonly ObservableCollection<Schedule> ScheduleList = new ObservableCollection<Schedule>();
-        public readonly ObservableCollection<CustomSchedule> CustomScheduleList = new ObservableCollection<CustomSchedule>();
-        public readonly ObservableCollection<Site> SiteList = new ObservableCollection<Site>();
-
         public bool LoadedAllData()
         {
-            return !EquipmentList.Contains(null) && !SensorList.Contains(null) && !ManualScheduleList.Contains(null) && !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null);
+            return !EquipmentList.Contains(null) && !SensorList.Contains(null) && !ManualScheduleList.Contains(null) &&
+                   !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null);
         }
-        
     }
 }

@@ -9,80 +9,48 @@ using Plugin.FirebasePushNotification;
 using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Notification;
-using Xamarin.Forms;
 using Pump.Notification;
+using Xamarin.Forms;
+using Application = Android.App.Application;
 using NotificationPriority = Plugin.FirebasePushNotification.NotificationPriority;
-
+using String = Java.Lang.String;
 
 [assembly: Dependency(typeof(AndroidNotificationManager))]
+
 namespace Pump.Droid.Notification
 {
-   
     class AndroidNotificationManager : DefaultPushNotificationHandler, INotificationManager
     {
-        private NotificationManager _manager;
-        private readonly Context _mContext;
-        
         public new const string TitleKey = "title";
         public new const string MessageKey = "message";
         public const string ControllerNameKey = "btmac";
-        public event EventHandler NotificationReceived;
-        public static AndroidNotificationManager Instance { get; private set; }
-        private bool _channelInitialized;
         const string ChannelId = "default";
         const string ChannelName = "Default";
         const string ChannelDescription = "The default channel for notifications.";
+        private readonly Context _mContext;
+        private bool _channelInitialized;
+        private NotificationManager _manager;
         int _messageId;
         int _pendingIntentId;
 
         public AndroidNotificationManager()
         {
-            _mContext = Android.App.Application.Context;
+            _mContext = Application.Context;
             if (Instance == null)
             {
                 CreateNotificationChannel();
                 Instance = this;
             }
-            
-            
         }
 
-      
-        
-        
-      public override void OnReceived(IDictionary<string, object> parameters)
-      {
-          //Do Not show notifications for now.... we will use Custom Ones
-      }
-              
-        void CreateNotificationChannel()
-        {
-            _manager = (NotificationManager)_mContext.GetSystemService(Context.NotificationService);
-
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                var channelNameJava = new Java.Lang.String(ChannelName);
-                var channel = new NotificationChannel(ChannelId, channelNameJava, NotificationImportance.Default)
-                {
-                    Description = ChannelDescription
-                };
-                
-                channel.EnableLights(true);
-                channel.EnableVibration(true);
-                //channel.SetSound(sound, alarmAttributes);
-                channel.SetShowBadge(true);
-                channel.Importance = NotificationImportance.High;
-                channel.SetVibrationPattern(new long[] { 100, 200, 300, 400, 500, 400, 300, 200, 400 });
-                _manager?.CreateNotificationChannel(channel);
-            }
-            _channelInitialized = true;
-        }
+        public static AndroidNotificationManager Instance { get; private set; }
+        public event EventHandler NotificationReceived;
 
         public void SendNotification(string title, string message, string BTmac, DateTime? notifyTime = null)
         {
             var controller = new DatabaseController().GetControllerNameByMac(BTmac);
-            if(controller == null) return;
-            
+            if (controller == null) return;
+
             if (!_channelInitialized)
             {
                 CreateNotificationChannel();
@@ -95,8 +63,9 @@ namespace Pump.Droid.Notification
                 intent.PutExtra(MessageKey, message);
                 intent.PutExtra(ControllerNameKey, controller.Name);
 
-                
-                PendingIntent pendingIntent = PendingIntent.GetBroadcast(_mContext, _pendingIntentId++, intent, PendingIntentFlags.CancelCurrent);
+
+                PendingIntent pendingIntent = PendingIntent.GetBroadcast(_mContext, _pendingIntentId++, intent,
+                    PendingIntentFlags.CancelCurrent);
                 long triggerTime = GetNotifyTime(notifyTime.Value);
                 AlarmManager alarmManager = _mContext.GetSystemService(Context.AlarmService) as AlarmManager;
                 alarmManager?.Set(AlarmType.RtcWakeup, triggerTime, pendingIntent);
@@ -106,13 +75,56 @@ namespace Pump.Droid.Notification
                 Show(title, message, controller.Name);
             }
         }
+
+        public void ReceiveNotification(string title, string message, string controllerName)
+        {
+            var args = new NotificationEventArgs
+            {
+                Title = title,
+                Message = message,
+                ControllerName = controllerName
+            };
+            NotificationReceived?.Invoke(null, args);
+        }
+
+
+        public override void OnReceived(IDictionary<string, object> parameters)
+        {
+            //Do Not show notifications for now.... we will use Custom Ones
+        }
+
+        void CreateNotificationChannel()
+        {
+            _manager = (NotificationManager)_mContext.GetSystemService(Context.NotificationService);
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                var channelNameJava = new String(ChannelName);
+                var channel = new NotificationChannel(ChannelId, channelNameJava, NotificationImportance.Default)
+                {
+                    Description = ChannelDescription
+                };
+
+                channel.EnableLights(true);
+                channel.EnableVibration(true);
+                //channel.SetSound(sound, alarmAttributes);
+                channel.SetShowBadge(true);
+                channel.Importance = NotificationImportance.High;
+                channel.SetVibrationPattern(new long[] { 100, 200, 300, 400, 500, 400, 300, 200, 400 });
+                _manager?.CreateNotificationChannel(channel);
+            }
+
+            _channelInitialized = true;
+        }
+
         public void Show(string title, string message, string controllerName)
         {
             Intent intent = new Intent(_mContext, typeof(MainActivity));
             intent.PutExtra(title, message);
             intent.AddFlags(ActivityFlags.ClearTop);
 
-            PendingIntent pendingIntent = PendingIntent.GetActivity(_mContext, _pendingIntentId++, intent, PendingIntentFlags.UpdateCurrent);
+            PendingIntent pendingIntent = PendingIntent.GetActivity(_mContext, _pendingIntentId++, intent,
+                PendingIntentFlags.UpdateCurrent);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(_mContext, ChannelId)
                 .SetContentIntent(pendingIntent)
@@ -128,10 +140,10 @@ namespace Pump.Droid.Notification
                 .SetStyle(new NotificationCompat.BigTextStyle()
                     .BigText(message))
                 .SetDefaults((int)NotificationDefaults.Sound | (int)NotificationDefaults.Vibrate);
-            
+
             var notification = builder.Build();
             _manager.Notify(_messageId++, notification);
-            
+
             /*
             try
             {
@@ -194,17 +206,6 @@ namespace Pump.Droid.Notification
             */
         }
 
-        public void ReceiveNotification(string title, string message, string controllerName)
-        {
-            var args = new NotificationEventArgs
-            {
-                Title = title,
-                Message = message,
-                ControllerName = controllerName
-            };
-            NotificationReceived?.Invoke(null, args);
-        }
-        
         private long GetNotifyTime(DateTime notifyTime)
         {
             var utcTime = TimeZoneInfo.ConvertTimeToUtc(notifyTime);

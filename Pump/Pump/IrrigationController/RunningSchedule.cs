@@ -6,13 +6,15 @@ namespace Pump.IrrigationController
 {
     internal class RunningSchedule
     {
-        private readonly IEnumerable<Schedule> _scheduleList;
         private readonly IEnumerable<Equipment> _equipmentList;
+        private readonly IEnumerable<Schedule> _scheduleList;
+
         public RunningSchedule(IEnumerable<Schedule> scheduleList, IEnumerable<Equipment> equipmentList)
         {
             _scheduleList = scheduleList;
             _equipmentList = equipmentList;
         }
+
         public IEnumerable<ActiveSchedule> GetActiveSchedule()
         {
             var activeScheduleList = new List<ActiveSchedule>();
@@ -38,7 +40,8 @@ namespace Pump.IrrigationController
                     {
                         var activeSchedule = new ActiveSchedule
                         {
-                            Id = schedule.ID + scheduleDetails.id_Equipment, Name = schedule.NAME, IdEquipment = scheduleDetails.id_Equipment
+                            Id = schedule.ID + scheduleDetails.id_Equipment, Name = schedule.NAME,
+                            IdEquipment = scheduleDetails.id_Equipment
                         };
                         activeSchedule.NameEquipment =
                             _equipmentList.FirstOrDefault(x => x?.ID == activeSchedule.IdEquipment)?.NAME;
@@ -56,10 +59,9 @@ namespace Pump.IrrigationController
                     }
                 }
             }
+
             var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
             return sortedList;
-
-
         }
 
         private static IEnumerable<DateTime> WeekCalculator(string week)

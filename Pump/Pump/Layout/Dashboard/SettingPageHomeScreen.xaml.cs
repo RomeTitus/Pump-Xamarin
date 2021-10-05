@@ -12,7 +12,9 @@ namespace Pump.Layout.Dashboard
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly ObservableSiteIrrigation _observableSiteIrrigation;
         private readonly SocketPicker _socketPicker;
-        public SettingPageHomeScreen(ObservableIrrigation observableIrrigation,ObservableSiteIrrigation observableSiteIrrigation, SocketPicker socketPicker)
+
+        public SettingPageHomeScreen(ObservableIrrigation observableIrrigation,
+            ObservableSiteIrrigation observableSiteIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
@@ -27,7 +29,8 @@ namespace Pump.Layout.Dashboard
 
         private void BtnEquipmentDetail_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation, _observableSiteIrrigation, _socketPicker));
+            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation, _observableSiteIrrigation,
+                _socketPicker));
         }
 
         public Button GetSiteButton()

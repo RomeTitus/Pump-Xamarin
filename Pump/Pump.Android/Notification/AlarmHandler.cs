@@ -13,7 +13,8 @@ namespace Pump.Droid.Notification
                 string message = intent.GetStringExtra(AndroidNotificationManager.MessageKey);
                 string controllerName = intent.GetStringExtra(AndroidNotificationManager.ControllerNameKey);
 
-                AndroidNotificationManager manager = AndroidNotificationManager.Instance ?? new AndroidNotificationManager();
+                AndroidNotificationManager manager =
+                    AndroidNotificationManager.Instance ?? new AndroidNotificationManager();
                 manager.Show(title, message, controllerName);
             }
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microcharts;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
@@ -27,16 +26,23 @@ namespace Pump.Layout
         {
             foreach (var chartEntry in _chartEntries)
             {
-                
                 var stackLayout = new StackLayout
                 {
                     HorizontalOptions = LayoutOptions.FillAndExpand, Orientation = StackOrientation.Horizontal,
                     VerticalOptions = LayoutOptions.Start,
                     Children =
                     {
-                        new Label{HorizontalOptions = LayoutOptions.StartAndExpand, Text = chartEntry.Label, VerticalOptions = LayoutOptions.CenterAndExpand},
-                        new Label{HorizontalOptions = LayoutOptions.EndAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand, Text = chartEntry.ValueLabel + "  "},
-                        }
+                        new Label
+                        {
+                            HorizontalOptions = LayoutOptions.StartAndExpand, Text = chartEntry.Label,
+                            VerticalOptions = LayoutOptions.CenterAndExpand
+                        },
+                        new Label
+                        {
+                            HorizontalOptions = LayoutOptions.EndAndExpand,
+                            VerticalOptions = LayoutOptions.CenterAndExpand, Text = chartEntry.ValueLabel + "  "
+                        },
+                    }
                 };
                 var filterCheckBox = new CheckBox
                 {

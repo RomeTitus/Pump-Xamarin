@@ -4,7 +4,6 @@ using System.Linq;
 using Firebase.Database;
 using Microcharts;
 using Newtonsoft.Json.Linq;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
@@ -17,10 +16,11 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class RecordScreen : ContentPage
     {
-        private readonly ObservableSiteIrrigation _observableIrrigation;
         private readonly List<ChartEntry> _chartEntries = new List<ChartEntry>();
         private readonly List<string> _excludedEntries = new List<string>();
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
+        private readonly ObservableSiteIrrigation _observableIrrigation;
+
         public RecordScreen(ObservableSiteIrrigation observableIrrigation)
         {
             InitializeComponent();
@@ -59,8 +59,9 @@ namespace Pump.Layout
             var recordJObjectList = await new Authentication().GetRecordingBetweenDates(startTime, endTime);
             await PopupNavigation.Instance.PopAllAsync();
             var allRecordList = CalculateHistoryRecording(recordJObjectList);
-            if(!allRecordList.Any())return;
-            var recordList = allRecordList.Where(x => _observableIrrigation.SiteList.First().Attachments.Contains(x.id_Equipment));
+            if (!allRecordList.Any()) return;
+            var recordList = allRecordList.Where(x =>
+                _observableIrrigation.SiteList.First().Attachments.Contains(x.id_Equipment));
 
             _chartEntries.Clear();
 
@@ -69,10 +70,9 @@ namespace Pump.Layout
                 var random = new Random();
                 var color = $"#{random.Next(0x1000000):X6}";
                 var equipment = _observableIrrigation.EquipmentList.FirstOrDefault(x => x.ID == record.id_Equipment);
-                if(equipment != null)
+                if (equipment != null)
                     _chartEntries.Add(new ChartEntry(record.Duration)
                     {
-                    
                         Label = equipment.NAME,
                         ValueLabel = record.Duration.ToString(),
                         Color = SKColor.Parse(color),
@@ -80,8 +80,14 @@ namespace Pump.Layout
                         ValueLabelColor = SKColor.Parse(color)
                     });
             }
-            RecordChartView.Chart = new BarChart{Entries = _chartEntries, BackgroundColor = SKColor.Parse("#00bfff"), LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30, ValueLabelTextSize = 30};
+
+            RecordChartView.Chart = new BarChart
+            {
+                Entries = _chartEntries, BackgroundColor = SKColor.Parse("#00bfff"),
+                LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30, ValueLabelTextSize = 30
+            };
         }
+
         private List<Record> CalculateHistoryRecording(IReadOnlyCollection<FirebaseObject<JObject>> recordJObjectList)
         {
             var historyList = new List<Record>();
@@ -110,7 +116,6 @@ namespace Pump.Layout
                             existingRecording.Duration += record.Duration;
                         }
                     }
-
                 }
             }
 
@@ -130,31 +135,37 @@ namespace Pump.Layout
                 recordScreenStackLayout.Orientation = StackOrientation.Vertical;
                 RecordChartView.HeightRequest = 250;
             }
+
             base.OnSizeAllocated(width, height); //must be called
         }
 
         private void BtnFilterViewChart_OnPressed(object sender, EventArgs e)
         {
             var chartFilter = new ChartEntryFilterScreen(_chartEntries, _excludedEntries);
-            var chartLayout = new List<object>{chartFilter.GetLayout()};
+            var chartLayout = new List<object> { chartFilter.GetLayout() };
             _floatingScreen.SetFloatingScreen(chartLayout);
             foreach (var checkBox in chartFilter.GetCheckBoxes())
             {
                 checkBox.CheckedChanged += CheckBox_CheckedChanged;
             }
-            PopupNavigation.Instance.PushAsync(_floatingScreen);
 
+            PopupNavigation.Instance.PushAsync(_floatingScreen);
         }
 
         private void CheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            var checkBox = (CheckBox) sender;
+            var checkBox = (CheckBox)sender;
             if (checkBox.IsChecked)
-            
+
                 _excludedEntries.Remove(checkBox.AutomationId);
             else
                 _excludedEntries.Add(checkBox.AutomationId);
-            RecordChartView.Chart = new BarChart { Entries = _chartEntries.Where(x => _excludedEntries.Contains(x.Label) == false), BackgroundColor = SKColor.Parse("#00bfff"), LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30, ValueLabelTextSize = 30 };
+            RecordChartView.Chart = new BarChart
+            {
+                Entries = _chartEntries.Where(x => _excludedEntries.Contains(x.Label) == false),
+                BackgroundColor = SKColor.Parse("#00bfff"), LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30,
+                ValueLabelTextSize = 30
+            };
         }
     }
 }

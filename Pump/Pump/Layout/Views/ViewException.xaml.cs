@@ -13,8 +13,8 @@ namespace Pump.Layout.Views
             ID = "-849";
             AutomationId = ID;
             LabelException.Text = e.Message;
-            
         }
+
         public string ID { get; private set; }
     }
 }

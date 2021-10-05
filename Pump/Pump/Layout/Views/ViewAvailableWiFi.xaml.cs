@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Pump.IrrigationController;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
@@ -14,6 +11,7 @@ namespace Pump.Layout.Views
     public partial class ViewAvailableWiFi : ContentView
     {
         private List<WiFiContainer> _WiFiContainers;
+
         public ViewAvailableWiFi(List<WiFiContainer> WiFiContainers)
         {
             InitializeComponent();

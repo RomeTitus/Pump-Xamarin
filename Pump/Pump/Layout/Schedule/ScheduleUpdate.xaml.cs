@@ -15,12 +15,13 @@ namespace Pump.Layout.Schedule
     public partial class ScheduleUpdate : ContentPage
     {
         private readonly List<Equipment> _equipmentList;
-        private IrrigationController.Schedule _schedule;
         private readonly List<string> _pumpIdList = new List<string>();
-        private ViewSchedulePumpTime _pumpSelectedTime;
         private readonly SocketPicker _socketPicker;
+        private ViewSchedulePumpTime _pumpSelectedTime;
+        private IrrigationController.Schedule _schedule;
 
-        public ScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker, IrrigationController.Schedule schedule = null)
+        public ScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker,
+            IrrigationController.Schedule schedule = null)
         {
             InitializeComponent();
             _equipmentList = equipmentList;
@@ -36,7 +37,7 @@ namespace Pump.Layout.Schedule
                 var selectWeekThread = new Thread(SetSelectedWeek);
                 selectWeekThread.Start();
             }
-            
+
 
             //SetUpWeekDays(); //Not sure where this should go
             new Thread(SetUpWeekDays).Start();
@@ -44,8 +45,6 @@ namespace Pump.Layout.Schedule
             PopulateEquipment();
             ButtonCreateSchedule.IsEnabled = true;
             PumpPicker.IsEnabled = true;
-            
-
         }
 
         private void PopulateEquipment()
@@ -59,7 +58,8 @@ namespace Pump.Layout.Schedule
                     PumpPicker.SelectedIndex = (PumpPicker.Items.Count - 1);
                 }
             }
-            if(PumpPicker.SelectedIndex == -1 && PumpPicker.Items.Count>0)
+
+            if (PumpPicker.SelectedIndex == -1 && PumpPicker.Items.Count > 0)
                 PumpPicker.SelectedIndex = 0;
             try
             {
@@ -126,7 +126,7 @@ namespace Pump.Layout.Schedule
                 frame.BackgroundColor = Color.DeepSkyBlue;
             }
         }
-        
+
         private static void FramesLoaded(IReadOnlyCollection<Frame> frames)
         {
             for (var i = 0; i < 100; i++)
@@ -143,13 +143,14 @@ namespace Pump.Layout.Schedule
             var frame = (Frame)sender;
             var weekday = frame.AutomationId;
 
-            if (_schedule.WEEK.Split(',').Contains(weekday)) 
-                _schedule.WEEK = _schedule.WEEK.Replace(weekday+",","");
+            if (_schedule.WEEK.Split(',').Contains(weekday))
+                _schedule.WEEK = _schedule.WEEK.Replace(weekday + ",", "");
             else
                 _schedule.WEEK += (weekday + ",");
 
             SetSelectedWeek();
         }
+
         private void SetSelectedWeek()
         {
             var frames = new List<Frame>
@@ -170,6 +171,7 @@ namespace Pump.Layout.Schedule
                 ChangeWeekSelect(frame, _schedule.WEEK.Split(',').Contains(frame.AutomationId));
             }
         }
+
         private static void ChangeWeekSelect(Frame frame, bool isSelected)
         {
             var frameChildren = frame.Children;
@@ -195,8 +197,6 @@ namespace Pump.Layout.Schedule
 
         private async void ButtonUpdateSchedule_OnClicked(object sender, EventArgs e)
         {
-
-
             var notification = SendUpdateScheduleValidate();
             notification = SendSelectedZonesValidate(notification);
 
@@ -217,14 +217,15 @@ namespace Pump.Layout.Schedule
                 {
                     _schedule.ScheduleDetails = scheduleDetail;
                     await _socketPicker.SendCommand(_schedule);
-                    
+
                     await Navigation.PopModalAsync();
                 }
                 else
                 {
                     var floatingScreen = new FloatingScreen();
                     await PopupNavigation.Instance.PushAsync(floatingScreen);
-                    _pumpSelectedTime = new ViewSchedulePumpTime(_schedule, _equipmentList.First(x => x?.ID == _schedule.id_Pump));
+                    _pumpSelectedTime = new ViewSchedulePumpTime(_schedule,
+                        _equipmentList.First(x => x?.ID == _schedule.id_Pump));
                     _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
                     floatingScreen.SetFloatingScreen(new List<object> { _pumpSelectedTime });
                 }
@@ -292,7 +293,7 @@ namespace Pump.Layout.Schedule
         {
             foreach (var scrollViewZone in ScrollViewZoneDetail.Children)
             {
-                var child = (ViewZoneAndTimeGrid) scrollViewZone;
+                var child = (ViewZoneAndTimeGrid)scrollViewZone;
                 var maskTime = child.GetMaskText();
                 if (string.IsNullOrWhiteSpace(maskTime.Text) || maskTime.Text.Length >= 4) continue;
                 if (string.IsNullOrWhiteSpace(notification))
@@ -307,7 +308,11 @@ namespace Pump.Layout.Schedule
 
         private List<ScheduleDetail> GetSelectedZonesList()
         {
-            return (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children select child.GetMaskText() into maskTime where !string.IsNullOrWhiteSpace(maskTime.Text) select new ScheduleDetail {id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text}).ToList();
+            return (from ViewZoneAndTimeGrid child in ScrollViewZoneDetail.Children
+                select child.GetMaskText()
+                into maskTime
+                where !string.IsNullOrWhiteSpace(maskTime.Text)
+                select new ScheduleDetail { id_Equipment = maskTime.AutomationId, DURATION = maskTime.Text }).ToList();
         }
 
         private async void UpdateSchedulePumpDuration_Pressed(object sender, EventArgs e)
@@ -323,7 +328,7 @@ namespace Pump.Layout.Schedule
                 await PopupNavigation.Instance.PopAsync();
                 _schedule.ScheduleDetails = new List<ScheduleDetail>
                 {
-                    new ScheduleDetail()
+                    new ScheduleDetail
                     {
                         id_Equipment = _pumpIdList[PumpPicker.SelectedIndex],
                         DURATION = _pumpSelectedTime.GetPumpDurationTime().Text
@@ -335,7 +340,7 @@ namespace Pump.Layout.Schedule
             await Navigation.PopModalAsync();
             await Navigation.PopModalAsync();
         }
-        
+
 
         private string SendSelectedPumpValidate(string notification, string pumpName)
         {

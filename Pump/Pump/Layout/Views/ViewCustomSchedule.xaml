@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
 <ContentView
     x:Class="Pump.Layout.Views.ViewCustomSchedule"
     xmlns="http://xamarin.com/schemas/2014/forms"
@@ -37,7 +38,8 @@
                         VerticalOptions="Center" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
-                    <Image HeightRequest="15" Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                    <Image HeightRequest="15"
+                           Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
                         Text="Unknown"

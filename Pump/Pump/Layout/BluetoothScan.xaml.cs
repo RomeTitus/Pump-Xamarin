@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Linq;
-using Plugin.BLE.Abstractions.EventArgs;
 using Pump.Class;
 using Pump.Layout.Views;
 using Pump.SocketController.BT;
 using Xamarin.Forms;
-using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout
@@ -13,8 +12,9 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class BlueToothScan : ContentPage
     {
-        private readonly NotificationEvent _notificationEvent;
         private readonly BluetoothManager _bluetoothManager;
+        private readonly NotificationEvent _notificationEvent;
+
         public BlueToothScan(NotificationEvent notificationEvent)
         {
             InitializeComponent();
@@ -32,24 +32,22 @@ namespace Pump.Layout
             if (_bluetoothManager.AdapterBle.IsScanning)
             {
                 BtnScan.Text = "Start Scan";
-                
             }
             else
                 BtnScan.Text = "Stop Scan";
-            
+
             await _bluetoothManager.StartScanning();
-            
         }
 
         private void PopulateBluetoothDeviceEvent(object sender,
-            System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            NotifyCollectionChangedEventArgs e)
         {
             Device.BeginInvokeOnMainThread(PopulateBluetoothDevice);
         }
 
         private async void ViewSiteScreen_Tapped(object sender, EventArgs e)
         {
-            var viewBlueTooth = (StackLayout) sender;
+            var viewBlueTooth = (StackLayout)sender;
             var blueToothDevice =
                 _bluetoothManager.IrrigationDeviceBt.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
 
@@ -72,7 +70,6 @@ namespace Pump.Layout
                 {
                     await DisplayAlert("Connect Exception!", exception.Message, "Understood");
                 }
-
             }
         }
 
@@ -85,7 +82,7 @@ namespace Pump.Layout
                 foreach (var view in ScrollViewSetupSystem.Children)
                 {
                     if (view.GetType() != typeof(ViewBluetoothSummary)) continue;
-                    var existingViewBluetoothSummary = (ViewBluetoothSummary) view;
+                    var existingViewBluetoothSummary = (ViewBluetoothSummary)view;
                     if (existingViewBluetoothSummary.BluetoothDevice.Id == bluetooth.Id)
                     {
                         existingView = true;
@@ -94,6 +91,7 @@ namespace Pump.Layout
                         break;
                     }
                 }
+
                 if (existingView) continue;
                 var blueToothView = new ViewBluetoothSummary(bluetooth);
                 blueToothView.GetTapGestureRecognizer().Tapped += ViewSiteScreen_Tapped;
@@ -118,11 +116,12 @@ namespace Pump.Layout
                         break;
                     }
                 }
+
                 if (existingView) continue;
                 ScrollViewSetupSystem.Children.Remove(viewBlueTooth);
             }
         }
-    
+
         void Adapter_ScanTimeoutElapsed(object sender, EventArgs e)
         {
             BtnScan.Text = "Start Scan";

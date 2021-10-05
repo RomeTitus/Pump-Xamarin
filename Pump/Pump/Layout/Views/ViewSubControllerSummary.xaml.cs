@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using EmbeddedImages;
-using Pump.IrrigationController;
+﻿using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,6 +8,7 @@ namespace Pump.Layout.Views
     public partial class ViewSubControllerSummary : ContentView
     {
         public readonly SubController SubController;
+
         public ViewSubControllerSummary(SubController subController)
         {
             InitializeComponent();
@@ -26,7 +20,7 @@ namespace Pump.Layout.Views
         public void Populate()
         {
             LabelSubControllerName.Text = SubController.NAME;
-            if(SubController.UseLoRa)
+            if (SubController.UseLoRa)
                 LabelType.Text = "Long Range";
         }
 

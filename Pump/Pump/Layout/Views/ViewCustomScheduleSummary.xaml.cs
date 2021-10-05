@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Pump.Class;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -13,8 +12,8 @@ namespace Pump.Layout.Views
     public partial class ViewCustomScheduleSummary : ContentView
     {
         private readonly List<Equipment> _equipmentList;
-        public readonly CustomSchedule CustomSchedule;
         private readonly List<TapGestureRecognizer> _zoneAndTimeTapGesture = new List<TapGestureRecognizer>();
+        public readonly CustomSchedule CustomSchedule;
 
         public ViewCustomScheduleSummary(CustomSchedule customSchedule, List<Equipment> equipmentList)
         {
@@ -30,7 +29,7 @@ namespace Pump.Layout.Views
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan) (endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
+                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
@@ -43,7 +42,7 @@ namespace Pump.Layout.Views
 
             foreach (var view in ScrollViewZoneDetail.Children)
             {
-                var scheduleGrid = (ViewZoneAndTimeGrid) view;
+                var scheduleGrid = (ViewZoneAndTimeGrid)view;
 
                 scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
@@ -60,7 +59,7 @@ namespace Pump.Layout.Views
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
             if (endTime != null)
             {
-                var timeLeft = (TimeSpan) (endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
+                var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 

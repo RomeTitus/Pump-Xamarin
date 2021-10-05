@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Timers;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -8,8 +9,9 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewActiveScheduleSummary : ContentView
     {
+        private Timer _timer;
         public ActiveSchedule ActiveSchedule;
-        private System.Timers.Timer _timer;
+
         public ViewActiveScheduleSummary(ActiveSchedule activeSchedule, double? size = null)
         {
             InitializeComponent();
@@ -21,10 +23,10 @@ namespace Pump.Layout.Views
                 LabelScheduleName.FontSize *= size.Value;
                 LablePump.FontSize *= size.Value;
                 LableZone.FontSize *= size.Value;
-                LableStartTime.FontSize *= size.Value*0.7;
+                LableStartTime.FontSize *= size.Value * 0.7;
                 LableEndTime.FontSize *= size.Value * 0.7;
-
             }
+
             PopulateSchedule();
         }
 
@@ -43,32 +45,29 @@ namespace Pump.Layout.Views
 
         private void StartEvent()
         {
-            _timer = new System.Timers.Timer(1000); // 1 seconds
+            _timer = new Timer(1000); // 1 seconds
             _timer.Elapsed += timer_Elapsed;
             _timer.Enabled = true;
         }
 
-        void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            
-                string duration;
-                if (DateTime.Now >= ActiveSchedule.StartTime)
+            string duration;
+            if (DateTime.Now >= ActiveSchedule.StartTime)
+            {
+                Device.BeginInvokeOnMainThread(() =>
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        var span = ActiveSchedule.EndTime - DateTime.Now;
-                        duration = $"Time left: \n{span:hh\\:mm\\:ss}";
-                        LableEndTime.Text = duration;
-                    });
-                }
-                else
-                {
-                    var span = ActiveSchedule.EndTime - ActiveSchedule.StartTime;
-                    duration = $"Duration: \n{span:hh\\:mm\\:ss}";
+                    var span = ActiveSchedule.EndTime - DateTime.Now;
+                    duration = $"Time left: \n{span:hh\\:mm\\:ss}";
                     LableEndTime.Text = duration;
-                }   
-                
+                });
+            }
+            else
+            {
+                var span = ActiveSchedule.EndTime - ActiveSchedule.StartTime;
+                duration = $"Duration: \n{span:hh\\:mm\\:ss}";
+                LableEndTime.Text = duration;
+            }
         }
-        
     }
 }

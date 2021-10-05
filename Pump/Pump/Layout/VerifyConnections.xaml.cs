@@ -1,6 +1,4 @@
 ﻿using System;
-using Pump.Database;
-using Pump.Database.Table;
 using Rg.Plugins.Popup.Pages;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms.Xaml;

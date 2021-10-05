@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
@@ -22,12 +21,13 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SetupSystem : ContentPage
     {
-        private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private readonly BluetoothManager _blueToothManage;
-        private List<WiFiContainer> _wiFiContainers;
+        private readonly NotificationEvent _notificationEvent;
+        private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private WiFiContainer _selectedWiFiContainer;
         private ViewBasicAlert _viewBasicAlert;
-        private readonly NotificationEvent _notificationEvent;
+        private List<WiFiContainer> _wiFiContainers;
+
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
         {
             InitializeComponent();
@@ -42,7 +42,7 @@ namespace Pump.Layout
 
         private void IsMain_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
-            var isMain = (CheckBox) sender;
+            var isMain = (CheckBox)sender;
             PairGrid.IsVisible = !isMain.IsChecked;
             ButtonCreate.Text = isMain.IsChecked ? "Create" : "Pair";
             LabelControllerName.Text = isMain.IsChecked ? "Controller Name" : "SubController Name";
@@ -52,7 +52,7 @@ namespace Pump.Layout
         {
             try
             {
-                var loadingScreen = new VerifyConnections {CloseWhenBackgroundIsClicked = false};
+                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 var result = await ScanWiFi();
                 await PopupNavigation.Instance.PopAllAsync();
@@ -65,11 +65,11 @@ namespace Pump.Layout
 
                 _wiFiContainers = DictToWiFiContainer(result);
                 var wiFiView = new ViewAvailableWiFi(_wiFiContainers);
-                await GeneratePopupScreen(new List<object> {wiFiView});
-                
+                await GeneratePopupScreen(new List<object> { wiFiView });
+
                 foreach (var views in wiFiView.GetChildren())
                 {
-                    var wifiView = (ViewWiFi) views;
+                    var wifiView = (ViewWiFi)views;
                     wifiView.GetGestureRecognizer().Tapped += WiFiView_Tapped;
                 }
             }
@@ -85,7 +85,8 @@ namespace Pump.Layout
             try
             {
                 var tapGestureRecognizerWiFi = (StackLayout)sender;
-                _selectedWiFiContainer = _wiFiContainers.FirstOrDefault(x => x?.ssid == tapGestureRecognizerWiFi.AutomationId);
+                _selectedWiFiContainer =
+                    _wiFiContainers.FirstOrDefault(x => x?.ssid == tapGestureRecognizerWiFi.AutomationId);
 
                 if (_selectedWiFiContainer != null)
                 {
@@ -100,8 +101,9 @@ namespace Pump.Layout
                             "Connect",
                             "Cancel", true);
                     }
+
                     _viewBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
-                    await GeneratePopupScreen(new List<object> {_viewBasicAlert}, 400);
+                    await GeneratePopupScreen(new List<object> { _viewBasicAlert }, 400);
                 }
                 else
                     await DisplayAlert("WIFI", "We could not find that WiFi Details", "Understood");
@@ -114,7 +116,7 @@ namespace Pump.Layout
 
         private async void WiFiPassword_Clicked(object sender, EventArgs e)
         {
-            if(_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.GetEditableText()))
+            if (_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.GetEditableText()))
                 _selectedWiFiContainer.passkey = _viewBasicAlert.GetEditableText();
 
             //LabelWiFi.Text = _selectedWiFiContainer.ssid;
@@ -134,8 +136,12 @@ namespace Pump.Layout
             if (Dict == "None") return wiFiList;
             var wiFiObject = JObject.Parse(Dict);
 
-            wiFiList.AddRange(wiFiObject["Networks"].Select(wiFiInfo => 
-                new WiFiContainer {encryption_type = wiFiInfo["encryption_type"].ToString(), signal = wiFiInfo["signal"].ToString(), ssid = wiFiInfo["ssid"].ToString()}));
+            wiFiList.AddRange(wiFiObject["Networks"].Select(wiFiInfo =>
+                new WiFiContainer
+                {
+                    encryption_type = wiFiInfo["encryption_type"].ToString(), signal = wiFiInfo["signal"].ToString(),
+                    ssid = wiFiInfo["ssid"].ToString()
+                }));
             return wiFiList;
         }
 
@@ -157,7 +163,9 @@ namespace Pump.Layout
             var selectedController = new DatabaseController().GetControllerConnectionSelection();
             for (var i = 0; i < _controllerList.Count; i++)
             {
-                ControllerPicker.Items.Add(string.IsNullOrEmpty(_controllerList[i].Name) ? "Name is missing" : _controllerList[i].Name);
+                ControllerPicker.Items.Add(string.IsNullOrEmpty(_controllerList[i].Name)
+                    ? "Name is missing"
+                    : _controllerList[i].Name);
                 if (_controllerList[i]?.ID == selectedController?.ID)
                     ControllerPicker.SelectedIndex = i;
             }
@@ -167,12 +175,12 @@ namespace Pump.Layout
                 IsMain.IsEnabled = false;
             }
         }
-        
+
         private async Task GetConnectionInfo(string result = null)
         {
             try
             {
-                if(result == null)
+                if (result == null)
                     result = await _blueToothManage.SendAndReceiveToBle(SocketCommands.ConnectionInfo());
                 var networkDetailObject = JObject.Parse(result);
                 LabelIP.IsVisible = true;
@@ -180,11 +188,11 @@ namespace Pump.Layout
                 {
                     var networkType = networkDetail.Key;
                     var networkIpAddress = networkDetail.Value.Value<string>();
-                    string networkInfo;   
+                    string networkInfo;
                     if (networkIpAddress.Contains("\n"))
                     {
                         LabelWiFi.Text = networkIpAddress.Split('\n').First();
-                        
+
                         networkInfo = networkType + " - " + networkIpAddress.Split('\n').Last();
                     }
                     else
@@ -230,7 +238,7 @@ namespace Pump.Layout
                     "Connect",
                     "Cancel", true);
                 _viewBasicAlert.GetAcceptButton().Clicked += SetUpMainController_Clicked;
-                await GeneratePopupScreen(new List<object>{_viewBasicAlert}, 400);
+                await GeneratePopupScreen(new List<object> { _viewBasicAlert }, 400);
             }
             else
             {
@@ -246,12 +254,14 @@ namespace Pump.Layout
             {
                 var result = await SendUid(_viewBasicAlert.GetEditableText());
                 await PopupNavigation.Instance.PopAllAsync();
-                var pumpController = new PumpConnection {Name = TxtControllerName.Text, Mac = _blueToothManage.BleDevice.NativeDevice.ToString()};
+                var pumpController = new PumpConnection
+                    { Name = TxtControllerName.Text, Mac = _blueToothManage.BleDevice.NativeDevice.ToString() };
                 if (!string.IsNullOrEmpty(LabelIP.Text))
                 {
                     pumpController.InternalPath = LabelIP.Text;
                     pumpController.InternalPort = 8080;
                 }
+
                 new DatabaseController().UpdateControllerConnection(pumpController);
                 await DisplayAlert("Setup", result, "Understood");
                 _notificationEvent.UpdateStatus();
@@ -270,32 +280,35 @@ namespace Pump.Layout
                 BTmac = _blueToothManage.BleDevice.NativeDevice.ToString(),
                 NAME = TxtControllerName.Text,
                 IncomingKey = randomKey,
-                OutgoingKey = new List<int>{randomKey},
+                OutgoingKey = new List<int> { randomKey },
                 IpAdress = LabelIP.Text,
                 Port = 8080,
                 UseLoRa = !IsMain.IsChecked
             };
-            
-            var subControllerId = await new Authentication(pumpConnection.Mac).SetSubController(mainController, new NotificationEvent());
 
-            var subController = new SubController {
-                BTmac = irrigationSelf.BTmac, 
-                Port = irrigationSelf.Port, 
-                IncomingKey = randomKey, 
-                OutgoingKey = new List<int>{randomKey},
-                NAME = "Main Controller", 
+            var subControllerId =
+                await new Authentication(pumpConnection.Mac).SetSubController(mainController, new NotificationEvent());
+
+            var subController = new SubController
+            {
+                BTmac = irrigationSelf.BTmac,
+                Port = irrigationSelf.Port,
+                IncomingKey = randomKey,
+                OutgoingKey = new List<int> { randomKey },
+                NAME = "Main Controller",
                 IpAdress = irrigationSelf.IpAdress,
                 UseLoRa = !IsMain.IsChecked,
                 ID = subControllerId
             };
-            
-            var result = await _blueToothManage.SendAndReceiveToBle(SocketCommands.SetupSubController(subController, subControllerId));
+
+            var result =
+                await _blueToothManage.SendAndReceiveToBle(
+                    SocketCommands.SetupSubController(subController, subControllerId));
 
             await DisplayAlert("Setup", result, "Understood");
 
-            
+
             _notificationEvent.UpdateStatus();
-        
         }
 
         private static async Task GeneratePopupScreen(IEnumerable<object> screenViews, double hightRequest = 600)

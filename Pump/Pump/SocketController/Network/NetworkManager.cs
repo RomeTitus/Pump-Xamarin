@@ -25,18 +25,18 @@ namespace Pump.SocketController.BT
             updated = updated.Replace("False", "false");
             return updated;
         }
-        
-        public async Task<string> SendAndReceiveToNetwork(JObject dataToSend, PumpConnection connection, int timeout = 0)
+
+        public async Task<string> SendAndReceiveToNetwork(JObject dataToSend, PumpConnection connection,
+            int timeout = 0)
         {
             var fullData = false;
             var networkReplyBytes = new List<byte>();
             var partNumber = 0;
             while (fullData == false)
             {
-                
                 var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
 
-                
+
                 if (dataToSend.ContainsKey("Task"))
                     try
                     {
@@ -46,14 +46,14 @@ namespace Pump.SocketController.BT
                     {
                         // ignored
                     }
-                
+
                 var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
 
                 var finalBytesReceived = new byte[0];
                 //Sending Large amounts of Data :/
-                for (var i = 0; i < bytes.Count; i+= 1020)
+                for (var i = 0; i < bytes.Count; i += 1020)
                 {
-                    var sendingBytes = bytes.Count > i + 1020 ? bytes.GetRange(i, i + 1020) : bytes;                   
+                    var sendingBytes = bytes.Count > i + 1020 ? bytes.GetRange(i, i + 1020) : bytes;
                     sendingBytes.InsertRange(0, key);
                     finalBytesReceived = await WriteToNetwork(sendingBytes.ToArray(), connection, timeout);
                 }
@@ -63,10 +63,12 @@ namespace Pump.SocketController.BT
                 if (finalBytesReceived.Length != 512)
                     fullData = true;
             }
-            return ConvertForApplication(Encoding.ASCII.GetString(networkReplyBytes.ToArray(), 0, networkReplyBytes.Count));
+
+            return ConvertForApplication(Encoding.ASCII.GetString(networkReplyBytes.ToArray(), 0,
+                networkReplyBytes.Count));
         }
 
-        private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, PumpConnection connection,  int timeout = 0)
+        private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, PumpConnection connection, int timeout = 0)
         {
             //Return nothing if there is no network path
             if (connection.InternalPort == -1 && connection.ExternalPort == -1)
@@ -101,7 +103,7 @@ namespace Pump.SocketController.BT
             var bytes = new byte[512];
             var bytesRec = sender.Receive(bytes);
             var shrinkBytes = new List<byte>();
-            
+
             for (var i = 0; i < bytesRec; i++)
             {
                 shrinkBytes.Add(bytes[i]);
@@ -112,7 +114,8 @@ namespace Pump.SocketController.BT
             sender.Shutdown(SocketShutdown.Both);
             sender.Close();
 
-            if (Encoding.ASCII.GetString(result, 0, result.Length) == Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
+            if (Encoding.ASCII.GetString(result, 0, result.Length) ==
+                Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
                 throw new Exception("Controller did not reply back using Network \n reboot required");
             return result;
         }

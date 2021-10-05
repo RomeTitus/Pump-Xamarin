@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Pump.Class
+﻿namespace Pump.Class
 {
     public class NotificationEvent
     {
         public delegate void StatusUpdateHandler(object sender, ControllerEventArgs e);
+
         public event StatusUpdateHandler OnUpdateStatus;
 
         public void UpdateStatus(string status = null)
