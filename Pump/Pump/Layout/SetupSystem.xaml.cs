@@ -258,7 +258,7 @@ namespace Pump.Layout
                     { Name = TxtControllerName.Text, Mac = _blueToothManage.BleDevice.NativeDevice.ToString() };
                 if (!string.IsNullOrEmpty(LabelIP.Text))
                 {
-                    pumpController.InternalPath = LabelIP.Text;
+                    pumpController.InternalPath = LabelIP.Text.Split('\n').Last().Split(Convert.ToChar("-")).Last();
                     pumpController.InternalPort = 8080;
                 }
 
@@ -292,11 +292,11 @@ namespace Pump.Layout
             var subController = new SubController
             {
                 BTmac = irrigationSelf.BTmac,
-                Port = irrigationSelf.Port,
+                Port = 20002,
                 IncomingKey = randomKey,
                 OutgoingKey = new List<int> { randomKey },
                 NAME = "Main Controller",
-                IpAdress = irrigationSelf.IpAdress,
+                IpAdress = irrigationSelf.IpAdress.Split('\n').Last().Split(Convert.ToChar("-")).Last(),
                 UseLoRa = !IsMain.IsChecked,
                 ID = subControllerId
             };

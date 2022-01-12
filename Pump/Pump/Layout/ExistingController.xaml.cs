@@ -201,15 +201,14 @@ namespace Pump.Layout
                     try
                     {
                         _firebaseConnection =
-                            Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result
-                                .Object;
+                            Task.Run(() => new Authentication().IrrigationSystemPath(TxtControllerCode.Text)).Result;
                     }
-                    catch
+                    catch (Exception e)
                     {
                         _firebaseConnection = false;
                     }
 
-                    if (_firebaseConnection != null)
+                    if (_firebaseConnection != false)
                     {
                         if (_firebaseConnection == true)
                         {

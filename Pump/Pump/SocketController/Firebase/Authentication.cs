@@ -76,21 +76,20 @@ namespace Pump.SocketController.Firebase
             }
         }
 
-        public async Task<FirebaseObject<bool>> IrrigationSystemPath(string path)
+        public async Task<bool> IrrigationSystemPath(string path)
         {
             try
             {
                 var firebaseExist = await FirebaseClient
-                    .Child(path + "/MasterStatus")
-                    .OnceAsync<bool>();
+                    .Child(path + "/SelfSetup")
+                    .OnceAsync<JObject>();
 
-
-                return firebaseExist.Count > 0 ? firebaseExist.FirstOrDefault(o => o.Object) : null;
+                return firebaseExist.Count > 0;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return false;
             }
         }
 

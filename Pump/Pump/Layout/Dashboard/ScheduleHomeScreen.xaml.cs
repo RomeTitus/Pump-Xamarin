@@ -55,7 +55,9 @@ namespace Pump.Layout.Dashboard
                             var viewScheduleStatus = (ViewScheduleSettingSummary)viewSchedule;
                             viewScheduleStatus.Schedule.NAME = schedule.NAME;
                             viewScheduleStatus.Schedule.TIME = schedule.TIME;
+                            viewScheduleStatus.GetSwitch().Toggled -= ScheduleSwitch_Toggled;
                             viewScheduleStatus.Schedule.isActive = schedule.isActive;
+                            viewScheduleStatus.GetSwitch().Toggled += ScheduleSwitch_Toggled;
                             viewScheduleStatus.Equipment.NAME = equipment?.NAME;
                             viewScheduleStatus.Populate();
                         }

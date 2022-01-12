@@ -59,7 +59,8 @@ namespace Pump.Layout.Dashboard
                             viewScheduleStatus.Schedule.NAME = customSchedule.NAME;
                             viewScheduleStatus.Schedule.StartTime = customSchedule.StartTime;
                             viewScheduleStatus.Schedule.Repeat = customSchedule.Repeat;
-                            viewScheduleStatus.Equipment.NAME = equipment?.NAME;
+                            if (viewScheduleStatus.Equipment != null)
+                                viewScheduleStatus.Equipment.NAME = equipment?.NAME;
                             viewScheduleStatus.Populate();
                         }
                         else
@@ -160,20 +161,23 @@ namespace Pump.Layout.Dashboard
         {
             foreach (var view in ScrollViewCustomScheduleDetail.Children)
             {
+                if (view.GetType() == typeof(ViewException))
+                    continue;
                 var viewCustomSchedule = (ViewCustomSchedule)view;
                 if (viewCustomSchedule.Schedule.ID != schedule.ID) continue;
                 viewCustomSchedule.Schedule = schedule;
 
-                Device.BeginInvokeOnMainThread(() =>
+                async void Action()
                 {
                     viewCustomSchedule.GetSwitch().Toggled -= ScheduleSwitch_Toggled;
                     viewCustomSchedule.Populate();
                     viewCustomSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
-                });
-            }
+                    //TODO Needs Confirmation that The Pi got it and its running :)
+                    await _socketPicker.SendCommand(schedule);
+                }
 
-            //TODO Needs Confirmation that The Pi got it and its running :)
-            await _socketPicker.SendCommand(schedule);
+                Device.BeginInvokeOnMainThread(Action);
+            }
         }
 
         private void ViewScheduleSummary(string id)

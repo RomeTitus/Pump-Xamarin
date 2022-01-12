@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Pump.Class;
 
 namespace Pump.IrrigationController
 {
@@ -118,6 +119,27 @@ namespace Pump.IrrigationController
                 List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
                 List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>> irrigationTupleEditState)
         {
+            if (observableIrrigation.AliveList.Count > 0)
+            {
+                if (observableIrrigation.AliveList[0] == null)
+                {
+                    observableIrrigation.AliveList.Clear();
+                    observableIrrigation.AliveList.Add(new Alive
+                    {
+                        RequestedTime = ScheduleTime.GetUnixTimeStampUtcNow() - 1,
+                        ResponseTime = ScheduleTime.GetUnixTimeStampUtcNow()
+                    });
+                }
+                else
+                {
+                    observableIrrigation.AliveList[0] = new Alive
+                    {
+                        RequestedTime = ScheduleTime.GetUnixTimeStampUtcNow() - 1,
+                        ResponseTime = ScheduleTime.GetUnixTimeStampUtcNow()
+                    };
+                }
+            }
+
             if (observableIrrigation.CustomScheduleList.Count > 0 && observableIrrigation.CustomScheduleList[0] == null)
                 observableIrrigation.CustomScheduleList.Clear();
 

@@ -49,7 +49,7 @@ namespace Pump.Layout.Schedule
 
         private void PopulateEquipment()
         {
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
             {
                 PumpPicker.Items.Add(equipment.NAME);
                 _pumpIdList.Add(equipment.ID);
@@ -66,7 +66,7 @@ namespace Pump.Layout.Schedule
                 ScrollViewZoneDetail.Children.Clear();
                 if (_equipmentList.Count(equipment => equipment.isPump == false) == 0)
                     ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
-                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false))
+                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =
                         _schedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);

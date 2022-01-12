@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Timers;
 using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
@@ -19,7 +20,7 @@ namespace Pump.Layout
     {
         private readonly NotificationEvent _notificationEvent;
         private readonly ObservableIrrigation _observableIrrigation;
-
+        private Timer _timer;
         private readonly SocketPicker _socketPicker;
 
         //INotificationManager notificationManager;
@@ -36,22 +37,24 @@ namespace Pump.Layout
             _notificationEvent.OnUpdateStatus += NewSelectedNotification;
             _socketPicker = new SocketPicker(_observableIrrigation);
             ControllerPicker.SelectedIndexChanged += _socketPicker.ConnectionPicker_OnSelectedIndexChanged;
+            
             PopulateControllers();
             var dbController = new DatabaseController();
             if (!dbController.GetControllerConnectionList().Any())
                 SetupNewController();
         }
-
+        //TODO Clean this up
         private void SetEvents()
         {
-            _observableIrrigation.SensorList.CollectionChanged += PopulateSiteEvent;
-            _observableIrrigation.EquipmentList.CollectionChanged += PopulateSiteEvent;
-            _observableIrrigation.ScheduleList.CollectionChanged += PopulateSiteEvent;
-            _observableIrrigation.CustomScheduleList.CollectionChanged += PopulateSiteEvent;
-            _observableIrrigation.ManualScheduleList.CollectionChanged += PopulateSiteEvent;
+            //_observableIrrigation.SensorList.CollectionChanged += PopulateSiteEvent;
+            //_observableIrrigation.EquipmentList.CollectionChanged += PopulateSiteEvent;
+            //_observableIrrigation.ScheduleList.CollectionChanged += PopulateSiteEvent;
+            //_observableIrrigation.CustomScheduleList.CollectionChanged += PopulateSiteEvent;
+            //_observableIrrigation.ManualScheduleList.CollectionChanged += PopulateSiteEvent;
+            //_observableIrrigation.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
-            _observableIrrigation.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
             ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
+            StartEvent();
         }
 
         private void PopulateControllers()
@@ -103,6 +106,7 @@ namespace Pump.Layout
             {
                 if (_observableIrrigation.LoadedAllData())
                 {
+                    _timer.Interval = 20000; //refresh every 2 seconds instead of every 0.3 sec
                     BtnAddSite.IsEnabled = true;
                     var selectedSiteId = new DatabaseController().GetControllerConnectionSelection().SiteSelectedId;
                     if (!string.IsNullOrEmpty(selectedSiteId) && _loadedHomeScreen == false &&
@@ -473,6 +477,19 @@ namespace Pump.Layout
         private void NewSelectedNotification(object sender, ControllerEventArgs e)
         {
             PopulateControllers();
+        }
+
+        private void StartEvent()
+        {
+            _timer = new Timer(300); // 0.3 seconds
+            _timer.Elapsed += timer_Elapsed;
+            _timer.Enabled = true;
+        }
+
+        void timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            PopulateSiteEvent(null, null);
+            PopulateSubControllerEvent(null, null);
         }
     }
 }

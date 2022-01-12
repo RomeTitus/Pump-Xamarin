@@ -66,6 +66,7 @@ namespace Pump.SocketController
 
         private async Task Subscribe()
         {
+            _observableIrrigation.IsDisposable = false;
             var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
             if (pumpConnection.ConnectionType == 0)
                 _initializeFirebase.SubscribeFirebase();
@@ -75,8 +76,6 @@ namespace Pump.SocketController
             {
                 await _initializeBlueTooth.SubscribeBle();
             }
-
-            _observableIrrigation.IsDisposable = false;
         }
 
         public async Task<string> SendCommand(object sendObject, bool runInBackground = true)
@@ -121,19 +120,23 @@ namespace Pump.SocketController
                 await PopupNavigation.Instance.PushAsync(_floatingScreenScreen);
             }
 
-            string result;
+            string result = "Did Not Complete Action: " + sendObject;
             switch (pumpConnection?.ConnectionType)
             {
                 case 0:
                     result = await new Authentication().Descript(sendObject, _notificationEvent);
                     break;
                 case 1:
+                    if (_initializeNetwork == null)
+                        break;
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
                     result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
                         SocketCommands.Descript(sendObject), pumpConnection);
                     break;
                 case 2:
+                    if (_initializeBlueTooth == null)
+                        break;
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();
                     result = await _initializeBlueTooth?.BlueToothManager.SendAndReceiveToBle(
                         SocketCommands.Descript(sendObject));

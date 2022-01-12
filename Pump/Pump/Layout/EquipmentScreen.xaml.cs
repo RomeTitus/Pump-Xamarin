@@ -42,7 +42,7 @@ namespace Pump.Layout
                 if (_observableSiteIrrigation.EquipmentList.Contains(null)) return;
                 BtnAddEquipment.IsEnabled = true;
                 if (_observableSiteIrrigation.EquipmentList.Any())
-                    foreach (var equipment in _observableSiteIrrigation.EquipmentList)
+                    foreach (var equipment in _observableSiteIrrigation.EquipmentList.OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                     {
                         var viewEquipment = ScrollViewEquipment.Children.FirstOrDefault(x =>
                             x.AutomationId == equipment.ID);

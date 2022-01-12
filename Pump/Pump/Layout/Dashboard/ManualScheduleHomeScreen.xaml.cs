@@ -42,7 +42,7 @@ namespace Pump.Layout.Dashboard
             {
                 if (!_observableIrrigation.LoadedAllData()) return;
 
-                foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump))
+                foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var existingButton =
                         ScrollViewManualPump.Children.FirstOrDefault(view => view.AutomationId == pump.ID);
@@ -56,8 +56,7 @@ namespace Pump.Layout.Dashboard
                 {
                     ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Pump Found Here"));
                 }
-
-                foreach (var zone in _observableIrrigation.EquipmentList.Where(x => !x.isPump))
+                foreach (var zone in _observableIrrigation.EquipmentList.Where(x => !x.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME).ToList())
                 {
                     var existingButton =
                         ScrollViewManualZone.Children.FirstOrDefault(view => view.AutomationId == zone.ID);
@@ -307,7 +306,7 @@ namespace Pump.Layout.Dashboard
             if (_observableIrrigation.EquipmentList == null)
                 return;
             var buttonList = new List<Button>();
-            foreach (var zone in _observableIrrigation.EquipmentList.Where(x => x.isPump == false))
+            foreach (var zone in _observableIrrigation.EquipmentList.Where(x => x.isPump == false).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
             {
                 var button = CreateEquipmentButton(zone);
                 button.Scale = 1.25;
@@ -325,7 +324,7 @@ namespace Pump.Layout.Dashboard
             if (_observableIrrigation.EquipmentList.Contains(null))
                 return;
             var buttonList = new List<Button>();
-            foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump))
+            foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
             {
                 var button = CreateEquipmentButton(pump);
                 button.Scale = 1.25;
