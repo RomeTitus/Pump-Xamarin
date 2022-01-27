@@ -31,6 +31,7 @@ namespace Pump.Layout
         public SiteScreen()
         {
             InitializeComponent();
+            _timer = new Timer(300); // 0.3 seconds
             _observableIrrigation = new ObservableIrrigation();
             SetEvents();
             _notificationEvent = new NotificationEvent();
@@ -470,8 +471,9 @@ namespace Pump.Layout
 
         private void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ControllerPicker.SelectedIndex != -1)
-                _homeScreen = null;
+            if (ControllerPicker.SelectedIndex == -1) return;
+            _homeScreen = null;
+            _timer.Interval = 300;
         }
 
         private void NewSelectedNotification(object sender, ControllerEventArgs e)
@@ -481,7 +483,6 @@ namespace Pump.Layout
 
         private void StartEvent()
         {
-            _timer = new Timer(300); // 0.3 seconds
             _timer.Elapsed += timer_Elapsed;
             _timer.Enabled = true;
         }

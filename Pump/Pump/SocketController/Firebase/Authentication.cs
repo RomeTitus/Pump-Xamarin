@@ -37,7 +37,6 @@ namespace Pump.SocketController.Firebase
             try
             {
                 var pumpDetail = new DatabaseController().GetControllerConnectionSelection();
-                //return "DC:A6:32:33:63:CA";
                 return pumpDetail.Mac;
             }
             catch

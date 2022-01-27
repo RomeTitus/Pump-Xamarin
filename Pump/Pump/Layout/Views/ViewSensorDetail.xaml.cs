@@ -40,7 +40,7 @@ namespace Pump.Layout.Views
             LabelSensorType.Text = Sensor.TYPE;
             LabelSensorName.Text = Sensor.NAME;
             if (Sensor.LastUpdated != null)
-                LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime().ToString("dd/MM/yyyy")
+                LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime().ToString("dd/MM/yyyy HH:mm")
                     .ToString(CultureInfo.InvariantCulture);
             switch (Sensor.TYPE)
             {
