@@ -11,7 +11,7 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSiteSummary : ContentView
     {
-        public readonly Sensor Sensor;
+        public  Sensor sensor;
         public readonly Site Site;
         public List<CustomSchedule> CustomSchedules;
         public List<Equipment> Equipments;
@@ -19,47 +19,39 @@ namespace Pump.Layout.Views
         public List<IrrigationController.Schedule> Schedules;
 
 
-        public ViewSiteSummary(Site site, Sensor sensor, List<IrrigationController.Schedule> schedules,
-            List<CustomSchedule> customSchedules, List<Equipment> equipments, List<ManualSchedule> manualSchedules)
+        public ViewSiteSummary(Site site)
         {
             InitializeComponent();
             Site = site;
-            Sensor = sensor;
-            Schedules = schedules;
-            CustomSchedules = customSchedules;
-            Equipments = equipments;
-            ManualSchedules = manualSchedules;
             AutomationId = Site.ID;
             StackLayoutSiteSummary.AutomationId = Site.ID;
-            Populate();
+            LabelSiteName.Text = Site.NAME;
+            LabelSiteDescription.Text = Site.Description;
         }
 
         public void Populate()
         {
             bool scheduleRunning = false;
-            LabelSiteName.Text = Site.NAME;
-            LabelSiteDescription.Text = Site.Description;
-
+            ActivityIndicatorLoadingIndicator.IsVisible = false;
+            LabelPressure.IsVisible = true;
             if (CustomSchedules.Any(customSchedule => Site.Attachments.Contains(customSchedule.id_Pump) &&
                                                       RunningCustomSchedule.GetCustomScheduleDetailRunning(
                                                           customSchedule) != null))
                 scheduleRunning = true;
-
-
             if (new RunningSchedule(Schedules.Where(x => Site.Attachments.Contains(x.id_Pump)), Equipments)
                 .GetRunningSchedule().ToList().Any())
                 scheduleRunning = true;
-
             var manualSchedule =
                 ManualSchedules.FirstOrDefault(x =>
                     x.ManualDetails.Any(z => Site.Attachments.Contains(z.id_Equipment)));
             if (manualSchedule != null)
                 scheduleRunning = true;
+            
             SetScheduleRunning(scheduleRunning);
 
-            if (Sensor != null)
+            if (sensor != null)
             {
-                if (Sensor.TYPE == "Pressure Sensor")
+                if (sensor.TYPE == "Pressure Sensor")
                 {
                     PressureSensor();
                 }
@@ -68,7 +60,7 @@ namespace Pump.Layout.Views
 
         private void PressureSensor()
         {
-            var reading = Convert.ToDouble(Sensor.LastReading, CultureInfo.InvariantCulture);
+            var reading = Convert.ToDouble(sensor.LastReading, CultureInfo.InvariantCulture);
 
             var voltage = reading * 5.0 / 1024.0;
 

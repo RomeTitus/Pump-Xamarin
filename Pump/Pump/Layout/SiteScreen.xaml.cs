@@ -98,69 +98,85 @@ namespace Pump.Layout
             ScreenCleanupForSite();
             try
             {
-                if (_observableIrrigation.LoadedAllData())
+                if (_observableIrrigation.SubControllerList.Contains(null))
                 {
-                    _timer.Interval = 20000; //refresh every 2 seconds instead of every 0.3 sec
-                    BtnAddSite.IsEnabled = true;
-                    var selectedSiteId = new DatabaseController().GetControllerConnectionSelection().SiteSelectedId;
-                    if (!string.IsNullOrEmpty(selectedSiteId) && _loadedHomeScreen == false &&
-                        _observableIrrigation.SiteList.Count == 1)
-                    {
-                        _loadedHomeScreen = true;
-                        StartHomePage(selectedSiteId);
-                    }
+                    BtnAddSite.IsEnabled = false;
+                    return;
+                }
 
-                    if (_observableIrrigation.SiteList.Any())
+                _timer.Interval = 10000; //refresh every 1 seconds instead of every 0.3 sec
+                BtnAddSite.IsEnabled = true;
+               
+                if (_observableIrrigation.SiteList.Any())
+                {
+                    foreach (var site in _observableIrrigation.SiteList)
                     {
-                        foreach (var site in _observableIrrigation.SiteList)
+                        var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
+                            x.AutomationId == site.ID);
+                        if (viewSite != null)
                         {
-                            var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
-                                x.AutomationId == site.ID);
-                            if (viewSite != null)
-                            {
-                                var viewScheduleStatus = (ViewSiteSummary)viewSite;
-                                viewScheduleStatus.Site.NAME = site.NAME;
-                                viewScheduleStatus.Site.Description = site.Description;
-                                if (viewScheduleStatus.Sensor != null)
-                                    viewScheduleStatus.Sensor.LastReading = _observableIrrigation.SensorList
-                                        .FirstOrDefault(x => x.ID == viewScheduleStatus.Sensor.ID)?.LastReading;
-                                viewScheduleStatus.Schedules = _observableIrrigation.ScheduleList.ToList();
-                                viewScheduleStatus.CustomSchedules =
-                                    _observableIrrigation.CustomScheduleList.ToList();
-                                viewScheduleStatus.Equipments = _observableIrrigation.EquipmentList.ToList();
-                                viewScheduleStatus.ManualSchedules =
-                                    _observableIrrigation.ManualScheduleList.ToList();
-                                viewScheduleStatus.Populate();
-                            }
-                            else
-                            {
-                                var viewSiteSummary = new ViewSiteSummary(site,
-                                    _observableIrrigation.SensorList.FirstOrDefault(x =>
-                                        site.Attachments.Contains(x?.ID) && x?.TYPE == "Pressure Sensor"),
-                                    _observableIrrigation.ScheduleList.ToList(),
-                                    _observableIrrigation.CustomScheduleList.ToList(),
-                                    _observableIrrigation.EquipmentList.ToList(),
-                                    _observableIrrigation.ManualScheduleList.ToList());
-                                ScrollViewSite.Children.Add(viewSiteSummary);
-                                viewSiteSummary.GetTapGestureRecognizer().Tapped += ViewSiteScreen_Tapped;
-                            }
+                            var viewScheduleStatus = (ViewSiteSummary)viewSite;
+                            viewScheduleStatus.Site.NAME = site.NAME;
+                            viewScheduleStatus.Site.Description = site.Description;
                         }
+                        else
+                        {
+                            var viewSiteSummary = new ViewSiteSummary(site);
+                            viewSiteSummary.GetTapGestureRecognizer().Tapped += ViewSiteScreen_Tapped;
+                            ScrollViewSite.Children.Add(viewSiteSummary);
 
-                        SetSelectedSite();
+                        }
                     }
-                    else
-                    {
-                        if (ScrollViewSite.Children.Count == 0)
-                            ScrollViewSite.Children.Add(new ViewEmptySchedule("No Sites Here"));
-                    }
+
+                    SetSelectedSite();
                 }
                 else
-                    BtnAddSite.IsEnabled = false;
+                {
+                    if (ScrollViewSite.Children.Count == 0)
+                        ScrollViewSite.Children.Add(new ViewEmptySchedule("No Sites Here"));
+                }
+
+                PopulateSiteDetail();
             }
+
             catch (Exception e)
             {
                 ScrollViewSite.Children.Add(new ViewException(e));
             }
+        }
+
+        private void PopulateSiteDetail()
+        {
+            if (_observableIrrigation.LoadedAllData())
+            {
+                foreach (var viewSite in ScrollViewSite.Children)
+                {
+                    var viewScheduleStatus = (ViewSiteSummary)viewSite;
+
+                    viewScheduleStatus.sensor = _observableIrrigation.SensorList.FirstOrDefault(x =>
+                                        viewScheduleStatus.Site.Attachments.Contains(x?.ID) && x?.TYPE == "Pressure Sensor");
+
+                    
+                    viewScheduleStatus.Schedules = _observableIrrigation.ScheduleList.ToList();
+                    viewScheduleStatus.CustomSchedules =
+                        _observableIrrigation.CustomScheduleList.ToList();
+                    viewScheduleStatus.Equipments = _observableIrrigation.EquipmentList.ToList();
+                    viewScheduleStatus.ManualSchedules =
+                        _observableIrrigation.ManualScheduleList.ToList();
+                    viewScheduleStatus.Populate();
+                }
+
+                var selectedSiteId = new DatabaseController().GetControllerConnectionSelection().SiteSelectedId;
+                if (!string.IsNullOrEmpty(selectedSiteId) && _loadedHomeScreen == false &&
+                    _observableIrrigation.SiteList.Count == 1)
+                {
+                    _loadedHomeScreen = true;
+                    StartHomePage(selectedSiteId);
+                }
+            }
+                
+
+            
         }
 
         private string SetSelectedSite()
