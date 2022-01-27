@@ -14,6 +14,7 @@ namespace Pump.Layout.Views
             InitializeComponent();
             SubController = subController;
             stackLayoutSubControllerSummary.AutomationId = SubController.ID;
+            AutomationId = SubController.ID;
             Populate();
         }
 

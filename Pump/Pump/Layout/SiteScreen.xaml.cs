@@ -44,15 +44,8 @@ namespace Pump.Layout
             if (!dbController.GetControllerConnectionList().Any())
                 SetupNewController();
         }
-        //TODO Clean this up
         private void SetEvents()
         {
-            //_observableIrrigation.SensorList.CollectionChanged += PopulateSiteEvent;
-            //_observableIrrigation.EquipmentList.CollectionChanged += PopulateSiteEvent;
-            //_observableIrrigation.ScheduleList.CollectionChanged += PopulateSiteEvent;
-            //_observableIrrigation.CustomScheduleList.CollectionChanged += PopulateSiteEvent;
-            //_observableIrrigation.ManualScheduleList.CollectionChanged += PopulateSiteEvent;
-            //_observableIrrigation.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
             ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
             StartEvent();
@@ -212,7 +205,6 @@ namespace Pump.Layout
         {
             try
             {
-                //Uses Sites to Display Elements on the Screen
                 if (!_observableIrrigation.SiteList.Contains(null))
                 {
                     var itemsThatAreOnDisplay = _observableIrrigation.SiteList.Select(x => x?.ID).ToList();
@@ -397,8 +389,10 @@ namespace Pump.Layout
                 if (!_observableIrrigation.SubControllerList.Contains(null))
                 {
                     var itemsThatAreOnDisplay = _observableIrrigation.SubControllerList.Select(x => x?.ID).ToList();
+
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
+
                     for (var index = 0; index < ScrollViewSubController.Children.Count; index++)
                     {
                         var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
@@ -410,6 +404,9 @@ namespace Pump.Layout
                 }
                 else
                 {
+                    if (ScrollViewSubController.Children.Count == 1 && ScrollViewSubController.Children.First().AutomationId ==
+                        "ActivityIndicatorSiteLoading")
+                        return;
                     ScrollViewSubController.Children.Clear();
                     var loadingIcon = new ActivityIndicator
                     {
