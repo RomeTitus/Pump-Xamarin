@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 
 <ContentView
     x:Class="Pump.Layout.Views.ViewSiteSummary"
@@ -28,13 +28,13 @@
                     </StackLayout.GestureRecognizers>
                     <ActivityIndicator
                         x:Name="ActivityIndicatorUWPLoadingIndicator"
-                                AutomationId="ActivityIndicator"
-                                HorizontalOptions="Center"
-                                IsEnabled="True"
-                                IsRunning="True"
-                                IsVisible="False"
-                                Color="Black"
-                                VerticalOptions="Center" />
+                        AutomationId="ActivityIndicator"
+                        HorizontalOptions="Center"
+                        IsEnabled="True"
+                        IsRunning="True"
+                        IsVisible="False"
+                        VerticalOptions="Center"
+                        Color="Black" />
                     <StackLayout Orientation="Horizontal">
                         <StackLayout Orientation="Vertical">
                             <Label
@@ -44,44 +44,35 @@
                                 Text="Name"
                                 VerticalOptions="Center" />
                             <Label
-                                IsVisible="false"
                                 x:Name="LabelSiteDescription"
                                 FontSize="Medium"
                                 HorizontalOptions="EndAndExpand"
+                                IsVisible="false"
                                 Text="Description"
                                 VerticalOptions="CenterAndExpand" />
                         </StackLayout>
 
-                        <Label
-                            x:Name="LabelPressure"
-                            FontSize="Large"
+                        <StackLayout
                             HorizontalOptions="EndAndExpand"
-                            Text=""
-                            VerticalOptions="CenterAndExpand" 
-                            IsVisible="False"/>
-                        <ActivityIndicator
-                        x:Name="ActivityIndicatorMobileLoadingIndicator"
+                            Orientation="Horizontal"
+                            VerticalOptions="CenterAndExpand">
+                            <Label
+                                x:Name="LabelPressure"
+                                FontSize="Large"
+                                HorizontalOptions="EndAndExpand"
+                                IsVisible="False"
+                                Text=""
+                                VerticalOptions="CenterAndExpand" />
+                            <ActivityIndicator
+                                x:Name="ActivityIndicatorMobileLoadingIndicator"
                                 AutomationId="ActivityIndicator"
-                                HorizontalOptions="Center"
+                                HorizontalOptions="EndAndExpand"
                                 IsEnabled="True"
                                 IsRunning="True"
                                 IsVisible="False"
-                                Color="Black"
-                                VerticalOptions="Center" />
-                        
-                        <Frame
-                            Margin="0"
-                            Padding="1"
-                            BackgroundColor="White"
-                            BorderColor="DarkGreen"
-                            CornerRadius="30"
-                            HasShadow="False"
-                            HeightRequest="30"
-                            HorizontalOptions="EndAndExpand"
-                            VerticalOptions="CenterAndExpand"
-                            WidthRequest="30">
+                                VerticalOptions="Center"
+                                Color="Black" />
                             <Frame
-                                x:Name="FrameScheduleStatus"
                                 Margin="0"
                                 Padding="1"
                                 BackgroundColor="White"
@@ -89,8 +80,21 @@
                                 CornerRadius="30"
                                 HasShadow="False"
                                 HeightRequest="30"
-                                WidthRequest="30" />
-                        </Frame>
+                                HorizontalOptions="EndAndExpand"
+                                VerticalOptions="CenterAndExpand"
+                                WidthRequest="30">
+                                <Frame
+                                    x:Name="FrameScheduleStatus"
+                                    Margin="0"
+                                    Padding="1"
+                                    BackgroundColor="White"
+                                    BorderColor="DarkGreen"
+                                    CornerRadius="30"
+                                    HasShadow="False"
+                                    HeightRequest="30"
+                                    WidthRequest="30" />
+                            </Frame>
+                        </StackLayout>
                     </StackLayout>
                 </StackLayout>
             </Frame>
