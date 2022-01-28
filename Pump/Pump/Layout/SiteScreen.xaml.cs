@@ -98,7 +98,7 @@ namespace Pump.Layout
             ScreenCleanupForSite();
             try
             {
-                if (_observableIrrigation.SubControllerList.Contains(null))
+                if (_observableIrrigation.SiteList.Contains(null))
                 {
                     BtnAddSite.IsEnabled = false;
                     return;
