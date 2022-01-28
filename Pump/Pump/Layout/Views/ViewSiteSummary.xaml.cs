@@ -22,6 +22,10 @@ namespace Pump.Layout.Views
         public ViewSiteSummary(Site site)
         {
             InitializeComponent();
+            if (Device.RuntimePlatform == Device.UWP)
+                ActivityIndicatorUWPLoadingIndicator.IsVisible = true;
+            else
+                ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
             Site = site;
             AutomationId = Site.ID;
             StackLayoutSiteSummary.AutomationId = Site.ID;
@@ -32,7 +36,12 @@ namespace Pump.Layout.Views
         public void Populate()
         {
             bool scheduleRunning = false;
-            ActivityIndicatorLoadingIndicator.IsVisible = false;
+
+            if (Device.RuntimePlatform == Device.UWP)
+                ActivityIndicatorUWPLoadingIndicator.IsVisible = false;
+            else
+                ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
+
             LabelPressure.IsVisible = true;
             if (CustomSchedules.Any(customSchedule => Site.Attachments.Contains(customSchedule.id_Pump) &&
                                                       RunningCustomSchedule.GetCustomScheduleDetailRunning(
