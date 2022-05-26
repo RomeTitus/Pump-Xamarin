@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<ContentView
+    x:Class="Pump.Layout.Views.ViewWiFi"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump-Redo">
+    <ContentView.Content>
+        <StackLayout
+            x:Name="StackLayoutViewWiFi"
+            Margin="0,0,0,5"
+            BackgroundColor="YellowGreen">
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer x:Name="StackLayoutViewWiFiTapGesture" />
+            </StackLayout.GestureRecognizers>
+            <StackLayout Orientation="Horizontal">
+                <Image
+                    x:Name="EquipmentImage"
+                    HeightRequest="40"
+                    HorizontalOptions="Start"
+                    Source="{embeddedImages:ImageResourceExtention Pump-Redo.Icons.NoConnection.png}" />
+                <Label
+                    x:Name="LabelSsid"
+                    FontSize="Large"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="SSID NAME"
+                    VerticalOptions="Center" />
+            </StackLayout>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackLayout
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Orientation="Vertical">
+                    <Label
+                        x:Name="LabelSignal"
+                        FontSize="Large"
+                        Text="RSSI -78"
+                        VerticalOptions="CenterAndExpand" />
+
+                </StackLayout>
+                <StackLayout
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    VerticalOptions="Center">
+                    <Label
+                        x:Name="LabelEncryption"
+                        FontSize="Large"
+                        HorizontalOptions="CenterAndExpand"
+                        Text="None"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </Grid>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>
