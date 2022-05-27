@@ -13,7 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace Pump_Redo.UWP
+namespace Pump.UWP
 {
     public sealed partial class MainPage
     {
@@ -21,7 +21,7 @@ namespace Pump_Redo.UWP
         {
             this.InitializeComponent();
 
-            LoadApplication(new Pump_Redo.App());
+            LoadApplication(new Pump.App());
         }
     }
 }

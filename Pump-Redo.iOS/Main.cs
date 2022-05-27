@@ -5,7 +5,7 @@ using System.Linq;
 using Foundation;
 using UIKit;
 
-namespace Pump_Redo.iOS
+namespace Pump.iOS
 {
     public class Application
     {

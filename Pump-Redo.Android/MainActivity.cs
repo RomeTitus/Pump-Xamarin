@@ -9,7 +9,7 @@ using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Platform = Xamarin.Essentials.Platform;
 
-namespace Pump_Redo.Droid
+namespace Pump.Droid
 {
     [Activity(Label = "Pump", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity

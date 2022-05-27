@@ -14,7 +14,7 @@ using Xamarin.Forms;
 using Application = Android.App.Application;
 using NotificationPriority = Plugin.FirebasePushNotification.NotificationPriority;
 using String = Java.Lang.String;
-using Pump_Redo.Droid;
+using Pump.Droid;
 using Android.Support.V4.App;
 
 [assembly: Dependency(typeof(AndroidNotificationManager))]

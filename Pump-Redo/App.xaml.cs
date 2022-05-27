@@ -3,7 +3,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Pump.Layout;
 
-namespace Pump_Redo
+namespace Pump
 {
     public partial class App : Application
     {
