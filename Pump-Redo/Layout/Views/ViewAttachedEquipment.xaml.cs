@@ -28,7 +28,7 @@ namespace Pump.Layout.Views
             LabelEquipmentName.Text = Equipment.NAME;
             if (Equipment.isPump)
                 EquipmentImage.Source = ImageSource.FromResource(
-                    "Pump-Redo.Icons.activePump.png",
+                    "Pump.Icons.activePump.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly);
             var attachedSensor = _sensor.AttachedEquipment.FirstOrDefault(x => x?.id_Equipment == Equipment.ID);
             if (attachedSensor != null)

@@ -25,7 +25,7 @@ namespace Pump.Layout.Views
             LabelPin.Text = "Pin: " + _sensor.GPIO;
             if (_sensor.TYPE == "Pressure Sensor")
                 SensorImage.Source = ImageSource.FromResource(
-                    "Pump-Redo.Icons.PressureHigh.png",
+                    "Pump.Icons.PressureHigh.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly);
         }
 

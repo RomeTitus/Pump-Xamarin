@@ -89,7 +89,7 @@
                         VerticalOptions="Center" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
-                    <Image HeightRequest="15" Source="{localImage:ImageResourceExtention Pump-Redo.Icons.activePump.png}" />
+                    <Image HeightRequest="15" Source="{localImage:ImageResourceExtention Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
                         Text="Big Pump"

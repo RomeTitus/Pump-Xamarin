@@ -4,7 +4,7 @@
     x:Class="Pump.Layout.Views.ViewEquipmentSummary"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump-Redo">
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
     <ContentView.Content>
         <StackLayout x:Name="stackLayoutEquipmentSummary" Margin="0,0,0,5">
             <StackLayout.GestureRecognizers>
@@ -15,7 +15,7 @@
                     x:Name="EquipmentImage"
                     HeightRequest="40"
                     HorizontalOptions="StartAndExpand"
-                    Source="{embeddedImages:ImageResourceExtention Pump-Redo.Icons.sprinkler.jpg}" />
+                    Source="{embeddedImages:ImageResourceExtention Pump.Icons.sprinkler.jpg}" />
                 <Label
                     x:Name="LabelEquipmentName"
                     FontSize="Large"

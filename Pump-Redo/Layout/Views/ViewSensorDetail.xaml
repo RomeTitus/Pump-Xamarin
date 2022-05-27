@@ -46,7 +46,7 @@
                 <Image
                     x:Name="ImageSensor"
                     HeightRequest="40"
-                    Source="{localImage:ImageResourceExtention Pump-Redo.Icons.PressureLow.png}" />
+                    Source="{localImage:ImageResourceExtention Pump.Icons.PressureLow.png}" />
                 <Label
                     x:Name="LableSensorStatus"
                     FontSize="15"

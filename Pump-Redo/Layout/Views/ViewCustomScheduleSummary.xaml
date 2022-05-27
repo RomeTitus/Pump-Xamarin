@@ -4,7 +4,7 @@
     x:Class="Pump.Layout.Views.ViewCustomScheduleSummary"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump-Redo">
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
     <StackLayout Margin="5" VerticalOptions="FillAndExpand">
         <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand">
             <StackLayout Orientation="Horizontal">
@@ -26,7 +26,7 @@
 
         <StackLayout HeightRequest="50" Orientation="Vertical">
             <StackLayout Orientation="Horizontal" VerticalOptions="CenterAndExpand">
-                <Image HeightRequest="30" Source="{embeddedImages:ImageResourceExtention Pump-Redo.Icons.activePump.png}" />
+                <Image HeightRequest="30" Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
                 <Label
                     x:Name="LabelPumpName"
                     FontSize="Large"

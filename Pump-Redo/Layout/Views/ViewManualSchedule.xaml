@@ -29,7 +29,7 @@
                 FontSize="16"
                 HorizontalOptions="Center"
                 Text="10:30" />
-            <Image HeightRequest="68" Source="{localImage:ImageResourceExtention Pump-Redo.Icons.sprinkler.jpg}" />
+            <Image HeightRequest="68" Source="{localImage:ImageResourceExtention Pump.Icons.sprinkler.jpg}" />
         </StackLayout>
     </Grid>
 

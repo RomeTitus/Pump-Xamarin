@@ -137,9 +137,9 @@ namespace Pump.Layout
 
     public static class SavedImage
     {
-        public const string Pump = "Pump-Redo.Icons.activePump.png";
-        public const string zone = "Pump-Redo.Icons.sprinkler.jpg";
-        public const string SubController = "Pump-Redo.Icons.SwitchController.png";
-        public const string Sensor = "Pump-Redo.Icons.PressureLow.png";
+        public const string Pump = "Pump.Icons.activePump.png";
+        public const string zone = "Pump.Icons.sprinkler.jpg";
+        public const string SubController = "Pump.Icons.SwitchController.png";
+        public const string Sensor = "Pump.Icons.PressureLow.png";
     }
 }

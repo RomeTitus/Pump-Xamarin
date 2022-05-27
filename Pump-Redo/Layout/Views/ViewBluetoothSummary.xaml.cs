@@ -35,7 +35,7 @@ namespace Pump.Layout.Views
             LabelBluetoothDeviceName.Text = BluetoothDevice.NativeDevice.ToString();
 
             BlueToothDeviceImage.Source = ImageSource.FromResource(
-                "Pump-Redo.Icons.NoConnection.png",
+                "Pump.Icons.NoConnection.png",
                 typeof(ImageResourceExtention).GetTypeInfo().Assembly);
         }
 

@@ -21,6 +21,7 @@ namespace Pump_Redo.Droid
             Manifest.Permission.Bluetooth,
             Manifest.Permission.BluetoothAdmin,
             Manifest.Permission.BluetoothScan,
+            Manifest.Permission.BluetoothConnect,
             Manifest.Permission.AccessCoarseLocation,
             Manifest.Permission.AccessFineLocation
         };

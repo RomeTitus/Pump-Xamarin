@@ -4,7 +4,7 @@
     x:Class="Pump.Layout.Views.ViewCustomSchedule"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump-Redo">
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
     <ContentView.Content>
         <StackLayout
             x:Name="StackLayoutViewSchedule"
@@ -39,7 +39,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="15"
-                           Source="{embeddedImages:ImageResourceExtention Pump-Redo.Icons.activePump.png}" />
+                           Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
                         Text="Unknown"

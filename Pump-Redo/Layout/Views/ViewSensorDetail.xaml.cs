@@ -76,18 +76,18 @@ namespace Pump.Layout.Views
                 if (bars < 2)
                 {
                     LableSensorStatus.Text = bars.ToString("0.##");
-                    _image = "Pump-Redo.Icons.PressureLow.png";
+                    _image = "Pump.Icons.PressureLow.png";
                 }
                 else
                 {
                     LableSensorStatus.Text = bars.ToString("0.##");
-                    _image = "Pump-Redo.Icons.PressureHigh.png";
+                    _image = "Pump.Icons.PressureHigh.png";
                 }
             }
             catch
             {
                 LableSensorStatus.Text = "Could Not Read Pressure :/";
-                _image = "Pump-Redo.Icons.PressureLow.png";
+                _image = "Pump.Icons.PressureLow.png";
             }
         }
 
@@ -97,13 +97,13 @@ namespace Pump.Layout.Views
             {
                 var reading = Convert.ToDouble(Sensor.LastReading, CultureInfo.InvariantCulture);
 
-                _image = reading > 8 ? "Pump-Redo.Icons.Temp_High.png" : "Pump-Redo.Icons.Temp_Low.png";
+                _image = reading > 8 ? "Pump.Icons.Temp_High.png" : "Pump.Icons.Temp_Low.png";
                 LableSensorStatus.Text = Sensor.LastReading + "°C";
             }
             catch
             {
                 LableSensorStatus.Text = "Could Not Read Temperature :/";
-                _image = "Pump-Redo.Icons.Temp_Unknown.png";
+                _image = "Pump.Icons.Temp_Unknown.png";
             }
         }
     }

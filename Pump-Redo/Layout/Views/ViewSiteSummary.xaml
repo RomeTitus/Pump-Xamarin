@@ -4,7 +4,7 @@
     x:Class="Pump.Layout.Views.ViewSiteSummary"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump-Redo">
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
     <ContentView.Content>
         <Frame
             Padding="1,1,1,1"

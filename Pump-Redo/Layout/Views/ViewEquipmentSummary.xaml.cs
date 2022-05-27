@@ -27,7 +27,7 @@ namespace Pump.Layout.Views
                 LabelPin.Text += "-" + Equipment.DirectOnlineGPIO;
             if (Equipment.isPump)
                 EquipmentImage.Source = ImageSource.FromResource(
-                    "Pump-Redo.Icons.activePump.png",
+                    "Pump.Icons.activePump.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly);
         }
 

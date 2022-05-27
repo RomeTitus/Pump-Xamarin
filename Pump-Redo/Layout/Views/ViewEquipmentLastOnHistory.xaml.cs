@@ -19,7 +19,7 @@ namespace Pump.Layout.Views
             LabelDurationTime.Text = SetTime(Convert.ToInt32(equipmentLastOnList[4]));
             if (equipmentLastOnList[2] != "1") return;
             EquipmentImage.Source = ImageSource.FromResource(
-                "Pump-Redo.Icons.activePump.png",
+                "Pump.Icons.activePump.png",
                 typeof(ImageResourceExtention).GetTypeInfo().Assembly);
             StackLayoutViewEquipmentLastOn.BackgroundColor = Color.DarkTurquoise;
         }

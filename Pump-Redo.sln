@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pump-Redo.Android", "Pump-R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pump-Redo.iOS", "Pump-Redo.iOS\Pump-Redo.iOS.csproj", "{B5E09053-73AC-4465-A3B6-810F8831B621}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pump-Redo", "Pump-Redo\Pump-Redo.csproj", "{B21ACD29-89DC-469F-A5C6-DEE42E99517A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pump", "Pump-Redo\Pump.csproj", "{B21ACD29-89DC-469F-A5C6-DEE42E99517A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

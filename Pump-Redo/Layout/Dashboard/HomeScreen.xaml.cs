@@ -52,7 +52,7 @@ namespace Pump.Layout.Dashboard
                 Text = "Summary",
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
-                    "Pump-Redo.Icons.Home.png",
+                    "Pump.Icons.Home.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
 
@@ -62,7 +62,7 @@ namespace Pump.Layout.Dashboard
                 Text = "Manual",
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
-                    "Pump-Redo.Icons.ManualSchedule.png",
+                    "Pump.Icons.ManualSchedule.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
 
@@ -72,7 +72,7 @@ namespace Pump.Layout.Dashboard
                 Text = "Custom",
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
-                    "Pump-Redo.Icons.CustomSchedule.png",
+                    "Pump.Icons.CustomSchedule.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
 
@@ -82,7 +82,7 @@ namespace Pump.Layout.Dashboard
                 Text = "Schedule",
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
-                    "Pump-Redo.Icons.FieldSun.png",
+                    "Pump.Icons.FieldSun.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
 
@@ -92,7 +92,7 @@ namespace Pump.Layout.Dashboard
                 Text = "Settings",
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
-                    "Pump-Redo.Icons.setting.png",
+                    "Pump.Icons.setting.png",
                     typeof(ImageResourceExtention).GetTypeInfo().Assembly)
             };
 
@@ -117,7 +117,7 @@ namespace Pump.Layout.Dashboard
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     SignalImage.Source = ImageSource.FromResource(
-                        result ? "Pump-Redo.Icons.Signal_5.png" : "Pump-Redo.Icons.Signal_NoSignal.png",
+                        result ? "Pump.Icons.Signal_5.png" : "Pump.Icons.Signal_NoSignal.png",
                         typeof(ImageResourceExtention).GetTypeInfo().Assembly);
                     BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
                 });
@@ -174,7 +174,7 @@ namespace Pump.Layout.Dashboard
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     SignalImage.Source = ImageSource.FromResource(
-                        "Pump-Redo.Icons.Signal_" + count1 + ".png",
+                        "Pump.Icons.Signal_" + count1 + ".png",
                         typeof(ImageResourceExtention).GetTypeInfo().Assembly);
                 });
                 count++;

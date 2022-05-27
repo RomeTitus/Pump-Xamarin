@@ -1,7 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Pump;
+using Pump.Layout;
 
 namespace Pump_Redo
 {
@@ -11,7 +11,7 @@ namespace Pump_Redo
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new AuthenticationScreen();
         }
 
         protected override void OnStart()
