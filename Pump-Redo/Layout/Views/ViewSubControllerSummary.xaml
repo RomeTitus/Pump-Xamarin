@@ -15,7 +15,7 @@
                     x:Name="SubControllerImage"
                     HeightRequest="20"
                     HorizontalOptions="StartAndExpand"
-                    Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
                 <Label
                     x:Name="LabelSubControllerName"
                     FontSize="Medium"

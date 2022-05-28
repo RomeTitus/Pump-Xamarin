@@ -15,7 +15,7 @@
                     x:Name="SensorImage"
                     HeightRequest="40"
                     HorizontalOptions="StartAndExpand"
-                    Source="{embeddedImages:ImageResourceExtention Pump.Icons.PressureLow.png}" />
+                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.PressureLow.png}" />
                 <Label
                     x:Name="LabelSensorName"
                     FontSize="Large"

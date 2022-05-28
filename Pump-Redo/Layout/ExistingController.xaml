@@ -95,7 +95,7 @@
                 HorizontalOptions="FillAndExpand">
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="18"
-                           Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
                     <Picker x:Name="ConnectionPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
 
                 </StackLayout>

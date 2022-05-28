@@ -31,7 +31,7 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     HeightRequest="40"
                     HorizontalOptions="EndAndExpand"
-                    Source="{localImage:ImageResourceExtention Pump.Icons.Signal_NoSignal.png}" />
+                    Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
             </AbsoluteLayout>
             <xct:TabView
                 x:Name="TabViewHome"

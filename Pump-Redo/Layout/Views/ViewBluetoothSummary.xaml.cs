@@ -36,7 +36,7 @@ namespace Pump.Layout.Views
 
             BlueToothDeviceImage.Source = ImageSource.FromResource(
                 "Pump.Icons.NoConnection.png",
-                typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                typeof(ImageResourceExtension).GetTypeInfo().Assembly);
         }
 
         public TapGestureRecognizer GetTapGestureRecognizer()

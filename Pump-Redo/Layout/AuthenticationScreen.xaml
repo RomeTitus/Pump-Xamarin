@@ -1,18 +1,201 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Pump.Layout.AuthenticationScreen">
+<ContentPage     
+    x:Class="Pump.Layout.AuthenticationScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    BackgroundColor="DeepSkyBlue"
+    mc:Ignorable="d">
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout Margin="10">
+            <Label
+                HorizontalOptions="Center"
+                Text="Smart Farms"
+                FontAttributes="Bold"
+                FontSize="40"
+                TextColor="Snow"
+                VerticalOptions="Center" />
 
-            <Button x:Name="signinButton" Text="Sign in with Google" Clicked="signinButton_Clicked"/>
+            <Label
+                HorizontalOptions="Start"
+                x:Name="labelLogin"
+                Text="Login"
+                FontAttributes="Bold"
+                FontSize="Title"
+                TextColor="Snow"
+                VerticalOptions="Center" />
+            <Label
+                HorizontalOptions="Start"
+                x:Name="labelSignIn"
+                Text="Sign in to continue"
+                FontSize="Small"
+                TextColor="Snow"
+                VerticalOptions="Center" />
+
+            
+
+            <StackLayout x:Name="SignInStackLayout" VerticalOptions="FillAndExpand">
+                <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" />
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black">
+                    <StackLayout Orientation="Horizontal">
+                        <Frame
+                            BackgroundColor="White"
+                            BorderColor="Black"
+                            HorizontalOptions="FillAndExpand">
+                            <StackLayout>
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Text="Email"
+                                    VerticalOptions="Center" />
+                                <Entry
+                                    x:Name="TxtSignInEmail"
+                                    FontSize="Small"
+                                    PlaceholderColor="LightGray"
+                                    Placeholder="email@domain.com"
+                                    HorizontalOptions="Fill" />
+
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Text="Password" />
+
+                                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                                        <Entry
+                                        x:Name="TxtSignInPassword"
+                                        FontSize="Small"
+                                        Placeholder="********"
+                                        HorizontalOptions="FillAndExpand"
+                                        PlaceholderColor="LightGray"
+                                        IsPassword="true"
+                                        />
+                                    <Label
+                                        Text="FORGOT"
+                                        FontSize="Small"
+                                        FontAttributes="Bold"
+                                        TextColor="LightBlue"
+                                        BackgroundColor="Lavender"
+                                        VerticalOptions="Center" 
+                                        HorizontalOptions="End">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="ForgotButton_Clicked" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </StackLayout>
+                                <Button
+                                    TextColor="Snow"
+                                    BackgroundColor="CadetBlue"
+                                    Clicked="ButtonLogin_OnClicked"
+                                    Text="LOGIN" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </Frame>
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin="0,0,0,20">
+                    <Label
+                            Text="Don't Have an account? "
+                            TextColor="Snow"
+                            FontSize="Small"
+                            VerticalOptions="Center" />
+                    <Label
+                            Text="Sign Up!"
+                            FontSize="Small"
+                            FontAttributes="Bold"
+                            TextColor="Yellow"
+                            VerticalOptions="Center" >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="SignupButton_Clicked" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </StackLayout>
+            <StackLayout x:Name="SignUpStackLayout" VerticalOptions="FillAndExpand" IsVisible="false">
+                <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" HeightRequest="100" />
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black" VerticalOptions="CenterAndExpand">
+                    <StackLayout Orientation="Horizontal">
+                        <Frame
+                            BackgroundColor="White"
+                            BorderColor="Black"
+                            HorizontalOptions="FillAndExpand">
+                            <StackLayout>
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Text="Full Name"
+                                    VerticalOptions="Center" />
+                                <Entry
+                                    x:Name="TxtSignUpFullName"
+                                    FontSize="Small"
+                                    PlaceholderColor="LightGray"
+                                    Placeholder="Full Name"
+                                    HorizontalOptions="Fill" />
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Text="Email"
+                                    VerticalOptions="Center" />
+                                <Entry
+                                    x:Name="TxtSignUpEmail"
+                                    FontSize="Small"
+                                    PlaceholderColor="LightGray"
+                                    Placeholder="email@domain.com"
+                                    HorizontalOptions="Fill" />
 
 
-            <Label x:Name="displayNameText" Text="Display Name :"/>
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Text="Password" />
 
+                                <Entry
+                                    x:Name="TxtSignUpPassword"
+                                    FontSize="Small"
+                                    Placeholder="********"
+                                    HorizontalOptions="Fill"
+                                    PlaceholderColor="LightGray"
+                                    IsPassword="true"
+                                    />
+                                
+                                <Label
+                                    HorizontalOptions="Center"
+                                    Text="Repeat Password" />
 
-            <Label x:Name="emailText" Text="Email:"/>
-         
+                                <Entry
+                                    x:Name="TxtSignUpRepeatPassword"
+                                    FontSize="Small"
+                                    Placeholder="********"
+                                    HorizontalOptions="Fill"
+                                    PlaceholderColor="LightGray"
+                                    IsPassword="true"
+                                    />
+                                <Button
+                                    TextColor="Snow"
+                                    BackgroundColor="CadetBlue"
+                                    Clicked="ButtonSignUp_OnClicked"
+                                    Text="SIGN UP" />
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </Frame>
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin="0,0,0,20">
+                    <Label
+                            Text="Already Have an account? "
+                            TextColor="Snow"
+                            FontSize="Small"
+                            VerticalOptions="Center" />
+                    <Label
+                            Text="Sign In!"
+                            FontSize="Small"
+                            FontAttributes="Bold"
+                            TextColor="Yellow"
+                            VerticalOptions="Center" >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="SigninButton_Clicked" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

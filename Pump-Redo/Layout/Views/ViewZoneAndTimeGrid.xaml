@@ -27,7 +27,7 @@
             Grid.Row="0"
             Grid.Column="0"
             Orientation="Horizontal">
-            <Image HeightRequest="40" Source="{embeddedImages:ImageResourceExtention Pump.Icons.sprinkler.jpg}" />
+            <Image HeightRequest="40" Source="{embeddedImages:ImageResourceExtension Pump.Icons.sprinkler.jpg}" />
             <Label
                 x:Name="LabelZoneName"
                 FontSize="Large"

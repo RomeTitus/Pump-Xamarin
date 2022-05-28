@@ -98,7 +98,7 @@
 
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="30"
-                           Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
                         FontSize="Large"

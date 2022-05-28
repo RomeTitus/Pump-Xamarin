@@ -15,7 +15,7 @@
                     x:Name="EquipmentImage"
                     HeightRequest="40"
                     HorizontalOptions="StartAndExpand"
-                    Source="{embeddedImages:ImageResourceExtention Pump.Icons.sprinkler.jpg}" />
+                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.sprinkler.jpg}" />
                 <Label
                     x:Name="LabelEquipmentName"
                     FontSize="Large"

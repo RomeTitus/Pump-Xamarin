@@ -60,7 +60,7 @@
                         HorizontalOptions="EndAndExpand">
                         <StackLayout Orientation="Horizontal" WidthRequest="160">
                             <Image HeightRequest="18"
-                                   Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                                   Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
                             <Picker x:Name="SystemPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
 
                         </StackLayout>

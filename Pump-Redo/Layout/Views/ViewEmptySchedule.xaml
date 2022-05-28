@@ -17,7 +17,7 @@
             VerticalOptions="CenterAndExpand" />
         <Image
             HeightRequest="50"
-            Source="{localImage:ImageResourceExtention Pump.Icons.FieldSun.png}"
+            Source="{localImage:ImageResourceExtension Pump.Icons.FieldSun.png}"
             VerticalOptions="CenterAndExpand" />
     </StackLayout>
 </ContentView>

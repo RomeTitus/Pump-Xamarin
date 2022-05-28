@@ -15,7 +15,7 @@
                     x:Name="BlueToothDeviceImage"
                     HeightRequest="40"
                     HorizontalOptions="StartAndExpand"
-                    Source="{embeddedImages:ImageResourceExtention Pump.Icons.SwitchController.png}" />
+                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
                 <Label
                     x:Name="LabelBluetoothDeviceName"
                     FontSize="Large"

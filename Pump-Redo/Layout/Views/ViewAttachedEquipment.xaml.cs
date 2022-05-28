@@ -29,7 +29,7 @@ namespace Pump.Layout.Views
             if (Equipment.isPump)
                 EquipmentImage.Source = ImageSource.FromResource(
                     "Pump.Icons.activePump.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly);
             var attachedSensor = _sensor.AttachedEquipment.FirstOrDefault(x => x?.id_Equipment == Equipment.ID);
             if (attachedSensor != null)
             {

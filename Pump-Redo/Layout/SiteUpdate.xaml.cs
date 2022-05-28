@@ -92,7 +92,7 @@ namespace Pump.Layout
                             HeightRequest = 40,
                             Source = ImageSource.FromResource(
                                 image,
-                                typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                                typeof(ImageResourceExtension).GetTypeInfo().Assembly)
                         },
                         new Label
                         {
@@ -122,7 +122,7 @@ namespace Pump.Layout
                             HeightRequest = 40,
                             Source = ImageSource.FromResource(
                                 image,
-                                typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                                typeof(ImageResourceExtension).GetTypeInfo().Assembly)
                         },
                         new Label
                         {

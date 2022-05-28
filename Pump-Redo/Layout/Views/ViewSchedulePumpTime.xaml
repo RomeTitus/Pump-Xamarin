@@ -61,7 +61,7 @@
                         CornerRadius="30">
                         <StackLayout Orientation="Horizontal">
                             <Image HeightRequest="18"
-                                   Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                                   Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
                             <Picker
                                 x:Name="PumpPicker"
                                 TextColor="DarkSlateBlue"
@@ -107,7 +107,7 @@
                     Grid.Column="0"
                     Margin="0,20,0,0"
                     HorizontalOptions="Center">
-                    <Image HeightRequest="120" Source="{embeddedImages:ImageResourceExtention Pump.Icons.FieldSun.png}" />
+                    <Image HeightRequest="120" Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" />
                 </StackLayout>
             </Grid>
             <StackLayout VerticalOptions="EndAndExpand">

@@ -26,7 +26,7 @@ namespace Pump.Layout.Views
             if (_sensor.TYPE == "Pressure Sensor")
                 SensorImage.Source = ImageSource.FromResource(
                     "Pump.Icons.PressureHigh.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly);
         }
 
         public TapGestureRecognizer GetTapGestureRecognizer()

@@ -6,7 +6,7 @@ using Xamarin.Forms.Xaml;
 namespace EmbeddedImages
 {
     [ContentProperty(nameof(source))]
-    internal class ImageResourceExtention : IMarkupExtension
+    internal class ImageResourceExtension : IMarkupExtension
     {
         public string source { get; set; }
 
@@ -14,7 +14,7 @@ namespace EmbeddedImages
         {
             if (source == null)
                 return null;
-            var imageSource = ImageSource.FromResource(source, typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+            var imageSource = ImageSource.FromResource(source, typeof(ImageResourceExtension).GetTypeInfo().Assembly);
             return imageSource;
         }
     }

@@ -53,7 +53,7 @@ namespace Pump.Layout.Dashboard
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
                     "Pump.Icons.Home.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly)
             };
 
             var navigationManualScheduleHomeScreen = new TabViewItem
@@ -63,7 +63,7 @@ namespace Pump.Layout.Dashboard
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
                     "Pump.Icons.ManualSchedule.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly)
             };
 
             var navigationCustomScheduleHomeScreen = new TabViewItem
@@ -73,7 +73,7 @@ namespace Pump.Layout.Dashboard
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
                     "Pump.Icons.CustomSchedule.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly)
             };
 
             var navigationScheduleHomeScreen = new TabViewItem
@@ -83,7 +83,7 @@ namespace Pump.Layout.Dashboard
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
                     "Pump.Icons.FieldSun.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly)
             };
 
             var navigationSettingPageHomeScreen = new TabViewItem
@@ -93,7 +93,7 @@ namespace Pump.Layout.Dashboard
                 TextColor = Color.AliceBlue,
                 Icon = ImageSource.FromResource(
                     "Pump.Icons.setting.png",
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly)
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly)
             };
 
             TabViewHome.TabItems.Add(navigationScheduleStatusHomeScreen);
@@ -118,7 +118,7 @@ namespace Pump.Layout.Dashboard
                 {
                     SignalImage.Source = ImageSource.FromResource(
                         result ? "Pump.Icons.Signal_5.png" : "Pump.Icons.Signal_NoSignal.png",
-                        typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
                     BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
                 });
             }
@@ -175,7 +175,7 @@ namespace Pump.Layout.Dashboard
                 {
                     SignalImage.Source = ImageSource.FromResource(
                         "Pump.Icons.Signal_" + count1 + ".png",
-                        typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
                 });
                 count++;
                 if (count > 5)

@@ -20,7 +20,7 @@ namespace Pump.Layout.Views
             if (equipmentLastOnList[2] != "1") return;
             EquipmentImage.Source = ImageSource.FromResource(
                 "Pump.Icons.activePump.png",
-                typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                typeof(ImageResourceExtension).GetTypeInfo().Assembly);
             StackLayoutViewEquipmentLastOn.BackgroundColor = Color.DarkTurquoise;
         }
 

@@ -57,7 +57,7 @@ namespace Pump.Layout.Views
                 _oldImage = _image;
                 ImageSensor.Source = ImageSource.FromResource(
                     _image,
-                    typeof(ImageResourceExtention).GetTypeInfo().Assembly);
+                    typeof(ImageResourceExtension).GetTypeInfo().Assembly);
             }
         }
 

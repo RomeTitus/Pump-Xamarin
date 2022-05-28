@@ -26,7 +26,7 @@
 
         <StackLayout HeightRequest="50" Orientation="Vertical">
             <StackLayout Orientation="Horizontal" VerticalOptions="CenterAndExpand">
-                <Image HeightRequest="30" Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                <Image HeightRequest="30" Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
                 <Label
                     x:Name="LabelPumpName"
                     FontSize="Large"

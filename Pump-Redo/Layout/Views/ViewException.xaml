@@ -21,7 +21,7 @@
             HorizontalOptions="Center">
             <Label FontSize="20" Text="Something, somewhere broke" />
             <Label x:Name="LabelException" FontSize="15" Text="Something, somewhere broke" />
-            <Image HeightRequest="68" Source="{localImage:ImageResourceExtention Pump.Icons.NoConnection.png}" />
+            <Image HeightRequest="68" Source="{localImage:ImageResourceExtension Pump.Icons.NoConnection.png}" />
         </StackLayout>
     </Grid>
 </ContentView>

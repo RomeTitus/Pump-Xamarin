@@ -123,7 +123,7 @@
                             CornerRadius="30">
                             <StackLayout Orientation="Horizontal">
                                 <Image HeightRequest="18"
-                                       Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                                       Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
                                 <Picker
                                     x:Name="PumpPicker"
                                     TextColor="DarkSlateBlue"

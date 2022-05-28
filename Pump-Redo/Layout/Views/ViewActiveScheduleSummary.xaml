@@ -20,7 +20,7 @@
         <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
 
             <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
-                <Image HeightRequest="40" Source="{localImage:ImageResourceExtention Pump.Icons.activePump.png}" />
+                <Image HeightRequest="40" Source="{localImage:ImageResourceExtension Pump.Icons.activePump.png}" />
                 <Label
                     x:Name="LablePump"
                     Text="Big Pump"
@@ -28,7 +28,7 @@
             </StackLayout>
 
             <StackLayout HorizontalOptions="End" Orientation="Horizontal">
-                <Image HeightRequest="40" Source="{localImage:ImageResourceExtention Pump.Icons.sprinkler.jpg}" />
+                <Image HeightRequest="40" Source="{localImage:ImageResourceExtension Pump.Icons.sprinkler.jpg}" />
                 <Label
                     x:Name="LableZone"
                     Text="Garden"

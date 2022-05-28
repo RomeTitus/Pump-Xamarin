@@ -39,7 +39,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="15"
-                           Source="{embeddedImages:ImageResourceExtention Pump.Icons.activePump.png}" />
+                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
                     <Label
                         x:Name="LabelPumpName"
                         Text="Unknown"

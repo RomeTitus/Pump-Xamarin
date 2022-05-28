@@ -43,7 +43,7 @@
                     Grid.Column="0"
                     Margin="0,20,0,0"
                     HorizontalOptions="Center">
-                    <Image HeightRequest="120" Source="{embeddedImages:ImageResourceExtention Pump.Icons.FieldSun.png}" />
+                    <Image HeightRequest="120" Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" />
                 </StackLayout>
             </Grid>
             <StackLayout VerticalOptions="EndAndExpand">
