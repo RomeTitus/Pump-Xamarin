@@ -30,9 +30,7 @@ namespace Pump.Layout
         {
             ScrollViewSetupSystem.Children.Clear();
             if (_bluetoothManager.AdapterBle.IsScanning)
-            {
                 BtnScan.Text = "Start Scan";
-            }
             else
                 BtnScan.Text = "Stop Scan";
 
@@ -54,15 +52,12 @@ namespace Pump.Layout
             var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
                 "Accept", "Cancel");
             if (result)
-            {
                 try
                 {
                     await _bluetoothManager.ConnectToDevice(blueToothDevice);
                     var isController = await _bluetoothManager.IsController();
                     if (isController)
-                    {
                         await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
-                    }
                     else
                         await DisplayAlert("Irrigation", "Not verified controller", "Understood");
                 }
@@ -70,7 +65,6 @@ namespace Pump.Layout
                 {
                     await DisplayAlert("Connect Exception!", exception.Message, "Understood");
                 }
-            }
         }
 
         private void PopulateBluetoothDevice()
@@ -122,7 +116,7 @@ namespace Pump.Layout
             }
         }
 
-        void Adapter_ScanTimeoutElapsed(object sender, EventArgs e)
+        private void Adapter_ScanTimeoutElapsed(object sender, EventArgs e)
         {
             BtnScan.Text = "Start Scan";
         }

@@ -5,7 +5,7 @@ using Pump.Class;
 
 namespace Pump.IrrigationController
 {
-    class RunningCustomSchedule
+    internal class RunningCustomSchedule
     {
         public List<ActiveSchedule> GetActiveCustomSchedule(List<CustomSchedule> customScheduleList,
             List<Equipment> equipmentList)
@@ -15,7 +15,6 @@ namespace Pump.IrrigationController
             {
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(schedule.StartTime);
                 for (var i = 0; i < schedule.Repeat + 1; i++)
-                {
                     foreach (var scheduleDetails in schedule.ScheduleDetails)
                     {
                         var activeSchedule = new ActiveSchedule
@@ -39,7 +38,6 @@ namespace Pump.IrrigationController
                         activeSchedule.EndTime = startTimeDateTime;
                         activeScheduleList.Add(activeSchedule);
                     }
-                }
             }
 
             var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
@@ -54,7 +52,6 @@ namespace Pump.IrrigationController
                 var currentTime = DateTime.UtcNow;
                 var index = 0;
                 for (var i = 0; i < customScheduleList.Repeat + 1; i++)
-                {
                     foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
                         //gets Next Schedule Start Time
@@ -68,7 +65,6 @@ namespace Pump.IrrigationController
                         startTimeDateTime = endTimeDateTime;
                         index++;
                     }
-                }
             }
             catch
             {
@@ -84,7 +80,6 @@ namespace Pump.IrrigationController
             {
                 var startTimeDateTime = ScheduleTime.FromUnixTimeStampUtc(customScheduleList.StartTime);
                 for (var i = 0; i < customScheduleList.Repeat + 1; i++)
-                {
                     foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
                         //gets Next Schedule Start Time
@@ -94,7 +89,6 @@ namespace Pump.IrrigationController
                                               TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
                         startTimeDateTime = endTimeDateTime;
                     }
-                }
 
                 return startTimeDateTime;
             }
@@ -114,13 +108,9 @@ namespace Pump.IrrigationController
                 var startTimeDateTime = DateTime.UtcNow;
                 var index = 0;
                 for (var i = 0; i < customScheduleList.Repeat + 1; i++)
-                {
                     foreach (var scheduleDetails in customScheduleList.ScheduleDetails)
                     {
-                        if (index == selectIndex)
-                        {
-                            return startTimeDateTime;
-                        }
+                        if (index == selectIndex) return startTimeDateTime;
 
                         //gets Next Schedule Start Time
                         var durationHour = scheduleDetails.DURATION.Split(':').First();
@@ -131,7 +121,6 @@ namespace Pump.IrrigationController
                         startTimeDateTime = endTimeDateTime;
                         index++;
                     }
-                }
             }
             catch
             {

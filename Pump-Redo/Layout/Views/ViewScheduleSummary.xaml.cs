@@ -27,10 +27,8 @@ namespace Pump.Layout.Views
             labelScheduleName.Text = _schedule.NAME;
             SetWeek();
             foreach (var scheduleDetail in _schedule.ScheduleDetails)
-            {
                 ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail,
                     _equipmentList.FirstOrDefault(x => x?.ID == scheduleDetail.id_Equipment), true));
-            }
         }
 
         private void SetWeek()

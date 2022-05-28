@@ -28,7 +28,9 @@ namespace Pump.Layout.Schedule
             _socketPicker = socketPicker;
             _schedule = schedule;
             if (_schedule == null)
+            {
                 _schedule = new IrrigationController.Schedule();
+            }
             else
             {
                 ButtonCreateSchedule.Text = "SAVE";
@@ -49,14 +51,13 @@ namespace Pump.Layout.Schedule
 
         private void PopulateEquipment()
         {
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length)
+                         .ThenBy(c => c.NAME))
             {
                 PumpPicker.Items.Add(equipment.NAME);
                 _pumpIdList.Add(equipment.ID);
                 if (_schedule.id_Pump != null && _schedule.id_Pump == equipment.ID)
-                {
-                    PumpPicker.SelectedIndex = (PumpPicker.Items.Count - 1);
-                }
+                    PumpPicker.SelectedIndex = PumpPicker.Items.Count - 1;
             }
 
             if (PumpPicker.SelectedIndex == -1 && PumpPicker.Items.Count > 0)
@@ -66,7 +67,8 @@ namespace Pump.Layout.Schedule
                 ScrollViewZoneDetail.Children.Clear();
                 if (_equipmentList.Count(equipment => equipment.isPump == false) == 0)
                     ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
-                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false)
+                             .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =
                         _schedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);
@@ -146,7 +148,7 @@ namespace Pump.Layout.Schedule
             if (_schedule.WEEK.Split(',').Contains(weekday))
                 _schedule.WEEK = _schedule.WEEK.Replace(weekday + ",", "");
             else
-                _schedule.WEEK += (weekday + ",");
+                _schedule.WEEK += weekday + ",";
 
             SetSelectedWeek();
         }
@@ -167,9 +169,7 @@ namespace Pump.Layout.Schedule
             if (_schedule == null)
                 return;
             foreach (var frame in frames)
-            {
                 ChangeWeekSelect(frame, _schedule.WEEK.Split(',').Contains(frame.AutomationId));
-            }
         }
 
         private static void ChangeWeekSelect(Frame frame, bool isSelected)

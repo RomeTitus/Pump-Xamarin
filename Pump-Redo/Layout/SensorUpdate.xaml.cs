@@ -61,9 +61,7 @@ namespace Pump.Layout
             }
 
             foreach (var equipment in _equipmentList.OrderBy(x => !x.isPump))
-            {
                 ScrollViewAttachedEquipment.Children.Add(new ViewAttachedEquipment(equipment, _sensor));
-            }
 
             index = 0;
             foreach (var sensor in _sensorTypesList)
@@ -150,9 +148,7 @@ namespace Pump.Layout
                 if (SystemPicker.SelectedIndex == 0)
                     _sensor.AttachedSubController = null;
                 else
-                {
                     _sensor.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex - 1].ID;
-                }
 
                 _sensor.AttachedEquipment.Clear();
                 foreach (var viewAttachedEquipment in ScrollViewAttachedEquipment.Children)
@@ -182,15 +178,11 @@ namespace Pump.Layout
                 return;
             if (sensorType.Items[sensorType.SelectedIndex] == "Pressure Sensor" ||
                 sensorType.Items[sensorType.SelectedIndex] == "Temperature Sensor")
-            {
                 _usableGpio = new GpioPins().GetAnalogGpioList().Where(x => _avalibleGpio.Contains(x)).Select(x => x)
                     .ToList();
-            }
             else
-            {
                 _usableGpio = new GpioPins().GetDigitalGpioList().Where(x => _avalibleGpio.Contains(x)).Select(x => x)
                     .ToList();
-            }
 
             UpdateGpioPicker();
 
@@ -227,8 +219,8 @@ namespace Pump.Layout
             {
                 GpioPicker.Items.Add("Pin: " + gpio);
                 if (_sensor.GPIO == gpio &&
-                    ((usedSensors.FirstOrDefault(x => x.AttachedSubController == _sensor.AttachedSubController) !=
-                      null) || usedSensors.Count == 0))
+                    (usedSensors.FirstOrDefault(x => x.AttachedSubController == _sensor.AttachedSubController) !=
+                        null || usedSensors.Count == 0))
                     GpioPicker.SelectedIndex = index;
                 index++;
             }

@@ -104,10 +104,7 @@ namespace Pump.SocketController.BT
             var bytesRec = sender.Receive(bytes);
             var shrinkBytes = new List<byte>();
 
-            for (var i = 0; i < bytesRec; i++)
-            {
-                shrinkBytes.Add(bytes[i]);
-            }
+            for (var i = 0; i < bytesRec; i++) shrinkBytes.Add(bytes[i]);
 
             var result = shrinkBytes.ToArray();
             // Release the socket.    

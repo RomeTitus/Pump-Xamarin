@@ -14,10 +14,7 @@ namespace Pump.SocketController
             var stringChars = new char[length];
             var random = new Random();
 
-            for (var i = 0; i < stringChars.Length; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
+            for (var i = 0; i < stringChars.Length; i++) stringChars[i] = chars[random.Next(chars.Length)];
 
             return new string(stringChars);
         }
@@ -183,7 +180,7 @@ namespace Pump.SocketController
         {
             if (entity.GetType() == typeof(ManualSchedule))
             {
-                ManualSchedule manualSchedule = (ManualSchedule)entity;
+                var manualSchedule = (ManualSchedule)entity;
                 return CleanJObject(manualSchedule.DeleteAwaiting
                     ? DeleteManualSchedule(manualSchedule)
                     : SetManualSchedule(manualSchedule));
@@ -191,13 +188,13 @@ namespace Pump.SocketController
 
             if (entity.GetType() == typeof(Schedule))
             {
-                Schedule schedule = (Schedule)entity;
+                var schedule = (Schedule)entity;
                 return CleanJObject(schedule.DeleteAwaiting ? DeleteSchedule(schedule) : SetSchedule(schedule));
             }
 
             if (entity.GetType() == typeof(CustomSchedule))
             {
-                CustomSchedule customSchedule = (CustomSchedule)entity;
+                var customSchedule = (CustomSchedule)entity;
                 return CleanJObject(customSchedule.DeleteAwaiting
                     ? DeleteCustomSchedule(customSchedule)
                     : SetCustomSchedule(customSchedule));
@@ -205,25 +202,25 @@ namespace Pump.SocketController
 
             if (entity.GetType() == typeof(Equipment))
             {
-                Equipment equipment = (Equipment)entity;
+                var equipment = (Equipment)entity;
                 return CleanJObject(equipment.DeleteAwaiting ? DeleteEquipment(equipment) : SetEquipment(equipment));
             }
 
             if (entity.GetType() == typeof(Sensor))
             {
-                Sensor sensor = (Sensor)entity;
+                var sensor = (Sensor)entity;
                 return CleanJObject(sensor.DeleteAwaiting ? DeleteSensor(sensor) : SetSensor(sensor));
             }
 
             if (entity.GetType() == typeof(Site))
             {
-                Site site = (Site)entity;
+                var site = (Site)entity;
                 return CleanJObject(site.DeleteAwaiting ? DeleteSite(site) : SetSite(site));
             }
 
             if (entity.GetType() == typeof(SubController))
             {
-                SubController subController = (SubController)entity;
+                var subController = (SubController)entity;
                 return CleanJObject(subController.DeleteAwaiting
                     ? DeleteSubController(subController)
                     : SetSubController(subController));
@@ -232,7 +229,7 @@ namespace Pump.SocketController
             //TODO see how this will work with BlueTooth / Socket
             if (entity.GetType() == typeof(Alive))
             {
-                Alive alive = (Alive)entity;
+                var alive = (Alive)entity;
                 return CleanJObject((JObject)ScheduleTime.GetUnixTimeStampUtcNow());
             }
 
@@ -248,10 +245,7 @@ namespace Pump.SocketController
                 {
                     var properties = (JProperty)jToken;
                     var result = properties.Value.ToString();
-                    if (string.IsNullOrEmpty(result) || result == "[]")
-                    {
-                        jToken.Remove();
-                    }
+                    if (string.IsNullOrEmpty(result) || result == "[]") jToken.Remove();
                 }
             }
 

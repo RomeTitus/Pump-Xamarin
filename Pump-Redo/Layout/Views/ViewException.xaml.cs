@@ -15,6 +15,6 @@ namespace Pump.Layout.Views
             LabelException.Text = e.Message;
         }
 
-        public string ID { get; private set; }
+        public string ID { get; }
     }
 }

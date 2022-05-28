@@ -9,6 +9,6 @@ namespace Pump.Class
             Status = status;
         }
 
-        public string Status { get; private set; }
+        public string Status { get; }
     }
 }

@@ -29,7 +29,9 @@ namespace Pump.Layout.Schedule
                 ButtonCreateCustomSchedule.Text = "SAVE";
             }
             else
+            {
                 schedule = new CustomSchedule();
+            }
 
             _customSchedule = schedule;
             MaskedEntryRepeat.Text = _customSchedule.Repeat.ToString();
@@ -40,14 +42,13 @@ namespace Pump.Layout.Schedule
 
         private void PopulateEquipment()
         {
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length)
+                         .ThenBy(c => c.NAME))
             {
                 CustomPumpPicker.Items.Add(equipment.NAME);
                 _pumpIdList.Add(equipment.ID);
                 if (_customSchedule.id_Pump != null && _customSchedule.id_Pump == equipment.ID)
-                {
-                    CustomPumpPicker.SelectedIndex = (CustomPumpPicker.Items.Count - 1);
-                }
+                    CustomPumpPicker.SelectedIndex = CustomPumpPicker.Items.Count - 1;
 
                 if (CustomPumpPicker.SelectedIndex == -1 && CustomPumpPicker.Items.Count > 0)
                     CustomPumpPicker.SelectedIndex = 0;
@@ -58,7 +59,8 @@ namespace Pump.Layout.Schedule
                 ScrollViewZoneDetail.Children.Clear();
                 if (_equipmentList.Count(equipment => equipment.isPump == false) == 0)
                     ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
-                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false)
+                             .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =
                         _customSchedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);
@@ -161,7 +163,9 @@ namespace Pump.Layout.Schedule
                     await Navigation.PopModalAsync();
                 }
                 else
+                {
                     await DisplayAlert("Incomplete", "\u2022 One or more zones are required!", "Understood");
+                }
             }
         }
 

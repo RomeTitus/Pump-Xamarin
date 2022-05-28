@@ -2,7 +2,7 @@
 
 namespace Pump.Class
 {
-    class GpioPins
+    internal class GpioPins
     {
         public List<long> GetAllGpioList()
         {

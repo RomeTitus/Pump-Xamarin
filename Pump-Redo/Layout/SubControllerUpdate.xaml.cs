@@ -40,7 +40,7 @@ namespace Pump.Layout
             SubControllerPort.Text = _subController.Port.ToString();
             SubControllerLoRa.IsChecked = _subController.UseLoRa;
             IncomingKey.Text = _subController.IncomingKey.ToString();
-            for (int i = 0; i < _subController.OutgoingKey?.Count; i++)
+            for (var i = 0; i < _subController.OutgoingKey?.Count; i++)
             {
                 OutgoingKey.Text += _subController.OutgoingKey[i].ToString();
                 if (i != _subController.OutgoingKey.Count - 1)

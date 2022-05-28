@@ -1,18 +1,20 @@
-﻿using System;
-using Android;
+﻿using Android;
 using Android.App;
 using Android.Content.PM;
-using Android.Runtime;
 using Android.OS;
+using Android.Runtime;
 using Rg.Plugins.Popup;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
 using Platform = Xamarin.Essentials.Platform;
 
 namespace Pump.Droid
 {
-    [Activity(Label = "Pump", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    [Activity(Label = "Pump", Theme = "@style/MainTheme", MainLauncher = true,
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode |
+                               ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
+    public class MainActivity : FormsAppCompatActivity
     {
         public const string TAG = "MainActivity";
 
@@ -30,8 +32,8 @@ namespace Pump.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            Platform.Init(this, savedInstanceState);
+            Forms.Init(this, savedInstanceState);
 
             Popup.Init(this);
             Platform.Init(this, savedInstanceState);
@@ -42,38 +44,30 @@ namespace Pump.Droid
 
             LoadApplication(new App());
         }
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
+            [GeneratedEnum] Permission[] grantResults)
         {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
         private void CheckPermissions()
         {
-            bool minimumPermissionsGranted = true;
+            var minimumPermissionsGranted = true;
 
-            foreach (string permission in _permissions)
-            {
+            foreach (var permission in _permissions)
                 if (CheckSelfPermission(permission) != Permission.Granted)
-                {
                     minimumPermissionsGranted = false;
-                }
-            }
 
             // If any of the minimum permissions aren't granted, we request them from the user
-            if (!minimumPermissionsGranted)
-            {
-                RequestPermissions(_permissions, 0);
-            }
+            if (!minimumPermissionsGranted) RequestPermissions(_permissions, 0);
         }
 
         public override void OnBackPressed()
         {
-            if (Popup.SendBackPressed(base.OnBackPressed))
-            {
-                PopupNavigation.Instance.PopAsync();
-            }
+            if (Popup.SendBackPressed(base.OnBackPressed)) PopupNavigation.Instance.PopAsync();
         }
     }
 }

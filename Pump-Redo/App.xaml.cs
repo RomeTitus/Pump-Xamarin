@@ -1,15 +1,15 @@
-﻿using System;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-using Firebase.Auth;
+﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
+using Firebase.Auth.Repository;
 using Pump.Layout;
+using Xamarin.Forms;
 
 namespace Pump
 {
     public partial class App : Application
     {
-        FirebaseAuthClient _client;
+        private FirebaseAuthClient _client;
+
         public App()
         {
             AuthenticateUser();
@@ -29,7 +29,7 @@ namespace Pump
         protected override void OnResume()
         {
         }
-    
+
         private void AuthenticateUser()
         {
             var config = new FirebaseAuthConfig
@@ -37,12 +37,13 @@ namespace Pump
                 ApiKey = "AIzaSyDxfc71frXHM-gtVgynCft8rokK_Bl6r0c",
                 AuthDomain = "pump-25eee.firebaseapp.com",
                 Providers = new FirebaseAuthProvider[]
-                    {
-                        new EmailProvider()
-                    }
+                {
+                    new EmailProvider()
+                },
+                UserRepository = new FileUserRepository("FirebaseCred")
             };
             _client = new FirebaseAuthClient(config);
+            
         }
-
     }
 }

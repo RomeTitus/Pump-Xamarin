@@ -7,12 +7,12 @@ using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
+using Pump.Layout;
 using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Pump.Layout;
 
 namespace Pump
 {
@@ -21,13 +21,13 @@ namespace Pump
     {
         private readonly NotificationEvent _notificationEvent;
         private readonly ObservableIrrigation _observableIrrigation;
-        private Timer _timer;
         private readonly SocketPicker _socketPicker;
 
         //INotificationManager notificationManager;
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private HomeScreen _homeScreen;
         private bool _loadedHomeScreen;
+        private readonly Timer _timer;
 
         public MainPage()
         {
@@ -45,6 +45,7 @@ namespace Pump
             if (!dbController.GetControllerConnectionList().Any())
                 SetupNewController();
         }
+
         private void SetEvents()
         {
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
@@ -125,7 +126,6 @@ namespace Pump
                             var viewSiteSummary = new ViewSiteSummary(site);
                             viewSiteSummary.GetTapGestureRecognizer().Tapped += ViewMainPage_Tapped;
                             ScrollViewSite.Children.Add(viewSiteSummary);
-
                         }
                     }
 
@@ -155,7 +155,7 @@ namespace Pump
                     var viewScheduleStatus = (ViewSiteSummary)viewSite;
 
                     viewScheduleStatus.sensor = _observableIrrigation.SensorList.FirstOrDefault(x =>
-                                        viewScheduleStatus.Site.Attachments.Contains(x?.ID) && x?.TYPE == "Pressure Sensor");
+                        viewScheduleStatus.Site.Attachments.Contains(x?.ID) && x?.TYPE == "Pressure Sensor");
 
 
                     viewScheduleStatus.Schedules = _observableIrrigation.ScheduleList.ToList();
@@ -175,9 +175,6 @@ namespace Pump
                     StartHomePage(selectedSiteId);
                 }
             }
-
-
-
         }
 
         private string SetSelectedSite()
@@ -201,7 +198,6 @@ namespace Pump
             }
 
             foreach (var view in ScrollViewSite.Children)
-            {
                 try
                 {
                     var siteView = (ViewSiteSummary)view;
@@ -213,7 +209,6 @@ namespace Pump
                 {
                     Console.WriteLine(e);
                 }
-            }
 
             return connection.SiteSelectedId;
         }
@@ -297,8 +292,8 @@ namespace Pump
                 else if (action == "Delete")
                 {
                     if (await DisplayAlert("Are you sure?",
-                        "Confirm to delete " + site.NAME, "Delete",
-                        "Cancel"))
+                            "Confirm to delete " + site.NAME, "Delete",
+                            "Cancel"))
                     {
                         site.DeleteAwaiting = true;
                         await _socketPicker.SendCommand(site);
@@ -389,9 +384,7 @@ namespace Pump
                         }
                     }
                 else
-                {
                     ScrollViewSubController.Children.Add(new ViewEmptySchedule("No other controller Here"));
-                }
             }
             catch
             {
@@ -421,7 +414,8 @@ namespace Pump
                 }
                 else
                 {
-                    if (ScrollViewSubController.Children.Count == 1 && ScrollViewSubController.Children.First().AutomationId ==
+                    if (ScrollViewSubController.Children.Count == 1 &&
+                        ScrollViewSubController.Children.First().AutomationId ==
                         "ActivityIndicatorSiteLoading")
                         return;
                     ScrollViewSubController.Children.Clear();
@@ -456,19 +450,15 @@ namespace Pump
                 if (action == null) return;
 
                 if (action == "Update")
-                {
                     await Navigation.PushModalAsync(new SubControllerUpdate(_socketPicker, subController));
-                }
                 else if (action == "Delete")
-                {
                     if (await DisplayAlert("Are you sure?",
-                        "Confirm to delete " + subController.NAME, "Delete",
-                        "Cancel"))
+                            "Confirm to delete " + subController.NAME, "Delete",
+                            "Cancel"))
                     {
                         subController.DeleteAwaiting = true;
                         await _socketPicker.SendCommand(subController);
                     }
-                }
             });
         }
 
@@ -501,7 +491,7 @@ namespace Pump
             _timer.Enabled = true;
         }
 
-        void timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             PopulateSiteEvent(null, null);
             PopulateSubControllerEvent(null, null);

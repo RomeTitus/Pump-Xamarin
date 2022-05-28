@@ -34,7 +34,9 @@ namespace Pump.Layout
                 ButtonUpdateEquipment.Text = "Create";
             }
             else
+            {
                 _equipmentList.Remove(equipment);
+            }
 
 
             _equipment = equipment;
@@ -59,10 +61,7 @@ namespace Pump.Layout
             if (_equipment.isPump)
             {
                 IsPumpCheckBox.IsChecked = true;
-                if (_equipment.DirectOnlineGPIO != null)
-                {
-                    IsDirectOnlineCheckBox.IsChecked = true;
-                }
+                if (_equipment.DirectOnlineGPIO != null) IsDirectOnlineCheckBox.IsChecked = true;
             }
         }
 
@@ -148,8 +147,8 @@ namespace Pump.Layout
             {
                 GpioPicker.Items.Add("Pin: " + gpio);
                 if (_equipment.GPIO == gpio &&
-                    ((usedEquipment.FirstOrDefault(x => x.AttachedSubController == _equipment.AttachedSubController) !=
-                      null) || usedEquipment.Count == 0))
+                    (usedEquipment.FirstOrDefault(x => x.AttachedSubController == _equipment.AttachedSubController) !=
+                        null || usedEquipment.Count == 0))
                     GpioPicker.SelectedIndex = index;
                 index++;
             }
@@ -159,9 +158,9 @@ namespace Pump.Layout
             {
                 DirectOnlineGpioPicker.Items.Add("Pin: " + gpio);
                 if (_equipment.DirectOnlineGPIO != null &&
-                    (_equipment.DirectOnlineGPIO == gpio &&
-                     (usedEquipment.FirstOrDefault(x =>
-                         x.AttachedSubController == _equipment.AttachedSubController) != null) ||
+                    ((_equipment.DirectOnlineGPIO == gpio &&
+                      usedEquipment.FirstOrDefault(x =>
+                          x.AttachedSubController == _equipment.AttachedSubController) != null) ||
                      usedEquipment.Count == 0))
                     DirectOnlineGpioPicker.SelectedIndex = index;
                 index++;

@@ -7,7 +7,7 @@ using Pump.IrrigationController;
 
 namespace Pump.SocketController.Firebase
 {
-    class InitializeFirebase
+    internal class InitializeFirebase
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private IDisposable _subscribeAlive;
@@ -50,11 +50,9 @@ namespace Pump.SocketController.Firebase
                         var sensor = x.Object;
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.SensorList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.SensorList.Count; i++)
                                 if (_observableIrrigation.SensorList[i].ID == x.Key)
                                     _observableIrrigation.SensorList.RemoveAt(i);
-                            }
                         }
                         else
                         {
@@ -98,11 +96,9 @@ namespace Pump.SocketController.Firebase
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.EquipmentList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.EquipmentList.Count; i++)
                                 if (_observableIrrigation.EquipmentList[i].ID == x.Key)
                                     _observableIrrigation.EquipmentList.RemoveAt(i);
-                            }
                         }
                         else
                         {
@@ -147,11 +143,9 @@ namespace Pump.SocketController.Firebase
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.ScheduleList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.ScheduleList.Count; i++)
                                 if (_observableIrrigation.ScheduleList[i].ID == x.Key)
                                     _observableIrrigation.ScheduleList.RemoveAt(i);
-                            }
                         }
                         else
                         {
@@ -196,11 +190,9 @@ namespace Pump.SocketController.Firebase
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.CustomScheduleList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.CustomScheduleList.Count; i++)
                                 if (_observableIrrigation.CustomScheduleList[i].ID == x.Key)
                                     _observableIrrigation.CustomScheduleList.RemoveAt(i);
-                            }
                         }
                         else
                         {
@@ -245,11 +237,9 @@ namespace Pump.SocketController.Firebase
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.ManualScheduleList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.ManualScheduleList.Count; i++)
                                 if (_observableIrrigation.ManualScheduleList[i].ID == x.Key)
                                     _observableIrrigation.ManualScheduleList.RemoveAt(i);
-                            }
                         }
                         else
                         {
@@ -294,11 +284,9 @@ namespace Pump.SocketController.Firebase
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.SubControllerList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.SubControllerList.Count; i++)
                                 if (_observableIrrigation.SubControllerList[i].ID == x.Key)
                                     _observableIrrigation.SubControllerList.RemoveAt(i);
-                            }
                         }
                         else
                         {
@@ -357,11 +345,9 @@ namespace Pump.SocketController.Firebase
 
                         if (x.EventType == FirebaseEventType.Delete)
                         {
-                            for (int i = 0; i < _observableIrrigation.SiteList.Count; i++)
-                            {
+                            for (var i = 0; i < _observableIrrigation.SiteList.Count; i++)
                                 if (_observableIrrigation.SiteList[i].ID == x.Key)
                                     _observableIrrigation.SiteList.RemoveAt(i);
-                            }
                         }
                         else
                         {

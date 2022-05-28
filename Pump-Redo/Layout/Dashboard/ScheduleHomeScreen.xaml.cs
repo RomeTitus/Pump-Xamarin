@@ -44,6 +44,7 @@ namespace Pump.Layout.Dashboard
             {
                 if (!_observableIrrigation.LoadedAllData()) return;
                 if (_observableIrrigation.ScheduleList.Any())
+                {
                     foreach (var schedule in _observableIrrigation.ScheduleList.ToList())
                     {
                         var viewSchedule = ScrollViewScheduleDetail.Children.FirstOrDefault(x =>
@@ -70,6 +71,7 @@ namespace Pump.Layout.Dashboard
                             viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                         }
                     }
+                }
                 else
                 {
                     if (ScrollViewScheduleDetail.Children.Count == 0)
@@ -248,7 +250,7 @@ namespace Pump.Layout.Dashboard
         {
             var viewScheduleScreen =
                 ScrollViewScheduleDetail.Children.First(x =>
-                    (((ViewScheduleSettingSummary)x).Schedule.ID == schedule.ID));
+                    ((ViewScheduleSettingSummary)x).Schedule.ID == schedule.ID);
             var viewSchedule = (ViewScheduleSettingSummary)viewScheduleScreen;
 
             viewSchedule.Schedule = schedule;

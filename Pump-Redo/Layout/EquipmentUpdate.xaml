@@ -61,7 +61,7 @@
                         <StackLayout Orientation="Horizontal" WidthRequest="160">
                             <Image HeightRequest="18"
                                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
-                            <Picker x:Name="SystemPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
+                            <Picker x:Name="SystemPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue" />
 
                         </StackLayout>
                     </Frame>
@@ -85,7 +85,7 @@
                         CornerRadius="30"
                         HorizontalOptions="EndAndExpand">
                         <StackLayout Orientation="Horizontal" WidthRequest="160">
-                            <Picker x:Name="GpioPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
+                            <Picker x:Name="GpioPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue" />
                         </StackLayout>
                     </Frame>
 
@@ -149,7 +149,8 @@
                             CornerRadius="30"
                             HorizontalOptions="EndAndExpand">
                             <StackLayout Orientation="Horizontal" WidthRequest="160">
-                                <Picker x:Name="DirectOnlineGpioPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
+                                <Picker x:Name="DirectOnlineGpioPicker" HorizontalOptions="FillAndExpand"
+                                        TextColor="DarkSlateBlue" />
                             </StackLayout>
                         </Frame>
                     </StackLayout>

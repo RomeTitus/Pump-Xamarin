@@ -1,5 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage     
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
     x:Class="Pump.Layout.AuthenticationScreen"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -20,7 +21,7 @@
 
             <Label
                 HorizontalOptions="Start"
-                x:Name="labelLogin"
+                x:Name="LabelLogin"
                 Text="Login"
                 FontAttributes="Bold"
                 FontSize="Title"
@@ -28,13 +29,12 @@
                 VerticalOptions="Center" />
             <Label
                 HorizontalOptions="Start"
-                x:Name="labelSignIn"
+                x:Name="LabelSignIn"
                 Text="Sign in to continue"
                 FontSize="Small"
                 TextColor="Snow"
                 VerticalOptions="Center" />
 
-            
 
             <StackLayout x:Name="SignInStackLayout" VerticalOptions="FillAndExpand">
                 <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" />
@@ -63,21 +63,19 @@
                                     Text="Password" />
 
                                 <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                                        <Entry
+                                    <Entry
                                         x:Name="TxtSignInPassword"
                                         FontSize="Small"
                                         Placeholder="********"
                                         HorizontalOptions="FillAndExpand"
                                         PlaceholderColor="LightGray"
-                                        IsPassword="true"
-                                        />
+                                        IsPassword="true" />
                                     <Label
                                         Text="FORGOT"
                                         FontSize="Small"
                                         FontAttributes="Bold"
                                         TextColor="LightBlue"
-                                        BackgroundColor="Lavender"
-                                        VerticalOptions="Center" 
+                                        VerticalOptions="Center"
                                         HorizontalOptions="End">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="ForgotButton_Clicked" />
@@ -93,18 +91,19 @@
                         </Frame>
                     </StackLayout>
                 </Frame>
-                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin="0,0,0,20">
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand"
+                             Margin="0,0,0,20">
                     <Label
-                            Text="Don't Have an account? "
-                            TextColor="Snow"
-                            FontSize="Small"
-                            VerticalOptions="Center" />
+                        Text="Don't Have an account? "
+                        TextColor="Snow"
+                        FontSize="Small"
+                        VerticalOptions="Center" />
                     <Label
-                            Text="Sign Up!"
-                            FontSize="Small"
-                            FontAttributes="Bold"
-                            TextColor="Yellow"
-                            VerticalOptions="Center" >
+                        Text="Sign Up!"
+                        FontSize="Small"
+                        FontAttributes="Bold"
+                        TextColor="Yellow"
+                        VerticalOptions="Center">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="SignupButton_Clicked" />
                         </Label.GestureRecognizers>
@@ -154,9 +153,8 @@
                                     Placeholder="********"
                                     HorizontalOptions="Fill"
                                     PlaceholderColor="LightGray"
-                                    IsPassword="true"
-                                    />
-                                
+                                    IsPassword="true" />
+
                                 <Label
                                     HorizontalOptions="Center"
                                     Text="Repeat Password" />
@@ -167,8 +165,7 @@
                                     Placeholder="********"
                                     HorizontalOptions="Fill"
                                     PlaceholderColor="LightGray"
-                                    IsPassword="true"
-                                    />
+                                    IsPassword="true" />
                                 <Button
                                     TextColor="Snow"
                                     BackgroundColor="CadetBlue"
@@ -178,18 +175,19 @@
                         </Frame>
                     </StackLayout>
                 </Frame>
-                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin="0,0,0,20">
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand"
+                             Margin="0,0,0,20">
                     <Label
-                            Text="Already Have an account? "
-                            TextColor="Snow"
-                            FontSize="Small"
-                            VerticalOptions="Center" />
+                        Text="Already Have an account? "
+                        TextColor="Snow"
+                        FontSize="Small"
+                        VerticalOptions="Center" />
                     <Label
-                            Text="Sign In!"
-                            FontSize="Small"
-                            FontAttributes="Bold"
-                            TextColor="Yellow"
-                            VerticalOptions="Center" >
+                        Text="Sign In!"
+                        FontSize="Small"
+                        FontAttributes="Bold"
+                        TextColor="Yellow"
+                        VerticalOptions="Center">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="SigninButton_Clicked" />
                         </Label.GestureRecognizers>

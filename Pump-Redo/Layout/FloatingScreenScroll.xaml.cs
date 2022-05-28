@@ -19,8 +19,10 @@ namespace Pump.Layout
         public void SetFloatingScreen(IEnumerable<object> screens)
         {
             if (IsStackLayout)
+            {
                 foreach (View screen in screens)
                     ScrollViewFloatingPage.Children.Add(screen);
+            }
             else
             {
                 var flexLayout = new FlexLayout

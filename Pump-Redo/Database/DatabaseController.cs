@@ -29,10 +29,8 @@ namespace Pump.Database
                 {
                     var pumpSelected = _database.Table<PumpSelection>().First();
                     foreach (var pumpConnection in _database.Table<PumpConnection>().ToList())
-                    {
                         if (pumpConnection == null)
                             _database.Delete(pumpConnection);
-                    }
 
                     return _database.Table<PumpConnection>().FirstOrDefault(x => x.ID == pumpSelected.PumpConnectionId);
                 }
@@ -69,7 +67,9 @@ namespace Pump.Database
                 var existingPumpConnection = _database.Table<PumpConnection>()
                     .FirstOrDefault(x => x.Mac.Equals(pumpConnection.Mac));
                 if (existingPumpConnection != null)
+                {
                     _database.Update(pumpConnection);
+                }
                 else
                 {
                     if (_database.Table<PumpSelection>().Any())

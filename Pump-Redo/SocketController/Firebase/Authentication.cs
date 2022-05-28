@@ -261,9 +261,7 @@ namespace Pump.SocketController.Firebase
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
-                {
                     notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
-                }
 
                 firebaseReplyListener.Dispose();
                 await DeleteStatus(manual.ID);
@@ -306,14 +304,16 @@ namespace Pump.SocketController.Firebase
                         if (x.Key == id)
                         {
                             //TODO Clear this up
-                            int pos = result.Body.IndexOf(_oldBody, StringComparison.Ordinal);
+                            var pos = result.Body.IndexOf(_oldBody, StringComparison.Ordinal);
                             if (pos >= 0)
                             {
-                                string strDiff = result.Body.Remove(pos, _oldBody.Length);
+                                var strDiff = result.Body.Remove(pos, _oldBody.Length);
                                 notificationEvent.UpdateStatus(strDiff);
                             }
                             else
+                            {
                                 notificationEvent.UpdateStatus(result.Body);
+                            }
 
                             _oldBody = result.Body;
 
@@ -509,9 +509,7 @@ namespace Pump.SocketController.Firebase
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
-                {
                     notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
-                }
 
                 firebaseReplyListener.Dispose();
                 await DeleteStatus(subController.ID);
@@ -532,11 +530,9 @@ namespace Pump.SocketController.Firebase
                 notificationEvent.UpdateStatus("Uploading....");
 
                 foreach (var mac in GetAllConnectedPi())
-                {
                     await FirebaseClient
                         .Child(mac + "/SubController/" + subController.ID)
                         .DeleteAsync();
-                }
 
                 notificationEvent.UpdateStatus("Complete\nController Received....");
                 var firebaseReplyListener = NotificationLiveObserver(subController.ID, notificationEvent);
@@ -554,9 +550,7 @@ namespace Pump.SocketController.Firebase
                 stopwatch.Stop();
 
                 if (_controllerStatus.IsComplete == null)
-                {
                     notificationEvent.UpdateStatus("\nOperation Failed\nWe never got a reply back");
-                }
 
                 firebaseReplyListener.Dispose();
                 await DeleteStatus(subController.ID);
@@ -604,11 +598,9 @@ namespace Pump.SocketController.Firebase
             try
             {
                 foreach (var mac in GetAllConnectedPi())
-                {
                     await FirebaseClient
                         .Child(mac + "/NotificationToken/" + notificationToken.ID)
                         .DeleteAsync();
-                }
             }
             catch (Exception e)
             {

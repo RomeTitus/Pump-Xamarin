@@ -32,9 +32,9 @@ namespace Pump.SocketController.BT
             AdapterBle.ScanTimeout = 30000;
         }
 
-        public IAdapter AdapterBle { get; private set; }
+        public IAdapter AdapterBle { get; }
         public IDevice BleDevice { get; private set; }
-        public ObservableCollection<IDevice> IrrigationDeviceBt { get; private set; }
+        public ObservableCollection<IDevice> IrrigationDeviceBt { get; }
 
         public async Task StartScanning()
         {
@@ -62,7 +62,6 @@ namespace Pump.SocketController.BT
             var cancellationToken = new CancellationTokenSource();
             cancellationToken.CancelAfter(10000);
             if (BleDevice == null)
-            {
                 try
                 {
                     var result =
@@ -76,8 +75,7 @@ namespace Pump.SocketController.BT
                     cancellationToken.Dispose();
                 }
 
-                //await AdapterBle.ConnectToDeviceAsync(device);
-            }
+            //await AdapterBle.ConnectToDeviceAsync(device);
 
             return BleDevice != null;
         }
@@ -102,26 +100,24 @@ namespace Pump.SocketController.BT
                 return;
             var currentController = new DatabaseController().GetControllerConnectionSelection();
             if (currentController != null && iDevice.NativeDevice.ToString() == currentController.Mac)
-            {
                 if (currentController.IDeviceGuid != iDevice.Id)
                 {
                     currentController.IDeviceGuid = iDevice.Id;
                     new DatabaseController().UpdateControllerConnection(currentController);
                 }
-            }
         }
 
-        void Adapter_DeviceDiscovered(object sender, DeviceEventArgs e)
+        private void Adapter_DeviceDiscovered(object sender, DeviceEventArgs e)
         {
             IrrigationDeviceBt.Add(e.Device);
         }
 
-        void Adapter_DeviceConnected(object sender, DeviceEventArgs e)
+        private void Adapter_DeviceConnected(object sender, DeviceEventArgs e)
         {
             Debug.WriteLine("Device already connected");
         }
 
-        async void Adapter_DeviceDisconnected(object sender, DeviceEventArgs e)
+        private async void Adapter_DeviceDisconnected(object sender, DeviceEventArgs e)
         {
             await DisconnectDevice();
             _loadedCharacteristic = null;
@@ -129,7 +125,7 @@ namespace Pump.SocketController.BT
             Debug.WriteLine("Device already disconnected");
         }
 
-        void Adapter_ScanTimeoutElapsed(object sender, EventArgs e)
+        private void Adapter_ScanTimeoutElapsed(object sender, EventArgs e)
         {
             AdapterBle.StopScanningForDevicesAsync();
             Debug.WriteLine("Timeout", "Bluetooth scan timeout elapsed");

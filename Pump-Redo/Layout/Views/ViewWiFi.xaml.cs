@@ -7,7 +7,7 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewWiFi : ContentView
     {
-        private WiFiContainer _wiFiContainer;
+        private readonly WiFiContainer _wiFiContainer;
 
         public ViewWiFi(WiFiContainer wiFiContainer)
         {

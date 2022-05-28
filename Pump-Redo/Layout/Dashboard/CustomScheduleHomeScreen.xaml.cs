@@ -46,6 +46,7 @@ namespace Pump.Layout.Dashboard
             {
                 if (!_observableIrrigation.LoadedAllData()) return;
                 if (_observableIrrigation.CustomScheduleList.Any())
+                {
                     foreach (var customSchedule in _observableIrrigation.CustomScheduleList)
                     {
                         var viewSchedule = ScrollViewCustomScheduleDetail.Children.FirstOrDefault(x =>
@@ -73,6 +74,7 @@ namespace Pump.Layout.Dashboard
                             viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
                         }
                     }
+                }
                 else
                 {
                     if (ScrollViewCustomScheduleDetail.Children.Count == 0)
@@ -223,10 +225,7 @@ namespace Pump.Layout.Dashboard
                 _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
                 customScheduleSummaryListObject.Add(_viewSchedule);
                 var zoneAndTimeTapGesture = _viewSchedule.GetZoneAndTimeGestureRecognizers();
-                foreach (var t in zoneAndTimeTapGesture)
-                {
-                    t.Tapped += SkipCustomSchedule_Tapped;
-                }
+                foreach (var t in zoneAndTimeTapGesture) t.Tapped += SkipCustomSchedule_Tapped;
 
 
                 return customScheduleSummaryListObject;
@@ -280,22 +279,18 @@ namespace Pump.Layout.Dashboard
             var gridEquipmentAndTime = (Grid)sender;
             int.TryParse(gridEquipmentAndTime.AutomationId, out var selectIndex);
             var customScheduleDetails = new List<ScheduleDetail>();
-            for (int i = 0; i < _viewSchedule.CustomSchedule.Repeat + 1; i++)
-            {
+            for (var i = 0; i < _viewSchedule.CustomSchedule.Repeat + 1; i++)
                 foreach (var scheduleDetail in _viewSchedule.CustomSchedule.ScheduleDetails)
-                {
                     customScheduleDetails.Add(scheduleDetail);
-                }
-            }
 
             var selectedCustomScheduleDetails = customScheduleDetails[selectIndex];
 
 
             if (!await Application.Current.MainPage.DisplayAlert("Are you sure?",
-                "You have selected " +
-                _observableIrrigation.EquipmentList.First(x => x?.ID == selectedCustomScheduleDetails.id_Equipment)
-                    .NAME + "\nConfirm to skip to this zone ?", "Confirm",
-                "cancel")) return;
+                    "You have selected " +
+                    _observableIrrigation.EquipmentList.First(x => x?.ID == selectedCustomScheduleDetails.id_Equipment)
+                        .NAME + "\nConfirm to skip to this zone ?", "Confirm",
+                    "cancel")) return;
             if (_viewSchedule == null) return;
             var nullableStartTime =
                 RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.CustomSchedule,
@@ -304,7 +299,7 @@ namespace Pump.Layout.Dashboard
             {
                 var startTime = (DateTime)nullableStartTime;
                 _viewSchedule.CustomSchedule.StartTime =
-                    (Int32)(startTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                    (int)startTime.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
                 _viewSchedule.UpdateScheduleSummary();
                 await ChangeCustomScheduleState(_viewSchedule.CustomSchedule);
             }

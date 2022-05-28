@@ -53,10 +53,7 @@ namespace Pump.Layout.Dashboard
                     var existingManualSchedule =
                         ScrollViewScheduleStatus.Children.FirstOrDefault(x => x.AutomationId == manualSchedule.ID);
                     if (existingManualSchedule == null)
-
-                    {
                         ScrollViewScheduleStatus.Children.Insert(0, new ViewManualSchedule(manualSchedule));
-                    }
                 }
 
                 var runningScheduleList =
@@ -68,6 +65,7 @@ namespace Pump.Layout.Dashboard
                     new RunningCustomSchedule().GetRunningCustomSchedule(activeCustomScheduleList));
 
                 if (runningScheduleList.Any())
+                {
                     foreach (var runningSchedule in runningScheduleList)
                     {
                         var viewActiveSchedule = ScrollViewScheduleStatus.Children.FirstOrDefault(x =>
@@ -84,6 +82,7 @@ namespace Pump.Layout.Dashboard
                                 new ViewActiveScheduleSummary(runningSchedule));
                         }
                     }
+                }
                 else
                 {
                     if (ScrollViewScheduleStatus.Children.Count == 0)
@@ -99,6 +98,7 @@ namespace Pump.Layout.Dashboard
                 queScheduleList.AddRange(new RunningCustomSchedule().GetQueCustomSchedule(queCustomScheduleList));
 
                 if (queScheduleList.Any())
+                {
                     foreach (var runningSchedule in queScheduleList)
                     {
                         var viewActiveSchedule = ScrollViewQueueStatus.Children.FirstOrDefault(x =>
@@ -115,6 +115,7 @@ namespace Pump.Layout.Dashboard
                                 new ViewActiveScheduleSummary(runningSchedule));
                         }
                     }
+                }
                 else
                 {
                     if (ScrollViewQueueStatus.Children.Count == 0)
@@ -140,6 +141,7 @@ namespace Pump.Layout.Dashboard
             {
                 if (_observableIrrigation.SensorList.Contains(null)) return;
                 if (_observableIrrigation.SensorList.Any())
+                {
                     foreach (var sensor in _observableIrrigation.SensorList)
                     {
                         var viewSensor = ScrollViewSensorStatus.Children.FirstOrDefault(x =>
@@ -158,6 +160,7 @@ namespace Pump.Layout.Dashboard
                                 new ViewSensorDetail(sensor));
                         }
                     }
+                }
                 else
                 {
                     if (ScrollViewSensorStatus.Children.Count == 0)

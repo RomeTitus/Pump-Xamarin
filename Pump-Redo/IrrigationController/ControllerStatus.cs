@@ -2,7 +2,7 @@
 
 namespace Pump.IrrigationController
 {
-    class ControllerStatus
+    internal class ControllerStatus
     {
         [JsonIgnore] public string ID { get; set; }
 

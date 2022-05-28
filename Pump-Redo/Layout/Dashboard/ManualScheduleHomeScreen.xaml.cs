@@ -42,7 +42,8 @@ namespace Pump.Layout.Dashboard
             {
                 if (!_observableIrrigation.LoadedAllData()) return;
 
-                foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+                foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump)
+                             .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var existingButton =
                         ScrollViewManualPump.Children.FirstOrDefault(view => view.AutomationId == pump.ID);
@@ -53,10 +54,9 @@ namespace Pump.Layout.Dashboard
                 }
 
                 if (_observableIrrigation.EquipmentList.Count(x => x.isPump) == 0)
-                {
                     ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Pump Found Here"));
-                }
-                foreach (var zone in _observableIrrigation.EquipmentList.Where(x => !x.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME).ToList())
+                foreach (var zone in _observableIrrigation.EquipmentList.Where(x => !x.isPump)
+                             .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME).ToList())
                 {
                     var existingButton =
                         ScrollViewManualZone.Children.FirstOrDefault(view => view.AutomationId == zone.ID);
@@ -67,9 +67,7 @@ namespace Pump.Layout.Dashboard
                 }
 
                 if (_observableIrrigation.EquipmentList.Count(x => x.isPump == false) == 0)
-                {
                     ScrollViewManualZone.Children.Add(new ViewEmptySchedule("No Zone Found Here"));
-                }
             }
             catch (Exception e)
             {
@@ -231,7 +229,7 @@ namespace Pump.Layout.Dashboard
             var equipmentOnScreen =
                 (Button)equipmentViewList.FirstOrDefault(x => x.AutomationId == button.AutomationId);
             if (_observableIrrigation.ManualScheduleList.Any(x =>
-                x.ManualDetails.Select(y => y?.id_Equipment).Contains(button.AutomationId)))
+                    x.ManualDetails.Select(y => y?.id_Equipment).Contains(button.AutomationId)))
             {
                 if (equipmentOnScreen != null)
                     equipmentOnScreen.BackgroundColor =
@@ -307,7 +305,8 @@ namespace Pump.Layout.Dashboard
             if (_observableIrrigation.EquipmentList == null)
                 return;
             var buttonList = new List<Button>();
-            foreach (var zone in _observableIrrigation.EquipmentList.Where(x => x.isPump == false).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+            foreach (var zone in _observableIrrigation.EquipmentList.Where(x => x.isPump == false)
+                         .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
             {
                 var button = CreateEquipmentButton(zone);
                 button.Scale = 1.25;
@@ -325,7 +324,8 @@ namespace Pump.Layout.Dashboard
             if (_observableIrrigation.EquipmentList.Contains(null))
                 return;
             var buttonList = new List<Button>();
-            foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump).OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+            foreach (var pump in _observableIrrigation.EquipmentList.Where(x => x.isPump).OrderBy(c => c.NAME.Length)
+                         .ThenBy(c => c.NAME))
             {
                 var button = CreateEquipmentButton(pump);
                 button.Scale = 1.25;

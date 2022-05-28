@@ -27,12 +27,12 @@ namespace Pump.Layout
             _observableIrrigation = observableIrrigation;
         }
 
-        void OnDateSelected(object sender, DateChangedEventArgs args)
+        private void OnDateSelected(object sender, DateChangedEventArgs args)
         {
             Recalculate();
         }
 
-        void Recalculate()
+        private void Recalculate()
         {
             BtnViewChart.IsEnabled = true;
             BtnFilterViewChart.IsVisible = false;
@@ -84,7 +84,7 @@ namespace Pump.Layout
             RecordChartView.Chart = new BarChart
             {
                 Entries = _chartEntries, BackgroundColor = SKColor.Parse("#00bfff"),
-                LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30//, ValueLabelTextSize = 30
+                LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30 //, ValueLabelTextSize = 30
             };
         }
 
@@ -92,30 +92,24 @@ namespace Pump.Layout
         {
             var historyList = new List<Record>();
             foreach (var recordJObject in recordJObjectList)
+            foreach (var recordJToken in recordJObject.Object)
             {
-                foreach (var recordJToken in recordJObject.Object)
+                var elementId = recordJToken.Key;
+                var recordDetailJObject = (JObject)recordJToken.Value;
+                //Skip Sensor Readings for now
+                if (!recordDetailJObject.ContainsKey("Duration")) continue;
+                foreach (var recordDurationJObject in recordDetailJObject)
                 {
-                    var elementId = recordJToken.Key;
-                    var recordDetailJObject = (JObject)recordJToken.Value;
-                    //Skip Sensor Readings for now
-                    if (!recordDetailJObject.ContainsKey("Duration")) continue;
-                    foreach (var recordDurationJObject in recordDetailJObject)
+                    var record = new Record
                     {
-                        var record = new Record
-                        {
-                            id_Equipment = elementId,
-                            Duration = recordDurationJObject.Value.ToObject<long>()
-                        };
-                        var existingRecording = historyList.FirstOrDefault(x => x.id_Equipment == elementId);
-                        if (existingRecording == null)
-                        {
-                            historyList.Add(record);
-                        }
-                        else
-                        {
-                            existingRecording.Duration += record.Duration;
-                        }
-                    }
+                        id_Equipment = elementId,
+                        Duration = recordDurationJObject.Value.ToObject<long>()
+                    };
+                    var existingRecording = historyList.FirstOrDefault(x => x.id_Equipment == elementId);
+                    if (existingRecording == null)
+                        historyList.Add(record);
+                    else
+                        existingRecording.Duration += record.Duration;
                 }
             }
 
@@ -144,10 +138,7 @@ namespace Pump.Layout
             var chartFilter = new ChartEntryFilterScreen(_chartEntries, _excludedEntries);
             var chartLayout = new List<object> { chartFilter.GetLayout() };
             _floatingScreen.SetFloatingScreen(chartLayout);
-            foreach (var checkBox in chartFilter.GetCheckBoxes())
-            {
-                checkBox.CheckedChanged += CheckBox_CheckedChanged;
-            }
+            foreach (var checkBox in chartFilter.GetCheckBoxes()) checkBox.CheckedChanged += CheckBox_CheckedChanged;
 
             PopupNavigation.Instance.PushAsync(_floatingScreen);
         }
@@ -163,7 +154,7 @@ namespace Pump.Layout
             RecordChartView.Chart = new BarChart
             {
                 Entries = _chartEntries.Where(x => _excludedEntries.Contains(x.Label) == false),
-                BackgroundColor = SKColor.Parse("#00bfff"), LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30,
+                BackgroundColor = SKColor.Parse("#00bfff"), LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30
                 //ValueLabelTextSize = 30
             };
         }

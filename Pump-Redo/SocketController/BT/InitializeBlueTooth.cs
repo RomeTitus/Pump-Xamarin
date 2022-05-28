@@ -10,7 +10,7 @@ using Pump.IrrigationController;
 
 namespace Pump.SocketController.BT
 {
-    class InitializeBlueTooth
+    internal class InitializeBlueTooth
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly PumpConnection _pumpConnection;
@@ -33,7 +33,9 @@ namespace Pump.SocketController.BT
             {
                 _isSubscribed = true;
                 if (_pumpConnection.IDeviceGuid != Guid.Empty)
+                {
                     await ConnectToDevice(_pumpConnection.IDeviceGuid);
+                }
                 else
                 {
                     await BlueToothManager.StartScanning();
@@ -45,9 +47,7 @@ namespace Pump.SocketController.BT
                         if (iDevice == null)
                             await Task.Delay(500);
                         else
-                        {
                             await ConnectToDevice(iDevice.Id);
-                        }
                     } while (BlueToothManager.AdapterBle.IsScanning);
 
                     if (_isSubscribed) continue;
@@ -73,10 +73,7 @@ namespace Pump.SocketController.BT
             RequestNow = true;
             while (_isSubscribed)
             {
-                while (CanRequestIrrigationData())
-                {
-                    await Task.Delay(500);
-                }
+                while (CanRequestIrrigationData()) await Task.Delay(500);
 
                 try
                 {
@@ -139,10 +136,7 @@ namespace Pump.SocketController.BT
 
         private bool CanRequestIrrigationData()
         {
-            if (!RequestNow)
-            {
-                return RequestIrrigationTimer.Elapsed <= TimeSpan.FromSeconds(15);
-            }
+            if (!RequestNow) return RequestIrrigationTimer.Elapsed <= TimeSpan.FromSeconds(15);
 
             RequestNow = false;
             RequestIrrigationTimer.Restart();

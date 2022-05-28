@@ -29,7 +29,7 @@ namespace Pump.Layout.Dashboard
             _observableSiteIrrigation = observableSiteIrrigation;
             _socketPicker = socketPicker;
             InitializeComponent();
-            
+
             subscribeToOnlineStatus(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
             HomeScreenSite(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

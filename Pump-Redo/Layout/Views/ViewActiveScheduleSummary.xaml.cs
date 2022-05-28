@@ -50,7 +50,7 @@ namespace Pump.Layout.Views
             _timer.Enabled = true;
         }
 
-        void timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             string duration;
             if (DateTime.Now >= ActiveSchedule.StartTime)

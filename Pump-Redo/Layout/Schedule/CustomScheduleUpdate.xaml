@@ -81,8 +81,8 @@
                                     <Picker
                                         x:Name="CustomPumpPicker"
                                         HorizontalOptions="FillAndExpand"
-                                        IsEnabled="False" 
-                                        TextColor="DarkSlateBlue"/>
+                                        IsEnabled="False"
+                                        TextColor="DarkSlateBlue" />
 
                                 </StackLayout>
                             </Frame>

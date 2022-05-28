@@ -4,7 +4,6 @@
     x:Class="Pump.Layout.SiteUpdate"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
     BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
         <ScrollView Margin="5">

@@ -26,7 +26,7 @@
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="18"
                            Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
-                    <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
+                    <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue" />
 
                 </StackLayout>
             </Frame>

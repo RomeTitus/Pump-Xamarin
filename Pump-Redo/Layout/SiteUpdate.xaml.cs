@@ -63,20 +63,14 @@ namespace Pump.Layout
             if (!string.IsNullOrEmpty(_site.Description))
                 SiteDescription.Text = _site.Description;
 
-            foreach (var equipment in _equipmentList)
-            {
-                PopulateSelectionView(equipment);
-            }
+            foreach (var equipment in _equipmentList) PopulateSelectionView(equipment);
 
-            foreach (var sensor in _sensorList)
-            {
-                PopulateSelectionView(sensor);
-            }
+            foreach (var sensor in _sensorList) PopulateSelectionView(sensor);
         }
 
         private void PopulateSelectionView(Equipment equipment)
         {
-            bool isSelected = _site.Attachments.Contains(equipment.ID);
+            var isSelected = _site.Attachments.Contains(equipment.ID);
             var image = equipment.isPump ? SavedImage.Pump : SavedImage.zone;
             ScrollViewSiteSelection.Children.Add(new StackLayout
                 {
@@ -106,7 +100,7 @@ namespace Pump.Layout
 
         private void PopulateSelectionView(Sensor sensor)
         {
-            bool isSelected = _site.Attachments.Contains(sensor.ID);
+            var isSelected = _site.Attachments.Contains(sensor.ID);
             var image = SavedImage.Sensor;
             ScrollViewSiteSelection.Children.Add(new StackLayout
                 {

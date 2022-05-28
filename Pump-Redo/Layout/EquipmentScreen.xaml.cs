@@ -42,7 +42,8 @@ namespace Pump.Layout
                 if (_observableSiteIrrigation.EquipmentList.Contains(null)) return;
                 BtnAddEquipment.IsEnabled = true;
                 if (_observableSiteIrrigation.EquipmentList.Any())
-                    foreach (var equipment in _observableSiteIrrigation.EquipmentList.OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
+                    foreach (var equipment in _observableSiteIrrigation.EquipmentList.OrderBy(c => c.NAME.Length)
+                                 .ThenBy(c => c.NAME))
                     {
                         var viewEquipment = ScrollViewEquipment.Children.FirstOrDefault(x =>
                             x.AutomationId == equipment.ID);
@@ -59,9 +60,7 @@ namespace Pump.Layout
                         }
                     }
                 else
-                {
                     ScrollViewEquipment.Children.Add(new ViewEmptySchedule("No Equipments Here"));
-                }
             }
             catch (Exception e)
             {
@@ -146,9 +145,7 @@ namespace Pump.Layout
                         }
                     }
                 else
-                {
                     ScrollViewSensor.Children.Add(new ViewEmptySchedule("No Sensor Here"));
-                }
             }
             catch (Exception e)
             {
@@ -209,21 +206,17 @@ namespace Pump.Layout
             if (action == null) return;
 
             if (action == "Update")
-            {
                 await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(),
                     _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.SiteList.First(),
                     _socketPicker, equipment));
-            }
             else if (action == "Delete")
-            {
                 if (await DisplayAlert("Are you sure?",
-                    "Confirm to delete " + equipment.NAME, "Delete",
-                    "Cancel"))
+                        "Confirm to delete " + equipment.NAME, "Delete",
+                        "Cancel"))
                 {
                     equipment.DeleteAwaiting = true;
                     await _socketPicker.SendCommand(equipment);
                 }
-            }
         }
 
         private async void ViewSensorScreen_Tapped(object sender, EventArgs e)
@@ -244,8 +237,8 @@ namespace Pump.Layout
             else
             {
                 if (await DisplayAlert("Are you sure?",
-                    "Confirm to delete " + sensor.NAME, "Delete",
-                    "Cancel"))
+                        "Confirm to delete " + sensor.NAME, "Delete",
+                        "Cancel"))
                 {
                     sensor.DeleteAwaiting = true;
                     await _socketPicker.SendCommand(sensor);

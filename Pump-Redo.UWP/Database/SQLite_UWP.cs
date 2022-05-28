@@ -9,11 +9,11 @@ using Xamarin.Forms;
 
 namespace Pump.Droid.Database
 {
-    class SQLite_UWP : ISQLite
+    internal class SQLite_UWP : ISQLite
     {
         public SQLiteConnection GetConnection()
         {
-            string dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "farm.db3");
+            var dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "farm.db3");
             var conn = new SQLiteConnection(dbpath);
 
             return conn;

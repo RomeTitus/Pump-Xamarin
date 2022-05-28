@@ -66,14 +66,12 @@ namespace Pump.Layout
             _bluetoothManager.IrrigationDeviceBt.CollectionChanged += (_, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
-                {
                     foreach (IDevice bluetoothDevice in args.NewItems)
                     {
                         var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
                         blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
                         ScrollViewSetupSystem.Children.Add(blueToothView);
                     }
-                }
             };
             await _bluetoothManager.StartScanning(Guid.Empty);
         }
@@ -86,7 +84,6 @@ namespace Pump.Layout
             var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
                 "Accept", "Cancel");
             if (result)
-            {
                 try
                 {
                     var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
@@ -96,10 +93,8 @@ namespace Pump.Layout
                     await PopupNavigation.Instance.PopAllAsync();
 
                     if (!await _bluetoothManager.IsController())
-                    {
                         if (!await DisplayAlert("Irrigation", "Not verified controller", "Continue", "Cancel"))
                             return;
-                    }
 
                     await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
                 }
@@ -109,7 +104,6 @@ namespace Pump.Layout
                     await PopupNavigation.Instance.PopAllAsync();
                     await DisplayAlert("Connect Exception!", exception.Message, "Understood");
                 }
-            }
         }
 
         private void FrameAddSystemTap_Tapped(object sender, EventArgs e)
@@ -130,9 +124,7 @@ namespace Pump.Layout
         private void PopulateElements()
         {
             foreach (var connectionType in _pumpConnection.ConnectionTypeList)
-            {
                 ConnectionPicker.Items.Add(connectionType);
-            }
 
             ConnectionPicker.SelectedIndex = _pumpConnection.ConnectionType;
 
@@ -173,7 +165,9 @@ namespace Pump.Layout
                         }
 
                         else
+                        {
                             _loadingScreen.InternalFailed();
+                        }
                     }
                 }
 
@@ -192,7 +186,9 @@ namespace Pump.Layout
                         }
 
                         else
+                        {
                             _loadingScreen.ExternalFailed();
+                        }
                     }
                 }
 
@@ -218,15 +214,15 @@ namespace Pump.Layout
                         }
 
                         else
+                        {
                             _loadingScreen.FirebaseFailed();
+                        }
                     }
                 }
 
                 _loadingScreen.StopActivityIndicator();
                 if (_firebaseConnection == true || _externalConnection == true || _internalConnection == true)
-                {
                     AddPumpConnection(_pumpConnection);
-                }
             }
         }
 
@@ -266,11 +262,8 @@ namespace Pump.Layout
                     externalConnection = false;
             }
 
-            if (externalConnection != null && internalConnection != null &&
-                (code && internalConnection != false && externalConnection != false))
-            {
-                return notification;
-            }
+            if (externalConnection != null && internalConnection != null && code && internalConnection != false &&
+                externalConnection != false) return notification;
 
             if (!code && internalConnection == false && externalConnection == false)
             {
@@ -281,7 +274,7 @@ namespace Pump.Layout
                 LabelControllerCode.TextColor = Color.Red;
             }
 
-            if (internalConnection == null || !code && internalConnection == false && externalConnection == false)
+            if (internalConnection == null || (!code && internalConnection == false && externalConnection == false))
             {
                 if (string.IsNullOrEmpty(TxtInternalConnection.Text))
                 {
@@ -302,7 +295,7 @@ namespace Pump.Layout
                 }
             }
 
-            if (externalConnection == null || !code && internalConnection == false && externalConnection == false)
+            if (externalConnection == null || (!code && internalConnection == false && externalConnection == false))
             {
                 if (string.IsNullOrEmpty(TxtExternalConnection.Text))
                 {
@@ -395,13 +388,9 @@ namespace Pump.Layout
             StackLayoutLocalConnection.IsVisible = !StackLayoutLocalConnection.IsVisible;
 
             if (StackLayoutLocalConnection.IsVisible)
-            {
                 BtnAdvancedConnectionScreen.Text = "Hide Network";
-            }
             else
-            {
                 BtnAdvancedConnectionScreen.Text = "Show Network";
-            }
         }
     }
 }

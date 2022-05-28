@@ -34,9 +34,7 @@ namespace Pump.Layout.Views
             }
 
             foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == CustomSchedule.id_Pump))
-            {
                 LabelPumpName.Text = equipment.NAME;
-            }
 
             labelScheduleName.Text = CustomSchedule.NAME;
 
@@ -46,10 +44,8 @@ namespace Pump.Layout.Views
 
                 scheduleGrid.SetBackGroundColor(Color.Yellow);
                 if (runningScheduleDetail != null)
-                {
                     if (scheduleGrid.AutomationId == runningScheduleDetail.ID)
                         scheduleGrid.SetBackGroundColor(Color.YellowGreen);
-                }
             }
         }
 
@@ -64,15 +60,12 @@ namespace Pump.Layout.Views
             }
 
             foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == CustomSchedule.id_Pump))
-            {
                 LabelPumpName.Text = equipment.NAME;
-            }
 
             labelScheduleName.Text = CustomSchedule.NAME;
 
             var index = 0;
             for (var i = 0; i < CustomSchedule.Repeat + 1; i++)
-            {
                 foreach (var scheduleEquipment in CustomSchedule.ScheduleDetails)
                 {
                     scheduleEquipment.ID = index.ToString();
@@ -83,15 +76,12 @@ namespace Pump.Layout.Views
                     scheduleGrid.SetBackGroundColor(Color.Yellow);
                     scheduleGrid.AutomationId = scheduleEquipment.ID;
                     if (runningScheduleDetail != null)
-                    {
                         if (scheduleEquipment.ID == runningScheduleDetail.ID) //Why does the ID randomly Change?
                             scheduleGrid.SetBackGroundColor(Color.YellowGreen);
-                    }
 
                     ScrollViewZoneDetail.Children.Add(scheduleGrid);
                     index++;
                 }
-            }
         }
 
         public List<TapGestureRecognizer> GetZoneAndTimeGestureRecognizers()

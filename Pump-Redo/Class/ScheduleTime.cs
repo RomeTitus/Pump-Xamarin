@@ -21,22 +21,22 @@ namespace Pump.Class
 
         public static DateTime FromUnixTimeStampLocal(long unixTimeStamp)
         {
-            return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp);
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTimeStamp);
         }
 
         public static DateTime FromUnixTimeStampUtc(long unixTimeStamp)
         {
-            return (new DateTime(1970, 1, 1, 0, 0, 0, 0)).AddSeconds(unixTimeStamp);
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTimeStamp);
         }
 
         public int getUnixTimeStampNow()
         {
-            return (int)(DateTime.Now.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            return (int)DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
         }
 
         public static int GetUnixTimeStampUtcNow()
         {
-            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            return (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
         }
 
         public static int GetUnixTimeStampUtcNow(TimeSpan hours, TimeSpan minutes)

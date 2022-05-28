@@ -33,8 +33,7 @@
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
                     <ScrollView HeightRequest="100">
-                        <StackLayout x:Name="ScrollViewSetupSystem">
-                        </StackLayout>
+                        <StackLayout x:Name="ScrollViewSetupSystem" />
                     </ScrollView>
                 </Frame>
             </StackLayout>
@@ -96,7 +95,7 @@
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="18"
                            Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
-                    <Picker x:Name="ConnectionPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue"/>
+                    <Picker x:Name="ConnectionPicker" HorizontalOptions="FillAndExpand" TextColor="DarkSlateBlue" />
 
                 </StackLayout>
             </Frame>

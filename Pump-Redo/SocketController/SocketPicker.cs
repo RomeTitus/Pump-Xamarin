@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database;
 using Pump.IrrigationController;
+using Pump.Layout;
 using Pump.SocketController.BT;
 using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
-using Pump.Layout;
 
 namespace Pump.SocketController
 {
@@ -58,10 +58,7 @@ namespace Pump.SocketController
                 _initializeFirebase.Disposable();
             else if (pumpConnection.ConnectionType == 1)
                 _initializeNetwork.Disposable();
-            else if (pumpConnection.ConnectionType == 2)
-            {
-                _initializeBlueTooth.Disposable();
-            }
+            else if (pumpConnection.ConnectionType == 2) _initializeBlueTooth.Disposable();
         }
 
         private async Task Subscribe()
@@ -72,10 +69,7 @@ namespace Pump.SocketController
                 _initializeFirebase.SubscribeFirebase();
             else if (pumpConnection.ConnectionType == 1)
                 await _initializeNetwork.SubscribeNetwork();
-            else if (pumpConnection.ConnectionType == 2)
-            {
-                await _initializeBlueTooth.SubscribeBle();
-            }
+            else if (pumpConnection.ConnectionType == 2) await _initializeBlueTooth.SubscribeBle();
         }
 
         public async Task<string> SendCommand(object sendObject, bool runInBackground = true)
@@ -120,7 +114,7 @@ namespace Pump.SocketController
                 await PopupNavigation.Instance.PushAsync(_floatingScreenScreen);
             }
 
-            string result = "Did Not Complete Action: " + sendObject;
+            var result = "Did Not Complete Action: " + sendObject;
             switch (pumpConnection?.ConnectionType)
             {
                 case 0:

@@ -41,7 +41,7 @@ namespace Pump.Layout
                         {
                             HorizontalOptions = LayoutOptions.EndAndExpand,
                             VerticalOptions = LayoutOptions.CenterAndExpand, Text = chartEntry.ValueLabel + "  "
-                        },
+                        }
                     }
                 };
                 var filterCheckBox = new CheckBox

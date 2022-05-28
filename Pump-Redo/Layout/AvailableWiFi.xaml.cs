@@ -11,7 +11,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class AvailableWiFi : ContentPage
     {
-        private List<WiFiContainer> _WiFiContainers;
+        private readonly List<WiFiContainer> _WiFiContainers;
 
         public AvailableWiFi(List<WiFiContainer> WiFiContainers)
         {
@@ -22,10 +22,7 @@ namespace Pump.Layout
 
         public void Populate()
         {
-            foreach (var wiFi in _WiFiContainers)
-            {
-                ScrollViewWiFiDetail.Children.Add(new ViewWiFi(wiFi));
-            }
+            foreach (var wiFi in _WiFiContainers) ScrollViewWiFiDetail.Children.Add(new ViewWiFi(wiFi));
         }
 
         private void ButtonCancel_OnClicked(object sender, EventArgs e)

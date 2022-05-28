@@ -9,7 +9,7 @@ using Pump.IrrigationController;
 
 namespace Pump.SocketController.BT
 {
-    class InitializeNetwork
+    internal class InitializeNetwork
     {
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly PumpConnection _pumpConnection;
@@ -50,10 +50,7 @@ namespace Pump.SocketController.BT
             RequestNow = true;
             while (_isSubscribed)
             {
-                while (CanRequestIrrigationData())
-                {
-                    await Task.Delay(500);
-                }
+                while (CanRequestIrrigationData()) await Task.Delay(500);
 
                 try
                 {
@@ -82,10 +79,7 @@ namespace Pump.SocketController.BT
 
         private bool CanRequestIrrigationData()
         {
-            if (!RequestNow)
-            {
-                return RequestIrrigationTimer.Elapsed <= TimeSpan.FromSeconds(15);
-            }
+            if (!RequestNow) return RequestIrrigationTimer.Elapsed <= TimeSpan.FromSeconds(15);
 
             RequestNow = false;
             RequestIrrigationTimer.Restart();

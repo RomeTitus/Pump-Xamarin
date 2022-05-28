@@ -9,12 +9,12 @@ using Xamarin.Forms;
 
 namespace Pump.iOS.Database
 {
-    class SQLite_IOS : ISQLite
+    internal class SQLite_IOS : ISQLite
     {
         public SQLiteConnection GetConnection()
         {
             var sqliteFileName = "farm.db3";
-            string dockumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            var dockumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             var librarypath = Path.Combine(dockumentsPath, "..", "Library");
             var path = Path.Combine(librarypath, sqliteFileName);
             var conn = new SQLiteConnection(path);

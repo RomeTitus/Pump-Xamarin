@@ -1,6 +1,6 @@
 ﻿namespace Pump.IrrigationController
 {
-    class IrrigationSelf
+    internal class IrrigationSelf
     {
         public string BTmac { get; set; }
         public string IpAdress { get; set; }

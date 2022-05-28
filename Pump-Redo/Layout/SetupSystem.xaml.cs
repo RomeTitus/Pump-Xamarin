@@ -95,18 +95,18 @@ namespace Pump.Layout
                             "Are you use you want to connect to " + _selectedWiFiContainer.ssid, "Connect",
                             "Cancel");
                     else
-                    {
                         _viewBasicAlert = new ViewBasicAlert("WIFI",
                             "Are you use you want to connect to " + _selectedWiFiContainer.ssid + "\nEnter Password",
                             "Connect",
                             "Cancel", true);
-                    }
 
                     _viewBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
                     await GeneratePopupScreen(new List<object> { _viewBasicAlert }, 400);
                 }
                 else
+                {
                     await DisplayAlert("WIFI", "We could not find that WiFi Details", "Understood");
+                }
             }
             catch (Exception exception)
             {
@@ -170,10 +170,7 @@ namespace Pump.Layout
                     ControllerPicker.SelectedIndex = i;
             }
 
-            if (!_controllerList.Any())
-            {
-                IsMain.IsEnabled = false;
-            }
+            if (!_controllerList.Any()) IsMain.IsEnabled = false;
         }
 
         private async Task GetConnectionInfo(string result = null)
@@ -249,7 +246,9 @@ namespace Pump.Layout
         private async void SetUpMainController_Clicked(object sender, EventArgs e)
         {
             if (_viewBasicAlert.GetEditableText() != _viewBasicAlert.GetSubEditableText())
+            {
                 await DisplayAlert("Setup", "Passwords does not match", "Understood");
+            }
             else
             {
                 var result = await SendUid(_viewBasicAlert.GetEditableText());

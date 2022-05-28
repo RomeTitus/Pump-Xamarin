@@ -11,12 +11,12 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSiteSummary : ContentView
     {
-        public  Sensor sensor;
         public readonly Site Site;
         public List<CustomSchedule> CustomSchedules;
         public List<Equipment> Equipments;
         public List<ManualSchedule> ManualSchedules;
         public List<IrrigationController.Schedule> Schedules;
+        public Sensor sensor;
 
 
         public ViewSiteSummary(Site site)
@@ -35,7 +35,7 @@ namespace Pump.Layout.Views
 
         public void Populate()
         {
-            bool scheduleRunning = false;
+            var scheduleRunning = false;
 
             if (Device.RuntimePlatform == Device.UWP)
                 ActivityIndicatorUWPLoadingIndicator.IsVisible = false;
@@ -55,16 +55,12 @@ namespace Pump.Layout.Views
                     x.ManualDetails.Any(z => Site.Attachments.Contains(z.id_Equipment)));
             if (manualSchedule != null)
                 scheduleRunning = true;
-            
+
             SetScheduleRunning(scheduleRunning);
 
             if (sensor != null)
-            {
                 if (sensor.TYPE == "Pressure Sensor")
-                {
                     PressureSensor();
-                }
-            }
         }
 
         private void PressureSensor()

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+
 namespace Pump.Class
 {
     public class PasswordAdvisor
@@ -10,7 +8,7 @@ namespace Pump.Class
         {
             if (string.IsNullOrEmpty(password))
                 return PasswordScore.Blank;
-            int score = 0;
+            var score = 0;
 
             if (password.Length < 1)
                 return PasswordScore.Blank;
@@ -35,7 +33,6 @@ namespace Pump.Class
 
             return (PasswordScore)score;
         }
-        
     }
 
     public enum PasswordScore
