@@ -163,6 +163,9 @@ namespace Pump.Layout
 
             try
             {
+                //User is already signed in
+                if(_client.User?.Info.Email == TxtSignInEmail.Text)
+                    return;
                 var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 var userCredential = await _client.SignInWithEmailAndPasswordAsync(TxtSignInEmail.Text,

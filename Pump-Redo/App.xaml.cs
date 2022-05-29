@@ -1,6 +1,7 @@
 ﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
 using Firebase.Auth.Repository;
+using Pump.Class;
 using Pump.Layout;
 using Xamarin.Forms;
 
@@ -15,7 +16,10 @@ namespace Pump
             AuthenticateUser();
             InitializeComponent();
 
-            MainPage = new AuthenticationScreen(_client);
+            if (_client.User == null)
+                MainPage = new AuthenticationScreen(_client);
+            else
+                MainPage = new MainPage();
         }
 
         protected override void OnStart()
@@ -40,10 +44,14 @@ namespace Pump
                 {
                     new EmailProvider()
                 },
-                UserRepository = new FileUserRepository("FirebaseCred")
+                UserRepository = new StorageRepository()
             };
             _client = new FirebaseAuthClient(config);
-            
+            _client.AuthStateChanged += ClientOnAuthStateChanged;
+        }
+
+        private void ClientOnAuthStateChanged(object sender, UserEventArgs e)
+        {
         }
     }
 }

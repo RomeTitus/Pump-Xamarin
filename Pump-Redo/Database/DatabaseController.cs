@@ -17,8 +17,8 @@ namespace Pump.Database
             _database = DependencyService.Get<ISQLite>().GetConnection();
 
             _database.CreateTable<PumpConnection>();
-
             _database.CreateTable<PumpSelection>();
+            _database.CreateTable<UserAuthentication>();
         }
 
         public PumpConnection GetControllerConnectionSelection()
@@ -58,8 +58,7 @@ namespace Pump.Database
                     : new List<PumpConnection>();
             }
         }
-
-
+        
         public void UpdateControllerConnection(PumpConnection pumpConnection)
         {
             lock (Locker)
@@ -117,6 +116,30 @@ namespace Pump.Database
             if (selectedPump?.RealTimeDatabase != null) return (bool)selectedPump.RealTimeDatabase;
 
             return false;
+        }
+        
+        public UserAuthentication GetUserAuthentication()
+        {
+            lock (Locker)
+            {
+                return _database.Table<UserAuthentication>().FirstOrDefault();
+            }
+        }
+        
+        public void DeleteUserAuthentication()
+        {
+            lock (Locker)
+            {
+                _database.DeleteAll<UserAuthentication>();
+            }
+        }
+        public void SaveUserAuthentication(UserAuthentication userAuthentication)
+        {
+            lock (Locker)
+            {
+                _database.DeleteAll<UserAuthentication>();
+                _database.Insert(userAuthentication);
+            }
         }
     }
 }

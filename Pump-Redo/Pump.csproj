@@ -11,73 +11,73 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="Icons\activePump.png"/>
-        <None Remove="Icons\ConnectionDown.png"/>
-        <None Remove="Icons\CustomSchedule.png"/>
-        <None Remove="Icons\FieldSun.png"/>
-        <None Remove="Icons\Home.png"/>
-        <None Remove="Icons\Logo.png"/>
-        <None Remove="Icons\ManualSchedule.png"/>
-        <None Remove="Icons\NoConnection.png"/>
-        <None Remove="Icons\PressureError.png"/>
-        <None Remove="Icons\PressureHigh.png"/>
-        <None Remove="Icons\PressureLow.png"/>
-        <None Remove="Icons\pump.jpg"/>
-        <None Remove="Icons\rain.png"/>
-        <None Remove="Icons\setting.png"/>
-        <None Remove="Icons\Signal_1.png"/>
-        <None Remove="Icons\Signal_2.png"/>
-        <None Remove="Icons\Signal_3.png"/>
-        <None Remove="Icons\Signal_4.png"/>
-        <None Remove="Icons\Signal_5.png"/>
-        <None Remove="Icons\Signal_NoSignal.png"/>
-        <None Remove="Icons\sprinkler.jpg"/>
-        <None Remove="Icons\SwitchController.png"/>
-        <None Remove="Icons\Temp_High.png"/>
-        <None Remove="Icons\Temp_Low.png"/>
-        <None Remove="Icons\Temp_Unknown.png"/>
+        <None Remove="Icons\activePump.png" />
+        <None Remove="Icons\ConnectionDown.png" />
+        <None Remove="Icons\CustomSchedule.png" />
+        <None Remove="Icons\FieldSun.png" />
+        <None Remove="Icons\Home.png" />
+        <None Remove="Icons\Logo.png" />
+        <None Remove="Icons\ManualSchedule.png" />
+        <None Remove="Icons\NoConnection.png" />
+        <None Remove="Icons\PressureError.png" />
+        <None Remove="Icons\PressureHigh.png" />
+        <None Remove="Icons\PressureLow.png" />
+        <None Remove="Icons\pump.jpg" />
+        <None Remove="Icons\rain.png" />
+        <None Remove="Icons\setting.png" />
+        <None Remove="Icons\Signal_1.png" />
+        <None Remove="Icons\Signal_2.png" />
+        <None Remove="Icons\Signal_3.png" />
+        <None Remove="Icons\Signal_4.png" />
+        <None Remove="Icons\Signal_5.png" />
+        <None Remove="Icons\Signal_NoSignal.png" />
+        <None Remove="Icons\sprinkler.jpg" />
+        <None Remove="Icons\SwitchController.png" />
+        <None Remove="Icons\Temp_High.png" />
+        <None Remove="Icons\Temp_Low.png" />
+        <None Remove="Icons\Temp_Unknown.png" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Icons\activePump.png"/>
-        <EmbeddedResource Include="Icons\ConnectionDown.png"/>
-        <EmbeddedResource Include="Icons\CustomSchedule.png"/>
-        <EmbeddedResource Include="Icons\FieldSun.png"/>
-        <EmbeddedResource Include="Icons\Home.png"/>
-        <EmbeddedResource Include="Icons\Logo.png"/>
-        <EmbeddedResource Include="Icons\ManualSchedule.png"/>
-        <EmbeddedResource Include="Icons\NoConnection.png"/>
-        <EmbeddedResource Include="Icons\PressureError.png"/>
-        <EmbeddedResource Include="Icons\PressureHigh.png"/>
-        <EmbeddedResource Include="Icons\PressureLow.png"/>
-        <EmbeddedResource Include="Icons\pump.jpg"/>
-        <EmbeddedResource Include="Icons\rain.png"/>
-        <EmbeddedResource Include="Icons\setting.png"/>
-        <EmbeddedResource Include="Icons\Signal_1.png"/>
-        <EmbeddedResource Include="Icons\Signal_2.png"/>
-        <EmbeddedResource Include="Icons\Signal_3.png"/>
-        <EmbeddedResource Include="Icons\Signal_4.png"/>
-        <EmbeddedResource Include="Icons\Signal_5.png"/>
-        <EmbeddedResource Include="Icons\Signal_NoSignal.png"/>
-        <EmbeddedResource Include="Icons\sprinkler.jpg"/>
-        <EmbeddedResource Include="Icons\SwitchController.png"/>
-        <EmbeddedResource Include="Icons\Temp_High.png"/>
-        <EmbeddedResource Include="Icons\Temp_Low.png"/>
-        <EmbeddedResource Include="Icons\Temp_Unknown.png"/>
+        <EmbeddedResource Include="Icons\activePump.png" />
+        <EmbeddedResource Include="Icons\ConnectionDown.png" />
+        <EmbeddedResource Include="Icons\CustomSchedule.png" />
+        <EmbeddedResource Include="Icons\FieldSun.png" />
+        <EmbeddedResource Include="Icons\Home.png" />
+        <EmbeddedResource Include="Icons\Logo.png" />
+        <EmbeddedResource Include="Icons\ManualSchedule.png" />
+        <EmbeddedResource Include="Icons\NoConnection.png" />
+        <EmbeddedResource Include="Icons\PressureError.png" />
+        <EmbeddedResource Include="Icons\PressureHigh.png" />
+        <EmbeddedResource Include="Icons\PressureLow.png" />
+        <EmbeddedResource Include="Icons\pump.jpg" />
+        <EmbeddedResource Include="Icons\rain.png" />
+        <EmbeddedResource Include="Icons\setting.png" />
+        <EmbeddedResource Include="Icons\Signal_1.png" />
+        <EmbeddedResource Include="Icons\Signal_2.png" />
+        <EmbeddedResource Include="Icons\Signal_3.png" />
+        <EmbeddedResource Include="Icons\Signal_4.png" />
+        <EmbeddedResource Include="Icons\Signal_5.png" />
+        <EmbeddedResource Include="Icons\Signal_NoSignal.png" />
+        <EmbeddedResource Include="Icons\sprinkler.jpg" />
+        <EmbeddedResource Include="Icons\SwitchController.png" />
+        <EmbeddedResource Include="Icons\Temp_High.png" />
+        <EmbeddedResource Include="Icons\Temp_Low.png" />
+        <EmbeddedResource Include="Icons\Temp_Unknown.png" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FirebaseAuthentication.net" Version="4.0.0-alpha.2"/>
-        <PackageReference Include="FirebaseDatabase.net" Version="4.0.7"/>
-        <PackageReference Include="Microcharts.Forms" Version="1.0.0-preview1"/>
-        <PackageReference Include="Plugin.BLE" Version="2.2.0-pre2"/>
-        <PackageReference Include="Rg.Plugins.Popup" Version="2.1.0"/>
-        <PackageReference Include="SkiaSharp.Views.Forms" Version="2.88.1-preview.1"/>
-        <PackageReference Include="sqlite-net-pcl" Version="1.8.116"/>
-        <PackageReference Include="Xamarin.CommunityToolkit" Version="2.0.2"/>
-        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401"/>
-        <PackageReference Include="Xamarin.Essentials" Version="1.7.3"/>
-        <PackageReference Include="Xamarin.Forms.MaskedEntry" Version="1.1.0"/>
+        <PackageReference Include="FirebaseAuthentication.net" Version="4.0.0-alpha.2" />
+        <PackageReference Include="FirebaseDatabase.net" Version="4.0.7" />
+        <PackageReference Include="Microcharts.Forms" Version="1.0.0-preview1" />
+        <PackageReference Include="Plugin.BLE" Version="2.2.0-pre2" />
+        <PackageReference Include="Rg.Plugins.Popup" Version="2.1.0" />
+        <PackageReference Include="SkiaSharp.Views.Forms" Version="2.88.1-preview.1" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+        <PackageReference Include="Xamarin.CommunityToolkit" Version="2.0.2" />
+        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
+        <PackageReference Include="Xamarin.Forms.MaskedEntry" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>
