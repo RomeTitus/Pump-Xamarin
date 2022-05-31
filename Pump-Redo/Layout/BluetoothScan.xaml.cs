@@ -49,13 +49,12 @@ namespace Pump.Layout
             var blueToothDevice =
                 _bluetoothManager.IrrigationDeviceBt.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
 
-            var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
-                "Accept", "Cancel");
-            if (result)
+            if (await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
+                    "Accept", "Cancel"))
                 try
                 {
                     await _bluetoothManager.ConnectToDevice(blueToothDevice);
-                    var isController = await _bluetoothManager.IsController();
+                    var isController = await _bluetoothManager.IsValidController();
                     if (isController)
                         await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
                     else

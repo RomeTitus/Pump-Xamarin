@@ -16,7 +16,7 @@ namespace Pump.SocketController.BT
 {
     public class BluetoothManager
     {
-        private const string IrrigationServiceCode = "D9AB1E08-07C8-4CB0-B36B-256D3A0C0F16";
+        private const string IrrigationServiceCode = "7949B569-7FC4-465E-B35B-1B5B200AC8C3";
         private ICharacteristic _loadedCharacteristic;
 
         public BluetoothManager()
@@ -80,14 +80,34 @@ namespace Pump.SocketController.BT
             return BleDevice != null;
         }
 
-        public async Task<bool> ConnectToDevice(IDevice device)
+        public async Task<bool> ConnectToDevice(IDevice device, int retry = 0)
         {
             var cancellationToken = new CancellationTokenSource();
             cancellationToken.CancelAfter(23000);
             if (BleDevice != null) return BleDevice != null;
 
-            await AdapterBle.StopScanningForDevicesAsync();
-            await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+            
+            var tries = -1;
+
+            while (tries < retry)
+            {
+                var connected = true;
+                try
+                {
+                    //await AdapterBle.StopScanningForDevicesAsync();
+                    await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+                }
+                catch (Exception e)
+                {
+                    connected = false;
+                    tries++;
+                    if(tries == retry)
+                        throw;
+                }
+                if(connected)
+                    break;
+            }
+
             BleDevice = device;
             SaveIDevice(BleDevice);
 
@@ -141,7 +161,7 @@ namespace Pump.SocketController.BT
             }
         }
 
-        public async Task<bool> IsController()
+        public async Task<bool> IsValidController()
         {
             var services = await BleDevice.GetServicesAsync();
             return services.FirstOrDefault(x => x.Id == Guid.Parse(IrrigationServiceCode)) != null;
@@ -184,7 +204,8 @@ namespace Pump.SocketController.BT
                 if (dataToSend.ContainsKey("Task"))
                     try
                     {
-                        dataToSend["Task"]["Part"] = partNumber;
+                        if(dataToSend["Task"].Type != JTokenType.String)
+                            dataToSend["Task"]["Part"] = partNumber;
                     }
                     catch
                     {

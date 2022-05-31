@@ -12,12 +12,15 @@ using Pump.SocketController.BT;
 using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
+using System.Timers;
 
 namespace Pump.Layout
 {
     public partial class ExistingController : ContentPage
     {
         private readonly BluetoothManager _bluetoothManager;
+        private readonly Timer _timer;
+        private int _scanCounter;
 
         private readonly VerifyConnections _loadingScreen = new VerifyConnections
             { CloseWhenBackgroundIsClicked = false };
@@ -35,8 +38,11 @@ namespace Pump.Layout
             BluetoothManager bluetoothManager, PumpConnection pumpConnection = null)
         {
             InitializeComponent();
-            //_bluetoothManager = bluetoothManager;
-            _bluetoothManager = new BluetoothManager();
+            _bluetoothManager = bluetoothManager;
+            _timer = new Timer(300); // 0.3 seconds
+            _timer.Elapsed += ScanTimerEvent;
+            _bluetoothManager.AdapterBle.ScanTimeoutElapsed += AdapterBleOnScanTimeoutElapsed;
+
             BtScan();
             FrameAddSystemTap.Tapped += FrameAddSystemTap_Tapped;
             _notificationEvent = notificationEvent;
@@ -56,24 +62,72 @@ namespace Pump.Layout
                 NewControllerStackLayout.IsVisible = true;
             }
 
-
             if (firstConnection) return;
             BtnBackAddConnectionScreen.IsVisible = true;
         }
 
+        private void ScanTimerEvent(object sender, ElapsedEventArgs e)
+        {
+            
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                    switch (_scanCounter % 6)
+                {
+                    case 0:
+                        LabelBtScan.Text = "Scan.";
+                        break;
+                    case 1:
+                        LabelBtScan.Text = "Scan..";
+                        break;
+                    case 2:
+                        LabelBtScan.Text = "Scan...";
+                        break;
+                    case 3:
+                        LabelBtScan.Text = "Scan....";
+                        break;
+                    case 4:
+                        LabelBtScan.Text = "Scan.....";
+                        break;
+                    case 5:
+                        LabelBtScan.Text = "Scan......";
+                        break;
+                }
+                _scanCounter++;
+            });
+            
+        }
+
         private async void BtScan()
         {
+            _bluetoothManager.IrrigationDeviceBt.Clear();
+            ScrollViewSetupSystem.Children.Clear();
             _bluetoothManager.IrrigationDeviceBt.CollectionChanged += (_, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
                     foreach (IDevice bluetoothDevice in args.NewItems)
                     {
+                        var template = ScrollViewSetupSystem.Children.FirstOrDefault(x =>
+                            x.AutomationId == bluetoothDevice.Id.ToString());
+                        if(template != null)
+                            continue;
                         var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
                         blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
                         ScrollViewSetupSystem.Children.Add(blueToothView);
                     }
             };
+            _scanCounter = 1;
+            _timer.Enabled = true;
             await _bluetoothManager.StartScanning(Guid.Empty);
+            
+        }
+
+        private void AdapterBleOnScanTimeoutElapsed(object sender, EventArgs e)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                _timer.Enabled = false;
+                LabelBtScan.Text = "Rescan    ";
+            });
         }
 
         private async void BlueToothDeviceTapped(object sender, EventArgs e)
@@ -81,18 +135,17 @@ namespace Pump.Layout
             var viewBlueTooth = (StackLayout)sender;
             var blueToothDevice =
                 _bluetoothManager.IrrigationDeviceBt.First(x => x?.Id.ToString() == viewBlueTooth.AutomationId);
-            var result = await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
-                "Accept", "Cancel");
-            if (result)
+            if (await DisplayAlert("Connect?", "You have selected to connect to " + blueToothDevice.Name,
+                    "Accept", "Cancel"))
                 try
                 {
                     var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
-                    await _bluetoothManager.ConnectToDevice(blueToothDevice);
+                    await _bluetoothManager.ConnectToDevice(blueToothDevice, 3);
 
                     await PopupNavigation.Instance.PopAllAsync();
 
-                    if (!await _bluetoothManager.IsController())
+                    if (!await _bluetoothManager.IsValidController())
                         if (!await DisplayAlert("Irrigation", "Not verified controller", "Continue", "Cancel"))
                             return;
 
@@ -154,20 +207,17 @@ namespace Pump.Layout
                 {
                     _internalConnection =
                         CheckSocket(TxtInternalConnection.Text, Convert.ToInt32(TxtInternalPort.Text));
-                    if (_internalConnection != null)
+                    if (_internalConnection == true)
                     {
-                        if (_internalConnection == true)
-                        {
-                            _loadingScreen.InternalSuccess();
-                            _pumpConnection.InternalPath = TxtInternalConnection.Text;
-                            _pumpConnection.InternalPort = Convert.ToInt32(TxtInternalPort.Text);
-                            _pumpConnection.Mac = _mac;
-                        }
+                        _loadingScreen.InternalSuccess();
+                        _pumpConnection.InternalPath = TxtInternalConnection.Text;
+                        _pumpConnection.InternalPort = Convert.ToInt32(TxtInternalPort.Text);
+                        _pumpConnection.Mac = _mac;
+                    }
 
-                        else
-                        {
-                            _loadingScreen.InternalFailed();
-                        }
+                    else
+                    {
+                        _loadingScreen.InternalFailed();
                     }
                 }
 
@@ -391,6 +441,12 @@ namespace Pump.Layout
                 BtnAdvancedConnectionScreen.Text = "Hide Network";
             else
                 BtnAdvancedConnectionScreen.Text = "Show Network";
+        }
+
+        private void LabelBTScan_OnTapped(object sender, EventArgs e)
+        {
+            if(_timer.Enabled == false)
+                BtScan();
         }
     }
 }

@@ -37,15 +37,24 @@
                     </ScrollView>
                 </Frame>
             </StackLayout>
+            <StackLayout HorizontalOptions="EndAndExpand">
+                <StackLayout HorizontalOptions="End" WidthRequest="75">
+                    <Label x:Name="LabelBtScan" Text="Rescan    " HorizontalOptions="Start" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="LabelBTScan_OnTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </StackLayout>
             <Label
-                Padding="0,15,0,15"
-                FontAttributes="Bold"
-                FontSize="Large"
-                HorizontalOptions="Center"
-                Text="OR"
-                TextColor="Red"
-                TextDecorations="Underline"
-                VerticalOptions="Center" />
+            Padding="0,15,0,15"
+            FontAttributes="Bold"
+            FontSize="Large"
+            HorizontalOptions="Center"
+            Text="OR"
+            TextColor="Red"
+            TextDecorations="Underline"
+            VerticalOptions="Center" />
         </StackLayout>
 
         <StackLayout>

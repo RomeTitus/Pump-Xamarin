@@ -13,6 +13,7 @@ namespace Pump.Layout
     public partial class AuthenticationScreen : ContentPage
     {
         private readonly FirebaseAuthClient _client;
+        public bool IsDisplayed = false;
 
         public AuthenticationScreen(FirebaseAuthClient client)
         {
@@ -88,7 +89,7 @@ namespace Pump.Layout
                     try
                     {
                         var unused = new MailAddress(TxtSignInEmail.Text);
-                        if(TxtSignInEmail.Text.Contains(".") == false)
+                        if (TxtSignInEmail.Text.Contains(".") == false)
                             notification += "\n\u2022 " + TxtSignInEmail.Text + " is not a valid email";
                     }
                     catch (FormatException)
@@ -97,7 +98,7 @@ namespace Pump.Layout
                     }
                 }
 
-                if(validateEmailOnly == false)
+                if (validateEmailOnly == false)
                     if (string.IsNullOrWhiteSpace(TxtSignInPassword.Text))
                     {
                         notification += "\n\u2022 Password required";
@@ -136,14 +137,13 @@ namespace Pump.Layout
 
             try
             {
-                await DisplayAlert("Confirmation", "Are you sure you want to reset your password?", "Accept","Cancel");
+                await DisplayAlert("Confirmation", "Are you sure you want to reset your password?", "Accept", "Cancel");
 
                 var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 await _client.ResetEmailPasswordAsync(TxtSignInEmail.Text);
                 await PopupNavigation.Instance.PopAllAsync();
                 await DisplayAlert("Complete", "Password reset sent to " + TxtSignInEmail.Text, "Understood");
-
             }
             catch (FirebaseAuthHttpException ex)
             {
@@ -164,11 +164,12 @@ namespace Pump.Layout
             try
             {
                 //User is already signed in
-                if(_client.User?.Info.Email == TxtSignInEmail.Text)
-                    return;
+                if (_client.User?.Info.Email == TxtSignInEmail.Text) return;
+
+
                 var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
-                var userCredential = await _client.SignInWithEmailAndPasswordAsync(TxtSignInEmail.Text,
+                await _client.SignInWithEmailAndPasswordAsync(TxtSignInEmail.Text,
                     TxtSignInPassword.Text);
                 await PopupNavigation.Instance.PopAllAsync();
             }
@@ -177,6 +178,11 @@ namespace Pump.Layout
                 await PopupNavigation.Instance.PopAllAsync();
                 await DisplayAlert("Invalid", "Reason: " + ex.Reason, "Understood");
             }
+        }
+
+        public void ClosePage()
+        {
+            Navigation.PopModalAsync();
         }
 
         private async void ButtonSignUp_OnClicked(object sender, EventArgs e)
@@ -192,7 +198,7 @@ namespace Pump.Layout
             {
                 var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
-                var userCredential = await _client.CreateUserWithEmailAndPasswordAsync(TxtSignUpEmail.Text,
+                await _client.CreateUserWithEmailAndPasswordAsync(TxtSignUpEmail.Text,
                     TxtSignUpPassword.Text, TxtSignUpFullName.Text);
                 await PopupNavigation.Instance.PopAllAsync();
             }

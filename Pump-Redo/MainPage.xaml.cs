@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Timers;
+using Firebase.Auth;
 using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
@@ -19,31 +20,49 @@ namespace Pump
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainPage : ContentPage
     {
+        private readonly AuthenticationScreen _authenticationScreen;
         private readonly NotificationEvent _notificationEvent;
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly SocketPicker _socketPicker;
+        private readonly Timer _timer;
 
         //INotificationManager notificationManager;
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private HomeScreen _homeScreen;
         private bool _loadedHomeScreen;
-        private readonly Timer _timer;
 
-        public MainPage()
+        public MainPage(FirebaseAuthClient client)
         {
             InitializeComponent();
-            _timer = new Timer(300); // 0.3 seconds
-            _observableIrrigation = new ObservableIrrigation();
-            SetEvents();
             _notificationEvent = new NotificationEvent();
-            _notificationEvent.OnUpdateStatus += NewSelectedNotification;
+            _observableIrrigation = new ObservableIrrigation();
             _socketPicker = new SocketPicker(_observableIrrigation);
+            _authenticationScreen = new AuthenticationScreen(client);
+            _timer = new Timer(300); // 0.3 seconds
+            SetEvents();
+            _notificationEvent.OnUpdateStatus += NewSelectedNotification;
             ControllerPicker.SelectedIndexChanged += _socketPicker.ConnectionPicker_OnSelectedIndexChanged;
-
+            client.AuthStateChanged += ClientOnAuthStateChanged;
             PopulateControllers();
-            var dbController = new DatabaseController();
-            if (!dbController.GetControllerConnectionList().Any())
-                SetupNewController();
+        }
+
+        private async void ClientOnAuthStateChanged(object sender, UserEventArgs e)
+        {
+            if (e.User == null)
+            {
+                await Navigation.PushModalAsync(_authenticationScreen);
+                _authenticationScreen.IsDisplayed = true;
+            }
+            else
+            {
+                if (_authenticationScreen.IsDisplayed)
+                    _authenticationScreen.ClosePage();
+                _authenticationScreen.IsDisplayed = false;
+                var dbController = new DatabaseController();
+
+                if (!dbController.GetControllerConnectionList().Any())
+                    Device.BeginInvokeOnMainThread(SetupNewController);
+            }
         }
 
         private void SetEvents()
@@ -306,7 +325,8 @@ namespace Pump
         {
             var connectionScreen = new ExistingController(true, _notificationEvent, _socketPicker.BluetoothManager());
             connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
-            Navigation.PushModalAsync(connectionScreen);
+            if (Navigation.ModalStack.All(x => x.GetType() != typeof(ExistingController)))
+                Navigation.PushModalAsync(connectionScreen);
         }
 
         private async void BtnAddController_OnPressed(object sender, EventArgs e)
