@@ -26,15 +26,18 @@
         Margin="20,60,20,60"
         BackgroundColor="Azure"
         CornerRadius="10"
-        OutlineColor="Black">
+        BorderColor="Black"
+        VerticalOptions="FillAndExpand">
 
         <StackLayout
             x:Name="FloatingScreenMainStackLayout"
             HorizontalOptions="FillAndExpand"
+            BackgroundColor="Gold"
             VerticalOptions="FillAndExpand">
             <ScrollView>
 
                 <StackLayout
+                    BackgroundColor="Coral"
                     x:Name="ScrollViewFloatingPage"
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand" />

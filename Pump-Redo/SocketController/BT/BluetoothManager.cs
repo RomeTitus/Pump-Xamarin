@@ -10,7 +10,9 @@ using Newtonsoft.Json.Linq;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
+using Plugin.BLE.Abstractions.Exceptions;
 using Pump.Database;
+using Xamarin.Forms;
 
 namespace Pump.SocketController.BT
 {
@@ -52,9 +54,7 @@ namespace Pump.SocketController.BT
             if (IrrigationDeviceBt.Any())
                 IrrigationDeviceBt.Clear();
             AdapterBle.ScanMode = ScanMode.Balanced;
-            //await DisconnectDevice(); //TODO Can we not Connect to two at once? Bummer....
             await AdapterBle.StartScanningForDevicesAsync();
-            //Debug.WriteLine("adapter.StartScanningForDevices(" + forService + ")");
         }
 
         public async Task<bool> ConnectToKnownDevice(Guid deviceId)
@@ -75,42 +75,47 @@ namespace Pump.SocketController.BT
                     cancellationToken.Dispose();
                 }
 
-            //await AdapterBle.ConnectToDeviceAsync(device);
-
             return BleDevice != null;
         }
 
         public async Task<bool> ConnectToDevice(IDevice device, int retry = 0)
         {
-            var cancellationToken = new CancellationTokenSource();
-            cancellationToken.CancelAfter(23000);
             if (BleDevice != null) return BleDevice != null;
 
-            
             var tries = -1;
 
             while (tries < retry)
             {
                 var connected = true;
-                try
-                {
-                    //await AdapterBle.StopScanningForDevicesAsync();
-                    await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
-                }
-                catch (Exception e)
-                {
-                    connected = false;
-                    tries++;
-                    if(tries == retry)
-                        throw;
-                }
-                if(connected)
-                    break;
+                var cancellationToken = new CancellationTokenSource();
+                    cancellationToken.CancelAfter(23000);
+                    
+                    try
+                    {
+                        await AdapterBle.StopScanningForDevicesAsync();
+                        await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+                    }
+                    catch (DeviceConnectionException deviceConnectionException)
+                    {
+                        connected = false;
+                        tries++;
+                        if (tries == retry)
+                            throw new ArgumentException("Failed to connect \n" + deviceConnectionException.Message);
+                    }
+
+                    catch (Exception e)
+                    {
+                        connected = false;
+                        tries++;
+                        if (tries == retry)
+                            throw;
+                    }
+                    if (connected)
+                        break;
             }
 
             BleDevice = device;
             SaveIDevice(BleDevice);
-
             return BleDevice != null;
         }
 
@@ -181,7 +186,7 @@ namespace Pump.SocketController.BT
             return updated;
         }
 
-        public async Task<string> SendAndReceiveToBle(JObject dataToSend, int timeout = 0)
+        public async Task<string> SendAndReceiveToBleAsync(JObject dataToSend, int timeout = 0)
         {
             if (_loadedCharacteristic == null)
             {
@@ -213,8 +218,8 @@ namespace Pump.SocketController.BT
                     }
 
                 var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
-                var finalBytesReceived = new byte[0];
-                //Sending Large amounts of Data :/
+                var finalBytesReceived = Array.Empty<byte>();
+
                 for (var i = 0; i < bytes.Count; i += 508)
                 {
                     var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;

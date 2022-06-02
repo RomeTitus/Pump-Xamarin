@@ -5,25 +5,16 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
     <ContentPage.Content>
-        <StackLayout HeightRequest="600">
+        <StackLayout VerticalOptions="FillAndExpand">
             <StackLayout>
                 <Label
                     CharacterSpacing="1"
                     FontSize="Large"
                     HorizontalOptions="CenterAndExpand"
-                    Text="Available WiFis"
+                    Text="Available WiFi"
                     VerticalOptions="Center" />
             </StackLayout>
-
-
             <StackLayout Padding="20" VerticalOptions="FillAndExpand">
-                <Label
-                    FontSize="Title"
-                    HorizontalOptions="Center"
-                    Text="Scanned"
-                    TextColor="White"
-                    TextDecorations="Underline" />
-
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Gray"
@@ -33,13 +24,9 @@
                         <StackLayout x:Name="ScrollViewWiFiDetail" />
                     </ScrollView>
                 </Frame>
-
             </StackLayout>
-
-
             <StackLayout VerticalOptions="EndAndExpand">
                 <Button
-                    x:Name="ButtonCancel"
                     Clicked="ButtonCancel_OnClicked"
                     Text="Cancel" />
             </StackLayout>

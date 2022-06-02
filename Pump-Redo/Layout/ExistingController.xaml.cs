@@ -141,8 +141,10 @@ namespace Pump.Layout
                 {
                     var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
-                    await _bluetoothManager.ConnectToDevice(blueToothDevice, 3);
-
+                    await Device.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await _bluetoothManager.ConnectToDevice(blueToothDevice, 3);
+                    });
                     await PopupNavigation.Instance.PopAllAsync();
 
                     if (!await _bluetoothManager.IsValidController())

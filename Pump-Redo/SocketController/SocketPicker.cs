@@ -132,7 +132,7 @@ namespace Pump.SocketController
                     if (_initializeBlueTooth == null)
                         break;
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();
-                    result = await _initializeBlueTooth?.BlueToothManager.SendAndReceiveToBle(
+                    result = await _initializeBlueTooth?.BlueToothManager.SendAndReceiveToBleAsync(
                         SocketCommands.Descript(sendObject));
                     _initializeBlueTooth.RequestNow = true;
                     break;

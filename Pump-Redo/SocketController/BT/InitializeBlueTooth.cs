@@ -131,7 +131,7 @@ namespace Pump.SocketController.BT
 
         private async Task<string> GetIrrigationData()
         {
-            return await BlueToothManager.SendAndReceiveToBle(SocketCommands.AllTogether());
+            return await BlueToothManager.SendAndReceiveToBleAsync(SocketCommands.AllTogether());
         }
 
         private bool CanRequestIrrigationData()
