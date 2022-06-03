@@ -12,7 +12,6 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
 using Pump.Database;
-using Xamarin.Forms;
 
 namespace Pump.SocketController.BT
 {

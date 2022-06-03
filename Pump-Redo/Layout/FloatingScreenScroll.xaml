@@ -32,12 +32,10 @@
         <StackLayout
             x:Name="FloatingScreenMainStackLayout"
             HorizontalOptions="FillAndExpand"
-            BackgroundColor="Gold"
             VerticalOptions="FillAndExpand">
             <ScrollView>
 
                 <StackLayout
-                    BackgroundColor="Coral"
                     x:Name="ScrollViewFloatingPage"
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand" />

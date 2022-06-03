@@ -27,7 +27,7 @@ namespace Pump.Layout
         private readonly NotificationEvent _notificationEvent;
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private WiFiContainer _selectedWiFiContainer;
-        private ViewBasicAlert _viewBasicAlert;
+        private PopupBasicAlert _popupBasicAlert;
         private List<WiFiContainer> _wiFiContainers;
         
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
@@ -114,8 +114,8 @@ namespace Pump.Layout
                 }
 
                 _wiFiContainers = DictToWiFiContainer(result);
-                var wiFiView = new ViewAvailableWiFi(_wiFiContainers);
-                await GeneratePopupScreen(new List<object> { wiFiView });
+                var wiFiView = new PopupAvailableWiFi(_wiFiContainers);
+                await PopupNavigation.Instance.PushAsync(wiFiView);
 
                 foreach (var views in wiFiView.GetChildren())
                 {
@@ -141,17 +141,17 @@ namespace Pump.Layout
                 if (_selectedWiFiContainer != null)
                 {
                     if (!_selectedWiFiContainer.encryption_type.Contains("Encryption: on"))
-                        _viewBasicAlert = new ViewBasicAlert("WIFI",
+                        _popupBasicAlert = new PopupBasicAlert("WIFI",
                             "Are you use you want to connect to " + _selectedWiFiContainer.ssid, "Connect",
                             "Cancel");
                     else
-                        _viewBasicAlert = new ViewBasicAlert("WIFI",
+                        _popupBasicAlert = new PopupBasicAlert("WIFI",
                             "Are you use you want to connect to " + _selectedWiFiContainer.ssid + "\nEnter Password",
                             "Connect",
                             "Cancel", true);
 
-                    _viewBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
-                    await GeneratePopupScreen(new List<object> { _viewBasicAlert }, 400);
+                    _popupBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
+                    await PopupNavigation.Instance.PushAsync(_popupBasicAlert);
                 }
                 else
                 {
@@ -166,8 +166,8 @@ namespace Pump.Layout
 
         private async void WiFiPassword_Clicked(object sender, EventArgs e)
         {
-            if (_viewBasicAlert.Editable && !string.IsNullOrEmpty(_viewBasicAlert.GetEditableText()))
-                _selectedWiFiContainer.passkey = _viewBasicAlert.GetEditableText();
+            if (_popupBasicAlert.Editable && !string.IsNullOrEmpty(_popupBasicAlert.GetEditableText()))
+                _selectedWiFiContainer.passkey = _popupBasicAlert.GetEditableText();
             
             await PopupNavigation.Instance.PopAllAsync();
 
@@ -243,12 +243,6 @@ namespace Pump.Layout
             {
                 await DisplayAlert("Setup", notification, "Understood");
             }
-        }
-        private static async Task GeneratePopupScreen(IEnumerable<object> screenViews, double hightRequest = 600)
-        {
-            var floatingScreen = new FloatingScreenScroll(hightRequest);
-            floatingScreen.SetFloatingScreen(screenViews);
-            await PopupNavigation.Instance.PushAsync(floatingScreen);
         }
 
         private string Validation()

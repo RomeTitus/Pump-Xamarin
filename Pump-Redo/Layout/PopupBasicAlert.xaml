@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<pages:PopupPage
+    x:Class="Pump.Layout.PopupBasicAlert"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup">
+    <pages:PopupPage.Animation>
+        <animations:ScaleAnimation
+            DurationIn="200"
+            DurationOut="200"
+            EasingIn="Linear"
+            EasingOut="Linear"
+            HasBackgroundAnimation="True"
+            PositionIn="Center"
+            PositionOut="Center"
+            ScaleIn="0.7"
+            ScaleOut="1.5" />
+    </pages:PopupPage.Animation>
+    
+    <Frame
+        Margin="20,100,20,100"
+        BackgroundColor="AliceBlue"
+        CornerRadius="10"
+        BorderColor="Black"
+        VerticalOptions="FillAndExpand">
+        <StackLayout VerticalOptions="FillAndExpand">
+                <StackLayout>
+                    <Label
+                        x:Name="LabelTitle"
+                        CharacterSpacing="1"
+                        FontSize="Title"
+                        HorizontalOptions="CenterAndExpand"
+                        Text="Title Goes Here"
+                        TextDecorations="Underline"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            <StackLayout Padding="10" VerticalOptions="FillAndExpand">
+                    <Label
+                        x:Name="LabelMessage"
+                        FontSize="Large"
+                        HorizontalOptions="Center" />
+                    <Frame x:Name="FrameBasicAlertEnter" 
+                           IsVisible="False"
+                           BackgroundColor="AliceBlue"
+                           CornerRadius="5"
+                           BorderColor="Black">
+                        <Entry x:Name="BasicAlertEnter" IsVisible="False" />
+                    </Frame>
+                    
+            </StackLayout>
+            <StackLayout Padding="10" VerticalOptions="FillAndExpand">
+                    <Label
+                        x:Name="LabelSubMessage"
+                        FontSize="Large"
+                        HorizontalOptions="Center"
+                        IsVisible="False"
+                        TextDecorations="Underline" />
+                    <Entry x:Name="SubBasicAlertEnter" IsVisible="False" />
+                </StackLayout>
+
+                <StackLayout VerticalOptions="EndAndExpand">
+                    <Button x:Name="ButtonAccept" Text="Accept" />
+                    <Button
+                        x:Name="ButtonCancel"
+                        Clicked="ButtonCancel_OnClicked"
+                        Text="Cancel" />
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+</pages:PopupPage>

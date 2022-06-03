@@ -1,12 +1,13 @@
 ﻿using System;
+using Rg.Plugins.Popup.Pages;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace Pump.Layout.Views
+namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewBasicAlert : ContentView
+    public partial class PopupBasicAlert : PopupPage
     {
         private readonly string _accept;
         private readonly string _cancel;
@@ -14,10 +15,10 @@ namespace Pump.Layout.Views
         private readonly string _title;
         public readonly bool Editable;
 
-        public ViewBasicAlert(string title, string message, string accept, string cancel, bool editable = false)
+        public PopupBasicAlert(string title, string message, string accept, string cancel, bool editable = false)
         {
             InitializeComponent();
-            BasicAlertEnter.IsVisible = editable;
+            FrameBasicAlertEnter.IsVisible = editable;
             Editable = editable;
             _title = title;
             _message = message;
@@ -26,11 +27,11 @@ namespace Pump.Layout.Views
             Populate();
         }
 
-        public ViewBasicAlert(string title, string message, string subMessage, string accept, string cancel,
+        public PopupBasicAlert(string title, string message, string subMessage, string accept, string cancel,
             bool editable)
         {
             InitializeComponent();
-            BasicAlertEnter.IsVisible = editable;
+            FrameBasicAlertEnter.IsVisible = editable;
             SubBasicAlertEnter.IsVisible = editable;
             LabelSubMessage.IsVisible = editable;
             Editable = editable;

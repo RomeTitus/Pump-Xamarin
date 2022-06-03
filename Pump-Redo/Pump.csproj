@@ -91,4 +91,15 @@
             <Generator>MSBuild:Compile</Generator>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Layout\PopupAvailableWiFi.xaml.cs">
+        <DependentUpon>PopupAvailableWiFi.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Layout\PopupBasicAlert.xaml.cs">
+        <DependentUpon>PopupBasicAlert.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>
