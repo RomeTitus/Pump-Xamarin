@@ -29,7 +29,7 @@
                         BorderColor="Black"
                         CornerRadius="10"
                         HorizontalOptions="FillAndExpand">
-                        <ScrollView HeightRequest="100">
+                        <ScrollView HeightRequest="50">
                             <FlexLayout
                                 x:Name="ScrollViewManualPump"
                                 JustifyContent="SpaceBetween"
@@ -59,7 +59,7 @@
                         FontSize="Subtitle"
                         HorizontalOptions="Center"
                         Text="Zone"
-                        TextColor="White"
+                        TextColor="white"
                         TextDecorations="Underline" />
                     <Frame
                         BackgroundColor="White"
@@ -68,7 +68,7 @@
                         HorizontalOptions="FillAndExpand">
 
 
-                        <ScrollView HeightRequest="100">
+                        <ScrollView HeightRequest="300">
 
                             <FlexLayout
                                 x:Name="ScrollViewManualZone"
@@ -126,9 +126,7 @@
                         IsVisible="false "
                         VerticalOptions="Center" />
 
-                </StackLayout>
 
-                <StackLayout>
                     <Button
                         x:Name="ButtonStartManual"
                         BackgroundColor="DeepSkyBlue"
@@ -141,9 +139,9 @@
                         BackgroundColor="DeepSkyBlue"
                         Clicked="ButtonStopManual_Clicked"
                         CornerRadius="10"
-                        IsEnabled="False"
+                        IsEnabled="True"
                         Text="Stop"
-                        TextColor="White" />
+                        TextColor="red" />
                 </StackLayout>
 
             </FlexLayout>

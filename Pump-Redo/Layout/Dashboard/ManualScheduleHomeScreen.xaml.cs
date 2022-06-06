@@ -185,7 +185,7 @@ namespace Pump.Layout.Dashboard
                 AutomationId = equipment.ID,
                 HeightRequest = 40,
                 TextColor = Color.DarkSlateBlue,
-                Margin = new Thickness(10, 10, 10, 20),
+                Margin = new Thickness(0, 10, 0, 20),
                 VerticalOptions = LayoutOptions.CenterAndExpand,
                 HorizontalOptions = LayoutOptions.Center,
                 BackgroundColor = Color.AliceBlue,
