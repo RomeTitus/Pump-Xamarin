@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView
+    x:Class="Pump.Layout.Views.ViewActiveScheduleSummary"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:localImage="clr-namespace:EmbeddedImages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+
+    <StackLayout HorizontalOptions="FillAndExpand">
+        <Label
+            x:Name="LabelScheduleName"
+            FontSize="20"
+            HorizontalOptions="Center"
+            Text="Schedule name" />
+
+        <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+
+            <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
+                <Image HeightRequest="40" Source="{localImage:ImageResourceExtension Pump.Icons.activePump.png}" />
+                <Label
+                    x:Name="LablePump"
+                    Text="Big Pump"
+                    VerticalOptions="Center" />
+            </StackLayout>
+
+            <StackLayout HorizontalOptions="End" Orientation="Horizontal">
+                <Image HeightRequest="40" Source="{localImage:ImageResourceExtension Pump.Icons.sprinkler.jpg}" />
+                <Label
+                    x:Name="LableZone"
+                    Text="Garden"
+                    VerticalOptions="Center" />
+            </StackLayout>
+        </StackLayout>
+        <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+            <StackLayout HorizontalOptions="StartAndExpand" Orientation="Horizontal">
+                <Label
+                    x:Name="LableStartTime"
+                    FontSize="16"
+                    Text="Start: 10:30"
+                    WidthRequest="100" />
+            </StackLayout>
+
+            <StackLayout HorizontalOptions="EndAndExpand" Orientation="Horizontal">
+                <Label
+                    x:Name="LableEndTime"
+                    FontSize="16"
+                    Text="End: 11:45"
+                    WidthRequest="100" />
+            </StackLayout>
+        </StackLayout>
+
+    </StackLayout>
+
+</ContentView>

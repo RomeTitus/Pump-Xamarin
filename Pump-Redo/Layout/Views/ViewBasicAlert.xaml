@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<ContentView
+    x:Class="Pump.Layout.Views.ViewBasicAlert"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <ContentView.Content>
+        <StackLayout HeightRequest="400">
+            <StackLayout>
+                <Label
+                    x:Name="LabelTitle"
+                    CharacterSpacing="1"
+                    FontSize="Title"
+                    HorizontalOptions="CenterAndExpand"
+                    Text="Title Goes Here"
+                    TextDecorations="Underline"
+                    VerticalOptions="Center" />
+            </StackLayout>
+
+
+            <StackLayout Padding="10" VerticalOptions="FillAndExpand">
+                <Label
+                    x:Name="LabelMessage"
+                    FontSize="Large"
+                    HorizontalOptions="Center" />
+                <Entry x:Name="BasicAlertEnter" IsVisible="False" />
+            </StackLayout>
+
+            <StackLayout Padding="10" VerticalOptions="FillAndExpand">
+                <Label
+                    x:Name="LabelSubMessage"
+                    FontSize="Large"
+                    HorizontalOptions="Center"
+                    IsVisible="False"
+                    TextDecorations="Underline" />
+                <Entry x:Name="SubBasicAlertEnter" IsVisible="False" />
+            </StackLayout>
+
+            <StackLayout VerticalOptions="EndAndExpand">
+                <Button x:Name="ButtonAccept" Text="Accept" />
+                <Button
+                    x:Name="ButtonCancel"
+                    Clicked="ButtonCancel_OnClicked"
+                    Text="Cancel" />
+            </StackLayout>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="Pump.Layout.EquipmentScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Configuration"
+    BackgroundColor="DeepSkyBlue">
+    <ContentPage.Content>
+        <ScrollView>
+            <FlexLayout
+                Margin="20"
+                Direction="Column"
+                JustifyContent="SpaceAround"
+                VerticalOptions="Center">
+                <StackLayout>
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Current Equipment"
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <Button
+                            x:Name="BtnAddEquipment"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="End"
+                            IsEnabled="False"
+                            Pressed="BtnAddEquipment_OnPressed"
+                            Text="Add Equipment"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        CornerRadius="10"
+                        HasShadow="True"
+                        HorizontalOptions="FillAndExpand">
+                        <ScrollView HeightRequest="150">
+
+
+                            <StackLayout x:Name="ScrollViewEquipment">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewEquipmentTap" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorEquipmentLoading"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+
+                        </ScrollView>
+                    </Frame>
+
+                </StackLayout>
+
+                <StackLayout>
+                    <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                        <Label
+                            FontSize="Subtitle"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Current Sensor"
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <Button
+                            x:Name="BtnAddSensor"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="End"
+                            IsEnabled="False"
+                            Pressed="BtnAddSensor_OnPressed"
+                            Text="Add Sensor"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Black"
+                        CornerRadius="10"
+                        HasShadow="True"
+                        HorizontalOptions="FillAndExpand">
+                        <ScrollView HeightRequest="150">
+                            <StackLayout x:Name="ScrollViewSensor">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="ScrollViewSensorTap" />
+                                </StackLayout.GestureRecognizers>
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorSensorLoading"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </ScrollView>
+                    </Frame>
+
+                </StackLayout>
+                <Button
+                    x:Name="BtnBack"
+                    BackgroundColor="DeepSkyBlue"
+                    Pressed="BtnBack_OnPressed"
+                    Text="Back"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </FlexLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

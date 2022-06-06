@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="Pump.Layout.SubControllerUpdate"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="DeepSkyBlue">
+    <ContentPage.Content>
+        <StackLayout Margin="8,8,8,0" Orientation="Vertical">
+            <StackLayout>
+                <Label
+                    x:Name="LabelHeading"
+                    CharacterSpacing="2"
+                    FontSize="30"
+                    HorizontalTextAlignment="Center"
+                    Text="Create Sub Controller"
+                    TextColor="White" />
+            </StackLayout>
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Name"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerName"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        MaxLength="225"
+                        Placeholder="Sub controller name"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Mac Address"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerMac"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        Placeholder="AB:CD:AB:CD:AB:CD"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="IP"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerIp"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        MaxLength="225"
+                        Placeholder="127.0.0.1"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Port"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="SubControllerPort"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        Keyboard="Numeric"
+                        MaxLength="225"
+                        Placeholder="8080"
+                        PlaceholderColor="Gray"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+            <StackLayout Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Force LoRa"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <CheckBox
+                        x:Name="SubControllerLoRa"
+                        HorizontalOptions="EndAndExpand"
+                        IsChecked="False"
+                        Scale="1"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout
+                x:Name="ComKeyStackLayout"
+                IsVisible="False"
+                Orientation="Vertical">
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Incoming Key"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="IncomingKey"
+                        Margin="0,0,17,0"
+                        AutoSize="TextChanges"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        Keyboard="Numeric"
+                        MaxLength="2"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="Start"
+                        Text="Outgoing Key"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Editor
+                        x:Name="OutgoingKey"
+                        Margin="0,0,17,0"
+                        FontSize="Large"
+                        HorizontalOptions="EndAndExpand"
+                        Scale="1"
+                        TextColor="White"
+                        WidthRequest="180" />
+                </StackLayout>
+            </StackLayout>
+
+
+            <StackLayout VerticalOptions="EndAndExpand">
+                <StackLayout Margin="5">
+                    <Button
+                        x:Name="ButtonUpdateSubController"
+                        Clicked="ButtonUpdateSubController_OnClicked"
+                        Text="Create" />
+                    <Button
+                        x:Name="ButtonBack"
+                        Clicked="ButtonBack_OnClicked"
+                        Text="Back" />
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

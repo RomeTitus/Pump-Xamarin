@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView
+    x:Class="Pump.Layout.Views.ViewScheduleSummary"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackLayout
+        Margin="5"
+        HeightRequest="600"
+        VerticalOptions="FillAndExpand">
+
+        <Grid VerticalOptions="Start">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="0"
+                Orientation="Vertical"
+                VerticalOptions="Start">
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="labelScheduleName"
+                        FontSize="Large"
+                        Text="Schedule Name"
+                        VerticalOptions="Center" />
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="LabelSunday"
+                        FontSize="24"
+                        Text="S"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelMonday"
+                        FontSize="24"
+                        Text="M"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelTuesday"
+                        FontSize="24"
+                        Text="T"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelWednesday"
+                        FontSize="24"
+                        Text="W"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelThursday"
+                        FontSize="24"
+                        Text="T"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelFriday"
+                        FontSize="24"
+                        Text="F"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelSaturday"
+                        FontSize="24"
+                        Text="S"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+
+            <StackLayout
+                Grid.Row="0"
+                Grid.Column="1"
+                Orientation="Vertical"
+                VerticalOptions="Start">
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="labelScheduleTime"
+                        FontSize="Large"
+                        Text="20:30"
+                        VerticalOptions="Center" />
+                </StackLayout>
+
+                <StackLayout Orientation="Horizontal">
+                    <Image HeightRequest="30"
+                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
+                    <Label
+                        x:Name="LabelPumpName"
+                        FontSize="Large"
+                        Text="Big Pump"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+        </Grid>
+        <StackLayout VerticalOptions="FillAndExpand">
+            <StackLayout VerticalOptions="FillAndExpand">
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView>
+                        <StackLayout x:Name="ScrollViewZoneDetail" HorizontalOptions="FillAndExpand" />
+                    </ScrollView>
+                </Frame>
+            </StackLayout>
+
+            <StackLayout VerticalOptions="End">
+
+                <Button x:Name="ButtonEdit" Text="Edit Schedule" />
+                <Button x:Name="ButtonDelete" Text="Delete Schedule" />
+            </StackLayout>
+        </StackLayout>
+
+    </StackLayout>
+</ContentView>

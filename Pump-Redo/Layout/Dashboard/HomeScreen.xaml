@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="Pump.Layout.Dashboard.HomeScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:localImage="clr-namespace:EmbeddedImages"
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    x:Name="TabPageMain"
+    BackgroundColor="Coral">
+
+
+    <ContentPage.Content>
+        <StackLayout>
+            <AbsoluteLayout HorizontalOptions="FillAndExpand">
+                <Label
+                    x:Name="LabelSite"
+                    Margin="5"
+                    AbsoluteLayout.LayoutBounds="0.5, -1, -1, -1"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    FontSize="24"
+                    HorizontalOptions="CenterAndExpand"
+                    MaxLines="2"
+                    Text="Unknown"
+                    TextColor="Azure"
+                    VerticalOptions="FillAndExpand" />
+                <Image
+                    x:Name="SignalImage"
+                    AbsoluteLayout.LayoutBounds="1, -1, -1, 1"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    HeightRequest="40"
+                    HorizontalOptions="EndAndExpand"
+                    Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
+            </AbsoluteLayout>
+            <xct:TabView
+                x:Name="TabViewHome"
+                TabIndicatorColor="White"
+                TabStripBackgroundColor="DodgerBlue"
+                TabStripHeight="60"
+                TabStripPlacement="Top" />
+        </StackLayout>
+    </ContentPage.Content>
+
+</ContentPage>

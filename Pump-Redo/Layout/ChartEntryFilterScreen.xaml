@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="Pump.Layout.ChartEntryFilterScreen"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <ContentPage.Content>
+        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <Label
+                FontSize="24"
+                HorizontalOptions="CenterAndExpand"
+                Text="Filter"
+                VerticalOptions="Start" />
+            <ScrollView HeightRequest="300">
+                <StackLayout
+                    x:Name="ChartEntryFilterLayout"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand" />
+            </ScrollView>
+            <Button
+                Clicked="Button_OnClicked"
+                Text="Close"
+                VerticalOptions="EndAndExpand" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

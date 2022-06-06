@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="Pump.Layout.Schedule.CustomScheduleUpdate"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
+    xmlns:maskedEntry="clr-namespace:Xamarin.Forms.MaskedEntry;assembly=Xamarin.Forms.MaskedEntry"
+    BackgroundColor="DeepSkyBlue">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+                <StackLayout>
+                    <Label
+                        CharacterSpacing="2"
+                        FontSize="30"
+                        HorizontalTextAlignment="Center"
+                        Text="Create Custom Schedule"
+                        TextColor="White" />
+                </StackLayout>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackLayout
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HeightRequest="15"
+                        Orientation="Vertical">
+                        <StackLayout Orientation="Vertical">
+                            <Label
+                                CharacterSpacing="1"
+                                FontSize="Large"
+                                HorizontalOptions="Center"
+                                Text="Name"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                            <Editor
+                                x:Name="ScheduleName"
+                                AutoSize="TextChanges"
+                                FlowDirection="RightToLeft"
+                                FontSize="Large"
+                                MaxLength="225"
+                                Placeholder="Schedule name"
+                                PlaceholderColor="Gray"
+                                Scale="0.8"
+                                TextColor="White" />
+                        </StackLayout>
+
+
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="0" Grid.Column="1">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Large"
+                            HorizontalOptions="Center"
+                            Text="Select"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <StackLayout
+                            Margin="0,10,0,0"
+                            HeightRequest="50"
+                            HorizontalOptions="FillAndExpand"
+                            Orientation="Vertical">
+
+                            <Frame
+                                Margin="0,0,10,0"
+                                Padding="10,0,10,0"
+                                BackgroundColor="AliceBlue"
+                                CornerRadius="30">
+                                <StackLayout Orientation="Horizontal">
+                                    <Image HeightRequest="18"
+                                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
+                                    <Picker
+                                        x:Name="CustomPumpPicker"
+                                        HorizontalOptions="FillAndExpand"
+                                        IsEnabled="False"
+                                        TextColor="DarkSlateBlue" />
+
+                                </StackLayout>
+                            </Frame>
+
+                        </StackLayout>
+                    </StackLayout>
+
+                </Grid>
+
+                <StackLayout Padding="20" VerticalOptions="FillAndExpand">
+                    <Label
+                        FontSize="Title"
+                        HorizontalOptions="Center"
+                        Text="Zone"
+                        TextColor="White"
+                        TextDecorations="Underline" />
+
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Gray"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
+                        <ScrollView HeightRequest="300">
+                            <StackLayout x:Name="ScrollViewZoneDetail">
+                                <ActivityIndicator
+                                    AutomationId="ActivityIndicatorManualPump"
+                                    HorizontalOptions="Center"
+                                    IsEnabled="true"
+                                    IsRunning="True"
+                                    IsVisible="True"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </ScrollView>
+                    </Frame>
+
+                </StackLayout>
+                <StackLayout VerticalOptions="EndAndExpand">
+                    <StackLayout Margin="5" Orientation="Horizontal">
+                        <Label
+                            FontSize="Large"
+                            HorizontalOptions="Center"
+                            Text="Repeat: "
+                            TextColor="White"
+                            TextDecorations="Underline"
+                            VerticalOptions="Center" />
+                        <maskedEntry:MaskedEntry
+                            x:Name="MaskedEntryRepeat"
+                            FlowDirection="RightToLeft"
+                            HorizontalOptions="StartAndExpand"
+                            Keyboard="Numeric"
+                            Mask="X"
+                            Placeholder="0"
+                            Scale="1.2" />
+                    </StackLayout>
+
+                    <Button
+                        x:Name="ButtonCreateCustomSchedule"
+                        Clicked="ButtonCreateCustomSchedule_OnClicked"
+                        IsEnabled="False"
+                        Text="Create Custom Schedule" />
+                    <Button
+                        x:Name="ButtonBack"
+                        Clicked="ButtonBack_OnClicked"
+                        Text="Back" />
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
