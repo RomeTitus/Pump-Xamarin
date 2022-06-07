@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using EmbeddedImages;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.Database;
@@ -12,50 +13,50 @@ using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Pump.SocketController.BT;
-using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout
 {
-    //DisplayPromptAsync
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SetupSystem : ContentPage
     {
         private readonly BluetoothManager _blueToothManage;
-        private readonly NotificationEvent _notificationEvent;
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private WiFiContainer _selectedWiFiContainer;
-        private PopupBasicAlert _popupBasicAlert;
         private List<WiFiContainer> _wiFiContainers;
+        private List<DHCPConfig> _configs = new List<DHCPConfig>();
         
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
         {
             InitializeComponent();
             _blueToothManage = blueToothManager;
-            _notificationEvent = notificationEvent;
-            _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
+            notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             PopulateControllers();
             Task.FromResult(GetConnectionInfo());
         }
 
-        private async Task GetConnectionInfo()
+        private async Task GetConnectionInfo(string connection = null)
         {
-            GridNetworkDetail.IsVisible = false;
-            SetUpSystemActivityIndicator.IsVisible = true;
-            var result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.ConnectionInfo());
-            SetUpSystemActivityIndicator.IsVisible = false;
-            GridNetworkDetail.IsVisible = true;
-            var connectionInfoJObject = JObject.Parse(result);
+            if (string.IsNullOrEmpty(connection))
+            {
+                GridNetworkDetail.IsVisible = false;
+                SetUpSystemActivityIndicator.IsVisible = true;
+                connection = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.ConnectionInfo());
+                SetUpSystemActivityIndicator.IsVisible = false;
+                GridNetworkDetail.IsVisible = true;
+
+            }
+            var connectionInfoJObject = JObject.Parse(connection);
 
             foreach (var connectionInfo in connectionInfoJObject)
             {
                 if (connectionInfo.Key.Contains("eth"))
                 {
-                    LabelLanIp.Text = "IP: " + connectionInfo.Value; 
+                    LabelLanIp.Text = "IP: " + connectionInfo.Value;
                 }
-                else
+                else if(connectionInfo.Key.Contains("wlan"))
                 {
                     var wifiDetailList = connectionInfo.Value.ToString().Split('\n');
                     if (wifiDetailList.Length == 3)
@@ -65,9 +66,17 @@ namespace Pump.Layout
                     }
 
                     LabelWiFiName.Text = wifiDetailList.First();
-                    LabelWiFiIp.Text = "IP: " + wifiDetailList[1];    
+                    LabelWiFiIp.Text = "IP: " + wifiDetailList[1];
+                }else if (connectionInfo.Key.Contains("DHCP"))
+                {
+                    _configs.Clear();
+                    foreach (var dhcpConfig in connectionInfo.Value)
+                    {
+                        var config = JsonConvert.DeserializeObject<DHCPConfig>(dhcpConfig.First.ToString());
+                        config.DHCPinterface = dhcpConfig.Path.Replace("DHCP.", "");
+                        _configs.Add(config);
+                    }
                 }
-                
             }
         }
 
@@ -129,6 +138,12 @@ namespace Pump.Layout
                 await DisplayAlert("Bluetooth Exception", exception.ToString(), "Understood");
             }
         }
+        
+        private async void SetDHCPInterface_OnTapped(object sender, EventArgs e)
+        {
+            
+        }
+
 
         private async void WiFiView_Tapped(object sender, EventArgs e)
         {
@@ -140,18 +155,30 @@ namespace Pump.Layout
 
                 if (_selectedWiFiContainer != null)
                 {
-                    if (!_selectedWiFiContainer.encryption_type.Contains("Encryption: on"))
-                        _popupBasicAlert = new PopupBasicAlert("WIFI",
-                            "Are you use you want to connect to " + _selectedWiFiContainer.ssid, "Connect",
-                            "Cancel");
+                    if (_selectedWiFiContainer.encryption_type.Contains("Encryption: on"))
+                    {
+                        bool passwordValidationFailed;
+                        do
+                        {
+                            var password = await DisplayPromptAsync("WiFi", "Connect to " + _selectedWiFiContainer.ssid + "\nEnter WiFi Password");
+                            if(password == null)
+                                return;
+                            passwordValidationFailed = password.Length < 7;
+                            if(passwordValidationFailed)
+                                await DisplayAlert("Validation", "\u2022 Password too short", "Understood");
+                            _selectedWiFiContainer.passkey = password;
+                        } while (passwordValidationFailed);
+                    }
                     else
-                        _popupBasicAlert = new PopupBasicAlert("WIFI",
-                            "Are you use you want to connect to " + _selectedWiFiContainer.ssid + "\nEnter Password",
-                            "Connect",
-                            "Cancel", true);
+                        await DisplayAlert("WiFi", "Connect to " + _selectedWiFiContainer.ssid, "");
+                    
+                    await PopupNavigation.Instance.PopAllAsync();
+                    var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                    await PopupNavigation.Instance.PushAsync(loadingScreen);
+                    var result = await ConnectToWifi(_selectedWiFiContainer);
+                    await PopupNavigation.Instance.PopAllAsync();
+                    await GetConnectionInfo(result);
 
-                    _popupBasicAlert.GetAcceptButton().Clicked += WiFiPassword_Clicked;
-                    await PopupNavigation.Instance.PushAsync(_popupBasicAlert);
                 }
                 else
                 {
@@ -162,20 +189,6 @@ namespace Pump.Layout
             {
                 await DisplayAlert("WIFI", "We ran into a problem \n" + exception.Message, "Understood");
             }
-        }
-
-        private async void WiFiPassword_Clicked(object sender, EventArgs e)
-        {
-            if (_popupBasicAlert.Editable && !string.IsNullOrEmpty(_popupBasicAlert.GetEditableText()))
-                _selectedWiFiContainer.passkey = _popupBasicAlert.GetEditableText();
-            
-            await PopupNavigation.Instance.PopAllAsync();
-
-            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
-            await PopupNavigation.Instance.PushAsync(loadingScreen);
-            var result = await ConnectToWifi(_selectedWiFiContainer);
-            await PopupNavigation.Instance.PopAllAsync();
-            //await GetConnectionInfo(result);
         }
 
         private static List<WiFiContainer> DictToWiFiContainer(string dict)

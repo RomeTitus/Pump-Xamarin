@@ -80,15 +80,37 @@
                                            Text="Not Connected"
                                            FontSize="Small"
                                            TextColor="White"/>
+                                    <Label Text="Tap to scan"
+                                           FontAttributes="Bold"
+                                           TextDecorations="Underline"
+                                           FontSize="Small"
+                                           TextColor="White">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="LabelWiFiScan_OnTapped" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
 
                                 </StackLayout>
+                                <StackLayout>
                                 <Image
                                     x:Name="SignalImage"
                                     AbsoluteLayout.LayoutBounds="1, -1, -1, 1"
                                     AbsoluteLayout.LayoutFlags="PositionProportional"
                                     HeightRequest="40"
                                     HorizontalOptions="EndAndExpand"
-                                    Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />        
+                                    Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
+                                <Label AutomationId="WiFi"
+                                       Text="Modify" 
+                                       VerticalOptions="EndAndExpand"
+                                       FontAttributes="Bold"
+                                       TextDecorations="Underline"
+                                       FontSize="Small"
+                                       TextColor="White">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="SetDHCPInterface_OnTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                </StackLayout>
                             </StackLayout>
                             
                             <StackLayout  Grid.Column="1" HorizontalOptions="FillAndExpand" Margin="10,0,5,0">
@@ -98,19 +120,20 @@
                                 <Label Text="Not connected" x:Name="LabelLanIp"
                                        FontSize="Small"
                                        TextColor="White"/>
+                                <Label AutomationId="Lan" 
+                                       Text="Modify Lan"
+                                       VerticalOptions="EndAndExpand"
+                                       HorizontalOptions="Start"
+                                       FontAttributes="Bold"
+                                       TextDecorations="Underline"
+                                       FontSize="Small"
+                                       TextColor="White">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="SetDHCPInterface_OnTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                             </StackLayout>
                             </Grid>
-                    </StackLayout>
-                    <StackLayout>
-                        <Label Text="Tap to scan"
-                               FontAttributes="Bold"
-                               TextDecorations="Underline"
-                               FontSize="Small"
-                               TextColor="White">
-                            <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="LabelWiFiScan_OnTapped" />
-                            </Label.GestureRecognizers>
-                        </Label>
                     </StackLayout>
                     
                     <StackLayout Orientation="Horizontal">

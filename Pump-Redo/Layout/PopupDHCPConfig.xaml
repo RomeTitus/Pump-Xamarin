@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<pages:PopupPage
+    x:Class="Pump.Layout.PopupDHCPConfig"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup">
+    
+    <pages:PopupPage.Animation>
+        <animations:ScaleAnimation
+            DurationIn="200"
+            DurationOut="200"
+            EasingIn="Linear"
+            EasingOut="Linear"
+            HasBackgroundAnimation="True"
+            PositionIn="Center"
+            PositionOut="Center"
+            ScaleIn="0.7"
+            ScaleOut="1.5" />
+    </pages:PopupPage.Animation>
+    
+    <Frame
+        Margin="20,60,20,60"
+        BackgroundColor="Azure"
+        CornerRadius="10"
+        BorderColor="Black"
+        VerticalOptions="FillAndExpand">
+        
+        <StackLayout HeightRequest="400">
+                <StackLayout VerticalOptions="FillAndExpand">
+                    <StackLayout>
+                        <Label
+                            x:Name="LabelHeading"
+                            CharacterSpacing="1"
+                            FontSize="Large"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Configuration"
+                            VerticalOptions="Center" />
+                        <Frame
+                            BackgroundColor="Azure"
+                            CornerRadius="10"
+                            BorderColor="Black">
+                        <Picker x:Name="DhcpPicker" HorizontalOptions="FillAndExpand"
+                                TextColor="DarkSlateBlue" >
+                            <Picker.Items>
+                                <x:String>DHCP</x:String>
+                                <x:String>Static IP</x:String>
+                            </Picker.Items>
+                        </Picker>
+                        </Frame>
+                    </StackLayout>
+                    <ScrollView>
+                        <StackLayout x:Name="StackLayoutDhcpConfig" IsVisible="True">
+                            <Label Text="IP Address" Margin="10,0,0,0"/>
+                            <Frame
+                                BackgroundColor="Azure"
+                                BorderColor="Black">
+                                <Entry
+                                    x:Name="TxtIP"
+                                    Margin="0"
+                                    FlowDirection="MatchParent"
+                                    HorizontalOptions="Center"
+                                    InputTransparent="False"
+                                    MinimumWidthRequest="30"
+                                    Scale="1"
+                                    VerticalOptions="Center"
+                                    WidthRequest="300" />
+                            </Frame>
+                        </StackLayout>
+                    </ScrollView>
+                    <StackLayout VerticalOptions="EndAndExpand">
+                        <Button
+                            Clicked="ButtonCancel_OnClicked"
+                            Text="Save" />
+                        <Button
+                            Clicked="ButtonCancel_OnClicked"
+                            Text="Cancel" />
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+</pages:PopupPage>
