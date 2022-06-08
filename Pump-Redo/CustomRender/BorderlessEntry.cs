@@ -4,6 +4,5 @@ namespace Pump.CustomRender
 {
     public class BorderlessEntry : Entry
     {
-
     }
 }

@@ -5,7 +5,8 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
-    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup">
+    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+    xmlns:customRender="clr-namespace:Pump.CustomRender;assembly=Pump">
     
     <pages:PopupPage.Animation>
         <animations:ScaleAnimation
@@ -35,14 +36,21 @@
                             CharacterSpacing="1"
                             FontSize="Large"
                             HorizontalOptions="CenterAndExpand"
+                            Text="Network"
+                            VerticalOptions="Center" />
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Medium"
+                            HorizontalOptions="Start"
                             Text="Configuration"
                             VerticalOptions="Center" />
                         <Frame
-                            BackgroundColor="Azure"
-                            CornerRadius="10"
-                            BorderColor="Black">
-                        <Picker x:Name="DhcpPicker" HorizontalOptions="FillAndExpand"
-                                TextColor="DarkSlateBlue" >
+                            Margin="0,0,10,0"
+                            Padding="10,0,10,0"
+                            BackgroundColor="AliceBlue"
+                            CornerRadius="30">
+                            <Picker x:Name="DhcpPicker" HorizontalOptions="FillAndExpand"
+                                    TextColor="DarkSlateBlue">
                             <Picker.Items>
                                 <x:String>DHCP</x:String>
                                 <x:String>Static IP</x:String>
@@ -52,21 +60,27 @@
                     </StackLayout>
                     <ScrollView>
                         <StackLayout x:Name="StackLayoutDhcpConfig" IsVisible="True">
-                            <Label Text="IP Address" Margin="10,0,0,0"/>
-                            <Frame
-                                BackgroundColor="Azure"
-                                BorderColor="Black">
-                                <Entry
-                                    x:Name="TxtIP"
-                                    Margin="0"
-                                    FlowDirection="MatchParent"
-                                    HorizontalOptions="Center"
-                                    InputTransparent="False"
-                                    MinimumWidthRequest="30"
-                                    Scale="1"
-                                    VerticalOptions="Center"
-                                    WidthRequest="300" />
-                            </Frame>
+                            <customRender:EntryOutlined 
+                                Margin="0,7,0,0"
+                                x:Name="EntryIP"
+                                Placeholder="Ip Address"
+                                BorderColor="Black"
+                                PlaceholderColor="Navy" 
+                                TextChanged="EntryDhcpConfig_OnTextChanged"/>
+                            <customRender:EntryOutlined
+                                Margin="0,7,0,0"
+                                x:Name="EntryGateway"
+                                Placeholder="Gateway"
+                                BorderColor="Black"
+                                PlaceholderColor="Navy" 
+                                TextChanged="EntryDhcpConfig_OnTextChanged"/>
+                            <customRender:EntryOutlined
+                                Margin="0,7,0,0"
+                                x:Name="EntryDNS"
+                                Placeholder="DNS"
+                                BorderColor="Black"
+                                PlaceholderColor="Navy" 
+                                TextChanged="EntryDhcpConfig_OnTextChanged"/>
                         </StackLayout>
                     </ScrollView>
                     <StackLayout VerticalOptions="EndAndExpand">

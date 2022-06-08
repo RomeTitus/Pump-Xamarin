@@ -101,5 +101,9 @@
         <DependentUpon>PopupDHCPConfig.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="CustomRender\EntryOutlined.xaml.cs">
+        <DependentUpon>ViewException.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>
