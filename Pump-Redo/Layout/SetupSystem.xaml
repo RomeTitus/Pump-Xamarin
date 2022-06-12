@@ -99,7 +99,7 @@
                                     HeightRequest="40"
                                     HorizontalOptions="EndAndExpand"
                                     Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
-                                <Label AutomationId="WiFi"
+                                <Label x:Name="WiFiDhcp" 
                                        Text="Modify" 
                                        VerticalOptions="EndAndExpand"
                                        FontAttributes="Bold"
@@ -120,7 +120,7 @@
                                 <Label Text="Not connected" x:Name="LabelLanIp"
                                        FontSize="Small"
                                        TextColor="White"/>
-                                <Label AutomationId="Lan" 
+                                <Label x:Name="LanDhcp" 
                                        Text="Modify Lan"
                                        VerticalOptions="EndAndExpand"
                                        HorizontalOptions="Start"

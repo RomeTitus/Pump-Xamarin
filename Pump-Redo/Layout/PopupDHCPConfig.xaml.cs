@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Pump.Class;
 using Pump.CustomRender;
-using Pump.IrrigationController;
-using Pump.Layout.Views;
 using Rg.Plugins.Popup.Pages;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
@@ -16,21 +15,73 @@ namespace Pump.Layout
     public partial class PopupDHCPConfig : PopupPage
     {
         private readonly DHCPConfig _dhcpConfig;
-
-        public PopupDHCPConfig(DHCPConfig dhcpConfig = null)
+        private readonly List<string> _dhcpInterface;
+        public PopupDHCPConfig(List<string> dhcpInterface, string ipAddress, DHCPConfig dhcpConfig = null)
         {
             InitializeComponent();
             _dhcpConfig = dhcpConfig;
-            DhcpPicker.SelectedIndex = 0;
-            if(dhcpConfig != null)
-                PopulateExisting();
+            _dhcpInterface = dhcpInterface;
+            DhcpPicker.SelectedIndexChanged += DhcpPickerOnSelectedIndexChanged;
         }
 
-        private void PopulateExisting()
+        private void DhcpPickerOnSelectedIndexChanged(object sender, EventArgs e)
         {
-            StackLayoutDhcpConfig.IsVisible = true;
-            LabelHeading.Text = _dhcpConfig.DHCPinterface;
-            
+            if(DhcpPicker.SelectedIndex == 0) 
+                StackLayoutDhcpConfig.IsVisible = false;
+            else
+                StackLayoutDhcpConfig.IsVisible = true;
+        }
+
+        private async Task Populate()
+        {
+            LabelHeading.Text = _dhcpInterface[0];
+            if (_dhcpConfig != null)
+            {
+                DhcpPicker.SelectedIndex = 1;
+                await SetFocus(true);
+                EntryIP.Text = _dhcpConfig.ip_address;
+                EntryGateway.Text = _dhcpConfig.routers;
+                EntryDNS.Text = _dhcpConfig.domain_name_servers;
+            }
+            else
+            {
+                await SetFocusIpAddress();
+                EntryIP.Text = _dhcpInterface[1];
+                DhcpPicker.SelectedIndex = 0;
+            }
+                
+        }
+        
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await Task.Delay(100);
+            await Populate();
+        }
+
+        private async Task SetFocus(bool isFocused)
+        {
+            await Task.Delay(100);
+            if (isFocused)
+            {
+                EntryIP.TextBox_Focused(this, new FocusEventArgs(this, true));
+                EntryGateway.TextBox_Focused(this, new FocusEventArgs(this, true));
+                EntryDNS.TextBox_Focused(this, new FocusEventArgs(this, true));
+            }
+            else
+            {
+                EntryIP.TextBox_Unfocused(this, new FocusEventArgs(this, false));
+                EntryGateway.TextBox_Unfocused(this, new FocusEventArgs(this, false));
+                EntryDNS.TextBox_Unfocused(this, new FocusEventArgs(this, false));
+            }
+            await Task.Delay(200);
+        }
+        
+        private async Task SetFocusIpAddress()
+        {
+            await Task.Delay(100);
+            EntryIP.TextBox_Focused(this, new FocusEventArgs(this, true));
+            await Task.Delay(200);
         }
 
         private void ButtonCancel_OnClicked(object sender, EventArgs e)
@@ -68,7 +119,6 @@ namespace Pump.Layout
                     }
                 }
             }
-                
 
             Device.BeginInvokeOnMainThread(() =>
             {
@@ -84,6 +134,26 @@ namespace Pump.Layout
 
                 }
             });
+        }
+
+        public Button GetSaveButtonDhcpSaveButton()
+        {
+            return ButtonDhcpSave;
+        }
+
+        public DHCPConfig GetDhcpConfig()
+        {
+            var dhcpConfig = new DHCPConfig
+            {
+                DHCPinterface = _dhcpInterface[0]
+            };
+            if (DhcpPicker.SelectedIndex == 0) 
+                return dhcpConfig;
+            dhcpConfig.ip_address = EntryIP.Text;
+            dhcpConfig.routers = EntryGateway.Text;
+            dhcpConfig.domain_name_servers = EntryDNS.Text;
+
+            return dhcpConfig;
         }
     }
 }

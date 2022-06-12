@@ -39,6 +39,14 @@ namespace Pump.SocketController
             return wiFiCommand;
         }
 
+        public static JObject TempDhcpConfig(JObject DhcpConfig)
+        {
+            var tempDhcpConfigCommand = new JObject { { "Task", new JObject() } };
+            tempDhcpConfigCommand["Task"] = new JObject { { "TempDhcpConfig", new JObject() } };
+            tempDhcpConfigCommand["Task"]["TempDhcpConfig"] = DhcpConfig;
+            return tempDhcpConfigCommand;
+        }
+        
         public static JObject FirebaseUid(string uid)
         {
             var wiFiCommand = new JObject { { "Task", new JObject() } };

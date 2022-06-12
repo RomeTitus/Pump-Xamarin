@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using EmbeddedImages;
+using Firebase.Auth;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
@@ -26,7 +27,8 @@ namespace Pump.Layout
         private List<PumpConnection> _controllerList = new List<PumpConnection>();
         private WiFiContainer _selectedWiFiContainer;
         private List<WiFiContainer> _wiFiContainers;
-        private List<DHCPConfig> _configs = new List<DHCPConfig>();
+        private List<DHCPConfig> _dhcpconfigList = new List<DHCPConfig>();
+        private PopupDHCPConfig popupDHCPConfig;
         
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
         {
@@ -39,6 +41,9 @@ namespace Pump.Layout
 
         private async Task GetConnectionInfo(string connection = null)
         {
+            WiFiDhcp.IsVisible = false;
+            LanDhcp.IsVisible = false;
+
             if (string.IsNullOrEmpty(connection))
             {
                 GridNetworkDetail.IsVisible = false;
@@ -55,9 +60,14 @@ namespace Pump.Layout
                 if (connectionInfo.Key.Contains("eth"))
                 {
                     LabelLanIp.Text = "IP: " + connectionInfo.Value;
+                    LanDhcp.ClassId = connectionInfo.Key.ToLower() + "$" + connectionInfo.Value;
+                    LanDhcp.IsVisible = true;
                 }
                 else if(connectionInfo.Key.Contains("wlan"))
                 {
+                    
+                    WiFiDhcp.ClassId = connectionInfo.Key.ToLower()  + "$" + connectionInfo.Value;
+                    
                     var wifiDetailList = connectionInfo.Value.ToString().Split('\n');
                     if (wifiDetailList.Length == 3)
                     {
@@ -67,14 +77,15 @@ namespace Pump.Layout
 
                     LabelWiFiName.Text = wifiDetailList.First();
                     LabelWiFiIp.Text = "IP: " + wifiDetailList[1];
+                    WiFiDhcp.IsVisible = true;
                 }else if (connectionInfo.Key.Contains("DHCP"))
                 {
-                    _configs.Clear();
+                    _dhcpconfigList.Clear();
                     foreach (var dhcpConfig in connectionInfo.Value)
                     {
                         var config = JsonConvert.DeserializeObject<DHCPConfig>(dhcpConfig.First.ToString());
                         config.DHCPinterface = dhcpConfig.Path.Replace("DHCP.", "");
-                        _configs.Add(config);
+                        _dhcpconfigList.Add(config);
                     }
                 }
             }
@@ -84,19 +95,19 @@ namespace Pump.Layout
         {
             string signalStrength;
                     
-            if (dBm < 50)
+            if (dBm < 53)
                 signalStrength = "5";
 
-            else if (dBm < 57 )
+            else if (dBm < 60 )
                 signalStrength = "4";
                     
-            else if (dBm < 62 )
+            else if (dBm < 68 )
                 signalStrength = "3";
                     
-            else if (dBm < 67 )
+            else if (dBm < 77 )
                 signalStrength = "3";
                     
-            else if (dBm < 70 )
+            else if (dBm < 81 )
                 signalStrength = "1";
 
             else
@@ -141,9 +152,35 @@ namespace Pump.Layout
         
         private async void SetDHCPInterface_OnTapped(object sender, EventArgs e)
         {
+            var networkLabel = (Label)sender;
+            popupDHCPConfig = new PopupDHCPConfig(
+                networkLabel.ClassId.Split('$').ToList(), LabelLanIp.Text.Replace("", ""),
+                _dhcpconfigList.FirstOrDefault(x => x.DHCPinterface.Contains(networkLabel.ClassId.ToLower()))); 
+            await PopupNavigation.Instance.PushAsync(popupDHCPConfig);
+            popupDHCPConfig.GetSaveButtonDhcpSaveButton().Pressed +=OnPressed;
             
         }
 
+        private async void OnPressed(object sender, EventArgs e)
+        {
+            await PopupNavigation.Instance.PopAllAsync();
+            var dhcpConfig = popupDHCPConfig.GetDhcpConfig(); 
+            var dhcpConfigSerialize = JObject.Parse(JsonConvert.SerializeObject(dhcpConfig));
+            for (int i = 0; i < dhcpConfigSerialize.Count; i++)
+            {
+                if (string.IsNullOrEmpty(dhcpConfigSerialize[i].ToString()))
+                {
+                    var test = dhcpConfigSerialize;
+                }
+            }
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                await PopupNavigation.Instance.PushAsync(loadingScreen);
+                var result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.TempDhcpConfig(dhcpConfigSerialize), 8000);
+                await PopupNavigation.Instance.PopAllAsync();
+            });
+        }
 
         private async void WiFiView_Tapped(object sender, EventArgs e)
         {

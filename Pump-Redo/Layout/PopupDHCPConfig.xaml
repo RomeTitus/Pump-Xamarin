@@ -85,7 +85,7 @@
                     </ScrollView>
                     <StackLayout VerticalOptions="EndAndExpand">
                         <Button
-                            Clicked="ButtonCancel_OnClicked"
+                            x:Name="ButtonDhcpSave"
                             Text="Save" />
                         <Button
                             Clicked="ButtonCancel_OnClicked"

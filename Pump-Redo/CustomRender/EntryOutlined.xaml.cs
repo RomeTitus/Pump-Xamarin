@@ -12,23 +12,26 @@ namespace Pump.CustomRender
         {
             InitializeComponent();
         }
-        
+
         public static readonly BindableProperty TextProperty =
-            BindableProperty.Create(nameof(Text), typeof(string), typeof(EntryOutlined), null);
+            BindableProperty.Create(nameof(Text), typeof(string), typeof(EntryOutlined));
 
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            set
+            {
+                SetValue(TextProperty, value);
+            }
         }
 
         public static readonly BindableProperty PlaceholderProperty =
-            BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(EntryOutlined), null);
+            BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(EntryOutlined));
 
         public string Placeholder
         {
             get { return (string)GetValue(PlaceholderProperty); }
-            set { SetValue(PlaceholderProperty, value); }
+            set { SetValue(PlaceholderProperty, value);}
         }
 
         public static readonly BindableProperty PlaceholderColorProperty =
@@ -49,38 +52,41 @@ namespace Pump.CustomRender
             set { SetValue(BorderColorProperty, value); }
         }
         
-        async void TextBox_Focused(object sender, FocusEventArgs e)
+        public async void TextBox_Focused(object sender, FocusEventArgs e)
         {
             await TranslateLabelToTitle();
         }
 
-        async void TextBox_Unfocused(object sender, FocusEventArgs e)
+        public async void TextBox_Unfocused(object sender, FocusEventArgs e)
         {
             await TranslateLabelToPlaceHolder();
         }
 
-        async Task TranslateLabelToTitle()
+        public async Task TranslateLabelToTitle(bool noAnimation = false)
         {
             if (string.IsNullOrEmpty(this.Text))
             {
-                var placeHolder = this.PlaceHolderLabel;
-                var distance = GetPlaceholderDistance(placeHolder);
-                await placeHolder.TranslateTo(0, -distance);
+                var distance = GetPlaceholderDistance(PlaceHolderLabel);
+                if(noAnimation)
+                    await PlaceHolderLabel.TranslateTo(0, -distance, 0);
+                else
+                    await PlaceHolderLabel.TranslateTo(0, -distance);
+                
             }
             
         }
 
         async Task TranslateLabelToPlaceHolder()
         {
-            if(string.IsNullOrEmpty(this.Text))
+            if(string.IsNullOrEmpty(Text))
             {
-                await this.PlaceHolderLabel.TranslateTo(0, 0);                
+                await PlaceHolderLabel.TranslateTo(0, 0);                
             }
         }
 
         double GetPlaceholderDistance(Label control)
         {
-            var distance = 0d;
+            double distance;
             if(Device.RuntimePlatform == Device.iOS) distance = 0;
             else distance = 5;
             
@@ -89,7 +95,7 @@ namespace Pump.CustomRender
         }
         
         public event EventHandler<TextChangedEventArgs> TextChanged;
-        public virtual void OnTextChanged(System.Object sender, Xamarin.Forms.TextChangedEventArgs e)
+        public virtual async void OnTextChanged(object sender, TextChangedEventArgs e)
         {
             TextChanged?.Invoke(this, e);
         }

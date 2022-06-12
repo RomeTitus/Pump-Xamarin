@@ -99,8 +99,6 @@ namespace Pump.Layout
 
         private async void BtScan()
         {
-            await PopupNavigation.Instance.PushAsync(new PopupDHCPConfig());
-            
             _bluetoothManager.IrrigationDeviceBt.Clear();
             ScrollViewSetupSystem.Children.Clear();
             _bluetoothManager.IrrigationDeviceBt.CollectionChanged += (_, args) =>
