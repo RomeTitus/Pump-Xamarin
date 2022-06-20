@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    x:Class="Pump.Layout.ExistingController"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    BackgroundColor="DeepSkyBlue"
+    mc:Ignorable="d">
+
+    <FlexLayout
+        x:Name="LayoutAddController"
+        Margin="20"
+        Direction="Column"
+        JustifyContent="SpaceAround"
+        VerticalOptions="Center">
+        <StackLayout>
+            <Label
+                Margin="0,15,0,0"
+                FontSize="Title"
+                HorizontalOptions="CenterAndExpand"
+                Text="Nearby Controllers"
+                TextColor="White"
+                TextDecorations="Underline"
+                VerticalOptions="Center" />
+            <StackLayout VerticalOptions="FillAndExpand">
+                <Frame
+                    BackgroundColor="White"
+                    BorderColor="Black"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+                    <ScrollView HeightRequest="100">
+                        <StackLayout x:Name="ScrollViewSetupSystem" />
+                    </ScrollView>
+                </Frame>
+            </StackLayout>
+            <StackLayout HorizontalOptions="EndAndExpand">
+                <StackLayout HorizontalOptions="End" WidthRequest="75">
+                    <Label x:Name="LabelBtScan" Text="Rescan    " HorizontalOptions="Start" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="LabelBTScan_OnTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </FlexLayout>
+</ContentPage>

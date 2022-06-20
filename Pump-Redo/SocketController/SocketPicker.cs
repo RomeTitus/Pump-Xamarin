@@ -8,6 +8,7 @@ using Pump.IrrigationController;
 using Pump.Layout;
 using Pump.SocketController.BT;
 using Pump.SocketController.Firebase;
+using Pump.SocketController.Network;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 
@@ -52,29 +53,29 @@ namespace Pump.SocketController
         private void Disposable()
         {
             _observableIrrigation.IsDisposable = true;
-            var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            var IrrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
 
-            if (pumpConnection.ConnectionType == 0)
+            if (IrrigationConfiguration.ConnectionType == 0)
                 _initializeFirebase.Disposable();
-            else if (pumpConnection.ConnectionType == 1)
+            else if (IrrigationConfiguration.ConnectionType == 1)
                 _initializeNetwork.Disposable();
-            else if (pumpConnection.ConnectionType == 2) _initializeBlueTooth.Disposable();
+            else if (IrrigationConfiguration.ConnectionType == 2) _initializeBlueTooth.Disposable();
         }
 
         private async Task Subscribe()
         {
             _observableIrrigation.IsDisposable = false;
-            var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
-            if (pumpConnection.ConnectionType == 0)
+            var IrrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
+            if (IrrigationConfiguration.ConnectionType == 0)
                 _initializeFirebase.SubscribeFirebase();
-            else if (pumpConnection.ConnectionType == 1)
+            else if (IrrigationConfiguration.ConnectionType == 1)
                 await _initializeNetwork.SubscribeNetwork();
-            else if (pumpConnection.ConnectionType == 2) await _initializeBlueTooth.SubscribeBle();
+            else if (IrrigationConfiguration.ConnectionType == 2) await _initializeBlueTooth.SubscribeBle();
         }
 
         public async Task<string> SendCommand(object sendObject, bool runInBackground = true)
         {
-            var pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            var IrrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
             var buttonClosed = new Button
             {
                 Text = "Close", VerticalOptions = LayoutOptions.EndAndExpand,
@@ -115,7 +116,7 @@ namespace Pump.SocketController
             }
 
             var result = "Did Not Complete Action: " + sendObject;
-            switch (pumpConnection?.ConnectionType)
+            switch (IrrigationConfiguration?.ConnectionType)
             {
                 case 0:
                     result = await new Authentication().Descript(sendObject, _notificationEvent);
@@ -126,7 +127,7 @@ namespace Pump.SocketController
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
                     result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
-                        SocketCommands.Descript(sendObject), pumpConnection);
+                        SocketCommands.Descript(sendObject), IrrigationConfiguration);
                     break;
                 case 2:
                     if (_initializeBlueTooth == null)

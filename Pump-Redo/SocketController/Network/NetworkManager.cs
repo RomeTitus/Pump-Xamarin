@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using Pump.Database.Table;
 using Xamarin.Essentials;
 
-namespace Pump.SocketController.BT
+namespace Pump.SocketController.Network
 {
     public class NetworkManager
     {
@@ -26,7 +26,7 @@ namespace Pump.SocketController.BT
             return updated;
         }
 
-        public async Task<string> SendAndReceiveToNetwork(JObject dataToSend, PumpConnection connection,
+        public async Task<string> SendAndReceiveToNetwork(JObject dataToSend, IrrigationConfiguration connection,
             int timeout = 0)
         {
             var fullData = false;
@@ -68,7 +68,7 @@ namespace Pump.SocketController.BT
                 networkReplyBytes.Count));
         }
 
-        private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, PumpConnection connection, int timeout = 0)
+        private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, IrrigationConfiguration connection, int timeout = 0)
         {
             //Return nothing if there is no network path
             if (connection.InternalPort == -1 && connection.ExternalPort == -1)
@@ -85,7 +85,7 @@ namespace Pump.SocketController.BT
                 {
                     var profiles = Connectivity.ConnectionProfiles;
                     if (profiles.Contains(ConnectionProfile.WiFi))
-                        sender.Connect(connection.InternalPath, connection.InternalPort);
+                        sender.Connect(connection.InternalPath, connection.InternalPort.Value);
                     else
                         throw new Exception();
                 }
@@ -93,7 +93,7 @@ namespace Pump.SocketController.BT
             catch
             {
                 if (connection.ExternalPort != -1)
-                    sender.Connect(connection.ExternalPath, connection.ExternalPort);
+                    sender.Connect(connection.ExternalPath, connection.ExternalPort.Value);
             }
 
             // Send the data through the socket.

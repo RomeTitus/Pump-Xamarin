@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Timers;
 using Firebase.Auth;
 using Pump.Class;
 using Pump.Database;
-using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout;
-using Pump.Layout.Dashboard;
-using Pump.Layout.Views;
 using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -24,12 +18,12 @@ namespace Pump
         private readonly NotificationEvent _notificationEvent;
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly SocketPicker _socketPicker;
-        private readonly Timer _timer;
+        //private readonly Timer _timer;
 
         //INotificationManager notificationManager;
-        private List<PumpConnection> _controllerList = new List<PumpConnection>();
-        private HomeScreen _homeScreen;
-        private bool _loadedHomeScreen;
+        //private List<IrrigationConfiguration> _controllerList = new List<IrrigationConfiguration>();
+        //private HomeScreen _homeScreen;
+        //private bool _loadedHomeScreen;
 
         public MainPage(FirebaseAuthClient client)
         {
@@ -38,12 +32,8 @@ namespace Pump
             _observableIrrigation = new ObservableIrrigation();
             _socketPicker = new SocketPicker(_observableIrrigation);
             _authenticationScreen = new AuthenticationScreen(client);
-            _timer = new Timer(300); // 0.3 seconds
-            SetEvents();
-            _notificationEvent.OnUpdateStatus += NewSelectedNotification;
-            ControllerPicker.SelectedIndexChanged += _socketPicker.ConnectionPicker_OnSelectedIndexChanged;
+            //_timer = new Timer(300); // 0.3 seconds
             client.AuthStateChanged += ClientOnAuthStateChanged;
-            PopulateControllers();
         }
 
         private async void ClientOnAuthStateChanged(object sender, UserEventArgs e)
@@ -64,11 +54,34 @@ namespace Pump
                     Device.BeginInvokeOnMainThread(SetupNewController);
             }
         }
+        
+        private void SetupNewController()
+        {
+            //var connectionScreen = new ExistingController(true, _notificationEvent, _socketPicker.BluetoothManager());
+            //if (Navigation.ModalStack.All(x => x.GetType() != typeof(ExistingController)))
+            //    Navigation.PushModalAsync(connectionScreen);
+        }
+        
+        
+        private void BtnAddSite_OnPressed(object sender, EventArgs e)
+        {
+            var equipmentList = _observableIrrigation.EquipmentList.ToList();
+            var equipments = _observableIrrigation.SiteList.Aggregate(equipmentList,
+                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
 
+            var sensorList = _observableIrrigation.SensorList.ToList();
+            var sensors = _observableIrrigation.SiteList.Aggregate(sensorList,
+                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
+
+
+            Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, _socketPicker));
+        }
+        
+        /*
+        
         private void SetEvents()
         {
             _observableIrrigation.SiteList.CollectionChanged += PopulateSiteEvent;
-            ControllerPicker.SelectedIndexChanged += ConnectionPicker_OnSelectedIndexChanged;
             StartEvent();
         }
 
@@ -90,19 +103,7 @@ namespace Pump
             BtnEditController.IsEnabled = ControllerPicker.Items.Count > 0;
         }
 
-        private void BtnAddSite_OnPressed(object sender, EventArgs e)
-        {
-            var equipmentList = _observableIrrigation.EquipmentList.ToList();
-            var equipments = _observableIrrigation.SiteList.Aggregate(equipmentList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
-
-            var sensorList = _observableIrrigation.SensorList.ToList();
-            var sensors = _observableIrrigation.SiteList.Aggregate(sensorList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
-
-
-            Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, _socketPicker));
-        }
+        
 
         private void BtnAddSubController_OnPressed(object sender, EventArgs e)
         {
@@ -321,13 +322,7 @@ namespace Pump
             });
         }
 
-        private void SetupNewController()
-        {
-            var connectionScreen = new ExistingController(true, _notificationEvent, _socketPicker.BluetoothManager());
-            connectionScreen.GetUpdateButton().Tapped += BtnUpdateController_OnPressed;
-            if (Navigation.ModalStack.All(x => x.GetType() != typeof(ExistingController)))
-                Navigation.PushModalAsync(connectionScreen);
-        }
+        
 
         private async void BtnAddController_OnPressed(object sender, EventArgs e)
         {
@@ -500,10 +495,6 @@ namespace Pump
             _timer.Interval = 300;
         }
 
-        private void NewSelectedNotification(object sender, ControllerEventArgs e)
-        {
-            PopulateControllers();
-        }
 
         private void StartEvent()
         {
@@ -516,5 +507,6 @@ namespace Pump
             PopulateSiteEvent(null, null);
             PopulateSubControllerEvent(null, null);
         }
+    */
     }
 }

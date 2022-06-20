@@ -6,13 +6,14 @@ using Newtonsoft.Json.Linq;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
+using Pump.SocketController.Network;
 
 namespace Pump.SocketController.BT
 {
     internal class InitializeNetwork
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly PumpConnection _pumpConnection;
+        private readonly IrrigationConfiguration _irrigationConfiguration;
         public readonly NetworkManager NetworkManager;
         public readonly Stopwatch RequestIrrigationTimer;
         private bool _isSubscribed;
@@ -22,7 +23,7 @@ namespace Pump.SocketController.BT
         {
             _observableIrrigation = observableIrrigation;
             RequestIrrigationTimer = new Stopwatch();
-            _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            _irrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
             NetworkManager = new NetworkManager();
         }
 
@@ -109,7 +110,7 @@ namespace Pump.SocketController.BT
 
         private async Task<string> GetIrrigationData()
         {
-            return await NetworkManager.SendAndReceiveToNetwork(SocketCommands.AllTogether(), _pumpConnection);
+            return await NetworkManager.SendAndReceiveToNetwork(SocketCommands.AllTogether(), _irrigationConfiguration);
         }
     }
 }

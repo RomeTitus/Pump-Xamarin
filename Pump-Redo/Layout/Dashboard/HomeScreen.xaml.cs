@@ -126,11 +126,11 @@ namespace Pump.Layout.Dashboard
 
         private void HomeScreenSite(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var site = _observableIrrigation.SiteList.FirstOrDefault(x =>
-                x?.ID == _databaseController.GetControllerConnectionSelection().SiteSelectedId);
-            if (site == null || LabelSite.Text == site.NAME)
-                return;
-            Device.BeginInvokeOnMainThread(() => { LabelSite.Text = site.NAME; });
+            //var site = _observableIrrigation.SiteList.FirstOrDefault(x =>
+            //    x?.ID == _databaseController.GetControllerConnectionSelection().SiteSelectedId);
+            //if (site == null || LabelSite.Text == site.NAME)
+            //    return;
+            //Device.BeginInvokeOnMainThread(() => { LabelSite.Text = site.NAME; });
         }
 
         private async Task<bool> ConnectionSuccessful()

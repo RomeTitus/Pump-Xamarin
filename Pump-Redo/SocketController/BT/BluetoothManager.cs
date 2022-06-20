@@ -12,6 +12,7 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
 using Pump.Database;
+using Xamarin.Forms;
 
 namespace Pump.SocketController.BT
 {
@@ -29,8 +30,7 @@ namespace Pump.SocketController.BT
             AdapterBle.DeviceConnected += Adapter_DeviceConnected;
             AdapterBle.DeviceDisconnected += Adapter_DeviceDisconnected;
             AdapterBle.ScanTimeoutElapsed += Adapter_ScanTimeoutElapsed;
-            //30 Seconds spent Scanning
-            AdapterBle.ScanTimeout = 30000;
+            AdapterBle.ScanTimeout = 20000; //20 Seconds spent Scanning
         }
 
         public IAdapter AdapterBle { get; }
@@ -52,7 +52,7 @@ namespace Pump.SocketController.BT
 
             if (IrrigationDeviceBt.Any())
                 IrrigationDeviceBt.Clear();
-            AdapterBle.ScanMode = ScanMode.Balanced;
+            AdapterBle.ScanMode = ScanMode.LowLatency;
             await AdapterBle.StartScanningForDevicesAsync();
         }
 
@@ -187,54 +187,64 @@ namespace Pump.SocketController.BT
 
         public async Task<string> SendAndReceiveToBleAsync(JObject dataToSend, int timeout = 0)
         {
-            if (_loadedCharacteristic == null)
+            try
             {
-                var services = await BleDevice.GetServicesAsync();
-                if (services == null || !services.Any())
-                    return null;
-                var characteristics = await services[0].GetCharacteristicsAsync();
-                _loadedCharacteristic = characteristics[0];
-            }
-
-
-            if (_loadedCharacteristic == null || !_loadedCharacteristic.CanWrite) return null;
-
-            var fullData = false;
-            var bleReplyBytes = new List<byte>();
-            var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
-            var partNumber = 0;
-            while (fullData == false)
-            {
-                if (dataToSend.ContainsKey("Task"))
-                    try
-                    {
-                        if(dataToSend["Task"].Type != JTokenType.String)
-                            dataToSend["Task"]["Part"] = partNumber;
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-
-                var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
-                var finalBytesReceived = Array.Empty<byte>();
-
-                for (var i = 0; i < bytes.Count; i += 508)
+                if (_loadedCharacteristic == null)
                 {
-                    var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;
-
-                    sendingBytes.InsertRange(0, key);
-
-                    finalBytesReceived = await WriteToBle(sendingBytes.ToArray(), timeout);
+                    var services = await BleDevice.GetServicesAsync();
+                    if (services == null || !services.Any())
+                        return null;
+                    var characteristics = await services[0].GetCharacteristicsAsync();
+                    _loadedCharacteristic = characteristics[0];
                 }
 
-                bleReplyBytes.AddRange(finalBytesReceived);
-                if (finalBytesReceived.Length != 512)
-                    fullData = true;
-                partNumber++;
-            }
 
-            return ConvertForApplication(Encoding.ASCII.GetString(bleReplyBytes.ToArray(), 0, bleReplyBytes.Count));
+                if (_loadedCharacteristic == null || !_loadedCharacteristic.CanWrite) return null;
+
+                var fullData = false;
+                var bleReplyBytes = new List<byte>();
+                var key = Encoding.ASCII.GetBytes(SocketCommands.GenerateKey(4)).ToList();
+                var partNumber = 0;
+                while (fullData == false)
+                {
+                    if (dataToSend.ContainsKey("Task"))
+                        try
+                        {
+                            if(dataToSend["Task"].Type != JTokenType.String)
+                                dataToSend["Task"]["Part"] = partNumber;
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+
+                    var bytes = Encoding.ASCII.GetBytes(ConvertForIrrigation(dataToSend.ToString())).ToList();
+                    var finalBytesReceived = Array.Empty<byte>();
+
+                    for (var i = 0; i < bytes.Count; i += 508)
+                    {
+                        var sendingBytes = bytes.Count > i + 508 ? bytes.GetRange(i, i + 508) : bytes;
+
+                        sendingBytes.InsertRange(0, key);
+
+                        finalBytesReceived = await WriteToBle(sendingBytes.ToArray(), timeout);
+                    }
+
+                    bleReplyBytes.AddRange(finalBytesReceived);
+                    if (finalBytesReceived.Length != 512)
+                        fullData = true;
+                    partNumber++;
+                }
+                
+                return ConvertForApplication(Encoding.ASCII.GetString(bleReplyBytes.ToArray(), 0, bleReplyBytes.Count));
+            }
+            catch(Exception e)
+            {
+                await Application.Current.MainPage.DisplayAlert("Bluetooth Exception",
+                    e.Message, "Understood");
+
+                return null;
+            }
         }
 
         private async Task<byte[]> WriteToBle(byte[] bytesToSend, int timeout = 0)
@@ -244,7 +254,7 @@ namespace Pump.SocketController.BT
             var result = await _loadedCharacteristic.ReadAsync();
             if (Encoding.ASCII.GetString(result, 0, result.Length) ==
                 Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
-                throw new Exception("Controller did not reply back using BlueTooth \n Reboot required");
+                throw new Exception("Controller did not reply back using BlueTooth");
             return result;
         }
     }

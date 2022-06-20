@@ -16,108 +16,94 @@ namespace Pump.Database
         {
             _database = DependencyService.Get<ISQLite>().GetConnection();
 
-            _database.CreateTable<PumpConnection>();
+            _database.CreateTable<IrrigationConfiguration>();
             _database.CreateTable<PumpSelection>();
             _database.CreateTable<UserAuthentication>();
         }
 
-        public PumpConnection GetControllerConnectionSelection()
+        public IrrigationConfiguration GetControllerConnectionSelection()
         {
             lock (Locker)
             {
                 if (_database.Table<PumpSelection>().Any())
                 {
                     var pumpSelected = _database.Table<PumpSelection>().First();
-                    foreach (var pumpConnection in _database.Table<PumpConnection>().ToList())
-                        if (pumpConnection == null)
-                            _database.Delete(pumpConnection);
-
-                    return _database.Table<PumpConnection>().FirstOrDefault(x => x.ID == pumpSelected.PumpConnectionId);
+                    return _database.Table<IrrigationConfiguration>().FirstOrDefault(x => x.ID == pumpSelected.IrrigationConfigurationId);
                 }
 
-                if (_database.Table<PumpConnection>().Any())
+                if (_database.Table<IrrigationConfiguration>().Any())
                 {
                     _database.DeleteAll<PumpSelection>();
-                    var selectedNewPump = _database.Table<PumpConnection>().FirstOrDefault();
+                    var selectedNewPump = _database.Table<IrrigationConfiguration>().FirstOrDefault();
 
                     _database.Insert(new PumpSelection(selectedNewPump.ID));
 
                     return selectedNewPump;
                 }
-
                 return null;
             }
         }
 
-        public List<PumpConnection> GetControllerConnectionList()
+        public List<IrrigationConfiguration> GetControllerConnectionList()
         {
             lock (Locker)
             {
-                return _database.Table<PumpConnection>().Any()
-                    ? _database.Table<PumpConnection>().ToList()
-                    : new List<PumpConnection>();
+                return _database.Table<IrrigationConfiguration>().Any()
+                    ? _database.Table<IrrigationConfiguration>().ToList()
+                    : new List<IrrigationConfiguration>();
             }
         }
         
-        public void UpdateControllerConnection(PumpConnection pumpConnection)
+        public void UpdateControllerConnection(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {
-                var existingPumpConnection = _database.Table<PumpConnection>()
-                    .FirstOrDefault(x => x.Mac.Equals(pumpConnection.Mac));
-                if (existingPumpConnection != null)
+                var existingIrrigationConfiguration = _database.Table<IrrigationConfiguration>()
+                    .FirstOrDefault(x => x.Mac.Equals(irrigationConfiguration.Mac));
+                if (existingIrrigationConfiguration != null)
                 {
-                    _database.Update(pumpConnection);
+                    _database.Update(irrigationConfiguration);
                 }
                 else
                 {
                     if (_database.Table<PumpSelection>().Any())
                         _database.DeleteAll<PumpSelection>();
-                    _database.Insert(pumpConnection);
-                    _database.Insert(new PumpSelection(pumpConnection.ID));
+                    _database.Insert(irrigationConfiguration);
+                    _database.Insert(new PumpSelection(irrigationConfiguration.ID));
                 }
             }
         }
 
-        public void DeleteControllerConnection(PumpConnection pumpConnection)
+        public void DeleteControllerConnection(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {
                 _database.DeleteAll<PumpSelection>();
-                _database.Delete(pumpConnection);
-                if (!_database.Table<PumpConnection>().Any()) return;
-                var selectedNewPump = _database.Table<PumpConnection>().FirstOrDefault();
+                _database.Delete(irrigationConfiguration);
+                if (!_database.Table<IrrigationConfiguration>().Any()) return;
+                var selectedNewPump = _database.Table<IrrigationConfiguration>().FirstOrDefault();
                 _database.Insert(new PumpSelection(selectedNewPump.ID));
             }
         }
 
-        public void SetSelectedController(PumpConnection pumpConnection)
+        public void SetSelectedController(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {
                 _database.DeleteAll<PumpSelection>();
-                _database.Insert(new PumpSelection { PumpConnectionId = pumpConnection.ID });
+                _database.Insert(new PumpSelection { IrrigationConfigurationId = irrigationConfiguration.ID });
             }
         }
 
-        public PumpConnection GetControllerNameByMac(string bt)
+        public IrrigationConfiguration GetControllerNameByMac(string bt)
         {
             if (string.IsNullOrEmpty(bt)) return null;
             lock (Locker)
             {
-                var pumpConnection = _database.Table<PumpConnection>().FirstOrDefault(x => x.Mac.Equals(bt));
-                return pumpConnection;
+                var irrigationConfiguration = _database.Table<IrrigationConfiguration>().FirstOrDefault(x => x.Mac.Equals(bt));
+                return irrigationConfiguration;
             }
         }
-
-        public bool IsRealtimeFirebaseSelected()
-        {
-            var selectedPump = GetControllerConnectionSelection();
-            if (selectedPump?.RealTimeDatabase != null) return (bool)selectedPump.RealTimeDatabase;
-
-            return false;
-        }
-        
         public UserAuthentication GetUserAuthentication()
         {
             lock (Locker)

@@ -16,7 +16,7 @@ namespace Pump.Layout
     {
         private readonly DHCPConfig _dhcpConfig;
         private readonly List<string> _dhcpInterface;
-        public PopupDHCPConfig(List<string> dhcpInterface, string ipAddress, DHCPConfig dhcpConfig = null)
+        public PopupDHCPConfig(List<string> dhcpInterface, DHCPConfig dhcpConfig = null)
         {
             InitializeComponent();
             _dhcpConfig = dhcpConfig;

@@ -13,7 +13,7 @@ namespace Pump.SocketController.BT
     internal class InitializeBlueTooth
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly PumpConnection _pumpConnection;
+        private readonly IrrigationConfiguration _irrigationConfiguration;
         public readonly BluetoothManager BlueToothManager;
         public readonly Stopwatch RequestIrrigationTimer;
         private bool _isSubscribed;
@@ -23,7 +23,7 @@ namespace Pump.SocketController.BT
         {
             _observableIrrigation = observableIrrigation;
             RequestIrrigationTimer = new Stopwatch();
-            _pumpConnection = new DatabaseController().GetControllerConnectionSelection();
+            _irrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
             BlueToothManager = new BluetoothManager();
         }
 
@@ -32,9 +32,9 @@ namespace Pump.SocketController.BT
             while (true)
             {
                 _isSubscribed = true;
-                if (_pumpConnection.IDeviceGuid != Guid.Empty)
+                if (_irrigationConfiguration.IDeviceGuid != Guid.Empty)
                 {
-                    await ConnectToDevice(_pumpConnection.IDeviceGuid);
+                    await ConnectToDevice(_irrigationConfiguration.IDeviceGuid);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace Pump.SocketController.BT
                     {
                         var iDevice =
                             BlueToothManager.IrrigationDeviceBt.FirstOrDefault(x =>
-                                x.NativeDevice.ToString() == _pumpConnection.Mac);
+                                x.NativeDevice.ToString() == _irrigationConfiguration.Mac);
                         if (iDevice == null)
                             await Task.Delay(500);
                         else

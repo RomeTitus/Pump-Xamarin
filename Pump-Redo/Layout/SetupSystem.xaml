@@ -29,7 +29,6 @@
                         TextColor="White"
                         TextType="Text"
                         VerticalOptions="Center" />
-
                     <Entry
                         x:Name="TxtControllerName"
                         Margin="0"
@@ -65,11 +64,11 @@
                         <Grid x:Name="GridNetworkDetail" IsVisible="True">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="150"/>
                             </Grid.ColumnDefinitions>
                             
                             <StackLayout Grid.Column="0" Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                                <StackLayout Margin="5,0,0,0">
+                                <StackLayout Margin="20,0,0,0">
                                     <Label CharacterSpacing="1"
                                            FontSize="Small"  
                                            x:Name="LabelWiFiName" 
@@ -80,10 +79,10 @@
                                            Text="Not Connected"
                                            FontSize="Small"
                                            TextColor="White"/>
-                                    <Label Text="Tap to scan"
+                                    <Label Text="Scan"
                                            FontAttributes="Bold"
                                            TextDecorations="Underline"
-                                           FontSize="Small"
+                                           FontSize="Medium"
                                            TextColor="White">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="LabelWiFiScan_OnTapped" />
@@ -136,24 +135,25 @@
                             </Grid>
                     </StackLayout>
                     
-                    <StackLayout Orientation="Horizontal">
-                        <Label
-                            CharacterSpacing="1"
-                            FontSize="Medium"
-                            HorizontalOptions="Center"
-                            Margin="3"
-                            Text="Pair to existing controller"
-                            TextColor="White"
-                            VerticalOptions="Center" />
-                        <CheckBox
-                            x:Name="IsMain"
-                            HorizontalOptions="End"
-                            IsChecked="True"
-                            Margin="15,0,0,0"
-                            VerticalOptions="Center" />
-                    </StackLayout>
+                    <StackLayout IsVisible="False">
+                        <StackLayout Orientation="Horizontal">
+                            <Label
+                                CharacterSpacing="1"
+                                FontSize="Medium"
+                                HorizontalOptions="Center"
+                                Margin="3"
+                                Text="Pair to existing controller"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                            <CheckBox
+                                x:Name="IsMain"
+                                HorizontalOptions="End"
+                                IsChecked="True"
+                                Margin="15,0,0,0"
+                                VerticalOptions="Center" />
+                        </StackLayout>
 
-                    <StackLayout>
+                        <StackLayout>
                         <StackLayout
                             VerticalOptions="EndAndExpand">
                             <Label
@@ -203,6 +203,7 @@
                                 IsChecked="False"
                                 VerticalOptions="Center" />
                         </StackLayout>
+                    </StackLayout>
                     </StackLayout>
                 </StackLayout>
                 

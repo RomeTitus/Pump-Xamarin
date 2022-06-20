@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using EmbeddedImages;
-using Firebase.Auth;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
@@ -24,22 +23,23 @@ namespace Pump.Layout
     public partial class SetupSystem : ContentPage
     {
         private readonly BluetoothManager _blueToothManage;
-        private List<PumpConnection> _controllerList = new List<PumpConnection>();
+        private List<IrrigationConfiguration> _controllerList = new List<IrrigationConfiguration>();
         private WiFiContainer _selectedWiFiContainer;
         private List<WiFiContainer> _wiFiContainers;
-        private List<DHCPConfig> _dhcpconfigList = new List<DHCPConfig>();
-        private PopupDHCPConfig popupDHCPConfig;
+        private readonly List<DHCPConfig> _dhcpConfigList = new List<DHCPConfig>();
+        private readonly NotificationEvent _notificationEvent;
+        private PopupDHCPConfig _popupDhcpConfig;
         
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
         {
             InitializeComponent();
             _blueToothManage = blueToothManager;
-            notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
-            PopulateControllers();
-            Task.FromResult(GetConnectionInfo());
+            _notificationEvent = notificationEvent;
+            _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
+            GetConnectionInfo();
         }
 
-        private async Task GetConnectionInfo(string connection = null)
+        private async void GetConnectionInfo(string connection = null)
         {
             WiFiDhcp.IsVisible = false;
             LanDhcp.IsVisible = false;
@@ -53,21 +53,19 @@ namespace Pump.Layout
                 GridNetworkDetail.IsVisible = true;
 
             }
+
             var connectionInfoJObject = JObject.Parse(connection);
 
             foreach (var connectionInfo in connectionInfoJObject)
             {
                 if (connectionInfo.Key.Contains("eth"))
                 {
+                    LanDhcp.ClassId = connectionInfo.Key.ToLower() + "/" + connectionInfo.Value;
                     LabelLanIp.Text = "IP: " + connectionInfo.Value;
-                    LanDhcp.ClassId = connectionInfo.Key.ToLower() + "$" + connectionInfo.Value;
                     LanDhcp.IsVisible = true;
                 }
                 else if(connectionInfo.Key.Contains("wlan"))
                 {
-                    
-                    WiFiDhcp.ClassId = connectionInfo.Key.ToLower()  + "$" + connectionInfo.Value;
-                    
                     var wifiDetailList = connectionInfo.Value.ToString().Split('\n');
                     if (wifiDetailList.Length == 3)
                     {
@@ -77,15 +75,16 @@ namespace Pump.Layout
 
                     LabelWiFiName.Text = wifiDetailList.First();
                     LabelWiFiIp.Text = "IP: " + wifiDetailList[1];
+                    WiFiDhcp.ClassId = connectionInfo.Key.ToLower()  + "/" + wifiDetailList[1];
                     WiFiDhcp.IsVisible = true;
                 }else if (connectionInfo.Key.Contains("DHCP"))
                 {
-                    _dhcpconfigList.Clear();
+                    _dhcpConfigList.Clear();
                     foreach (var dhcpConfig in connectionInfo.Value)
                     {
                         var config = JsonConvert.DeserializeObject<DHCPConfig>(dhcpConfig.First.ToString());
                         config.DHCPinterface = dhcpConfig.Path.Replace("DHCP.", "");
-                        _dhcpconfigList.Add(config);
+                        _dhcpConfigList.Add(config);
                     }
                 }
             }
@@ -124,7 +123,7 @@ namespace Pump.Layout
             {
                 var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
-                var result = await Device.InvokeOnMainThreadAsync(ScanWiFi);
+                var result = await ScanWiFi();
                 await PopupNavigation.Instance.PopAllAsync();
 
                 if (SocketExceptions.CheckException(result))
@@ -153,33 +152,33 @@ namespace Pump.Layout
         private async void SetDHCPInterface_OnTapped(object sender, EventArgs e)
         {
             var networkLabel = (Label)sender;
-            popupDHCPConfig = new PopupDHCPConfig(
-                networkLabel.ClassId.Split('$').ToList(), LabelLanIp.Text.Replace("", ""),
-                _dhcpconfigList.FirstOrDefault(x => x.DHCPinterface.Contains(networkLabel.ClassId.ToLower()))); 
-            await PopupNavigation.Instance.PushAsync(popupDHCPConfig);
-            popupDHCPConfig.GetSaveButtonDhcpSaveButton().Pressed +=OnPressed;
+            _popupDhcpConfig = new PopupDHCPConfig(
+                networkLabel.ClassId.Split('/').ToList(),
+                _dhcpConfigList.FirstOrDefault(x => x.DHCPinterface.Contains(networkLabel.ClassId.Split('/').First()))); 
+            await PopupNavigation.Instance.PushAsync(_popupDhcpConfig);
+            _popupDhcpConfig.GetSaveButtonDhcpSaveButton().Pressed +=OnPressed;
             
         }
 
         private async void OnPressed(object sender, EventArgs e)
         {
             await PopupNavigation.Instance.PopAllAsync();
-            var dhcpConfig = popupDHCPConfig.GetDhcpConfig(); 
+            var dhcpConfig = _popupDhcpConfig.GetDhcpConfig();
             var dhcpConfigSerialize = JObject.Parse(JsonConvert.SerializeObject(dhcpConfig));
-            for (int i = 0; i < dhcpConfigSerialize.Count; i++)
+            
+            if (string.IsNullOrEmpty(dhcpConfigSerialize["ip_address"].ToString()) &&
+                string.IsNullOrEmpty(dhcpConfigSerialize["routers"].ToString()) &&
+                string.IsNullOrEmpty(dhcpConfigSerialize["domain_name_servers"].ToString()))
             {
-                if (string.IsNullOrEmpty(dhcpConfigSerialize[i].ToString()))
-                {
-                    var test = dhcpConfigSerialize;
-                }
+                dhcpConfigSerialize.Remove("ip_address");
+                dhcpConfigSerialize.Remove("routers");
+                dhcpConfigSerialize.Remove("domain_name_servers");
             }
-            Device.BeginInvokeOnMainThread(async () =>
-            {
-                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 var result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.TempDhcpConfig(dhcpConfigSerialize), 8000);
                 await PopupNavigation.Instance.PopAllAsync();
-            });
+                GetConnectionInfo(result);
         }
 
         private async void WiFiView_Tapped(object sender, EventArgs e)
@@ -214,7 +213,7 @@ namespace Pump.Layout
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
                     var result = await ConnectToWifi(_selectedWiFiContainer);
                     await PopupNavigation.Instance.PopAllAsync();
-                    await GetConnectionInfo(result);
+                    GetConnectionInfo(result);
 
                 }
                 else
@@ -251,39 +250,7 @@ namespace Pump.Layout
         private async Task<string> ConnectToWifi(WiFiContainer wiFiContainer)
         {
             var wiFiJson = JObject.FromObject(wiFiContainer);
-            string result = null;
-            await Device.InvokeOnMainThreadAsync(async () =>
-            {
-                result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.WiFiConnect(wiFiJson), 8000);
-            });
-            return result;
-        }
-
-        private void PopulateControllers()
-        {
-            _controllerList = new DatabaseController().GetControllerConnectionList();
-            ControllerPicker.Items.Clear();
-            var selectedController = new DatabaseController().GetControllerConnectionSelection();
-            for (var i = 0; i < _controllerList.Count; i++)
-            {
-                ControllerPicker.Items.Add(string.IsNullOrEmpty(_controllerList[i].Name)
-                    ? "Name is missing"
-                    : _controllerList[i].Name);
-                if (_controllerList[i]?.ID == selectedController?.ID)
-                    ControllerPicker.SelectedIndex = i;
-            }
-
-            if (!_controllerList.Any()) IsMain.IsEnabled = false;
-        }
-
-        private async Task<string> SendUid(string uid)
-        {
-            string result = null;
-            await Device.InvokeOnMainThreadAsync(async () =>
-            {
-                result = await  _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.FirebaseUid(uid));
-            });
-            return result;
+            return await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.WiFiConnect(wiFiJson), 8000);
         }
 
         private async void ButtonCreate_OnClicked(object sender, EventArgs e)
@@ -292,6 +259,25 @@ namespace Pump.Layout
             if (!string.IsNullOrEmpty(notification))
             {
                 await DisplayAlert("Setup", notification, "Understood");
+                return;
+            }
+
+            var controllerConfig = new JObject();
+            controllerConfig["UID"] = JObject.Parse(new DatabaseController().GetUserAuthentication().UserInfo)["Uid"].ToString();
+            controllerConfig["Path"] = TxtControllerName.Text.Replace(" ", "_");
+            controllerConfig["IsMain"] = true;
+            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
+            var result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.SetupFirebaseController(controllerConfig), 8000);
+            await PopupNavigation.Instance.PopAllAsync();
+
+            if(result == null)
+                return;
+            await DisplayAlert("Info", result, "Understood");
+
+            if (result == "Controller is setup!")
+            {
+                _notificationEvent.UpdateStatus();
             }
         }
 

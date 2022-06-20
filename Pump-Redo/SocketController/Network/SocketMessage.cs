@@ -24,7 +24,7 @@ namespace Pump.SocketController
                 {
                     var profiles = Connectivity.ConnectionProfiles;
                     if (profiles.Contains(ConnectionProfile.WiFi))
-                        SocketResult = Send(data, connection.InternalPath, connection.InternalPort);
+                        SocketResult = Send(data, connection.InternalPath, connection.InternalPort.Value);
                 }
             }
             catch (Exception e)
@@ -38,7 +38,7 @@ namespace Pump.SocketController
             try
             {
                 if (connection.ExternalPort != -1)
-                    SocketResult = Send(data, connection.ExternalPath, connection.ExternalPort);
+                    SocketResult = Send(data, connection.ExternalPath, connection.ExternalPort.Value);
             }
             catch (Exception e)
             {

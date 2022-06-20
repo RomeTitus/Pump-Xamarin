@@ -8,13 +8,13 @@ namespace Pump.Database.Table
         {
         }
 
-        public PumpSelection(int PumpConnectionID)
+        public PumpSelection(int irrigationConfigurationId)
         {
-            PumpConnectionId = PumpConnectionID;
+            IrrigationConfigurationId = irrigationConfigurationId;
         }
 
-        [PrimaryKey] [AutoIncrement] public int ID { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
 
-        public int PumpConnectionId { get; set; }
+        public int IrrigationConfigurationId { get; set; }
     }
 }
