@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.Database;
-using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
@@ -23,7 +22,6 @@ namespace Pump.Layout
     public partial class SetupSystem : ContentPage
     {
         private readonly BluetoothManager _blueToothManage;
-        private List<IrrigationConfiguration> _controllerList = new List<IrrigationConfiguration>();
         private WiFiContainer _selectedWiFiContainer;
         private List<WiFiContainer> _wiFiContainers;
         private readonly List<DHCPConfig> _dhcpConfigList = new List<DHCPConfig>();
@@ -275,7 +273,7 @@ namespace Pump.Layout
                 return;
             await DisplayAlert("Info", result, "Understood");
 
-            if (result == "Controller is setup!")
+            if (result != "Already_Exist")
             {
                 _notificationEvent.UpdateStatus();
             }

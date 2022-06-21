@@ -57,9 +57,9 @@ namespace Pump
         
         private void SetupNewController()
         {
-            //var connectionScreen = new ExistingController(true, _notificationEvent, _socketPicker.BluetoothManager());
-            //if (Navigation.ModalStack.All(x => x.GetType() != typeof(ExistingController)))
-            //    Navigation.PushModalAsync(connectionScreen);
+            var connectionScreen = new ScanBluetooth( _notificationEvent, _socketPicker.BluetoothManager());
+            if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
+                Navigation.PushModalAsync(connectionScreen);
         }
         
         

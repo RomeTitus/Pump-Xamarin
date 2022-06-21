@@ -11,7 +11,7 @@ using System.Timers;
 
 namespace Pump.Layout
 {
-    public partial class ExistingController : ContentPage
+    public partial class ScanBluetooth : ContentPage
     {
         private readonly BluetoothManager _bluetoothManager;
         private readonly Timer _timer;
@@ -19,8 +19,7 @@ namespace Pump.Layout
 
         private readonly NotificationEvent _notificationEvent;
 
-        public ExistingController(NotificationEvent notificationEvent,
-            BluetoothManager bluetoothManager)
+        public ScanBluetooth(NotificationEvent notificationEvent, BluetoothManager bluetoothManager)
         {
             InitializeComponent();
             _bluetoothManager = bluetoothManager;

@@ -18,11 +18,12 @@ namespace Pump.SocketController.BT
 {
     public class BluetoothManager
     {
-        private const string IrrigationServiceCode = "7949B569-7FC4-465E-B35B-1B5B200AC8C3";
+        private readonly Guid _irrigationService; 
         private ICharacteristic _loadedCharacteristic;
 
         public BluetoothManager()
         {
+            _irrigationService = Guid.Parse("7949B569-7FC4-465E-B35B-1B5B200AC8C3");
             AdapterBle = CrossBluetoothLE.Current.Adapter;
             IrrigationDeviceBt = new ObservableCollection<IDevice>();
 
@@ -39,7 +40,7 @@ namespace Pump.SocketController.BT
 
         public async Task StartScanning()
         {
-            await StartScanning(Guid.Empty);
+            await StartScanning(_irrigationService);
         }
 
         public async Task StartScanning(Guid forService)
@@ -145,7 +146,6 @@ namespace Pump.SocketController.BT
         {
             await DisconnectDevice();
             _loadedCharacteristic = null;
-            //DeviceDisconnectedEvent?.Invoke(sender,e);
             Debug.WriteLine("Device already disconnected");
         }
 
@@ -168,7 +168,7 @@ namespace Pump.SocketController.BT
         public async Task<bool> IsValidController()
         {
             var services = await BleDevice.GetServicesAsync();
-            return services.FirstOrDefault(x => x.Id == Guid.Parse(IrrigationServiceCode)) != null;
+            return services.FirstOrDefault(x => x.Id == _irrigationService) != null;
         }
 
         private string ConvertForIrrigation(string dataToBeConverted)

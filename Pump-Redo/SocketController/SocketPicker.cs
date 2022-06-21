@@ -53,13 +53,14 @@ namespace Pump.SocketController
         private void Disposable()
         {
             _observableIrrigation.IsDisposable = true;
-            var IrrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
-
-            if (IrrigationConfiguration.ConnectionType == 0)
+            var irrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
+            
+            if (irrigationConfiguration.ConnectionType == 0)
                 _initializeFirebase.Disposable();
-            else if (IrrigationConfiguration.ConnectionType == 1)
+            else if (irrigationConfiguration.ConnectionType == 1)
                 _initializeNetwork.Disposable();
-            else if (IrrigationConfiguration.ConnectionType == 2) _initializeBlueTooth.Disposable();
+            else if (irrigationConfiguration.ConnectionType == 2) 
+                _initializeBlueTooth.Disposable();
         }
 
         private async Task Subscribe()

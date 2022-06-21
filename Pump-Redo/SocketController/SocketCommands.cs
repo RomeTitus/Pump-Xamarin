@@ -50,8 +50,8 @@ namespace Pump.SocketController
         public static JObject SetupFirebaseController(JObject controllerConfig)
         {
             var wiFiCommand = new JObject { { "Task", new JObject() } };
-            wiFiCommand["Task"] = new JObject { { "controllerConfig", new JObject() } };
-            wiFiCommand["Task"]["controllerConfig"] = controllerConfig;
+            wiFiCommand["Task"] = new JObject { { "controllerAuth", new JObject() } };
+            wiFiCommand["Task"]["ControllerAuth"] = controllerConfig;
             return wiFiCommand;
         }
 
