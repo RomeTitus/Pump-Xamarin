@@ -67,7 +67,7 @@ namespace Pump.Layout
         private async void ButtonUpdateSubController_OnClicked(object sender, EventArgs e)
         {
             SetSubControllerVariables();
-            await _socketPicker.SendCommand(_subController, false);
+            await _socketPicker.SendCommand(_subController);
             await Navigation.PopModalAsync();
         }
     }

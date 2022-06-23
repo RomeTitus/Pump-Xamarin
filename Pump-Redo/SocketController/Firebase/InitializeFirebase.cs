@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Firebase.Database.Streaming;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
 using Pump.Database;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.Firebase
@@ -10,21 +10,83 @@ namespace Pump.SocketController.Firebase
     internal class InitializeFirebase
     {
         private readonly ObservableIrrigation _observableIrrigation;
+        /*
         private IDisposable _subscribeAlive;
         private IDisposable _subscribeCustomSchedule;
         private IDisposable _subscribeEquipment;
         private IDisposable _subscribeManualSchedule;
         private IDisposable _subscribeSchedule;
-
         private IDisposable _subscribeSensor;
         private IDisposable _subscribeSite;
         private IDisposable _subscribeSubController;
-
-        public InitializeFirebase(ObservableIrrigation observableIrrigation)
+*/
+        private IDisposable _subscribeFirebase;
+        private readonly DatabaseController _database;
+        private readonly FirebaseManager _manager;
+        private bool _alreadySubscribed;
+        
+        public InitializeFirebase(FirebaseManager manager, ObservableIrrigation observableIrrigation)
         {
             _observableIrrigation = observableIrrigation;
+            _manager = manager;
+            _database = new DatabaseController();
         }
 
+        public void SubscribeFirebase()
+        {
+            if(_alreadySubscribed)
+                return;
+            _alreadySubscribed = true;
+            var configuration = _database.GetControllerConfigurationList();
+            _subscribeFirebase = _manager.FirebaseQuery
+                .Child(configuration.First().Path)
+                .AsObservable<JObject>()
+                .Subscribe(x =>
+                {
+                    /*
+                    try
+                    {
+                        if (_observableIrrigation.SensorList.Count > 0 && _observableIrrigation.SensorList[0] == null)
+                            _observableIrrigation.SensorList.Clear();
+
+                        if (x.Object == null && string.IsNullOrEmpty(x.Key))
+                        {
+                            _observableIrrigation.EquipmentList.Clear();
+                            return;
+                        }
+
+                        var sensor = x.Object;
+                        if (x.EventType == FirebaseEventType.Delete)
+                        {
+                            for (var i = 0; i < _observableIrrigation.SensorList.Count; i++)
+                                if (_observableIrrigation.SensorList[i].ID == x.Key)
+                                    _observableIrrigation.SensorList.RemoveAt(i);
+                        }
+                        else
+                        {
+                            var existingSensor = _observableIrrigation.SensorList.FirstOrDefault(y => y.ID == x.Key);
+                            if (existingSensor != null)
+                            {
+                                FirebaseMerger.CopyValues(existingSensor, sensor);
+                                var index = _observableIrrigation.SensorList.IndexOf(existingSensor);
+                                _observableIrrigation.SensorList[index] = existingSensor;
+                            }
+                            else
+                            {
+                                sensor.ID = x.Key;
+                                _observableIrrigation.SensorList.Add(sensor);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Sensor Error : {0}", e);
+                    }
+                    */
+                });
+        }
+
+        /*
         public void SubscribeFirebase()
         {
             if (new DatabaseController().GetControllerConnectionSelection() == null)
@@ -346,12 +408,12 @@ namespace Pump.SocketController.Firebase
                         if (x.EventType == FirebaseEventType.Delete)
                         {
                             for (var i = 0; i < _observableIrrigation.SiteList.Count; i++)
-                                if (_observableIrrigation.SiteList[i].ID == x.Key)
+                                if (_observableIrrigation.SiteList[i].Id == x.Key)
                                     _observableIrrigation.SiteList.RemoveAt(i);
                         }
                         else
                         {
-                            var existingSite = _observableIrrigation.SiteList.FirstOrDefault(y => y.ID == x.Key);
+                            var existingSite = _observableIrrigation.SiteList.FirstOrDefault(y => y.Id == x.Key);
                             if (existingSite != null)
                             {
                                 FirebaseMerger.CopyValues(existingSite, site);
@@ -362,7 +424,7 @@ namespace Pump.SocketController.Firebase
                             {
                                 if (site != null)
                                 {
-                                    site.ID = x.Key;
+                                    site.Id = x.Key;
                                     _observableIrrigation.SiteList.Add(site);
                                 }
                             }
@@ -374,7 +436,7 @@ namespace Pump.SocketController.Firebase
                     }
                 });
         }
-
+*/
         /*
         public void SubscribeFirebase()
         {
@@ -514,8 +576,14 @@ namespace Pump.SocketController.Firebase
         */
         public void Disposable()
         {
+            if(!_alreadySubscribed)
+                return;
+            _alreadySubscribed = false;
+
             try
             {
+                _subscribeFirebase.Dispose();
+                /*
                 _subscribeSensor?.Dispose();
                 _subscribeEquipment?.Dispose();
                 _subscribeSchedule?.Dispose();
@@ -524,6 +592,7 @@ namespace Pump.SocketController.Firebase
                 _subscribeSite?.Dispose();
                 _subscribeSubController?.Dispose();
                 _subscribeAlive?.Dispose();
+                */
             }
             catch
             {

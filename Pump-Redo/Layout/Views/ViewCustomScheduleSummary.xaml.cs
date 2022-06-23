@@ -33,7 +33,7 @@ namespace Pump.Layout.Views
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == CustomSchedule.id_Pump))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.Id == CustomSchedule.id_Pump))
                 LabelPumpName.Text = equipment.NAME;
 
             labelScheduleName.Text = CustomSchedule.NAME;
@@ -59,7 +59,7 @@ namespace Pump.Layout.Views
                 LabelCustomSchedule.Text = "Total Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
             }
 
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.ID == CustomSchedule.id_Pump))
+            foreach (var equipment in _equipmentList.Where(equipment => equipment.Id == CustomSchedule.id_Pump))
                 LabelPumpName.Text = equipment.NAME;
 
             labelScheduleName.Text = CustomSchedule.NAME;
@@ -70,7 +70,7 @@ namespace Pump.Layout.Views
                 {
                     scheduleEquipment.ID = index.ToString();
                     var scheduleGrid = new ViewZoneAndTimeGrid(scheduleEquipment,
-                        _equipmentList.FirstOrDefault(x => x.ID == scheduleEquipment.id_Equipment),
+                        _equipmentList.FirstOrDefault(x => x.Id == scheduleEquipment.id_Equipment),
                         true);
                     _zoneAndTimeTapGesture.Add(scheduleGrid.GetTapGesture());
                     scheduleGrid.SetBackGroundColor(Color.Yellow);
@@ -92,14 +92,14 @@ namespace Pump.Layout.Views
         public Button GetButtonEdit()
         {
             if (ButtonEdit.AutomationId == null)
-                ButtonEdit.AutomationId = CustomSchedule.ID;
+                ButtonEdit.AutomationId = CustomSchedule.Id;
             return ButtonEdit;
         }
 
         public Button GetButtonDelete()
         {
             if (ButtonDelete.AutomationId == null)
-                ButtonDelete.AutomationId = CustomSchedule.ID;
+                ButtonDelete.AutomationId = CustomSchedule.Id;
             return ButtonDelete;
         }
     }

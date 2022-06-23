@@ -55,7 +55,7 @@ namespace Pump.Layout
             foreach (var subController in _subControllerList)
             {
                 SystemPicker.Items.Add(subController.NAME);
-                if (_sensor.AttachedSubController != null && _sensor.AttachedSubController == subController.ID)
+                if (_sensor.AttachedSubController != null && _sensor.AttachedSubController == subController.Id)
                     SystemPicker.SelectedIndex = index;
                 index++;
             }
@@ -148,7 +148,7 @@ namespace Pump.Layout
                 if (SystemPicker.SelectedIndex == 0)
                     _sensor.AttachedSubController = null;
                 else
-                    _sensor.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex - 1].ID;
+                    _sensor.AttachedSubController = _subControllerList[SystemPicker.SelectedIndex - 1].Id;
 
                 _sensor.AttachedEquipment.Clear();
                 foreach (var viewAttachedEquipment in ScrollViewAttachedEquipment.Children)
@@ -159,8 +159,8 @@ namespace Pump.Layout
                 }
 
                 await _socketPicker.SendCommand(_sensor);
-                if (!_site.Attachments.Contains(_sensor.ID))
-                    await UpdateSensorToSite(_sensor.ID);
+                if (!_site.Attachments.Contains(_sensor.Id))
+                    await UpdateSensorToSite(_sensor.Id);
 
                 await Navigation.PopModalAsync();
             }
@@ -203,8 +203,8 @@ namespace Pump.Layout
                 ? _sensorList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
                 : _sensorList.Where(y =>
                     !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
-                    _subControllerList[SystemPicker.SelectedIndex - 1].ID).ToList();
-            var usedPins = usedSensors.Where(x => x.ID != _sensor.ID).Select(x => x.GPIO).ToList();
+                    _subControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
+            var usedPins = usedSensors.Where(x => x.Id != _sensor.Id).Select(x => x.GPIO).ToList();
 
             for (var i = 0; i < _avalibleGpio.Count; i++)
             {

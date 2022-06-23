@@ -20,7 +20,7 @@ namespace Pump.Layout.Views
             _equipment = equipment;
             PumpPicker.Items.Add(equipment.NAME);
             PumpPicker.SelectedIndex = 0;
-            ButtonEditSchedulePump.Text = schedule.ID != null ? "Save" : "CREATE SCHEDULE";
+            ButtonEditSchedulePump.Text = schedule.Id != null ? "Save" : "CREATE SCHEDULE";
         }
 
         private void ButtonCancel_OnClicked(object sender, EventArgs e)

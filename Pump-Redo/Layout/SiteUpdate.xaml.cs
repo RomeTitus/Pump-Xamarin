@@ -36,8 +36,7 @@ namespace Pump.Layout
 
         private async void ButtonUpdateSite_OnClicked(object sender, EventArgs e)
         {
-            _site.NAME = SiteName.Text;
-            _site.Description = SiteDescription.Text;
+            _site.Name = SiteName.Text;
             _site.Attachments.Clear();
             foreach (var view in ScrollViewSiteSelection.Children)
             {
@@ -58,10 +57,8 @@ namespace Pump.Layout
 
         private void PopulateScreen()
         {
-            if (!string.IsNullOrEmpty(_site.NAME))
-                SiteName.Text = _site.NAME;
-            if (!string.IsNullOrEmpty(_site.Description))
-                SiteDescription.Text = _site.Description;
+            if (!string.IsNullOrEmpty(_site.Name))
+                SiteName.Text = _site.Name;
 
             foreach (var equipment in _equipmentList) PopulateSelectionView(equipment);
 
@@ -70,11 +67,11 @@ namespace Pump.Layout
 
         private void PopulateSelectionView(Equipment equipment)
         {
-            var isSelected = _site.Attachments.Contains(equipment.ID);
+            var isSelected = _site.Attachments.Contains(equipment.Id);
             var image = equipment.isPump ? SavedImage.Pump : SavedImage.zone;
             ScrollViewSiteSelection.Children.Add(new StackLayout
                 {
-                    AutomationId = equipment.ID,
+                    AutomationId = equipment.Id,
                     Orientation = StackOrientation.Horizontal,
                     HorizontalOptions = LayoutOptions.StartAndExpand,
                     Children =
@@ -100,11 +97,11 @@ namespace Pump.Layout
 
         private void PopulateSelectionView(Sensor sensor)
         {
-            var isSelected = _site.Attachments.Contains(sensor.ID);
+            var isSelected = _site.Attachments.Contains(sensor.Id);
             var image = SavedImage.Sensor;
             ScrollViewSiteSelection.Children.Add(new StackLayout
                 {
-                    AutomationId = sensor.ID,
+                    AutomationId = sensor.Id,
                     Orientation = StackOrientation.Horizontal,
                     HorizontalOptions = LayoutOptions.StartAndExpand,
                     Children =

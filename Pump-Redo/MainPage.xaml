@@ -39,17 +39,15 @@
                             <StackLayout.GestureRecognizers>
                                 <TapGestureRecognizer x:Name="ScrollViewSiteTap" />
                             </StackLayout.GestureRecognizers>
-                            <ActivityIndicator
-                                AutomationId="ActivityIndicatorSiteLoading"
-                                HorizontalOptions="Center"
-                                IsEnabled="true"
-                                IsRunning="True"
-                                IsVisible="True"
-                                VerticalOptions="Center" />
                         </StackLayout>
 
                     </ScrollView>
                 </Frame>
+                <StackLayout>
+                    <Button
+                        Text="Scan For Controllers"
+                        Pressed="ButtonScanForControllers_OnPressed"/>
+                </StackLayout>
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

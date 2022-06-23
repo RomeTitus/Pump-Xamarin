@@ -15,36 +15,11 @@ namespace Pump.Database
         public DatabaseController()
         {
             _database = DependencyService.Get<ISQLite>().GetConnection();
-
             _database.CreateTable<IrrigationConfiguration>();
-            _database.CreateTable<PumpSelection>();
             _database.CreateTable<UserAuthentication>();
         }
 
-        public IrrigationConfiguration GetControllerConnectionSelection()
-        {
-            lock (Locker)
-            {
-                if (_database.Table<PumpSelection>().Any())
-                {
-                    var pumpSelected = _database.Table<PumpSelection>().First();
-                    return _database.Table<IrrigationConfiguration>().FirstOrDefault(x => x.ID == pumpSelected.IrrigationConfigurationId);
-                }
-
-                if (_database.Table<IrrigationConfiguration>().Any())
-                {
-                    _database.DeleteAll<PumpSelection>();
-                    var selectedNewPump = _database.Table<IrrigationConfiguration>().FirstOrDefault();
-
-                    _database.Insert(new PumpSelection(selectedNewPump.ID));
-
-                    return selectedNewPump;
-                }
-                return null;
-            }
-        }
-
-        public List<IrrigationConfiguration> GetControllerConnectionList()
+        public List<IrrigationConfiguration> GetControllerConfigurationList()
         {
             lock (Locker)
             {
@@ -54,7 +29,7 @@ namespace Pump.Database
             }
         }
         
-        public void UpdateControllerConnection(IrrigationConfiguration irrigationConfiguration)
+        public void SaveControllerConnection(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {
@@ -66,10 +41,7 @@ namespace Pump.Database
                 }
                 else
                 {
-                    if (_database.Table<PumpSelection>().Any())
-                        _database.DeleteAll<PumpSelection>();
                     _database.Insert(irrigationConfiguration);
-                    _database.Insert(new PumpSelection(irrigationConfiguration.ID));
                 }
             }
         }
@@ -78,30 +50,7 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-                _database.DeleteAll<PumpSelection>();
                 _database.Delete(irrigationConfiguration);
-                if (!_database.Table<IrrigationConfiguration>().Any()) return;
-                var selectedNewPump = _database.Table<IrrigationConfiguration>().FirstOrDefault();
-                _database.Insert(new PumpSelection(selectedNewPump.ID));
-            }
-        }
-
-        public void SetSelectedController(IrrigationConfiguration irrigationConfiguration)
-        {
-            lock (Locker)
-            {
-                _database.DeleteAll<PumpSelection>();
-                _database.Insert(new PumpSelection { IrrigationConfigurationId = irrigationConfiguration.ID });
-            }
-        }
-
-        public IrrigationConfiguration GetControllerNameByMac(string bt)
-        {
-            if (string.IsNullOrEmpty(bt)) return null;
-            lock (Locker)
-            {
-                var irrigationConfiguration = _database.Table<IrrigationConfiguration>().FirstOrDefault(x => x.Mac.Equals(bt));
-                return irrigationConfiguration;
             }
         }
         public UserAuthentication GetUserAuthentication()

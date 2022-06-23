@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Pump.Class;
 using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
-using Pump.Layout;
 using Pump.SocketController.BT;
 using Pump.SocketController.Firebase;
 using Pump.SocketController.Network;
-using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 
 namespace Pump.SocketController
@@ -19,39 +15,23 @@ namespace Pump.SocketController
         private readonly InitializeBlueTooth _initializeBlueTooth;
         private readonly InitializeFirebase _initializeFirebase;
         private readonly InitializeNetwork _initializeNetwork;
-        private readonly NotificationEvent _notificationEvent;
         private readonly ObservableIrrigation _observableIrrigation;
-        private Label _activityLabel;
-        private FloatingScreenScroll _floatingScreenScreen;
+        private readonly DatabaseController _database;
+        private readonly FirebaseManager _manager;
+        private IrrigationConfiguration _configuration;
 
-        public SocketPicker(ObservableIrrigation observableIrrigation)
+        public SocketPicker(FirebaseManager manager, DatabaseController database, ObservableIrrigation observableIrrigation)
         {
+            _database = database;
+            _manager = manager;
             _observableIrrigation = observableIrrigation;
-            _initializeFirebase = new InitializeFirebase(observableIrrigation);
+            _initializeFirebase = new InitializeFirebase(_manager, observableIrrigation);
             _initializeNetwork = new InitializeNetwork(observableIrrigation);
             _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation);
-            _notificationEvent = new NotificationEvent();
         }
-
-        public SocketPicker()
-        {
-        }
-
-
-        public async void ConnectionPicker_OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            var picker = (Picker)sender;
-            if (picker.SelectedIndex == -1)
-                return;
-            var controllerList = new DatabaseController().GetControllerConnectionList();
-            var selectedConnection = controllerList[picker.SelectedIndex];
-            Disposable();
-            new DatabaseController().SetSelectedController(selectedConnection);
-            await Subscribe();
-        }
-
         private void Disposable()
         {
+            /*
             _observableIrrigation.IsDisposable = true;
             var irrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
             
@@ -61,80 +41,41 @@ namespace Pump.SocketController
                 _initializeNetwork.Disposable();
             else if (irrigationConfiguration.ConnectionType == 2) 
                 _initializeBlueTooth.Disposable();
+        */
         }
 
         private async Task Subscribe()
         {
             _observableIrrigation.IsDisposable = false;
-            var IrrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
-            if (IrrigationConfiguration.ConnectionType == 0)
-                _initializeFirebase.SubscribeFirebase();
-            else if (IrrigationConfiguration.ConnectionType == 1)
-                await _initializeNetwork.SubscribeNetwork();
-            else if (IrrigationConfiguration.ConnectionType == 2) await _initializeBlueTooth.SubscribeBle();
+            foreach (var configuration in _database.GetControllerConfigurationList())
+            {
+                if (configuration.ConnectionType == 0)
+                    _initializeFirebase.SubscribeFirebase();
+                else if (configuration.ConnectionType == 1)
+                    await _initializeNetwork.SubscribeNetwork();
+                //else if (IrrigationConfiguration.ConnectionType == 2) 
+                //    await _initializeBlueTooth.SubscribeBle();
+            }
+           
         }
 
-        public async Task<string> SendCommand(object sendObject, bool runInBackground = true)
+        public async Task<string> SendCommand(object sendObject)
         {
-            var IrrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
-            var buttonClosed = new Button
-            {
-                Text = "Close", VerticalOptions = LayoutOptions.EndAndExpand,
-                HorizontalOptions = LayoutOptions.StartAndExpand, WidthRequest = 280, IsEnabled = false
-            };
-
-            _activityLabel = new Label { HorizontalOptions = LayoutOptions.CenterAndExpand, FontSize = 15 };
-            var activityIndicator = new ActivityIndicator
-            {
-                Margin = new Thickness(0, 20, 0, 20), HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.StartAndExpand, Color = Color.Black, IsVisible = true, IsRunning = true
-            };
-            if (runInBackground == false)
-            {
-                _floatingScreenScreen = new FloatingScreenScroll { CloseWhenBackgroundIsClicked = false };
-                _notificationEvent.OnUpdateStatus += NotificationEventOnUpdateStatus;
-                buttonClosed.Clicked += (sender, args) => { PopupNavigation.Instance.PopAsync(); };
-                object connectionStatusStackLayout = new StackLayout
-                {
-                    HeightRequest = 550,
-                    WidthRequest = 400,
-                    VerticalOptions = LayoutOptions.StartAndExpand,
-                    HorizontalOptions = LayoutOptions.StartAndExpand,
-                    Children =
-                    {
-                        new Label
-                        {
-                            Text = sendObject.GetType().ToString().Split('.').Last(), FontSize = 24,
-                            Margin = new Thickness(0, 0, 0, 20)
-                        },
-                        _activityLabel, activityIndicator, buttonClosed
-                    }
-                };
-
-
-                _floatingScreenScreen.SetFloatingScreen(new List<object> { connectionStatusStackLayout });
-                await PopupNavigation.Instance.PushAsync(_floatingScreenScreen);
-            }
-
-            var result = "Did Not Complete Action: " + sendObject;
-            switch (IrrigationConfiguration?.ConnectionType)
+            string result;
+            switch (_configuration.ConnectionType)
             {
                 case 0:
-                    result = await new Authentication().Descript(sendObject, _notificationEvent);
+                    result = await _manager.Description(sendObject, _configuration.Path);
                     break;
                 case 1:
-                    if (_initializeNetwork == null)
-                        break;
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
                     result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
-                        SocketCommands.Descript(sendObject), IrrigationConfiguration);
+                        SocketCommands.Descript(sendObject), _configuration);
                     break;
                 case 2:
-                    if (_initializeBlueTooth == null)
-                        break;
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();
-                    result = await _initializeBlueTooth?.BlueToothManager.SendAndReceiveToBleAsync(
+                    result = await _initializeBlueTooth.BlueToothManager.SendAndReceiveToBleAsync(
                         SocketCommands.Descript(sendObject));
                     _initializeBlueTooth.RequestNow = true;
                     break;
@@ -142,20 +83,7 @@ namespace Pump.SocketController
                     result = "Unknown Operation/Could not Identify user operations";
                     break;
             }
-
-            buttonClosed.IsEnabled = true;
-            activityIndicator.IsVisible = false;
-            if (_notificationEvent != null)
-                _notificationEvent.OnUpdateStatus -= NotificationEventOnUpdateStatus;
             return result;
-        }
-
-        private void NotificationEventOnUpdateStatus(object sender, ControllerEventArgs e)
-        {
-            if (_activityLabel == null)
-                return;
-
-            Device.InvokeOnMainThreadAsync(() => { _activityLabel.Text += e.Status; });
         }
 
         public BluetoothManager BluetoothManager()

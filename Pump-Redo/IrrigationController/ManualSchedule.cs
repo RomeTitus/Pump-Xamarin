@@ -5,7 +5,7 @@ namespace Pump.IrrigationController
 {
     public class ManualSchedule
     {
-        [JsonIgnore] public string ID;
+        [JsonIgnore] public string Id;
 
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
 

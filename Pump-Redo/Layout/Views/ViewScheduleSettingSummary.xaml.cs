@@ -16,9 +16,9 @@ namespace Pump.Layout.Views
             InitializeComponent();
             Schedule = schedule;
             Equipment = equipment ?? new Equipment();
-            AutomationId = schedule.ID;
-            switchScheduleIsActive.AutomationId = Schedule.ID;
-            StackLayoutViewSchedule.AutomationId = Schedule.ID;
+            AutomationId = schedule.Id;
+            switchScheduleIsActive.AutomationId = Schedule.Id;
+            StackLayoutViewSchedule.AutomationId = Schedule.Id;
             Populate();
         }
 

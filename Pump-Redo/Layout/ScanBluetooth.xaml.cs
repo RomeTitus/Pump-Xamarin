@@ -8,6 +8,7 @@ using Pump.SocketController.BT;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using System.Timers;
+using Pump.Database;
 
 namespace Pump.Layout
 {
@@ -16,17 +17,18 @@ namespace Pump.Layout
         private readonly BluetoothManager _bluetoothManager;
         private readonly Timer _timer;
         private int _scanCounter;
-
+        private readonly DatabaseController _database;
         private readonly NotificationEvent _notificationEvent;
 
-        public ScanBluetooth(NotificationEvent notificationEvent, BluetoothManager bluetoothManager)
+        public ScanBluetooth(NotificationEvent notificationEvent, BluetoothManager bluetoothManager, DatabaseController database)
         {
             InitializeComponent();
             _bluetoothManager = bluetoothManager;
             _timer = new Timer(300); // 0.3 seconds
             _timer.Elapsed += ScanTimerEvent;
+            _database = database;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += AdapterBleOnScanTimeoutElapsed;
-
+            StackLayoutBack.IsVisible = _database.GetControllerConfigurationList().Any();
             BtScan();
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
@@ -105,7 +107,7 @@ namespace Pump.Layout
                     "Accept", "Cancel"))
                 try
                 {
-                    var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                    var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
                     await Device.InvokeOnMainThreadAsync(async () =>
                     {
@@ -136,6 +138,11 @@ namespace Pump.Layout
         {
             if(_timer.Enabled == false)
                 BtScan();
+        }
+
+        private async void ButtonBack_OnPressed(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
         }
     }
 }

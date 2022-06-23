@@ -46,7 +46,7 @@ namespace Pump.Layout
                                  .ThenBy(c => c.NAME))
                     {
                         var viewEquipment = ScrollViewEquipment.Children.FirstOrDefault(x =>
-                            x.AutomationId == equipment.ID);
+                            x.AutomationId == equipment.Id);
                         if (viewEquipment != null)
                         {
                             var viewScheduleStatus = (ViewEquipmentSummary)viewEquipment;
@@ -74,7 +74,7 @@ namespace Pump.Layout
             {
                 if (_observableSiteIrrigation.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableSiteIrrigation.EquipmentList.Select(x => x?.ID).ToList();
+                    var itemsThatAreOnDisplay = _observableSiteIrrigation.EquipmentList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -127,7 +127,7 @@ namespace Pump.Layout
                     foreach (var sensor in _observableSiteIrrigation.SensorList)
                     {
                         var viewSensorChild = ScrollViewSensor.Children.FirstOrDefault(x =>
-                            x.AutomationId == sensor.ID);
+                            x.AutomationId == sensor.Id);
                         if (viewSensorChild != null)
                         {
                             var viewSensor = (ViewSensorSummary)viewSensorChild;
@@ -159,7 +159,7 @@ namespace Pump.Layout
             {
                 if (_observableSiteIrrigation.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableSiteIrrigation.SensorList.Select(x => x?.ID).ToList();
+                    var itemsThatAreOnDisplay = _observableSiteIrrigation.SensorList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
                     for (var index = 0; index < ScrollViewSensor.Children.Count; index++)
@@ -199,7 +199,7 @@ namespace Pump.Layout
         private async void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
         {
             var viewEquipment = (StackLayout)sender;
-            var equipment = _observableSiteIrrigation.EquipmentList.First(x => x?.ID == viewEquipment.AutomationId);
+            var equipment = _observableSiteIrrigation.EquipmentList.First(x => x?.Id == viewEquipment.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + equipment.NAME,
                 "Cancel", null, "Update", "Delete");
@@ -222,7 +222,7 @@ namespace Pump.Layout
         private async void ViewSensorScreen_Tapped(object sender, EventArgs e)
         {
             var viewSensor = (StackLayout)sender;
-            var sensor = _observableSiteIrrigation.SensorList.First(x => x?.ID == viewSensor.AutomationId);
+            var sensor = _observableSiteIrrigation.SensorList.First(x => x?.Id == viewSensor.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + sensor.NAME,
                 "Cancel", null, "Update", "Delete");

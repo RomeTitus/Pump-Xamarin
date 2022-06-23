@@ -48,15 +48,16 @@ namespace Pump.Layout
 
         private async void BtnViewChart_OnPressed(object sender, EventArgs e)
         {
+            /*
             BtnViewChart.IsEnabled = false;
             BtnFilterViewChart.IsVisible = true;
             _excludedEntries.Clear();
             var endTime = ((DateTimeOffset)endDatePicker.Date).ToUnixTimeSeconds();
             var startTime = ((DateTimeOffset)startDatePicker.Date).ToUnixTimeSeconds();
 
-            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+            var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
             await PopupNavigation.Instance.PushAsync(loadingScreen);
-            var recordJObjectList = await new Authentication().GetRecordingBetweenDates(startTime, endTime);
+            var recordJObjectList = await new FirebaseManager().GetRecordingBetweenDates(startTime, endTime);
             await PopupNavigation.Instance.PopAllAsync();
             var allRecordList = CalculateHistoryRecording(recordJObjectList);
             if (!allRecordList.Any()) return;
@@ -69,7 +70,7 @@ namespace Pump.Layout
             {
                 var random = new Random();
                 var color = $"#{random.Next(0x1000000):X6}";
-                var equipment = _observableIrrigation.EquipmentList.FirstOrDefault(x => x.ID == record.id_Equipment);
+                var equipment = _observableIrrigation.EquipmentList.FirstOrDefault(x => x.Id == record.id_Equipment);
                 if (equipment != null)
                     _chartEntries.Add(new ChartEntry(record.Duration)
                     {
@@ -86,6 +87,7 @@ namespace Pump.Layout
                 Entries = _chartEntries, BackgroundColor = SKColor.Parse("#00bfff"),
                 LabelColor = SKColor.Parse("#FFFFFF"), LabelTextSize = 30 //, ValueLabelTextSize = 30
             };
+            */
         }
 
         private List<Record> CalculateHistoryRecording(IReadOnlyCollection<FirebaseObject<JObject>> recordJObjectList)

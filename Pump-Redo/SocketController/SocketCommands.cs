@@ -72,115 +72,115 @@ namespace Pump.SocketController
         private static JObject DeleteManualSchedule(ManualSchedule manualSchedule)
         {
             var deleteManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject() } };
-            deleteManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.ID, new JObject() } };
+            deleteManualScheduleCommand[nameof(ManualSchedule)] = new JObject { { manualSchedule.Id, new JObject() } };
             return deleteManualScheduleCommand;
         }
 
         private static JObject SetManualSchedule(ManualSchedule manualSchedule)
         {
-            if (manualSchedule.ID == null)
-                manualSchedule.ID = GenerateKey(20);
+            if (manualSchedule.Id == null)
+                manualSchedule.Id = GenerateKey(20);
             var setManualScheduleCommand = new JObject { { nameof(ManualSchedule), new JObject() } };
             setManualScheduleCommand[nameof(ManualSchedule)] = new JObject
-                { { manualSchedule.ID, JToken.FromObject(manualSchedule) } };
+                { { manualSchedule.Id, JToken.FromObject(manualSchedule) } };
             return setManualScheduleCommand;
         }
 
         private static JObject DeleteSchedule(Schedule schedule)
         {
             var deleteScheduleCommand = new JObject { { nameof(Schedule), new JObject() } };
-            deleteScheduleCommand[nameof(Schedule)] = new JObject { { schedule.ID, new JObject() } };
+            deleteScheduleCommand[nameof(Schedule)] = new JObject { { schedule.Id, new JObject() } };
             return deleteScheduleCommand;
         }
 
         private static JObject SetSchedule(Schedule schedule)
         {
-            if (schedule.ID == null)
-                schedule.ID = GenerateKey(20);
+            if (schedule.Id == null)
+                schedule.Id = GenerateKey(20);
             var setScheduleCommand = new JObject { { nameof(Schedule), new JObject() } };
-            setScheduleCommand[nameof(Schedule)] = new JObject { { schedule.ID, JToken.FromObject(schedule) } };
+            setScheduleCommand[nameof(Schedule)] = new JObject { { schedule.Id, JToken.FromObject(schedule) } };
             return setScheduleCommand;
         }
 
         private static JObject DeleteCustomSchedule(CustomSchedule customSchedule)
         {
             var deleteCustomScheduleCommand = new JObject { { nameof(CustomSchedule), new JObject() } };
-            deleteCustomScheduleCommand[nameof(CustomSchedule)] = new JObject { { customSchedule.ID, new JObject() } };
+            deleteCustomScheduleCommand[nameof(CustomSchedule)] = new JObject { { customSchedule.Id, new JObject() } };
             return deleteCustomScheduleCommand;
         }
 
         private static JObject SetCustomSchedule(CustomSchedule customSchedule)
         {
-            if (customSchedule.ID == null)
-                customSchedule.ID = GenerateKey(20);
+            if (customSchedule.Id == null)
+                customSchedule.Id = GenerateKey(20);
             var setCustomScheduleCommand = new JObject { { nameof(CustomSchedule), new JObject() } };
             setCustomScheduleCommand[nameof(CustomSchedule)] = new JObject
-                { { customSchedule.ID, JToken.FromObject(customSchedule) } };
+                { { customSchedule.Id, JToken.FromObject(customSchedule) } };
             return setCustomScheduleCommand;
         }
 
         private static JObject DeleteEquipment(Equipment equipment)
         {
             var deleteEquipmentCommand = new JObject { { nameof(Equipment), new JObject() } };
-            deleteEquipmentCommand[nameof(Equipment)] = new JObject { { equipment.ID, new JObject() } };
+            deleteEquipmentCommand[nameof(Equipment)] = new JObject { { equipment.Id, new JObject() } };
             return deleteEquipmentCommand;
         }
 
         private static JObject SetEquipment(Equipment equipment)
         {
-            if (equipment.ID == null)
-                equipment.ID = GenerateKey(20);
+            if (equipment.Id == null)
+                equipment.Id = GenerateKey(20);
             var setEquipmentCommand = new JObject { { nameof(Equipment), new JObject() } };
-            setEquipmentCommand[nameof(Equipment)] = new JObject { { equipment.ID, JToken.FromObject(equipment) } };
+            setEquipmentCommand[nameof(Equipment)] = new JObject { { equipment.Id, JToken.FromObject(equipment) } };
             return setEquipmentCommand;
         }
 
         private static JObject DeleteSensor(Sensor sensor)
         {
             var deleteSensorCommand = new JObject { { nameof(Sensor), new JObject() } };
-            deleteSensorCommand[nameof(Sensor)] = new JObject { { sensor.ID, new JObject() } };
+            deleteSensorCommand[nameof(Sensor)] = new JObject { { sensor.Id, new JObject() } };
             return deleteSensorCommand;
         }
 
         private static JObject SetSensor(Sensor sensor)
         {
-            if (sensor.ID == null)
-                sensor.ID = GenerateKey(20);
+            if (sensor.Id == null)
+                sensor.Id = GenerateKey(20);
             var setSensorCommand = new JObject { { nameof(Sensor), new JObject() } };
-            setSensorCommand[nameof(Sensor)] = new JObject { { sensor.ID, JToken.FromObject(sensor) } };
+            setSensorCommand[nameof(Sensor)] = new JObject { { sensor.Id, JToken.FromObject(sensor) } };
             return setSensorCommand;
         }
 
         private static JObject DeleteSite(Site site)
         {
             var deleteSiteCommand = new JObject { { nameof(Site), new JObject() } };
-            deleteSiteCommand[nameof(Site)] = new JObject { { site.ID, new JObject() } };
+            deleteSiteCommand[nameof(Site)] = new JObject { { site.Id, new JObject() } };
             return deleteSiteCommand;
         }
 
         private static JObject SetSite(Site site)
         {
-            if (site.ID == null)
-                site.ID = GenerateKey(20);
+            if (site.Id == null)
+                site.Id = GenerateKey(20);
             var setSiteCommand = new JObject { { nameof(Site), new JObject() } };
-            setSiteCommand[nameof(Site)] = new JObject { { site.ID, JToken.FromObject(site) } };
+            setSiteCommand[nameof(Site)] = new JObject { { site.Id, JToken.FromObject(site) } };
             return setSiteCommand;
         }
 
         private static JObject DeleteSubController(SubController subController)
         {
             var deleteSubControllerCommand = new JObject { { nameof(SubController), new JObject() } };
-            deleteSubControllerCommand[nameof(SubController)] = new JObject { { subController.ID, new JObject() } };
+            deleteSubControllerCommand[nameof(SubController)] = new JObject { { subController.Id, new JObject() } };
             return deleteSubControllerCommand;
         }
 
         private static JObject SetSubController(SubController subController)
         {
-            if (subController.ID == null)
-                subController.ID = GenerateKey(20);
+            if (subController.Id == null)
+                subController.Id = GenerateKey(20);
             var setSubControllerCommand = new JObject { { nameof(SubController), new JObject() } };
             setSubControllerCommand[nameof(SubController)] = new JObject
-                { { subController.ID, JToken.FromObject(subController) } };
+                { { subController.Id, JToken.FromObject(subController) } };
             return setSubControllerCommand;
         }
 

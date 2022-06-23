@@ -13,8 +13,8 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             SubController = subController;
-            stackLayoutSubControllerSummary.AutomationId = SubController.ID;
-            AutomationId = SubController.ID;
+            stackLayoutSubControllerSummary.AutomationId = SubController.Id;
+            AutomationId = SubController.Id;
             Populate();
         }
 

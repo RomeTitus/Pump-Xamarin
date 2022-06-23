@@ -27,7 +27,7 @@ namespace Pump.IrrigationController
                     var customScheduleObject =
                         (CustomSchedule)irrigationJObject[nameof(CustomSchedule)][customScheduleJToken.Name]
                             .ToObject(typeof(CustomSchedule));
-                    customScheduleObject.ID = customScheduleJToken.Name;
+                    customScheduleObject.Id = customScheduleJToken.Name;
                     customScheduleList.Add(customScheduleObject);
                 }
 
@@ -37,7 +37,7 @@ namespace Pump.IrrigationController
                     var scheduleJToken = (JProperty)jToken;
                     var scheduleObject = (Schedule)irrigationJObject[nameof(Schedule)][scheduleJToken.Name]
                         .ToObject(typeof(Schedule));
-                    scheduleObject.ID = scheduleJToken.Name;
+                    scheduleObject.Id = scheduleJToken.Name;
                     scheduleList.Add(scheduleObject);
                 }
 
@@ -47,7 +47,7 @@ namespace Pump.IrrigationController
                     var equipmentJToken = (JProperty)jToken;
                     var equipmentObject = (Equipment)irrigationJObject[nameof(Equipment)][equipmentJToken.Name]
                         .ToObject(typeof(Equipment));
-                    equipmentObject.ID = equipmentJToken.Name;
+                    equipmentObject.Id = equipmentJToken.Name;
                     equipmentList.Add(equipmentObject);
                 }
 
@@ -58,7 +58,7 @@ namespace Pump.IrrigationController
                     var manualScheduleObject =
                         (ManualSchedule)irrigationJObject[nameof(ManualSchedule)][manualScheduleJToken.Name]
                             .ToObject(typeof(ManualSchedule));
-                    manualScheduleObject.ID = manualScheduleJToken.Name;
+                    manualScheduleObject.Id = manualScheduleJToken.Name;
                     manualScheduleList.Add(manualScheduleObject);
                 }
 
@@ -68,7 +68,7 @@ namespace Pump.IrrigationController
                     var sensorJToken = (JProperty)jToken;
                     var sensorObject =
                         (Sensor)irrigationJObject[nameof(Sensor)][sensorJToken.Name].ToObject(typeof(Sensor));
-                    sensorObject.ID = sensorJToken.Name;
+                    sensorObject.Id = sensorJToken.Name;
                     sensorList.Add(sensorObject);
                 }
 
@@ -78,7 +78,7 @@ namespace Pump.IrrigationController
                 {
                     var siteJToken = (JProperty)jToken;
                     var siteObject = (Site)irrigationJObject[nameof(Site)][siteJToken.Name].ToObject(typeof(Site));
-                    siteObject.ID = siteJToken.Name;
+                    siteObject.Id = siteJToken.Name;
                     siteList.Add(siteObject);
                 }
 
@@ -89,7 +89,7 @@ namespace Pump.IrrigationController
                     var subControllerObject =
                         (SubController)irrigationJObject[nameof(SubController)][subControllerJToken.Name]
                             .ToObject(typeof(SubController));
-                    subControllerObject.ID = subControllerJToken.Name;
+                    subControllerObject.Id = subControllerJToken.Name;
                     subControllerList.Add(subControllerObject);
                 }
 
@@ -133,7 +133,7 @@ namespace Pump.IrrigationController
                 if (customScheduleEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.CustomScheduleList.Count; i++)
-                        if (observableIrrigation.CustomScheduleList[i].ID == customScheduleEditSate.Values.First().ID)
+                        if (observableIrrigation.CustomScheduleList[i].Id == customScheduleEditSate.Values.First().Id)
                             observableIrrigation.CustomScheduleList.RemoveAt(i);
                 }
                 else if (customScheduleEditSate.ContainsKey(EditState.Created))
@@ -152,7 +152,7 @@ namespace Pump.IrrigationController
                 if (scheduleEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.ScheduleList.Count; i++)
-                        if (observableIrrigation.ScheduleList[i].ID == scheduleEditSate.Values.First().ID)
+                        if (observableIrrigation.ScheduleList[i].Id == scheduleEditSate.Values.First().Id)
                             observableIrrigation.ScheduleList.RemoveAt(i);
                 }
                 else if (scheduleEditSate.ContainsKey(EditState.Created))
@@ -171,7 +171,7 @@ namespace Pump.IrrigationController
                 if (equipmentEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.EquipmentList.Count; i++)
-                        if (observableIrrigation.EquipmentList[i].ID == equipmentEditSate.Values.First().ID)
+                        if (observableIrrigation.EquipmentList[i].Id == equipmentEditSate.Values.First().Id)
                             observableIrrigation.EquipmentList.RemoveAt(i);
                 }
                 else if (equipmentEditSate.ContainsKey(EditState.Created))
@@ -190,7 +190,7 @@ namespace Pump.IrrigationController
                 if (manualScheduleEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.ManualScheduleList.Count; i++)
-                        if (observableIrrigation.ManualScheduleList[i].ID == manualScheduleEditSate.Values.First().ID)
+                        if (observableIrrigation.ManualScheduleList[i].Id == manualScheduleEditSate.Values.First().Id)
                             observableIrrigation.ManualScheduleList.RemoveAt(i);
                 }
                 else if (manualScheduleEditSate.ContainsKey(EditState.Created))
@@ -209,7 +209,7 @@ namespace Pump.IrrigationController
                 if (sensorEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.SensorList.Count; i++)
-                        if (observableIrrigation.SensorList[i].ID == sensorEditSate.Values.First().ID)
+                        if (observableIrrigation.SensorList[i].Id == sensorEditSate.Values.First().Id)
                             observableIrrigation.SensorList.RemoveAt(i);
                 }
                 else if (sensorEditSate.ContainsKey(EditState.Created))
@@ -228,7 +228,7 @@ namespace Pump.IrrigationController
                 if (siteEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.SiteList.Count; i++)
-                        if (observableIrrigation.SiteList[i].ID == siteEditSate.Values.First().ID)
+                        if (observableIrrigation.SiteList[i].Id == siteEditSate.Values.First().Id)
                             observableIrrigation.SiteList.RemoveAt(i);
                 }
                 else if (siteEditSate.ContainsKey(EditState.Created))
@@ -247,7 +247,7 @@ namespace Pump.IrrigationController
                 if (subControllerEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.SubControllerList.Count; i++)
-                        if (observableIrrigation.SubControllerList[i].ID == subControllerEditSate.Values.First().ID)
+                        if (observableIrrigation.SubControllerList[i].Id == subControllerEditSate.Values.First().Id)
                             observableIrrigation.SubControllerList.RemoveAt(i);
                 }
                 else if (subControllerEditSate.ContainsKey(EditState.Created))
@@ -294,17 +294,17 @@ namespace Pump.IrrigationController
             var customScheduleState = new List<Dictionary<EditState, CustomSchedule>>();
 
             foreach (var customSchedules in oldCustomScheduleList.Where(x =>
-                         newCustomScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+                         newCustomScheduleList.Select(y => y.Id).Contains(x.Id) == false))
                 customScheduleState.Add(new Dictionary<EditState, CustomSchedule>
                     { { EditState.Deleted, customSchedules } });
 
             foreach (var customSchedules in newCustomScheduleList.Where(x =>
-                         oldCustomScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+                         oldCustomScheduleList.Select(y => y.Id).Contains(x.Id) == false))
                 customScheduleState.Add(new Dictionary<EditState, CustomSchedule>
                     { { EditState.Created, customSchedules } });
 
             foreach (var newCustomSchedule in newCustomScheduleList)
-            foreach (var oldCustomSchedule in oldCustomScheduleList.Where(x => x.ID == newCustomSchedule.ID))
+            foreach (var oldCustomSchedule in oldCustomScheduleList.Where(x => x.Id == newCustomSchedule.Id))
                 if (!string.Equals(JObject.FromObject(oldCustomSchedule).ToString(),
                         JObject.FromObject(oldCustomSchedule).ToString(), StringComparison.Ordinal))
                     customScheduleState.Add(new Dictionary<EditState, CustomSchedule>
@@ -319,15 +319,15 @@ namespace Pump.IrrigationController
             var scheduleState = new List<Dictionary<EditState, Schedule>>();
 
             foreach (var schedules in oldScheduleList.Where(x =>
-                         newScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+                         newScheduleList.Select(y => y.Id).Contains(x.Id) == false))
                 scheduleState.Add(new Dictionary<EditState, Schedule> { { EditState.Deleted, schedules } });
 
             foreach (var schedules in newScheduleList.Where(x =>
-                         oldScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+                         oldScheduleList.Select(y => y.Id).Contains(x.Id) == false))
                 scheduleState.Add(new Dictionary<EditState, Schedule> { { EditState.Created, schedules } });
 
             foreach (var newSchedule in newScheduleList)
-            foreach (var oldSchedule in oldScheduleList.Where(x => x.ID == newSchedule.ID))
+            foreach (var oldSchedule in oldScheduleList.Where(x => x.Id == newSchedule.Id))
                 if (!string.Equals(JObject.FromObject(oldSchedule).ToString(),
                         JObject.FromObject(oldSchedule).ToString(), StringComparison.Ordinal))
                     scheduleState.Add(new Dictionary<EditState, Schedule> { { EditState.Updated, newSchedule } });
@@ -341,15 +341,15 @@ namespace Pump.IrrigationController
             var equipmentState = new List<Dictionary<EditState, Equipment>>();
 
             foreach (var equipments in oldEquipmentList.Where(x =>
-                         newEquipmentList.Select(y => y.ID).Contains(x.ID) == false))
+                         newEquipmentList.Select(y => y.Id).Contains(x.Id) == false))
                 equipmentState.Add(new Dictionary<EditState, Equipment> { { EditState.Deleted, equipments } });
 
             foreach (var equipments in newEquipmentList.Where(x =>
-                         oldEquipmentList.Select(y => y.ID).Contains(x.ID) == false))
+                         oldEquipmentList.Select(y => y.Id).Contains(x.Id) == false))
                 equipmentState.Add(new Dictionary<EditState, Equipment> { { EditState.Created, equipments } });
 
             foreach (var newEquipment in newEquipmentList)
-            foreach (var oldEquipment in oldEquipmentList.Where(x => x.ID == newEquipment.ID))
+            foreach (var oldEquipment in oldEquipmentList.Where(x => x.Id == newEquipment.Id))
                 if (!string.Equals(JObject.FromObject(oldEquipment).ToString(),
                         JObject.FromObject(oldEquipment).ToString(), StringComparison.Ordinal))
                     equipmentState.Add(new Dictionary<EditState, Equipment>
@@ -364,17 +364,17 @@ namespace Pump.IrrigationController
             var manualScheduleState = new List<Dictionary<EditState, ManualSchedule>>();
 
             foreach (var manualSchedules in oldManualScheduleList.Where(x =>
-                         newManualScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+                         newManualScheduleList.Select(y => y.Id).Contains(x.Id) == false))
                 manualScheduleState.Add(new Dictionary<EditState, ManualSchedule>
                     { { EditState.Deleted, manualSchedules } });
 
             foreach (var manualSchedules in newManualScheduleList.Where(x =>
-                         oldManualScheduleList.Select(y => y.ID).Contains(x.ID) == false))
+                         oldManualScheduleList.Select(y => y.Id).Contains(x.Id) == false))
                 manualScheduleState.Add(new Dictionary<EditState, ManualSchedule>
                     { { EditState.Created, manualSchedules } });
 
             foreach (var newManualSchedule in newManualScheduleList)
-            foreach (var oldManualSchedule in oldManualScheduleList.Where(x => x.ID == newManualSchedule.ID))
+            foreach (var oldManualSchedule in oldManualScheduleList.Where(x => x.Id == newManualSchedule.Id))
                 if (!string.Equals(JObject.FromObject(oldManualSchedule).ToString(),
                         JObject.FromObject(oldManualSchedule).ToString(), StringComparison.Ordinal))
                     manualScheduleState.Add(new Dictionary<EditState, ManualSchedule>
@@ -388,14 +388,14 @@ namespace Pump.IrrigationController
         {
             var sensorState = new List<Dictionary<EditState, Sensor>>();
 
-            foreach (var sensors in oldSensorList.Where(x => newSensorList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var sensors in oldSensorList.Where(x => newSensorList.Select(y => y.Id).Contains(x.Id) == false))
                 sensorState.Add(new Dictionary<EditState, Sensor> { { EditState.Deleted, sensors } });
 
-            foreach (var sensors in newSensorList.Where(x => oldSensorList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var sensors in newSensorList.Where(x => oldSensorList.Select(y => y.Id).Contains(x.Id) == false))
                 sensorState.Add(new Dictionary<EditState, Sensor> { { EditState.Created, sensors } });
 
             foreach (var newSensor in newSensorList)
-            foreach (var oldSensor in oldSensorList.Where(x => x.ID == newSensor.ID))
+            foreach (var oldSensor in oldSensorList.Where(x => x.Id == newSensor.Id))
                 if (!string.Equals(JObject.FromObject(oldSensor).ToString(),
                         JObject.FromObject(oldSensor).ToString(), StringComparison.Ordinal))
                     sensorState.Add(new Dictionary<EditState, Sensor> { { EditState.Updated, newSensor } });
@@ -408,14 +408,14 @@ namespace Pump.IrrigationController
         {
             var siteState = new List<Dictionary<EditState, Site>>();
 
-            foreach (var sites in oldSiteList.Where(x => newSiteList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var sites in oldSiteList.Where(x => newSiteList.Select(y => y.Id).Contains(x.Id) == false))
                 siteState.Add(new Dictionary<EditState, Site> { { EditState.Deleted, sites } });
 
-            foreach (var sites in newSiteList.Where(x => oldSiteList.Select(y => y.ID).Contains(x.ID) == false))
+            foreach (var sites in newSiteList.Where(x => oldSiteList.Select(y => y.Id).Contains(x.Id) == false))
                 siteState.Add(new Dictionary<EditState, Site> { { EditState.Created, sites } });
 
             foreach (var newSite in newSiteList)
-            foreach (var oldSite in oldSiteList.Where(x => x.ID == newSite.ID))
+            foreach (var oldSite in oldSiteList.Where(x => x.Id == newSite.Id))
                 if (!string.Equals(JObject.FromObject(oldSite).ToString(),
                         JObject.FromObject(oldSite).ToString(), StringComparison.Ordinal))
                     siteState.Add(new Dictionary<EditState, Site> { { EditState.Updated, newSite } });
@@ -429,17 +429,17 @@ namespace Pump.IrrigationController
             var subControllerState = new List<Dictionary<EditState, SubController>>();
 
             foreach (var subControllers in oldSubControllerList.Where(x =>
-                         newSubControllerList.Select(y => y.ID).Contains(x.ID) == false))
+                         newSubControllerList.Select(y => y.Id).Contains(x.Id) == false))
                 subControllerState.Add(new Dictionary<EditState, SubController>
                     { { EditState.Deleted, subControllers } });
 
             foreach (var subControllers in newSubControllerList.Where(x =>
-                         oldSubControllerList.Select(y => y.ID).Contains(x.ID) == false))
+                         oldSubControllerList.Select(y => y.Id).Contains(x.Id) == false))
                 subControllerState.Add(new Dictionary<EditState, SubController>
                     { { EditState.Created, subControllers } });
 
             foreach (var newSubController in newSubControllerList)
-            foreach (var oldSubController in oldSubControllerList.Where(x => x.ID == newSubController.ID))
+            foreach (var oldSubController in oldSubControllerList.Where(x => x.Id == newSubController.Id))
                 if (!string.Equals(JObject.FromObject(oldSubController).ToString(),
                         JObject.FromObject(oldSubController).ToString(), StringComparison.Ordinal))
                     subControllerState.Add(new Dictionary<EditState, SubController>

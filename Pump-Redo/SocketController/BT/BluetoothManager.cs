@@ -56,27 +56,7 @@ namespace Pump.SocketController.BT
             AdapterBle.ScanMode = ScanMode.LowLatency;
             await AdapterBle.StartScanningForDevicesAsync();
         }
-
-        public async Task<bool> ConnectToKnownDevice(Guid deviceId)
-        {
-            var cancellationToken = new CancellationTokenSource();
-            cancellationToken.CancelAfter(10000);
-            if (BleDevice == null)
-                try
-                {
-                    var result =
-                        await AdapterBle.ConnectToKnownDeviceAsync(deviceId,
-                            cancellationToken: cancellationToken.Token);
-                    BleDevice = result;
-                    SaveIDevice(BleDevice);
-                }
-                catch (Exception)
-                {
-                    cancellationToken.Dispose();
-                }
-
-            return BleDevice != null;
-        }
+        
 
         public async Task<bool> ConnectToDevice(IDevice device, int retry = 0)
         {
@@ -103,7 +83,7 @@ namespace Pump.SocketController.BT
                             throw new ArgumentException("Failed to connect \n" + deviceConnectionException.Message);
                     }
 
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         connected = false;
                         tries++;
@@ -115,21 +95,7 @@ namespace Pump.SocketController.BT
             }
 
             BleDevice = device;
-            SaveIDevice(BleDevice);
             return BleDevice != null;
-        }
-
-        private void SaveIDevice(IDevice iDevice)
-        {
-            if (iDevice == null)
-                return;
-            var currentController = new DatabaseController().GetControllerConnectionSelection();
-            if (currentController != null && iDevice.NativeDevice.ToString() == currentController.Mac)
-                if (currentController.IDeviceGuid != iDevice.Id)
-                {
-                    currentController.IDeviceGuid = iDevice.Id;
-                    new DatabaseController().UpdateControllerConnection(currentController);
-                }
         }
 
         private void Adapter_DeviceDiscovered(object sender, DeviceEventArgs e)

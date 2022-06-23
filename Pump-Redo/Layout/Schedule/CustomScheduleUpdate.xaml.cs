@@ -46,8 +46,8 @@ namespace Pump.Layout.Schedule
                          .ThenBy(c => c.NAME))
             {
                 CustomPumpPicker.Items.Add(equipment.NAME);
-                _pumpIdList.Add(equipment.ID);
-                if (_customSchedule.id_Pump != null && _customSchedule.id_Pump == equipment.ID)
+                _pumpIdList.Add(equipment.Id);
+                if (_customSchedule.id_Pump != null && _customSchedule.id_Pump == equipment.Id)
                     CustomPumpPicker.SelectedIndex = CustomPumpPicker.Items.Count - 1;
 
                 if (CustomPumpPicker.SelectedIndex == -1 && CustomPumpPicker.Items.Count > 0)
@@ -63,7 +63,7 @@ namespace Pump.Layout.Schedule
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =
-                        _customSchedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);
+                        _customSchedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.Id);
                     ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail, equipment, true));
                 }
             }

@@ -16,7 +16,7 @@ namespace Pump.Layout.Views
             InitializeComponent();
             _equipment = equipment ?? new Equipment { NAME = "Unknown Zone" };
             _scheduleDetail = scheduleDetail;
-            LabelZoneTime.AutomationId = _equipment.ID;
+            LabelZoneTime.AutomationId = _equipment.Id;
             LabelZoneName.Text = _equipment.NAME;
             if (isTimeSet && scheduleDetail != null)
                 LabelZoneTime.Text = scheduleDetail.DURATION;

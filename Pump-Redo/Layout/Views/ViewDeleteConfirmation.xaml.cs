@@ -13,14 +13,14 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             ScheduleName.Text = schedule.NAME;
-            DeleteScheduleButton.AutomationId = schedule.ID;
+            DeleteScheduleButton.AutomationId = schedule.Id;
         }
 
         public ViewDeleteConfirmation(IrrigationController.Schedule schedule)
         {
             InitializeComponent();
             ScheduleName.Text = schedule.NAME;
-            DeleteScheduleButton.AutomationId = schedule.ID;
+            DeleteScheduleButton.AutomationId = schedule.Id;
         }
 
         public Button GetDeleteButton()

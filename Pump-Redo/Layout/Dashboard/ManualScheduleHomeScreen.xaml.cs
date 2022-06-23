@@ -46,7 +46,7 @@ namespace Pump.Layout.Dashboard
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var existingButton =
-                        ScrollViewManualPump.Children.FirstOrDefault(view => view.AutomationId == pump.ID);
+                        ScrollViewManualPump.Children.FirstOrDefault(view => view.AutomationId == pump.Id);
                     if (existingButton == null)
                         ScrollViewManualPump.Children.Add(CreateEquipmentButton(pump));
                     else
@@ -59,7 +59,7 @@ namespace Pump.Layout.Dashboard
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME).ToList())
                 {
                     var existingButton =
-                        ScrollViewManualZone.Children.FirstOrDefault(view => view.AutomationId == zone.ID);
+                        ScrollViewManualZone.Children.FirstOrDefault(view => view.AutomationId == zone.Id);
                     if (existingButton == null)
                         ScrollViewManualZone.Children.Add(CreateEquipmentButton(zone));
                     else
@@ -115,7 +115,7 @@ namespace Pump.Layout.Dashboard
                 if (_observableIrrigation.LoadedAllData())
                 {
                     var pumpsThatAreOnDisplay = _observableIrrigation.EquipmentList.Where(x => x.isPump)
-                        .Select(y => y.ID).ToList();
+                        .Select(y => y.Id).ToList();
                     if (pumpsThatAreOnDisplay.Count == 0)
                         pumpsThatAreOnDisplay.Add(new ViewEmptySchedule().AutomationId);
 
@@ -130,7 +130,7 @@ namespace Pump.Layout.Dashboard
                     }
 
                     var zonesThatAreOnDisplay = _observableIrrigation.EquipmentList.Where(x => !x.isPump)
-                        .Select(x => x.ID).ToList();
+                        .Select(x => x.Id).ToList();
                     if (zonesThatAreOnDisplay.Count == 0)
                         zonesThatAreOnDisplay.Add(new ViewEmptySchedule().AutomationId);
 
@@ -182,7 +182,7 @@ namespace Pump.Layout.Dashboard
             var button = new Button
             {
                 Text = equipment.NAME,
-                AutomationId = equipment.ID,
+                AutomationId = equipment.Id,
                 HeightRequest = 40,
                 TextColor = Color.DarkSlateBlue,
                 Margin = new Thickness(10, 10, 10, 20),
@@ -289,14 +289,14 @@ namespace Pump.Layout.Dashboard
                     .Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList();
             }
 
-            await _socketPicker.SendCommand(manualSchedule, false);
+            await _socketPicker.SendCommand(manualSchedule);
         }
 
         private async void ButtonStopManual_Clicked(object sender, EventArgs e)
         {
             var manualSchedule = _observableIrrigation.ManualScheduleList.FirstOrDefault() ?? new ManualSchedule();
             manualSchedule.DeleteAwaiting = true;
-            await _socketPicker.SendCommand(manualSchedule, false);
+            await _socketPicker.SendCommand(manualSchedule);
         }
 
 

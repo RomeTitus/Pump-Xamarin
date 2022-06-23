@@ -1,38 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Firebase.Auth;
 using Pump.Class;
 using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout;
+using Pump.Layout.Views;
 using Pump.SocketController;
+using Pump.SocketController.Firebase;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Pump
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class MainPage : ContentPage
+    public partial class MainPage
     {
         private readonly AuthenticationScreen _authenticationScreen;
         private readonly NotificationEvent _notificationEvent;
         private readonly ObservableIrrigation _observableIrrigation;
         private readonly SocketPicker _socketPicker;
-        //private readonly Timer _timer;
-
-        //INotificationManager notificationManager;
-        //private List<IrrigationConfiguration> _controllerList = new List<IrrigationConfiguration>();
-        //private HomeScreen _homeScreen;
-        //private bool _loadedHomeScreen;
+        private readonly DatabaseController _database;
 
         public MainPage(FirebaseAuthClient client)
         {
             InitializeComponent();
             _notificationEvent = new NotificationEvent();
             _observableIrrigation = new ObservableIrrigation();
-            _socketPicker = new SocketPicker(_observableIrrigation);
+            _database = new DatabaseController();
+            _socketPicker = new SocketPicker(new FirebaseManager(client), _database, _observableIrrigation);
             _authenticationScreen = new AuthenticationScreen(client);
-            //_timer = new Timer(300); // 0.3 seconds
+            
             client.AuthStateChanged += ClientOnAuthStateChanged;
         }
 
@@ -48,16 +48,17 @@ namespace Pump
                 if (_authenticationScreen.IsDisplayed)
                     _authenticationScreen.ClosePage();
                 _authenticationScreen.IsDisplayed = false;
-                var dbController = new DatabaseController();
 
-                if (!dbController.GetControllerConnectionList().Any())
+                if (!_database.GetControllerConfigurationList().Any())
                     Device.BeginInvokeOnMainThread(SetupNewController);
+                else
+                    PopulateSavedControllers(_database.GetControllerConfigurationList());
             }
         }
         
         private void SetupNewController()
         {
-            var connectionScreen = new ScanBluetooth( _notificationEvent, _socketPicker.BluetoothManager());
+            var connectionScreen = new ScanBluetooth( _notificationEvent, _socketPicker.BluetoothManager(), _database);
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
         }
@@ -67,15 +68,37 @@ namespace Pump
         {
             var equipmentList = _observableIrrigation.EquipmentList.ToList();
             var equipments = _observableIrrigation.SiteList.Aggregate(equipmentList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
+                (current, site) => current.Where(x => !site.Attachments.Contains(x?.Id)).ToList());
 
             var sensorList = _observableIrrigation.SensorList.ToList();
             var sensors = _observableIrrigation.SiteList.Aggregate(sensorList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x?.ID)).ToList());
+                (current, site) => current.Where(x => !site.Attachments.Contains(x?.Id)).ToList());
 
 
             Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, _socketPicker));
         }
+
+        private void PopulateSavedControllers(List<IrrigationConfiguration> irrigationConfigurationList)
+        {
+            foreach (var configuration in irrigationConfigurationList)
+            {
+                var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
+                    x.AutomationId == configuration.Id.ToString());
+                if (viewSite != null)
+                {
+                    var viewScheduleStatus = (ViewIrrigationConfigurationSummary)viewSite;
+                    viewScheduleStatus.IrrigationConfiguration.Path = configuration.Path;
+                }
+                else
+                {
+                    var viewSiteSummary = new ViewIrrigationConfigurationSummary(configuration);
+                    //viewSiteSummary.GetTapGestureRecognizer().Tapped += ViewMainPage_Tapped;
+                    ScrollViewSite.Children.Add(viewSiteSummary);
+                }
+            }
+        }
+        
+        
         
         /*
         
@@ -508,5 +531,9 @@ namespace Pump
             PopulateSubControllerEvent(null, null);
         }
     */
+        private void ButtonScanForControllers_OnPressed(object sender, EventArgs e)
+        {
+            Device.BeginInvokeOnMainThread(SetupNewController);
+        }
     }
 }

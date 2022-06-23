@@ -30,7 +30,7 @@ namespace Pump.Layout.Views
                 EquipmentImage.Source = ImageSource.FromResource(
                     "Pump.Icons.activePump.png",
                     typeof(ImageResourceExtension).GetTypeInfo().Assembly);
-            var attachedSensor = _sensor.AttachedEquipment.FirstOrDefault(x => x?.id_Equipment == Equipment.ID);
+            var attachedSensor = _sensor.AttachedEquipment.FirstOrDefault(x => x?.id_Equipment == Equipment.Id);
             if (attachedSensor != null)
             {
                 EquipmentCheckBox.IsChecked = true;
@@ -48,7 +48,7 @@ namespace Pump.Layout.Views
 
             return new AttachedSensor
             {
-                id_Equipment = Equipment.ID,
+                id_Equipment = Equipment.Id,
                 ThresholdLow = Convert.ToDouble(SensorThresholdLow.Text, CultureInfo.InvariantCulture),
                 ThresholdHigh = Convert.ToDouble(SensorThresholdHigh.Text, CultureInfo.InvariantCulture),
                 ThresholdTimer = Convert.ToDouble(SensorThresholdTimer.Text, CultureInfo.InvariantCulture)

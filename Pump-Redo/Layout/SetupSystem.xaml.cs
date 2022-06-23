@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
 using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
@@ -27,6 +28,7 @@ namespace Pump.Layout
         private readonly List<DHCPConfig> _dhcpConfigList = new List<DHCPConfig>();
         private readonly NotificationEvent _notificationEvent;
         private PopupDHCPConfig _popupDhcpConfig;
+        private DatabaseController _database;
         
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
         {
@@ -34,6 +36,7 @@ namespace Pump.Layout
             _blueToothManage = blueToothManager;
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
+            _database = new DatabaseController();
             GetConnectionInfo();
         }
 
@@ -119,7 +122,7 @@ namespace Pump.Layout
         {
             try
             {
-                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 var result = await ScanWiFi();
                 await PopupNavigation.Instance.PopAllAsync();
@@ -172,7 +175,7 @@ namespace Pump.Layout
                 dhcpConfigSerialize.Remove("routers");
                 dhcpConfigSerialize.Remove("domain_name_servers");
             }
-            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+            var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 var result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.TempDhcpConfig(dhcpConfigSerialize), 8000);
                 await PopupNavigation.Instance.PopAllAsync();
@@ -207,7 +210,7 @@ namespace Pump.Layout
                         await DisplayAlert("WiFi", "Connect to " + _selectedWiFiContainer.ssid, "");
                     
                     await PopupNavigation.Instance.PopAllAsync();
-                    var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                    var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
                     var result = await ConnectToWifi(_selectedWiFiContainer);
                     await PopupNavigation.Instance.PopAllAsync();
@@ -261,22 +264,24 @@ namespace Pump.Layout
             }
 
             var controllerConfig = new JObject();
-            controllerConfig["UID"] = JObject.Parse(new DatabaseController().GetUserAuthentication().UserInfo)["Uid"].ToString();
+            controllerConfig["UID"] = JObject.Parse(_database.GetUserAuthentication().UserInfo)["Uid"].ToString();
             controllerConfig["Path"] = TxtControllerName.Text.Replace(" ", "_");
             controllerConfig["IsMain"] = true;
-            var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+            var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
             await PopupNavigation.Instance.PushAsync(loadingScreen);
             var result = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.SetupFirebaseController(controllerConfig), 8000);
             await PopupNavigation.Instance.PopAllAsync();
-
+            
             if(result == null)
                 return;
-            await DisplayAlert("Info", result, "Understood");
 
             if (result != "Already_Exist")
             {
                 _notificationEvent.UpdateStatus();
             }
+            
+            var  irrigationController =JsonConvert.DeserializeObject<IrrigationConfiguration>(result);
+            _database.SaveControllerConnection(irrigationController);
         }
 
         private string Validation()

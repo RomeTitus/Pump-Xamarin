@@ -139,7 +139,7 @@ namespace Pump.Layout
             {
                 await DisplayAlert("Confirmation", "Are you sure you want to reset your password?", "Accept", "Cancel");
 
-                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 await _client.ResetEmailPasswordAsync(TxtSignInEmail.Text);
                 await PopupNavigation.Instance.PopAllAsync();
@@ -167,7 +167,7 @@ namespace Pump.Layout
                 if (_client.User?.Info.Email == TxtSignInEmail.Text) return;
 
 
-                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 await _client.SignInWithEmailAndPasswordAsync(TxtSignInEmail.Text,
                     TxtSignInPassword.Text);
@@ -196,7 +196,7 @@ namespace Pump.Layout
 
             try
             {
-                var loadingScreen = new VerifyConnections { CloseWhenBackgroundIsClicked = false };
+                var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 await _client.CreateUserWithEmailAndPasswordAsync(TxtSignUpEmail.Text,
                     TxtSignUpPassword.Text, TxtSignUpFullName.Text);

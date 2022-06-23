@@ -23,12 +23,12 @@ namespace Pump.Layout.Views
         private void SetScheduleSummary()
         {
             labelScheduleTime.Text = _schedule.TIME;
-            LabelPumpName.Text = _equipmentList.FirstOrDefault(x => x.ID == _schedule.id_Pump)?.NAME;
+            LabelPumpName.Text = _equipmentList.FirstOrDefault(x => x.Id == _schedule.id_Pump)?.NAME;
             labelScheduleName.Text = _schedule.NAME;
             SetWeek();
             foreach (var scheduleDetail in _schedule.ScheduleDetails)
                 ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail,
-                    _equipmentList.FirstOrDefault(x => x?.ID == scheduleDetail.id_Equipment), true));
+                    _equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.id_Equipment), true));
         }
 
         private void SetWeek()
@@ -87,14 +87,14 @@ namespace Pump.Layout.Views
         public Button GetButtonEdit()
         {
             if (ButtonEdit.AutomationId == null)
-                ButtonEdit.AutomationId = _schedule.ID;
+                ButtonEdit.AutomationId = _schedule.Id;
             return ButtonEdit;
         }
 
         public Button GetButtonDelete()
         {
             if (ButtonDelete.AutomationId == null)
-                ButtonDelete.AutomationId = _schedule.ID;
+                ButtonDelete.AutomationId = _schedule.Id;
             return ButtonDelete;
         }
     }

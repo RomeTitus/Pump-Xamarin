@@ -15,7 +15,7 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             Equipment = equipment;
-            stackLayoutEquipmentSummary.AutomationId = Equipment.ID;
+            stackLayoutEquipmentSummary.AutomationId = Equipment.Id;
             Populate();
         }
 

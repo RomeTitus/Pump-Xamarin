@@ -17,7 +17,7 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             _manualSchedule = manual;
-            AutomationId = _manualSchedule.ID;
+            AutomationId = _manualSchedule.Id;
             SetManualText();
         }
 

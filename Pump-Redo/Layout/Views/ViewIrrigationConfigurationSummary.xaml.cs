@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -9,9 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewSiteSummary : ContentView
+    public partial class ViewIrrigationConfigurationSummary : ContentView
     {
-        public readonly Site Site;
+        public readonly IrrigationConfiguration IrrigationConfiguration;
         public List<CustomSchedule> CustomSchedules;
         public List<Equipment> Equipments;
         public List<ManualSchedule> ManualSchedules;
@@ -19,20 +20,21 @@ namespace Pump.Layout.Views
         public Sensor sensor;
 
 
-        public ViewSiteSummary(Site site)
+        public ViewIrrigationConfigurationSummary(IrrigationConfiguration irrigationConfiguration)
         {
             InitializeComponent();
             if (Device.RuntimePlatform == Device.UWP)
                 ActivityIndicatorUWPLoadingIndicator.IsVisible = true;
             else
                 ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
-            Site = site;
-            AutomationId = Site.ID;
-            StackLayoutSiteSummary.AutomationId = Site.ID;
-            LabelSiteName.Text = Site.NAME;
-            LabelSiteDescription.Text = Site.Description;
+            
+            IrrigationConfiguration = irrigationConfiguration;
+            AutomationId = irrigationConfiguration.Id.ToString();
+            StackLayoutSiteSummary.AutomationId = irrigationConfiguration.Id.ToString();
+            LabelSiteName.Text = "TEST_SITE_NAME"; //irrigationConfiguration.Path;
         }
 
+        /*
         public void Populate()
         {
             var scheduleRunning = false;
@@ -43,16 +45,16 @@ namespace Pump.Layout.Views
                 ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
 
             LabelPressure.IsVisible = true;
-            if (CustomSchedules.Any(customSchedule => Site.Attachments.Contains(customSchedule.id_Pump) &&
+            if (CustomSchedules.Any(customSchedule => IrrigationConfiguration.Attachments.Contains(customSchedule.id_Pump) &&
                                                       RunningCustomSchedule.GetCustomScheduleDetailRunning(
                                                           customSchedule) != null))
                 scheduleRunning = true;
-            if (new RunningSchedule(Schedules.Where(x => Site.Attachments.Contains(x.id_Pump)), Equipments)
+            if (new RunningSchedule(Schedules.Where(x => IrrigationConfiguration.Attachments.Contains(x.id_Pump)), Equipments)
                 .GetRunningSchedule().ToList().Any())
                 scheduleRunning = true;
             var manualSchedule =
                 ManualSchedules.FirstOrDefault(x =>
-                    x.ManualDetails.Any(z => Site.Attachments.Contains(z.id_Equipment)));
+                    x.ManualDetails.Any(z => IrrigationConfiguration.Attachments.Contains(z.id_Equipment)));
             if (manualSchedule != null)
                 scheduleRunning = true;
 
@@ -75,6 +77,7 @@ namespace Pump.Layout.Views
             LabelPressure.Text = bars.ToString("0.##") + " Bar";
         }
 
+*/
         private void SetScheduleRunning(bool running)
         {
             FrameScheduleStatus.BackgroundColor = running ? Color.LawnGreen : Color.White;

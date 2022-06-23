@@ -20,7 +20,7 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             Sensor = sensor;
-            AutomationId = Sensor.ID;
+            AutomationId = Sensor.Id;
             PopulateSensor();
         }
 
@@ -28,7 +28,7 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             Sensor = sensor;
-            AutomationId = Sensor.ID;
+            AutomationId = Sensor.Id;
             HeightRequest = 150 * size;
             LabelSensorType.FontSize *= size;
             LabelSensorName.FontSize *= size;

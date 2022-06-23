@@ -95,7 +95,8 @@ namespace Pump.CustomRender
         }
         
         public event EventHandler<TextChangedEventArgs> TextChanged;
-        public virtual async void OnTextChanged(object sender, TextChangedEventArgs e)
+
+        protected virtual void OnTextChanged(object sender, TextChangedEventArgs e)
         {
             TextChanged?.Invoke(this, e);
         }

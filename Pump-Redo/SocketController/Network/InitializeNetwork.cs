@@ -4,17 +4,15 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
-using Pump.Database.Table;
 using Pump.IrrigationController;
-using Pump.SocketController.Network;
 
-namespace Pump.SocketController.BT
+namespace Pump.SocketController.Network
 {
     internal class InitializeNetwork
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly IrrigationConfiguration _irrigationConfiguration;
         public readonly NetworkManager NetworkManager;
+        private readonly DatabaseController _database;
         public readonly Stopwatch RequestIrrigationTimer;
         private bool _isSubscribed;
         public bool RequestNow;
@@ -23,7 +21,7 @@ namespace Pump.SocketController.BT
         {
             _observableIrrigation = observableIrrigation;
             RequestIrrigationTimer = new Stopwatch();
-            _irrigationConfiguration = new DatabaseController().GetControllerConnectionSelection();
+            _database = new DatabaseController();
             NetworkManager = new NetworkManager();
         }
 
@@ -55,6 +53,7 @@ namespace Pump.SocketController.BT
 
                 try
                 {
+                    /*
                     var irrigationJObject = JObject.Parse(await GetIrrigationData());
 
                     var irrigationTuple = IrrigationConvert.IrrigationJObjectToList(irrigationJObject);
@@ -65,6 +64,7 @@ namespace Pump.SocketController.BT
 
                     IrrigationConvert.UpdateObservableIrrigation(_observableIrrigation, irrigationTupleEditState);
                     oldIrrigationTuple = irrigationTuple;
+                    */
                 }
                 catch (Exception)
                 {
@@ -108,9 +108,11 @@ namespace Pump.SocketController.BT
             _observableIrrigation.AliveList.Add(null);
         }
 
+        /*
         private async Task<string> GetIrrigationData()
         {
             return await NetworkManager.SendAndReceiveToNetwork(SocketCommands.AllTogether(), _irrigationConfiguration);
         }
+        */
     }
 }

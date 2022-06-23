@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Pump.Class;
+using Pump.Database;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -53,7 +55,7 @@ namespace Pump.Layout
             foreach (var subController in _subControllerList)
             {
                 SystemPicker.Items.Add(subController.NAME);
-                if (_equipment.AttachedSubController != null && _equipment.AttachedSubController == subController.ID)
+                if (_equipment.AttachedSubController != null && _equipment.AttachedSubController == subController.Id)
                     SystemPicker.SelectedIndex = index;
                 index++;
             }
@@ -129,7 +131,7 @@ namespace Pump.Layout
                 ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
                 : _equipmentList.Where(y =>
                     !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
-                    _subControllerList[SystemPicker.SelectedIndex - 1].ID).ToList();
+                    _subControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
             var usedPins = usedEquipment.Select(x => x.GPIO).ToList();
             usedPins.AddRange(
                 usedEquipment.Where(x => x.DirectOnlineGPIO != null).Select(y => y.DirectOnlineGPIO.Value));
@@ -184,9 +186,9 @@ namespace Pump.Layout
                     _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
                 _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0
                     ? null
-                    : _subControllerList[SystemPicker.SelectedIndex - 1].ID;
+                    : _subControllerList[SystemPicker.SelectedIndex - 1].Id;
                 await _socketPicker.SendCommand(_equipment);
-                await UpdateEquipmentToSite(_equipment.ID);
+                await UpdateEquipmentToSite(_equipment.Id);
                 //
 
                 await Navigation.PopModalAsync();

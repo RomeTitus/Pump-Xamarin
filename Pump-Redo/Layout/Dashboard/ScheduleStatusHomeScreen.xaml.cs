@@ -51,7 +51,7 @@ namespace Pump.Layout.Dashboard
                 if (manualSchedule != null)
                 {
                     var existingManualSchedule =
-                        ScrollViewScheduleStatus.Children.FirstOrDefault(x => x.AutomationId == manualSchedule.ID);
+                        ScrollViewScheduleStatus.Children.FirstOrDefault(x => x.AutomationId == manualSchedule.Id);
                     if (existingManualSchedule == null)
                         ScrollViewScheduleStatus.Children.Insert(0, new ViewManualSchedule(manualSchedule));
                 }
@@ -145,7 +145,7 @@ namespace Pump.Layout.Dashboard
                     foreach (var sensor in _observableIrrigation.SensorList)
                     {
                         var viewSensor = ScrollViewSensorStatus.Children.FirstOrDefault(x =>
-                            x.AutomationId == sensor.ID);
+                            x.AutomationId == sensor.Id);
                         if (viewSensor != null)
                         {
                             var viewSensorStatus = (ViewSensorDetail)viewSensor;
@@ -195,7 +195,7 @@ namespace Pump.Layout.Dashboard
                         new RunningCustomSchedule().GetQueCustomSchedule(activeCustomScheduleList));
 
                     var itemsThatAreOnDisplay = runningScheduleList.Select(x => x.Id).ToList();
-                    itemsThatAreOnDisplay.AddRange(_observableIrrigation.ManualScheduleList.Select(x => x?.ID));
+                    itemsThatAreOnDisplay.AddRange(_observableIrrigation.ManualScheduleList.Select(x => x?.Id));
 
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
@@ -263,7 +263,7 @@ namespace Pump.Layout.Dashboard
             {
                 if (_observableIrrigation.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableIrrigation.SensorList.Select(x => x?.ID).ToList();
+                    var itemsThatAreOnDisplay = _observableIrrigation.SensorList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 

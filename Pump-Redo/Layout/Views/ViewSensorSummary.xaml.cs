@@ -15,7 +15,7 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             _sensor = sensor;
-            stackLayoutSensorSummary.AutomationId = _sensor.ID;
+            stackLayoutSensorSummary.AutomationId = _sensor.Id;
             Populate();
         }
 

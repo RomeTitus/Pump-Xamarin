@@ -12,7 +12,7 @@ namespace Pump.Layout.Views
         public ViewCustomSchedule(CustomSchedule schedule, Equipment equipment)
         {
             InitializeComponent();
-            AutomationId = schedule.ID;
+            AutomationId = schedule.Id;
             Schedule = schedule;
             Equipment = equipment;
             Populate();
@@ -26,9 +26,9 @@ namespace Pump.Layout.Views
         {
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(Schedule);
             if (switchScheduleIsActive.AutomationId == null)
-                switchScheduleIsActive.AutomationId = Schedule.ID;
+                switchScheduleIsActive.AutomationId = Schedule.Id;
             if (StackLayoutViewSchedule.AutomationId == null)
-                StackLayoutViewSchedule.AutomationId = Schedule.ID;
+                StackLayoutViewSchedule.AutomationId = Schedule.Id;
             LabelScheduleRepeat.Text = "Repeat: " + Schedule.Repeat;
             if (endTime != null)
             {

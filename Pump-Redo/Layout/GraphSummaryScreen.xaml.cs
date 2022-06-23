@@ -1,5 +1,6 @@
 ﻿using System;
 using Pump.SocketController;
+using Pump.SocketController.Network;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -8,7 +9,7 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class GraphSummaryScreen : ContentPage
     {
-        private readonly SocketMessage _socket = new SocketMessage();
+        //private readonly SocketMessage _socket = new SocketMessage();
 
         public GraphSummaryScreen()
         {

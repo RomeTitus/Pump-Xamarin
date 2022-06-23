@@ -10,13 +10,15 @@ namespace Pump.Database.Table
         {
         }
 
-        [PrimaryKey] [AutoIncrement] public int ID { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
+        public string Path { get; set; }
         public string Mac { get; set; }
-        public Guid IDeviceGuid { get; set; }
         public int ConnectionType { get; set; }
         public string InternalPath { get; set; }
         public int? InternalPort { get; set; }
         public string ExternalPath { get; set; }
         public int? ExternalPort { get; set; }
+        
+        
     }
 }

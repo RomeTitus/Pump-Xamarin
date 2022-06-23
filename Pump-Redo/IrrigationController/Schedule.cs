@@ -12,7 +12,7 @@ namespace Pump.IrrigationController
             ScheduleDetails = new List<ScheduleDetail>();
         }
 
-        [JsonIgnore] public string ID { get; set; }
+        [JsonIgnore] public string Id { get; set; }
 
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
 

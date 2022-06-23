@@ -55,8 +55,8 @@ namespace Pump.Layout.Schedule
                          .ThenBy(c => c.NAME))
             {
                 PumpPicker.Items.Add(equipment.NAME);
-                _pumpIdList.Add(equipment.ID);
-                if (_schedule.id_Pump != null && _schedule.id_Pump == equipment.ID)
+                _pumpIdList.Add(equipment.Id);
+                if (_schedule.id_Pump != null && _schedule.id_Pump == equipment.Id)
                     PumpPicker.SelectedIndex = PumpPicker.Items.Count - 1;
             }
 
@@ -71,7 +71,7 @@ namespace Pump.Layout.Schedule
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =
-                        _schedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.ID);
+                        _schedule.ScheduleDetails.FirstOrDefault(x => x.id_Equipment == equipment.Id);
                     ScrollViewZoneDetail.Children.Add(new ViewZoneAndTimeGrid(scheduleDetail, equipment, true));
                 }
             }
@@ -225,7 +225,7 @@ namespace Pump.Layout.Schedule
                     var floatingScreen = new FloatingScreen();
                     await PopupNavigation.Instance.PushAsync(floatingScreen);
                     _pumpSelectedTime = new ViewSchedulePumpTime(_schedule,
-                        _equipmentList.First(x => x?.ID == _schedule.id_Pump));
+                        _equipmentList.First(x => x?.Id == _schedule.id_Pump));
                     _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
                     floatingScreen.SetFloatingScreen(new List<object> { _pumpSelectedTime });
                 }

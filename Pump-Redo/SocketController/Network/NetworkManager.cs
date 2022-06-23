@@ -26,7 +26,7 @@ namespace Pump.SocketController.Network
             return updated;
         }
 
-        public async Task<string> SendAndReceiveToNetwork(JObject dataToSend, IrrigationConfiguration connection,
+        public async Task<string> SendAndReceiveToNetwork(JObject dataToSend, IrrigationConfiguration configuration,
             int timeout = 0)
         {
             var fullData = false;
@@ -55,7 +55,7 @@ namespace Pump.SocketController.Network
                 {
                     var sendingBytes = bytes.Count > i + 1020 ? bytes.GetRange(i, i + 1020) : bytes;
                     sendingBytes.InsertRange(0, key);
-                    finalBytesReceived = await WriteToNetwork(sendingBytes.ToArray(), connection, timeout);
+                    finalBytesReceived = await WriteToNetwork(sendingBytes.ToArray(), configuration, timeout);
                 }
 
                 partNumber++;

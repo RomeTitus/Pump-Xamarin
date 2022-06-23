@@ -8,14 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     BackgroundColor="DeepSkyBlue"
     mc:Ignorable="d">
-
-    <FlexLayout
-        x:Name="LayoutAddController"
-        Margin="20"
-        Direction="Column"
-        JustifyContent="SpaceAround"
-        VerticalOptions="Center">
-        <StackLayout>
+    <StackLayout Margin="20">
             <Label
                 Margin="0,15,0,0"
                 FontSize="Title"
@@ -44,6 +37,10 @@
                     </Label>
                 </StackLayout>
             </StackLayout>
+            <StackLayout HorizontalOptions="FillAndExpand" x:Name="StackLayoutBack" Margin="0,30,0,0">
+                <Button
+                    Text="Back"
+                    Pressed="ButtonBack_OnPressed"/>
+            </StackLayout>
         </StackLayout>
-    </FlexLayout>
 </ContentPage>
