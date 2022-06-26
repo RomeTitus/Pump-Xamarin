@@ -17,17 +17,15 @@ namespace Pump.Layout
     {
         private readonly Equipment _equipment;
         private readonly List<Equipment> _equipmentList;
-        private readonly Site _site;
         private readonly SocketPicker _socketPicker;
         private readonly List<SubController> _subControllerList;
         private List<long> _avalibleGpio;
 
-        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList, Site site,
+        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList,
             SocketPicker socketPicker, Equipment equipment = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
-            _site = site;
             _equipmentList = equipmentList;
             _subControllerList = subControllerList;
             if (equipment == null)
@@ -39,8 +37,6 @@ namespace Pump.Layout
             {
                 _equipmentList.Remove(equipment);
             }
-
-
             _equipment = equipment;
             Populate();
         }
@@ -72,39 +68,23 @@ namespace Pump.Layout
             var notification = "";
 
             if (string.IsNullOrWhiteSpace(EquipmentName.Text))
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Equipment name required";
-                else
-                    notification += "\n\u2022 Equipment name required";
+            { 
+                notification += "\n\u2022 Equipment name required";
                 EquipmentName.PlaceholderColor = Color.Red;
                 EquipmentName.Placeholder = "Equipment name";
             }
 
             if (SystemPicker.SelectedIndex == -1)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Sub-Controller";
-                else
-                    notification += "\n\u2022 Select a Sub-Controller";
-            }
+                notification += "\n\u2022 Select a Sub-Controller";
+            
 
-            if (GpioPicker.SelectedIndex == -1)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Pin";
-                else
+            if (GpioPicker.SelectedIndex == -1) 
                     notification += "\n\u2022 Select a Pin";
-            }
+            
 
             if (DirectOnlineGpioPicker.SelectedIndex == -1 && IsDirectOnlineCheckBox.IsChecked)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Direct Online Pin";
-                else
                     notification += "\n\u2022 Select a Direct Online Pin";
-            }
-
+            
             return notification;
         }
 
@@ -188,19 +168,8 @@ namespace Pump.Layout
                     ? null
                     : _subControllerList[SystemPicker.SelectedIndex - 1].Id;
                 await _socketPicker.SendCommand(_equipment);
-                await UpdateEquipmentToSite(_equipment.Id);
-                //
-
                 await Navigation.PopModalAsync();
             }
-        }
-
-        private async Task UpdateEquipmentToSite(string key)
-        {
-            if (_site.Attachments.Contains(key))
-                return;
-            _site.Attachments.Add(key);
-            await _socketPicker.SendCommand(_site);
         }
 
         private void ButtonBack_OnClicked(object sender, EventArgs e)

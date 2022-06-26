@@ -39,10 +39,10 @@ namespace Pump.SocketController.Firebase
             _alreadySubscribed = true;
             var configuration = _database.GetControllerConfigurationList();
             _subscribeFirebase = _manager.FirebaseQuery
-                .Child(configuration.First().Path)
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
+                    var test = string.Empty;
                     /*
                     try
                     {
@@ -604,7 +604,6 @@ namespace Pump.SocketController.Firebase
             _observableIrrigation.ManualScheduleList.Clear();
             _observableIrrigation.ScheduleList.Clear();
             _observableIrrigation.CustomScheduleList.Clear();
-            _observableIrrigation.SiteList.Clear();
             _observableIrrigation.SubControllerList.Clear();
             _observableIrrigation.AliveList.Clear();
 
@@ -613,7 +612,6 @@ namespace Pump.SocketController.Firebase
             _observableIrrigation.ManualScheduleList.Add(null);
             _observableIrrigation.ScheduleList.Add(null);
             _observableIrrigation.CustomScheduleList.Add(null);
-            _observableIrrigation.SiteList.Add(null);
             _observableIrrigation.SubControllerList.Add(null);
             _observableIrrigation.AliveList.Add(null);
         }

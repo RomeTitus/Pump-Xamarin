@@ -16,7 +16,6 @@ namespace Pump.IrrigationController
 
         public readonly ObservableCollection<Schedule> ScheduleList = new ObservableCollection<Schedule> { null };
         public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor> { null };
-        public readonly ObservableCollection<Site> SiteList = new ObservableCollection<Site> { null };
 
         public readonly ObservableCollection<SubController> SubControllerList = new ObservableCollection<SubController>
             { null };
@@ -29,7 +28,7 @@ namespace Pump.IrrigationController
             if (IsDisposable)
                 return false;
             return !EquipmentList.Contains(null) && !SensorList.Contains(null) && !ManualScheduleList.Contains(null) &&
-                   !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null) && !SiteList.Contains(null) &&
+                   !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null) &&
                    !AliveList.Contains(null) && !SubControllerList.Contains(null);
         }
     }

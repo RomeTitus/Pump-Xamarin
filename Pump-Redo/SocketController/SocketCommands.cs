@@ -151,22 +151,6 @@ namespace Pump.SocketController
             return setSensorCommand;
         }
 
-        private static JObject DeleteSite(Site site)
-        {
-            var deleteSiteCommand = new JObject { { nameof(Site), new JObject() } };
-            deleteSiteCommand[nameof(Site)] = new JObject { { site.Id, new JObject() } };
-            return deleteSiteCommand;
-        }
-
-        private static JObject SetSite(Site site)
-        {
-            if (site.Id == null)
-                site.Id = GenerateKey(20);
-            var setSiteCommand = new JObject { { nameof(Site), new JObject() } };
-            setSiteCommand[nameof(Site)] = new JObject { { site.Id, JToken.FromObject(site) } };
-            return setSiteCommand;
-        }
-
         private static JObject DeleteSubController(SubController subController)
         {
             var deleteSubControllerCommand = new JObject { { nameof(SubController), new JObject() } };
@@ -190,8 +174,7 @@ namespace Pump.SocketController
             {
                 var manualSchedule = (ManualSchedule)entity;
                 return CleanJObject(manualSchedule.DeleteAwaiting
-                    ? DeleteManualSchedule(manualSchedule)
-                    : SetManualSchedule(manualSchedule));
+                    ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule));
             }
 
             if (entity.GetType() == typeof(Schedule))
@@ -204,8 +187,7 @@ namespace Pump.SocketController
             {
                 var customSchedule = (CustomSchedule)entity;
                 return CleanJObject(customSchedule.DeleteAwaiting
-                    ? DeleteCustomSchedule(customSchedule)
-                    : SetCustomSchedule(customSchedule));
+                    ? DeleteCustomSchedule(customSchedule) : SetCustomSchedule(customSchedule));
             }
 
             if (entity.GetType() == typeof(Equipment))
@@ -219,19 +201,12 @@ namespace Pump.SocketController
                 var sensor = (Sensor)entity;
                 return CleanJObject(sensor.DeleteAwaiting ? DeleteSensor(sensor) : SetSensor(sensor));
             }
-
-            if (entity.GetType() == typeof(Site))
-            {
-                var site = (Site)entity;
-                return CleanJObject(site.DeleteAwaiting ? DeleteSite(site) : SetSite(site));
-            }
-
+            
             if (entity.GetType() == typeof(SubController))
             {
                 var subController = (SubController)entity;
                 return CleanJObject(subController.DeleteAwaiting
-                    ? DeleteSubController(subController)
-                    : SetSubController(subController));
+                    ? DeleteSubController(subController) : SetSubController(subController));
             }
 
             //TODO see how this will work with BlueTooth / Socket

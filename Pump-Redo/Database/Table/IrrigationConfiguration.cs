@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using SQLite;
 
 namespace Pump.Database.Table
@@ -18,6 +18,8 @@ namespace Pump.Database.Table
         public int? InternalPort { get; set; }
         public string ExternalPath { get; set; }
         public int? ExternalPort { get; set; }
+        
+        public Dictionary<string, List<string>> ControllerPairs { get; set; }
         
         
     }

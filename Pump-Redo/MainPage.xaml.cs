@@ -7,6 +7,7 @@ using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout;
+using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Pump.SocketController.Firebase;
@@ -30,7 +31,7 @@ namespace Pump
             _notificationEvent = new NotificationEvent();
             _observableIrrigation = new ObservableIrrigation();
             _database = new DatabaseController();
-            _socketPicker = new SocketPicker(new FirebaseManager(client), _database, _observableIrrigation);
+            _socketPicker = new SocketPicker(new FirebaseManager(), _database, _observableIrrigation);
             _authenticationScreen = new AuthenticationScreen(client);
             
             client.AuthStateChanged += ClientOnAuthStateChanged;
@@ -49,10 +50,15 @@ namespace Pump
                     _authenticationScreen.ClosePage();
                 _authenticationScreen.IsDisplayed = false;
 
-                if (!_database.GetControllerConfigurationList().Any())
+                var configList = _database.GetControllerConfigurationList();
+                if (!configList.Any())
                     Device.BeginInvokeOnMainThread(SetupNewController);
                 else
-                    PopulateSavedControllers(_database.GetControllerConfigurationList());
+                {
+                    PopulateSavedControllers(configList);
+                    await _socketPicker.Subscribe(configList, e.User);
+                }
+                    
             }
         }
         
@@ -92,14 +98,23 @@ namespace Pump
                 else
                 {
                     var viewSiteSummary = new ViewIrrigationConfigurationSummary(configuration);
-                    //viewSiteSummary.GetTapGestureRecognizer().Tapped += ViewMainPage_Tapped;
+                    viewSiteSummary.GetTapGestureRecognizer().Tapped += OnTapped_HomeScreen;
                     ScrollViewSite.Children.Add(viewSiteSummary);
                 }
             }
         }
-        
-        
-        
+
+        private void OnTapped_HomeScreen(object sender, EventArgs e)
+        {
+            var stackLayoutGesture = (StackLayout) sender;
+            var configList = _database.GetControllerConfigurationList();
+            var config = configList.First(x => x.Id.ToString() == stackLayoutGesture.AutomationId);
+            _socketPicker.TargetedIrrigation = config;
+            
+            var _homeScreen = new HomeScreen(_observableIrrigation, observableSiteIrrigation, _socketPicker);
+            //Navigation.PushModalAsync(_homeScreen);
+        }
+
         /*
         
         private void SetEvents()

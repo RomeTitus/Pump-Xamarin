@@ -207,8 +207,7 @@ namespace Pump.Layout
 
             if (action == "Update")
                 await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(),
-                    _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.SiteList.First(),
-                    _socketPicker, equipment));
+                    _observableIrrigation.SubControllerList.ToList(), _socketPicker, equipment));
             else if (action == "Delete")
                 if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + equipment.NAME, "Delete",
@@ -231,8 +230,7 @@ namespace Pump.Layout
             if (action == "Update")
             {
                 await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(),
-                    _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.EquipmentList.ToList(),
-                    _observableSiteIrrigation.SiteList.First(), _socketPicker, sensor));
+                    _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.EquipmentList.ToList(), _socketPicker, sensor));
             }
             else
             {
@@ -254,15 +252,13 @@ namespace Pump.Layout
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
             Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(),
-                _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.SiteList.First(),
-                _socketPicker));
+                _observableIrrigation.SubControllerList.ToList(), _socketPicker));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
             Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(),
-                _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.EquipmentList.ToList(),
-                _observableSiteIrrigation.SiteList.First(), _socketPicker));
+                _observableIrrigation.SubControllerList.ToList(), _observableSiteIrrigation.EquipmentList.ToList(), _socketPicker));
         }
     }
 }

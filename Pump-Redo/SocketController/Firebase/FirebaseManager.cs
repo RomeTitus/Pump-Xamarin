@@ -11,13 +11,19 @@ namespace Pump.SocketController.Firebase
 {
     public class FirebaseManager
     {
-        public FirebaseManager(FirebaseAuthClient client)
+        public ChildQuery FirebaseQuery { get; private set; }
+        public FirebaseManager()
         {
-            FirebaseQuery = new FirebaseClient("https://pump-25eee.firebaseio.com/").Child(client.User.Uid); //, new FirebaseOptions
         }
 
-        public ChildQuery FirebaseQuery { get; }
+        public void InitializeFirebase(User user)
+        {
+            FirebaseQuery = new FirebaseClient("https://pump-25eee.firebaseio.com/").Child(user.Uid);
 
+        }
+        
+
+ 
         //Schedule
         private async Task<string> SetSchedule(Schedule schedule, string path)
         {
@@ -262,50 +268,6 @@ namespace Pump.SocketController.Firebase
             return null;
         }
 
-        //Site
-        private async Task<string> SetSite(Site site, string path)
-        {
-            try
-            {
-                if (site.Id == null)
-                {
-                    var result = await FirebaseQuery
-                        .Child(path + "/Site")
-                        .PostAsync(site);
-                    site.Id = result.Key;
-                    return result.Key;
-                }
-
-                await FirebaseQuery
-                    .Child(path + "/Site/" + site.Id)
-                    .PutAsync(site);
-                return site.Id;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-        }
-
-        private async Task<string> DeleteSite(string siteId, string path)
-        {
-            try
-            {
-                await FirebaseQuery
-                    .Child(path + "/Site/" + siteId)
-                    .DeleteAsync();
-                return siteId;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            return null;
-        }
-
-
         //SubController
         private async Task<string> SetSubController(SubController subController, string path)
         {
@@ -442,12 +404,6 @@ namespace Pump.SocketController.Firebase
             {
                 var sensor = (Sensor)entity;
                 return sensor.DeleteAwaiting ? await DeleteSensor(sensor.Id, path) : await SetSensor(sensor, path);
-            }
-
-            if (entity.GetType() == typeof(Site))
-            {
-                var site = (Site)entity;
-                return site.DeleteAwaiting ? await DeleteSite(site.Id, path) : await SetSite(site, path);
             }
 
             if (entity.GetType() == typeof(Alive))

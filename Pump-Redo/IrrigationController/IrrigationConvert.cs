@@ -9,15 +9,13 @@ namespace Pump.IrrigationController
     internal static class IrrigationConvert
     {
         public static
-            Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<Site>,
-                List<SubController>> IrrigationJObjectToList(JObject irrigationJObject)
+            Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<SubController>> IrrigationJObjectToList(JObject irrigationJObject)
         {
             var customScheduleList = new List<CustomSchedule>();
             var scheduleList = new List<Schedule>();
             var equipmentList = new List<Equipment>();
             var manualScheduleList = new List<ManualSchedule>();
             var sensorList = new List<Sensor>();
-            var siteList = new List<Site>();
             var subControllerList = new List<SubController>();
 
             if (irrigationJObject.ContainsKey(nameof(CustomSchedule)))
@@ -73,15 +71,6 @@ namespace Pump.IrrigationController
                 }
 
 
-            if (irrigationJObject.ContainsKey(nameof(Site)))
-                foreach (var jToken in irrigationJObject[nameof(Site)])
-                {
-                    var siteJToken = (JProperty)jToken;
-                    var siteObject = (Site)irrigationJObject[nameof(Site)][siteJToken.Name].ToObject(typeof(Site));
-                    siteObject.Id = siteJToken.Name;
-                    siteList.Add(siteObject);
-                }
-
             if (irrigationJObject.ContainsKey(nameof(SubController)))
                 foreach (var jToken in irrigationJObject[nameof(SubController)])
                 {
@@ -94,16 +83,17 @@ namespace Pump.IrrigationController
                 }
 
             return new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
-                List<Site>, List<SubController>>
-            (customScheduleList, scheduleList, equipmentList, manualScheduleList, sensorList, siteList,
+                List<SubController>>
+            (customScheduleList, scheduleList, equipmentList, manualScheduleList, sensorList,
                 subControllerList);
         }
+
 
         public static void UpdateObservableIrrigation(ObservableIrrigation observableIrrigation,
             Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
                 List<Dictionary<EditState, Equipment>>,
                 List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
-                List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>> irrigationTupleEditState)
+                List<Dictionary<EditState, SubController>>> irrigationTupleEditState)
         {
             if (observableIrrigation.AliveList.Count > 0)
             {
@@ -221,29 +211,11 @@ namespace Pump.IrrigationController
                     var index = observableIrrigation.SensorList.IndexOf(sensorEditSate.Values.First());
                     observableIrrigation.SensorList[index] = sensorEditSate.Values.First();
                 }
-
-            if (observableIrrigation.SiteList.Count > 0 && observableIrrigation.SiteList[0] == null)
-                observableIrrigation.SiteList.Clear();
-            foreach (var siteEditSate in irrigationTupleEditState.Item6)
-                if (siteEditSate.ContainsKey(EditState.Deleted))
-                {
-                    for (var i = 0; i < observableIrrigation.SiteList.Count; i++)
-                        if (observableIrrigation.SiteList[i].Id == siteEditSate.Values.First().Id)
-                            observableIrrigation.SiteList.RemoveAt(i);
-                }
-                else if (siteEditSate.ContainsKey(EditState.Created))
-                {
-                    observableIrrigation.SiteList.Add(siteEditSate.Values.First());
-                }
-                else if (siteEditSate.ContainsKey(EditState.Updated))
-                {
-                    var index = observableIrrigation.SiteList.IndexOf(siteEditSate.Values.First());
-                    observableIrrigation.SiteList[index] = siteEditSate.Values.First();
-                }
-
+            
             if (observableIrrigation.SubControllerList.Count > 0 && observableIrrigation.SubControllerList[0] == null)
                 observableIrrigation.SubControllerList.Clear();
-            foreach (var subControllerEditSate in irrigationTupleEditState.Item7)
+            
+            foreach (var subControllerEditSate in irrigationTupleEditState.Item6)
                 if (subControllerEditSate.ContainsKey(EditState.Deleted))
                 {
                     for (var i = 0; i < observableIrrigation.SubControllerList.Count; i++)
@@ -264,27 +236,25 @@ namespace Pump.IrrigationController
         public static Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
                 List<Dictionary<EditState, Equipment>>,
                 List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
-                List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>>
+                List<Dictionary<EditState, SubController>>>
             CheckUpdatedStatus(
                 Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
-                    List<Site>, List<SubController>> newIrrigationTuple,
+                    List<SubController>> newIrrigationTuple,
                 Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
-                    List<Site>, List<SubController>> oldIrrigationTuple)
+                    List<SubController>> oldIrrigationTuple)
         {
             var customScheduleEditState = CheckUpdatedStatus(newIrrigationTuple.Item1, oldIrrigationTuple.Item1);
             var scheduleEditState = CheckUpdatedStatus(newIrrigationTuple.Item2, oldIrrigationTuple.Item2);
             var equipmentEditState = CheckUpdatedStatus(newIrrigationTuple.Item3, oldIrrigationTuple.Item3);
             var manualScheduleEditState = CheckUpdatedStatus(newIrrigationTuple.Item4, oldIrrigationTuple.Item4);
             var sensorEditState = CheckUpdatedStatus(newIrrigationTuple.Item5, oldIrrigationTuple.Item5);
-            var siteEditState = CheckUpdatedStatus(newIrrigationTuple.Item6, oldIrrigationTuple.Item6);
-            var subControllerEditState = CheckUpdatedStatus(newIrrigationTuple.Item7, oldIrrigationTuple.Item7);
-
+            var subControllerEditState = CheckUpdatedStatus(newIrrigationTuple.Item6, oldIrrigationTuple.Item6);
             return new Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
                 List<Dictionary<EditState, Equipment>>,
                 List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
-                List<Dictionary<EditState, Site>>, List<Dictionary<EditState, SubController>>>
+                 List<Dictionary<EditState, SubController>>>
             (customScheduleEditState, scheduleEditState, equipmentEditState, manualScheduleEditState,
-                sensorEditState, siteEditState, subControllerEditState);
+                sensorEditState, subControllerEditState);
         }
 
 
@@ -401,26 +371,6 @@ namespace Pump.IrrigationController
                     sensorState.Add(new Dictionary<EditState, Sensor> { { EditState.Updated, newSensor } });
 
             return sensorState;
-        }
-
-        private static List<Dictionary<EditState, Site>> CheckUpdatedStatus(List<Site> newSiteList,
-            List<Site> oldSiteList)
-        {
-            var siteState = new List<Dictionary<EditState, Site>>();
-
-            foreach (var sites in oldSiteList.Where(x => newSiteList.Select(y => y.Id).Contains(x.Id) == false))
-                siteState.Add(new Dictionary<EditState, Site> { { EditState.Deleted, sites } });
-
-            foreach (var sites in newSiteList.Where(x => oldSiteList.Select(y => y.Id).Contains(x.Id) == false))
-                siteState.Add(new Dictionary<EditState, Site> { { EditState.Created, sites } });
-
-            foreach (var newSite in newSiteList)
-            foreach (var oldSite in oldSiteList.Where(x => x.Id == newSite.Id))
-                if (!string.Equals(JObject.FromObject(oldSite).ToString(),
-                        JObject.FromObject(oldSite).ToString(), StringComparison.Ordinal))
-                    siteState.Add(new Dictionary<EditState, Site> { { EditState.Updated, newSite } });
-
-            return siteState;
         }
 
         private static List<Dictionary<EditState, SubController>> CheckUpdatedStatus(

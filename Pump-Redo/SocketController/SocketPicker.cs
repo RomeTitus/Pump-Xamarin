@@ -1,12 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Pump.Database;
+using Firebase.Auth;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController.BT;
 using Pump.SocketController.Firebase;
 using Pump.SocketController.Network;
-using Xamarin.Forms;
 
 namespace Pump.SocketController
 {
@@ -16,19 +15,20 @@ namespace Pump.SocketController
         private readonly InitializeFirebase _initializeFirebase;
         private readonly InitializeNetwork _initializeNetwork;
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly DatabaseController _database;
-        private readonly FirebaseManager _manager;
-        private IrrigationConfiguration _configuration;
+        private readonly FirebaseManager _firebaseManager;
+        public IrrigationConfiguration TargetedIrrigation { get; set; }
 
-        public SocketPicker(FirebaseManager manager, DatabaseController database, ObservableIrrigation observableIrrigation)
+        public SocketPicker(FirebaseManager firebaseManager, ObservableIrrigation observableIrrigation)
         {
-            _database = database;
-            _manager = manager;
+            _firebaseManager = firebaseManager;
             _observableIrrigation = observableIrrigation;
-            _initializeFirebase = new InitializeFirebase(_manager, observableIrrigation);
+            _initializeFirebase = new InitializeFirebase(_firebaseManager, observableIrrigation);
             _initializeNetwork = new InitializeNetwork(observableIrrigation);
             _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation);
         }
+
+        
+
         private void Disposable()
         {
             /*
@@ -44,13 +44,19 @@ namespace Pump.SocketController
         */
         }
 
-        private async Task Subscribe()
+        public async Task Subscribe(List<IrrigationConfiguration> configurationList, User user = null)
         {
             _observableIrrigation.IsDisposable = false;
-            foreach (var configuration in _database.GetControllerConfigurationList())
+            
+            foreach (var configuration in configurationList)
             {
                 if (configuration.ConnectionType == 0)
+                {
+                    if(user!= null)
+                        _firebaseManager.InitializeFirebase(user);
                     _initializeFirebase.SubscribeFirebase();
+                }
+                    
                 else if (configuration.ConnectionType == 1)
                     await _initializeNetwork.SubscribeNetwork();
                 //else if (IrrigationConfiguration.ConnectionType == 2) 
@@ -62,16 +68,16 @@ namespace Pump.SocketController
         public async Task<string> SendCommand(object sendObject)
         {
             string result;
-            switch (_configuration.ConnectionType)
+            switch (TargetedIrrigation.ConnectionType)
             {
                 case 0:
-                    result = await _manager.Description(sendObject, _configuration.Path);
+                    result = await _firebaseManager.Description(sendObject, TargetedIrrigation.Path);
                     break;
                 case 1:
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
                     result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
-                        SocketCommands.Descript(sendObject), _configuration);
+                        SocketCommands.Descript(sendObject), TargetedIrrigation);
                     break;
                 case 2:
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();

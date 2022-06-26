@@ -18,21 +18,19 @@ namespace Pump.Layout
         private readonly Sensor _sensor;
         private readonly List<Sensor> _sensorList;
         private readonly List<string> _sensorTypesList = new List<string> { "Pressure Sensor", "Temperature Sensor" };
-        private readonly Site _site;
         private readonly SocketPicker _socketPicker;
         private readonly List<SubController> _subControllerList;
         private List<long> _avalibleGpio;
         private List<long> _usableGpio;
 
         public SensorUpdate(List<Sensor> sensorList, List<SubController> subControllerList,
-            List<Equipment> equipmentList, Site site, SocketPicker socketPicker, Sensor sensor = null)
+            List<Equipment> equipmentList, SocketPicker socketPicker, Sensor sensor = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
             _sensorList = sensorList;
             _subControllerList = subControllerList;
             _equipmentList = equipmentList;
-            _site = site;
             if (sensor == null)
             {
                 sensor = new Sensor();
@@ -96,36 +94,21 @@ namespace Pump.Layout
             if (string.IsNullOrWhiteSpace(SensorName.Text))
             {
                 if (notification.Length < 1)
-                    notification = "\u2022 Equipment name required";
-                else
                     notification += "\n\u2022 Equipment name required";
                 SensorName.PlaceholderColor = Color.Red;
                 SensorName.Placeholder = "Equipment name";
             }
 
             if (SystemPicker.SelectedIndex == -1)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Sub-Controller";
-                else
-                    notification += "\n\u2022 Select a Sub-Controller";
-            }
+                notification += "\n\u2022 Select a Sub-Controller";
+            
 
             if (SensorTypePicker.SelectedIndex == -1)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Sensor Type";
-                else
-                    notification += "\n\u2022 Select a Sensor Type";
-            }
+                notification += "\n\u2022 Select a Sensor Type";
+            
 
             if (GpioPicker.SelectedIndex == -1)
-            {
-                if (notification.Length < 1)
-                    notification = "\u2022 Select a Pin";
-                else
-                    notification += "\n\u2022 Select a Pin";
-            }
+                notification += "\n\u2022 Select a Pin";
 
             return notification;
         }
@@ -159,9 +142,6 @@ namespace Pump.Layout
                 }
 
                 await _socketPicker.SendCommand(_sensor);
-                if (!_site.Attachments.Contains(_sensor.Id))
-                    await UpdateSensorToSite(_sensor.Id);
-
                 await Navigation.PopModalAsync();
             }
         }
@@ -226,14 +206,6 @@ namespace Pump.Layout
             }
 
             SensorTypePicker_OnSelectedIndexChanged(SensorTypePicker, null);
-        }
-
-        private async Task UpdateSensorToSite(string key)
-        {
-            if (_site.Attachments.Contains(key))
-                return;
-            _site.Attachments.Add(key);
-            await _socketPicker.SendCommand(_site);
         }
     }
 }

@@ -10,14 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewIrrigationConfigurationSummary : ContentView
+    public partial class ViewIrrigationConfigurationSummary
     {
         public readonly IrrigationConfiguration IrrigationConfiguration;
-        public List<CustomSchedule> CustomSchedules;
-        public List<Equipment> Equipments;
-        public List<ManualSchedule> ManualSchedules;
-        public List<IrrigationController.Schedule> Schedules;
-        public Sensor sensor;
 
 
         public ViewIrrigationConfigurationSummary(IrrigationConfiguration irrigationConfiguration)
@@ -29,7 +24,6 @@ namespace Pump.Layout.Views
                 ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
             
             IrrigationConfiguration = irrigationConfiguration;
-            AutomationId = irrigationConfiguration.Id.ToString();
             StackLayoutSiteSummary.AutomationId = irrigationConfiguration.Id.ToString();
             LabelSiteName.Text = "TEST_SITE_NAME"; //irrigationConfiguration.Path;
         }

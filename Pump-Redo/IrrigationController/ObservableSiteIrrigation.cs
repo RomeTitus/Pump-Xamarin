@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 
@@ -7,8 +8,6 @@ namespace Pump.IrrigationController
     public abstract class ObservableSiteIrrigation
     {
         private readonly ObservableIrrigation _observableIrrigation;
-
-        private readonly Site _site;
 
         public readonly ObservableCollection<CustomSchedule> CustomScheduleList =
             new ObservableCollection<CustomSchedule>();
@@ -20,9 +19,8 @@ namespace Pump.IrrigationController
 
         public readonly ObservableCollection<Schedule> ScheduleList = new ObservableCollection<Schedule>();
         public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor>();
-        public readonly ObservableCollection<Site> SiteList = new ObservableCollection<Site>();
 
-        protected ObservableSiteIrrigation(ObservableIrrigation observableIrrigation, Site site)
+        protected ObservableSiteIrrigation(ObservableIrrigation observableIrrigation, Dictionary<name> site)
         {
             _site = site;
             _observableIrrigation = observableIrrigation;
