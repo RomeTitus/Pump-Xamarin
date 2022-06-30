@@ -9,9 +9,9 @@ namespace Pump.IrrigationController
 
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
 
-        public string NAME { get; set; }
-        public string BTmac { get; set; }
-        public string IpAdress { get; set; }
+        public string Name { get; set; }
+        public string Mac { get; set; }
+        public string IpAddress { get; set; }
         public int Port { get; set; }
         public int IncomingKey { get; set; }
         public List<int> OutgoingKey { get; set; }

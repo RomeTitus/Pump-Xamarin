@@ -52,7 +52,7 @@ namespace Pump.Layout
             var index = 1;
             foreach (var subController in _subControllerList)
             {
-                SystemPicker.Items.Add(subController.NAME);
+                SystemPicker.Items.Add(subController.Name);
                 if (_sensor.AttachedSubController != null && _sensor.AttachedSubController == subController.Id)
                     SystemPicker.SelectedIndex = index;
                 index++;

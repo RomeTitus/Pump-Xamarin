@@ -20,7 +20,7 @@ namespace Pump.Layout.Views
 
         public void Populate()
         {
-            LabelSubControllerName.Text = SubController.NAME;
+            LabelSubControllerName.Text = SubController.Name;
             if (SubController.UseLoRa)
                 LabelType.Text = "Long Range";
         }

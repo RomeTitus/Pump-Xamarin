@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using SQLite;
 
 namespace Pump.Database.Table
@@ -19,8 +20,18 @@ namespace Pump.Database.Table
         public string ExternalPath { get; set; }
         public int? ExternalPort { get; set; }
         
+        [Ignore]
         public Dictionary<string, List<string>> ControllerPairs { get; set; }
-        
-        
+
+        private string ControllerPairsSerialized { get; set; }
+
+        public void SerializedControllerPair()
+        {
+            ControllerPairsSerialized = JsonConvert.SerializeObject(ControllerPairs);
+        }
+        public void DeserializedControllerPair()
+        {
+            ControllerPairs = ControllerPairsSerialized == null? new Dictionary<string, List<string>>() : JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(ControllerPairsSerialized);
+        }
     }
 }

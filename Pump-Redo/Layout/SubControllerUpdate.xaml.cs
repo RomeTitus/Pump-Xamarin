@@ -34,9 +34,9 @@ namespace Pump.Layout
             ButtonUpdateSubController.Text = "Update";
             ComKeyStackLayout.IsVisible = true;
             SubControllerMac.IsEnabled = false;
-            SubControllerName.Text = _subController.NAME;
-            SubControllerMac.Text = _subController.BTmac;
-            SubControllerIp.Text = _subController.IpAdress;
+            SubControllerName.Text = _subController.Name;
+            SubControllerMac.Text = _subController.Mac;
+            SubControllerIp.Text = _subController.IpAddress;
             SubControllerPort.Text = _subController.Port.ToString();
             SubControllerLoRa.IsChecked = _subController.UseLoRa;
             IncomingKey.Text = _subController.IncomingKey.ToString();
@@ -55,9 +55,9 @@ namespace Pump.Layout
 
         private void SetSubControllerVariables()
         {
-            _subController.NAME = SubControllerName.Text;
-            _subController.BTmac = SubControllerMac.Text;
-            _subController.IpAdress = SubControllerIp.Text;
+            _subController.Name = SubControllerName.Text;
+            _subController.Mac = SubControllerMac.Text;
+            _subController.IpAddress = SubControllerIp.Text;
             _subController.Port = int.Parse(SubControllerPort.Text);
             _subController.UseLoRa = SubControllerLoRa.IsChecked;
             _subController.IncomingKey = int.Parse(IncomingKey.Text);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Pump.FirebaseDatabase
 {
@@ -7,7 +8,6 @@ namespace Pump.FirebaseDatabase
         public static void CopyValues<T>(T target, T source)
         {
             var t = typeof(T);
-
             var properties = t.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
 
             foreach (var prop in properties)

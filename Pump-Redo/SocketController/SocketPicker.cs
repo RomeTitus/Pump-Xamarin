@@ -14,14 +14,14 @@ namespace Pump.SocketController
         private readonly InitializeBlueTooth _initializeBlueTooth;
         private readonly InitializeFirebase _initializeFirebase;
         private readonly InitializeNetwork _initializeNetwork;
-        private readonly ObservableIrrigation _observableIrrigation;
+        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         private readonly FirebaseManager _firebaseManager;
         public IrrigationConfiguration TargetedIrrigation { get; set; }
 
-        public SocketPicker(FirebaseManager firebaseManager, ObservableIrrigation observableIrrigation)
+        public SocketPicker(FirebaseManager firebaseManager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
             _firebaseManager = firebaseManager;
-            _observableIrrigation = observableIrrigation;
+            _observableDict = observableDict;
             _initializeFirebase = new InitializeFirebase(_firebaseManager, observableIrrigation);
             _initializeNetwork = new InitializeNetwork(observableIrrigation);
             _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation);

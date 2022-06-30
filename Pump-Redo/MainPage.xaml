@@ -17,15 +17,6 @@
                         TextColor="White"
                         TextDecorations="Underline"
                         VerticalOptions="Center" />
-                    <Button
-                        x:Name="BtnAddSite"
-                        BackgroundColor="DeepSkyBlue"
-                        HorizontalOptions="End"
-                        IsEnabled="False"
-                        Pressed="BtnAddSite_OnPressed"
-                        Text="Add Site"
-                        TextColor="White"
-                        VerticalOptions="Center" />
                 </StackLayout>
 
                 <Frame

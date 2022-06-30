@@ -18,33 +18,32 @@ namespace Pump.Layout.Dashboard
     {
         private readonly DatabaseController _databaseController = new DatabaseController();
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly ObservableSiteIrrigation _observableSiteIrrigation;
+        private readonly ObservableSiteFilteredIrrigation _observableSiteFilteredIrrigation;
         private readonly SocketPicker _socketPicker;
         private SettingPageHomeScreen _settingPageHomeScreen;
 
-        public HomeScreen(ObservableIrrigation observableIrrigation, ObservableSiteIrrigation observableSiteIrrigation,
+        public HomeScreen(ObservableSiteFilteredIrrigation observableSiteFilteredIrrigation,
             SocketPicker socketPicker)
         {
-            _observableIrrigation = observableIrrigation;
-            _observableSiteIrrigation = observableSiteIrrigation;
+            _observableIrrigation = observableSiteFilteredIrrigation.ObservableUnfilteredIrrigation;
+            _observableSiteFilteredIrrigation = observableSiteFilteredIrrigation;
             _socketPicker = socketPicker;
             InitializeComponent();
 
             subscribeToOnlineStatus(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
             HomeScreenSite(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            _observableIrrigation.SiteList.CollectionChanged += HomeScreenSite;
             SetUpNavigationPage();
         }
 
         private void SetUpNavigationPage()
         {
-            var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableSiteIrrigation);
-            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableSiteIrrigation, _socketPicker);
-            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableSiteIrrigation, _socketPicker);
-            var scheduleHomeScreen = new ScheduleHomeScreen(_observableSiteIrrigation, _socketPicker);
+            var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableSiteFilteredIrrigation);
+            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableSiteFilteredIrrigation, _socketPicker);
+            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableSiteFilteredIrrigation, _socketPicker);
+            var scheduleHomeScreen = new ScheduleHomeScreen(_observableSiteFilteredIrrigation, _socketPicker);
             _settingPageHomeScreen =
-                new SettingPageHomeScreen(_observableIrrigation, _observableSiteIrrigation, _socketPicker);
+                new SettingPageHomeScreen(_observableIrrigation, _observableSiteFilteredIrrigation, _socketPicker);
 
             var navigationScheduleStatusHomeScreen = new TabViewItem
             {

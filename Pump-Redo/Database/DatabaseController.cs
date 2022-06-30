@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Pump.Database.Table;
 using SQLite;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace Pump.Database
 {
@@ -23,9 +23,9 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-                return _database.Table<IrrigationConfiguration>().Any()
-                    ? _database.Table<IrrigationConfiguration>().ToList()
-                    : new List<IrrigationConfiguration>();
+                var irrigationConfigurationList = _database.Table<IrrigationConfiguration>();
+                irrigationConfigurationList.ForEach(x => x.DeserializedControllerPair());
+                return irrigationConfigurationList.ToList();
             }
         }
         
@@ -33,6 +33,8 @@ namespace Pump.Database
         {
             lock (Locker)
             {
+                irrigationConfiguration.SerializedControllerPair();
+                
                 var existingIrrigationConfiguration = _database.Table<IrrigationConfiguration>()
                     .FirstOrDefault(x => x.Mac.Equals(irrigationConfiguration.Mac));
                 if (existingIrrigationConfiguration != null)

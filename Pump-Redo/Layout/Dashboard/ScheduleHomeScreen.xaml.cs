@@ -18,17 +18,17 @@ namespace Pump.Layout.Dashboard
     public partial class ScheduleHomeScreen : ContentView
     {
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
-        private readonly ObservableSiteIrrigation _observableIrrigation;
+        private readonly ObservableSiteFilteredIrrigation _observableFilteredIrrigation;
         private readonly SocketPicker _socketPicker;
         private ViewScheduleSummary _viewSchedule;
 
-        public ScheduleHomeScreen(ObservableSiteIrrigation observableIrrigation, SocketPicker socketPicker)
+        public ScheduleHomeScreen(ObservableSiteFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
-            _observableIrrigation = observableIrrigation;
+            _observableFilteredIrrigation = observableFilteredIrrigation;
             _socketPicker = socketPicker;
-            _observableIrrigation.EquipmentList.CollectionChanged += PopulateScheduleStatusEvent;
-            _observableIrrigation.ScheduleList.CollectionChanged += PopulateScheduleStatusEvent;
+            _observableFilteredIrrigation.EquipmentList.CollectionChanged += PopulateScheduleStatusEvent;
+            _observableFilteredIrrigation.ScheduleList.CollectionChanged += PopulateScheduleStatusEvent;
             PopulateScheduleStatus();
         }
 
@@ -42,17 +42,17 @@ namespace Pump.Layout.Dashboard
             ScreenCleanupForSchedules();
             try
             {
-                if (!_observableIrrigation.LoadedAllData()) return;
-                if (_observableIrrigation.ScheduleList.Any())
+                if (!_observableFilteredIrrigation.LoadedAllData()) return;
+                if (_observableFilteredIrrigation.ScheduleList.Any())
                 {
-                    foreach (var schedule in _observableIrrigation.ScheduleList.ToList())
+                    foreach (var schedule in _observableFilteredIrrigation.ScheduleList.ToList())
                     {
                         var viewSchedule = ScrollViewScheduleDetail.Children.FirstOrDefault(x =>
                             x.AutomationId == schedule.Id);
                         if (viewSchedule != null)
                         {
                             var equipment =
-                                _observableIrrigation.EquipmentList.FirstOrDefault(x => x?.Id == schedule.id_Pump);
+                                _observableFilteredIrrigation.EquipmentList.FirstOrDefault(x => x?.Id == schedule.id_Pump);
                             var viewScheduleStatus = (ViewScheduleSettingSummary)viewSchedule;
                             viewScheduleStatus.Schedule.NAME = schedule.NAME;
                             viewScheduleStatus.Schedule.TIME = schedule.TIME;
@@ -65,7 +65,7 @@ namespace Pump.Layout.Dashboard
                         else
                         {
                             var viewScheduleSettingSummary = new ViewScheduleSettingSummary(schedule,
-                                _observableIrrigation.EquipmentList.FirstOrDefault(x => x?.Id == schedule.id_Pump));
+                                _observableFilteredIrrigation.EquipmentList.FirstOrDefault(x => x?.Id == schedule.id_Pump));
                             ScrollViewScheduleDetail.Children.Add(viewScheduleSettingSummary);
                             viewScheduleSettingSummary.GetSwitch().Toggled += ScheduleSwitch_Toggled;
                             viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
@@ -88,9 +88,9 @@ namespace Pump.Layout.Dashboard
         {
             try
             {
-                if (_observableIrrigation.LoadedAllData())
+                if (_observableFilteredIrrigation.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableIrrigation.ScheduleList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay = _observableFilteredIrrigation.ScheduleList.Select(x => x?.Id).ToList();
                     if (!itemsThatAreOnDisplay.Any())
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -136,7 +136,7 @@ namespace Pump.Layout.Dashboard
                 try
                 {
                     _floatingScreen.SetFloatingScreen(
-                        GetScheduleSummaryObject(_observableIrrigation.ScheduleList.FirstOrDefault(x => x?.Id == id)));
+                        GetScheduleSummaryObject(_observableFilteredIrrigation.ScheduleList.FirstOrDefault(x => x?.Id == id)));
                 }
                 catch (Exception e)
                 {
@@ -158,7 +158,7 @@ namespace Pump.Layout.Dashboard
                 }
 
 
-                _viewSchedule = new ViewScheduleSummary(schedule, _observableIrrigation.EquipmentList.ToList());
+                _viewSchedule = new ViewScheduleSummary(schedule, _observableFilteredIrrigation.EquipmentList.ToList());
 
                 _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
                 _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
@@ -189,15 +189,15 @@ namespace Pump.Layout.Dashboard
         {
             PopupNavigation.Instance.PopAsync();
             var edit = (Button)sender;
-            var schedule = _observableIrrigation.ScheduleList.First(x => x?.Id == edit.AutomationId);
-            Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.ToList(), _socketPicker,
+            var schedule = _observableFilteredIrrigation.ScheduleList.First(x => x?.Id == edit.AutomationId);
+            Navigation.PushModalAsync(new ScheduleUpdate(_observableFilteredIrrigation.EquipmentList.ToList(), _socketPicker,
                 schedule));
         }
 
         private void DeleteButton_Tapped(object sender, EventArgs e)
         {
             var delete = (Button)sender;
-            var schedule = _observableIrrigation.ScheduleList.First(x => x?.Id == delete.AutomationId);
+            var schedule = _observableFilteredIrrigation.ScheduleList.First(x => x?.Id == delete.AutomationId);
             var deleteConfirm = new ViewDeleteConfirmation(schedule);
             _floatingScreen.SetFloatingScreen(new List<object> { deleteConfirm });
             deleteConfirm.GetDeleteButton().Clicked += DeleteConfirmButton_Tapped;
@@ -207,15 +207,15 @@ namespace Pump.Layout.Dashboard
         {
             await PopupNavigation.Instance.PopAsync();
             var delete = (Button)sender;
-            var schedule = _observableIrrigation.ScheduleList.First(x => x?.Id == delete.AutomationId);
+            var schedule = _observableFilteredIrrigation.ScheduleList.First(x => x?.Id == delete.AutomationId);
             schedule.DeleteAwaiting = true;
             await _socketPicker.SendCommand(schedule);
         }
 
         private async void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
         {
-            if (_observableIrrigation.EquipmentList.Count > 0)
-                await Navigation.PushModalAsync(new ScheduleUpdate(_observableIrrigation.EquipmentList.ToList(),
+            if (_observableFilteredIrrigation.EquipmentList.Count > 0)
+                await Navigation.PushModalAsync(new ScheduleUpdate(_observableFilteredIrrigation.EquipmentList.ToList(),
                     _socketPicker));
             else
                 await Application.Current.MainPage.DisplayAlert("Cannot Create a Schedule",
@@ -228,7 +228,7 @@ namespace Pump.Layout.Dashboard
             try
             {
                 var updateSchedule =
-                    _observableIrrigation.ScheduleList.First(x => x?.Id == scheduleSwitch.AutomationId);
+                    _observableFilteredIrrigation.ScheduleList.First(x => x?.Id == scheduleSwitch.AutomationId);
 
                 if (scheduleSwitch.IsToggled)
                     updateSchedule.isActive = "1";

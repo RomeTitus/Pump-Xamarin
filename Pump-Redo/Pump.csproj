@@ -70,6 +70,7 @@
         <PackageReference Include="FirebaseAuthentication.net" Version="4.0.0-alpha.2" />
         <PackageReference Include="FirebaseDatabase.net" Version="4.0.7" />
         <PackageReference Include="Microcharts.Forms" Version="1.0.0-preview1" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Plugin.BLE" Version="2.2.0-pre2" />
         <PackageReference Include="Rg.Plugins.Popup" Version="2.1.0" />
         <PackageReference Include="SkiaSharp.Views.Forms" Version="2.88.1-preview.1" />

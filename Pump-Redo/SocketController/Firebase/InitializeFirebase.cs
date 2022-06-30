@@ -1,48 +1,65 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Firebase.Database.Query;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Pump.Database;
+using Pump.Database.Table;
+using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.Firebase
 {
     internal class InitializeFirebase
     {
-        private readonly ObservableIrrigation _observableIrrigation;
-        /*
-        private IDisposable _subscribeAlive;
-        private IDisposable _subscribeCustomSchedule;
-        private IDisposable _subscribeEquipment;
-        private IDisposable _subscribeManualSchedule;
-        private IDisposable _subscribeSchedule;
-        private IDisposable _subscribeSensor;
-        private IDisposable _subscribeSite;
-        private IDisposable _subscribeSubController;
-*/
+        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         private IDisposable _subscribeFirebase;
-        private readonly DatabaseController _database;
         private readonly FirebaseManager _manager;
         private bool _alreadySubscribed;
         
-        public InitializeFirebase(FirebaseManager manager, ObservableIrrigation observableIrrigation)
+        public InitializeFirebase(FirebaseManager manager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
-            _observableIrrigation = observableIrrigation;
+            _observableDict = observableDict;
             _manager = manager;
-            _database = new DatabaseController();
         }
 
-        public void SubscribeFirebase()
+        public async void SubscribeFirebase(IrrigationConfiguration irrigationConfiguration)
         {
-            if(_alreadySubscribed)
-                return;
-            _alreadySubscribed = true;
-            var configuration = _database.GetControllerConfigurationList();
+            
+            if (_observableDict.Keys.Any(x => x.ConnectionType == 1) && _alreadySubscribed == false)
+            {
+                _alreadySubscribed = true;
+                _subscribeFirebase.Dispose();
+            }
+            
             _subscribeFirebase = _manager.FirebaseQuery
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
-                    var test = string.Empty;
+                    try
+                    {
+                        foreach (var elementPair in x.Object)
+                        {
+                        
+                            if(x.Key == "Config")
+                                continue;
+                            if(!elementPair.Value.Any())
+                                continue;
+                            foreach (var keyValuePair in JObject.Parse(elementPair.Value.ToString()))
+                            {
+                                var dynamicValue = GetDynamicValueFromObject(elementPair.Key, keyValuePair);
+                                
+                                AddDynamicToObservableIrrigation(dynamicValue, _observableDict.Keys.FirstOrDefault(y => y.Path == elementPair.Key));
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                    
+                    
+                    //Var elementType = x.
                     /*
                     try
                     {
@@ -84,6 +101,74 @@ namespace Pump.SocketController.Firebase
                     }
                     */
                 });
+        }
+
+        private void AddDynamicToObservableIrrigation<T>(IrrigationConfiguration irrigationConfiguration, dynamic dynamicValue)
+        {
+            if(irrigationConfiguration.ConnectionType != 1)
+                return;
+            
+            
+            if (dynamicValue is CustomSchedule)
+            {
+                if(_observableDict[irrigationConfiguration].CustomScheduleList.Count == 1 && _observableDict[irrigationConfiguration].CustomScheduleList[0] == null)
+                    _observableDict[irrigationConfiguration].CustomScheduleList.Clear();
+                CustomSchedule element = dynamicValue;
+                var existingElement = _observableDict[irrigationConfiguration].CustomScheduleList
+                    .FirstOrDefault(x => x.Id == element.Id);
+                if(existingElement != null)
+                    FirebaseMerger.CopyValues(existingElement, element);
+                else
+                    _observableDict[irrigationConfiguration].CustomScheduleList.Add(element);
+            }
+        }
+
+        private dynamic GetDynamicValueFromObject(string type,  KeyValuePair<string,JToken> keyValuePair)
+        {
+            var elementObject = keyValuePair.Value.ToString();
+            
+            switch (type)
+            {
+                case "CustomSchedule":
+                    var customSchedule =  JsonConvert.DeserializeObject<CustomSchedule>(elementObject);
+                    customSchedule.Id = keyValuePair.Key;
+                    return customSchedule;
+                case "Equipment":
+                    var equipment =  JsonConvert.DeserializeObject<Equipment>(elementObject);
+                    equipment.Id = keyValuePair.Key;
+                    return equipment;
+                case "Schedule":
+                    var schedule =  JsonConvert.DeserializeObject<Schedule>(elementObject);
+                    schedule.Id = keyValuePair.Key;
+                    return schedule;
+                case "Sensor":
+                    var sensor =  JsonConvert.DeserializeObject<Sensor>(elementObject);
+                    sensor.Id = keyValuePair.Key;
+                    return sensor;
+                case "SubController":
+                    var subController =  JsonConvert.DeserializeObject<SubController>(elementObject);
+                    subController.Id = keyValuePair.Key;
+                    return subController;
+                case "ManualSchedule":
+                    var manualSchedule =  JsonConvert.DeserializeObject<ManualSchedule>(elementObject);
+                    manualSchedule.Id = keyValuePair.Key;
+                    return manualSchedule;
+            }
+
+            //if (elementTypeList == null)
+            //    return;
+            //var test = 65;
+            return null;
+        }
+        
+        private void Remove(KeyValuePair<string,JToken> keyPair)
+        {
+//            dynamic elementType = null;
+//            switch (keyPair.Key == "CustomSchedule")
+//            {
+//                case 0:
+//                    elementType = keyPair.Value
+//                    break;
         }
 
         /*
@@ -574,46 +659,31 @@ namespace Pump.SocketController.Firebase
                 }
             }
         */
-        public void Disposable()
+        public void Disposable(IrrigationConfiguration irrigationConfiguration)
         {
-            if(!_alreadySubscribed)
-                return;
-            _alreadySubscribed = false;
-
-            try
+            if (_observableDict.Keys.Any(x => x.ConnectionType == 1) == false && _alreadySubscribed)
             {
+                _alreadySubscribed = false;
                 _subscribeFirebase.Dispose();
-                /*
-                _subscribeSensor?.Dispose();
-                _subscribeEquipment?.Dispose();
-                _subscribeSchedule?.Dispose();
-                _subscribeCustomSchedule?.Dispose();
-                _subscribeManualSchedule?.Dispose();
-                _subscribeSite?.Dispose();
-                _subscribeSubController?.Dispose();
-                _subscribeAlive?.Dispose();
-                */
             }
-            catch
-            {
-                // ignored
-            }
+                
+            
 
-            _observableIrrigation.SensorList.Clear();
-            _observableIrrigation.EquipmentList.Clear();
-            _observableIrrigation.ManualScheduleList.Clear();
-            _observableIrrigation.ScheduleList.Clear();
-            _observableIrrigation.CustomScheduleList.Clear();
-            _observableIrrigation.SubControllerList.Clear();
-            _observableIrrigation.AliveList.Clear();
+            _observableDict[irrigationConfiguration].SensorList.Clear();
+            _observableDict[irrigationConfiguration].EquipmentList.Clear();
+            _observableDict[irrigationConfiguration].ManualScheduleList.Clear();
+            _observableDict[irrigationConfiguration].ScheduleList.Clear();
+            _observableDict[irrigationConfiguration].CustomScheduleList.Clear();
+            _observableDict[irrigationConfiguration].SubControllerList.Clear();
+            _observableDict[irrigationConfiguration].AliveList.Clear();
 
-            _observableIrrigation.SensorList.Add(null);
-            _observableIrrigation.EquipmentList.Add(null);
-            _observableIrrigation.ManualScheduleList.Add(null);
-            _observableIrrigation.ScheduleList.Add(null);
-            _observableIrrigation.CustomScheduleList.Add(null);
-            _observableIrrigation.SubControllerList.Add(null);
-            _observableIrrigation.AliveList.Add(null);
+            _observableDict[irrigationConfiguration].SensorList.Add(null);
+            _observableDict[irrigationConfiguration].EquipmentList.Add(null);
+            _observableDict[irrigationConfiguration].ManualScheduleList.Add(null);
+            _observableDict[irrigationConfiguration].ScheduleList.Add(null);
+            _observableDict[irrigationConfiguration].CustomScheduleList.Add(null);
+            _observableDict[irrigationConfiguration].SubControllerList.Add(null);
+            _observableDict[irrigationConfiguration].AliveList.Add(null);
         }
     }
 }

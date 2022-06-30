@@ -21,7 +21,8 @@ namespace Pump
     {
         private readonly AuthenticationScreen _authenticationScreen;
         private readonly NotificationEvent _notificationEvent;
-        private readonly ObservableIrrigation _observableIrrigation;
+        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
+        //private readonly ObservableIrrigation _observableIrrigation;
         private readonly SocketPicker _socketPicker;
         private readonly DatabaseController _database;
 
@@ -29,9 +30,12 @@ namespace Pump
         {
             InitializeComponent();
             _notificationEvent = new NotificationEvent();
-            _observableIrrigation = new ObservableIrrigation();
+            _observableDict = new Dictionary<IrrigationConfiguration, ObservableIrrigation>();
+            
+            //_observableIrrigation = new ObservableIrrigation();
+            
             _database = new DatabaseController();
-            _socketPicker = new SocketPicker(new FirebaseManager(), _database, _observableIrrigation);
+            _socketPicker = new SocketPicker(new FirebaseManager(), _observableDict);
             _authenticationScreen = new AuthenticationScreen(client);
             
             client.AuthStateChanged += ClientOnAuthStateChanged;
@@ -68,21 +72,6 @@ namespace Pump
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
         }
-        
-        
-        private void BtnAddSite_OnPressed(object sender, EventArgs e)
-        {
-            var equipmentList = _observableIrrigation.EquipmentList.ToList();
-            var equipments = _observableIrrigation.SiteList.Aggregate(equipmentList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x?.Id)).ToList());
-
-            var sensorList = _observableIrrigation.SensorList.ToList();
-            var sensors = _observableIrrigation.SiteList.Aggregate(sensorList,
-                (current, site) => current.Where(x => !site.Attachments.Contains(x?.Id)).ToList());
-
-
-            Navigation.PushModalAsync(new SiteUpdate(sensors, equipments, _socketPicker));
-        }
 
         private void PopulateSavedControllers(List<IrrigationConfiguration> irrigationConfigurationList)
         {
@@ -110,9 +99,9 @@ namespace Pump
             var configList = _database.GetControllerConfigurationList();
             var config = configList.First(x => x.Id.ToString() == stackLayoutGesture.AutomationId);
             _socketPicker.TargetedIrrigation = config;
-            
-            var _homeScreen = new HomeScreen(_observableIrrigation, observableSiteIrrigation, _socketPicker);
-            //Navigation.PushModalAsync(_homeScreen);
+            var observableSiteIrrigation = new ObservableSiteFilteredIrrigation(_observableIrrigation, config.ControllerPairs.First().Value.ToList()); //Edit to have selectible sites from diffrent controllers
+            var homeScreen = new HomeScreen(observableSiteIrrigation, _socketPicker);
+            Navigation.PushModalAsync(homeScreen);
         }
 
         /*

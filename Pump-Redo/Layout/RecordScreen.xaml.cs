@@ -19,12 +19,12 @@ namespace Pump.Layout
         private readonly List<ChartEntry> _chartEntries = new List<ChartEntry>();
         private readonly List<string> _excludedEntries = new List<string>();
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
-        private readonly ObservableSiteIrrigation _observableIrrigation;
+        private readonly ObservableSiteFilteredIrrigation _observableFilteredIrrigation;
 
-        public RecordScreen(ObservableSiteIrrigation observableIrrigation)
+        public RecordScreen(ObservableSiteFilteredIrrigation observableFilteredIrrigation)
         {
             InitializeComponent();
-            _observableIrrigation = observableIrrigation;
+            _observableFilteredIrrigation = observableFilteredIrrigation;
         }
 
         private void OnDateSelected(object sender, DateChangedEventArgs args)

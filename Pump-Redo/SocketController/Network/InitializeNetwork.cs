@@ -42,10 +42,9 @@ namespace Pump.SocketController.Network
         {
             RequestIrrigationTimer.Start();
             var oldIrrigationTuple =
-                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
-                    List<Site>, List<SubController>>
+                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<SubController>>
                 (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(),
-                    new List<ManualSchedule>(), new List<Sensor>(), new List<Site>(), new List<SubController>());
+                    new List<ManualSchedule>(), new List<Sensor>(), new List<SubController>());
             RequestNow = true;
             while (_isSubscribed)
             {
@@ -94,7 +93,6 @@ namespace Pump.SocketController.Network
             _observableIrrigation.ManualScheduleList.Clear();
             _observableIrrigation.ScheduleList.Clear();
             _observableIrrigation.CustomScheduleList.Clear();
-            _observableIrrigation.SiteList.Clear();
             _observableIrrigation.SubControllerList.Clear();
             _observableIrrigation.AliveList.Clear();
 
@@ -103,7 +101,6 @@ namespace Pump.SocketController.Network
             _observableIrrigation.ManualScheduleList.Add(null);
             _observableIrrigation.ScheduleList.Add(null);
             _observableIrrigation.CustomScheduleList.Add(null);
-            _observableIrrigation.SiteList.Add(null);
             _observableIrrigation.SubControllerList.Add(null);
             _observableIrrigation.AliveList.Add(null);
         }
