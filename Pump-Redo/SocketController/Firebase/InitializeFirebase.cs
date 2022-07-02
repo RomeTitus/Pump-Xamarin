@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Database.Table;
 using Pump.IrrigationController;
@@ -14,13 +13,11 @@ namespace Pump.SocketController.Firebase
         private IDisposable _subscribeFirebase;
         private readonly FirebaseManager _firebaseManager;
         private bool _alreadySubscribed;
-        private ManageObservableIrrigationData _manageObservable;
         
         public InitializeFirebase(FirebaseManager firebaseManager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
             _observableDict = observableDict;
             _firebaseManager = firebaseManager;
-            _manageObservable = new ManageObservableIrrigationData(observableDict);
         }
 
         public async void SubscribeFirebase()
@@ -38,28 +35,33 @@ namespace Pump.SocketController.Firebase
                 {
                     try
                     {
+                        //We get batches, if something is removed, we need to compare Lists
+                        if(x.Key == "Config")
+                            return;
+
+                        var configuration = _observableDict.Keys.FirstOrDefault(y => y.Path == x.Key);
+                        if (configuration == null)
+                            throw new Exception("Configuration does not exist for :" + x.Key);
+                        
                         foreach (var elementPair in x.Object)
                         {
-                        
-                            if(x.Key == "Config")
-                                continue;
                             if(!elementPair.Value.Any())
                                 continue;
                             foreach (var keyValuePair in JObject.Parse(elementPair.Value.ToString()))
                             {
-                                var dynamicValue = GetDynamicValueFromObject(elementPair.Key, keyValuePair);
+                                var dynamicValue = ManageObservableIrrigationData.GetDynamicValueFromObject(elementPair.Key, keyValuePair);
                                 
                                 if(dynamicValue == null)
                                     continue;
-                                _manageObservable.AddOrUpdateToList(dynamicValue, _observableDict.Keys.FirstOrDefault(y => y.Path == x.Key));
-                                //AddDynamicToObservableIrrigation(dynamicValue, _observableDict.Keys.FirstOrDefault(y => y.Path == elementPair.Key));
+                                
+                                ManageObservableIrrigationData.AddOrUpdateToList(dynamicValue, _observableDict[configuration]);
+                                
                             }
                         }
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
-                        throw;
                     }
                     
                     
@@ -107,63 +109,7 @@ namespace Pump.SocketController.Firebase
                 });
         }
 
-        private void AddDynamicToObservableIrrigation(IrrigationConfiguration irrigationConfiguration, dynamic entity)
-        {
-            if(irrigationConfiguration.ConnectionType != 1)
-                return;//<T> where T : IPermissionTreeEntity
-            
-            
-            if (entity is CustomSchedule)
-            {
-                if(_observableDict[irrigationConfiguration].CustomScheduleList.Count == 1 && _observableDict[irrigationConfiguration].CustomScheduleList[0] == null)
-                    _observableDict[irrigationConfiguration].CustomScheduleList.Clear();
-                CustomSchedule element = entity;
-                var existingElement = _observableDict[irrigationConfiguration].CustomScheduleList
-                    .FirstOrDefault(x => x.Id == element.Id);
-                if(existingElement != null)
-                    FirebaseMerger.CopyValues(existingElement, element);
-                else
-                    _observableDict[irrigationConfiguration].CustomScheduleList.Add(element);
-            }
-        }
-
-        private dynamic GetDynamicValueFromObject(string type,  KeyValuePair<string,JToken> keyValuePair)
-        {
-            var elementObject = keyValuePair.Value.ToString();
-            
-            switch (type)
-            {
-                case "CustomSchedule":
-                    var customSchedule =  JsonConvert.DeserializeObject<CustomSchedule>(elementObject);
-                    customSchedule.Id = keyValuePair.Key;
-                    return customSchedule;
-                case "Equipment":
-                    var equipment =  JsonConvert.DeserializeObject<Equipment>(elementObject);
-                    equipment.Id = keyValuePair.Key;
-                    return equipment;
-                case "Schedule":
-                    var schedule =  JsonConvert.DeserializeObject<Schedule>(elementObject);
-                    schedule.Id = keyValuePair.Key;
-                    return schedule;
-                case "Sensor":
-                    var sensor =  JsonConvert.DeserializeObject<Sensor>(elementObject);
-                    sensor.Id = keyValuePair.Key;
-                    return sensor;
-                case "SubController":
-                    var subController =  JsonConvert.DeserializeObject<SubController>(elementObject);
-                    subController.Id = keyValuePair.Key;
-                    return subController;
-                case "ManualSchedule":
-                    var manualSchedule =  JsonConvert.DeserializeObject<ManualSchedule>(elementObject);
-                    manualSchedule.Id = keyValuePair.Key;
-                    return manualSchedule;
-            }
-
-            //if (elementTypeList == null)
-            //    return;
-            //var test = 65;
-            return null;
-        }
+        
 
 
         /*
