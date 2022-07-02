@@ -7,13 +7,13 @@ namespace Pump.IrrigationController
 
         public ObservableIrrigation()
         {
-            AliveList = new ObservableCollection<Alive> { null };
-            CustomScheduleList = new ObservableCollection<CustomSchedule> { null };
-            EquipmentList = new ObservableCollection<Equipment> { null };
-            ManualScheduleList = new ObservableCollection<ManualSchedule> { null };
-            ScheduleList = new ObservableCollection<Schedule> { null };
-            SensorList = new ObservableCollection<Sensor> { null };
-            SubControllerList = new ObservableCollection<SubController> { null };
+            AliveList = new ObservableCollection<Alive>();
+            CustomScheduleList = new ObservableCollection<CustomSchedule>();
+            EquipmentList = new ObservableCollection<Equipment> ();
+            ManualScheduleList = new ObservableCollection<ManualSchedule>();
+            ScheduleList = new ObservableCollection<Schedule>();
+            SensorList = new ObservableCollection<Sensor>();
+            SubControllerList = new ObservableCollection<SubController>();
         }
         
         public ObservableCollection<Alive> AliveList { get; }
@@ -28,18 +28,7 @@ namespace Pump.IrrigationController
         public ObservableCollection<Sensor> SensorList { get; }
 
         public ObservableCollection<SubController> SubControllerList { get; }
-
         
-        public bool IsDisposable { get; set; }
-
-
-        public bool LoadedAllData()
-        {
-            if (IsDisposable)
-                return false;
-            return !EquipmentList.Contains(null) && !SensorList.Contains(null) && !ManualScheduleList.Contains(null) &&
-                   !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null) &&
-                   !AliveList.Contains(null) && !SubControllerList.Contains(null);
-        }
+        public bool LoadedData { get; set; }
     }
 }

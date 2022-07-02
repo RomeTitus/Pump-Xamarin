@@ -5,30 +5,53 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.IrrigationController;
+using Type = System.Type;
 
 namespace Pump.SocketController
 {
     public static class ManageObservableIrrigationData
     {
-        public static void AddOrUpdateToList<T>(T dynamicValue, ObservableIrrigation observableIrrigation) where T : IEntity
+        public static void AddUpdateOrRemove<T>(T _, List<T> dynamicValueList, ObservableIrrigation observableIrrigation) where T : IEntity
         {
             var observableType = typeof(ObservableIrrigation);
             var propertyInfo = observableType.GetProperties().FirstOrDefault(x => x.PropertyType == typeof(ObservableCollection<T>));
             if(propertyInfo == null)
                 return;
-            var observableCollectionType = (ObservableCollection<T>) propertyInfo.GetValue(observableIrrigation, null);
+            var observableCollectionIrrigation = (ObservableCollection<T>) propertyInfo.GetValue(observableIrrigation, null);
             
-            if(observableCollectionType.Count == 1 && observableCollectionType[0] == null)
-                observableCollectionType.Clear();
+            AddUpdateMissingRecord(dynamicValueList, observableCollectionIrrigation);
+            
+            RemoveMissingRecord(dynamicValueList, observableCollectionIrrigation);
+            
+            observableIrrigation.LoadedData = true;
+        }
 
-            var existingRecord = observableCollectionType.FirstOrDefault(x => x.Id == dynamicValue.Id);
-            if(existingRecord == null)
-                observableCollectionType.Add(dynamicValue);
-            else
+        private static void RemoveMissingRecord<T>(List<T> dynamicValueList, ObservableCollection<T> observableCollectionIrrigation)
+            where T : IEntity
+        {
+            foreach (var existingEntity in observableCollectionIrrigation)
             {
-                CopyValues(existingRecord, dynamicValue);
-                var index = observableCollectionType.IndexOf(existingRecord);
-                observableCollectionType[index] = existingRecord;
+                var existingRecord = dynamicValueList.FirstOrDefault(x => x.Id == existingEntity.Id);
+                if(existingRecord == null)
+                    observableCollectionIrrigation.Remove(existingEntity);
+            }
+        }
+        
+        private static void AddUpdateMissingRecord<T>(List<T> dynamicValueList, ObservableCollection<T> observableCollectionIrrigation)
+            where T : IEntity
+        {
+            foreach (var entity in dynamicValueList)
+            {
+                var existingRecord = observableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
+                if(existingRecord == null)
+                    observableCollectionIrrigation.Add(entity);
+                else
+                {
+                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity)) 
+                        continue;
+                    var index = observableCollectionIrrigation.IndexOf(existingRecord);
+                    observableCollectionIrrigation[index] = entity;
+                }    
             }
         }
 
@@ -44,18 +67,23 @@ namespace Pump.SocketController
             return irrigationObject;
         }
         
-        private static void CopyValues<T>(T target, T source)
+        public static (dynamic type, List<dynamic> dynamicList) GetDynamicValueListFromJObject(string className,  JObject jObject)
         {
-            var t = typeof(T);
-            var properties = t.GetProperties().Where(prop => prop.CanRead && prop.CanWrite);
-
-            foreach (var prop in properties)
+            var dynamicList = new List<dynamic>();
+            var type = Type.GetType("Pump.IrrigationController."+ className);
+            if (type == null) 
+                return (null, dynamicList);
+            
+            foreach (var keyValuePair in jObject)
             {
-                var value = prop.GetValue(source, null);
-                if (value != null)
-                    prop.SetValue(target, value, null);
+                var elementObject = keyValuePair.Value.ToString();
+                var irrigationObject = JsonConvert.DeserializeObject(elementObject, type);
+                if (!(irrigationObject is IEntity entity)) return (null, dynamicList);
+                entity.Id = keyValuePair.Key;
+                dynamicList.Add(entity);
             }
+            var instance = Activator.CreateInstance(type);
+            return (instance, dynamicList);
         }
-        
     }
 }

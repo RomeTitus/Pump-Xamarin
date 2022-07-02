@@ -47,16 +47,13 @@ namespace Pump.SocketController.Firebase
                         {
                             if(!elementPair.Value.Any())
                                 continue;
-                            foreach (var keyValuePair in JObject.Parse(elementPair.Value.ToString()))
-                            {
-                                var dynamicValue = ManageObservableIrrigationData.GetDynamicValueFromObject(elementPair.Key, keyValuePair);
+                            
+                            var typeAndDynamicValueList = ManageObservableIrrigationData.GetDynamicValueListFromJObject(elementPair.Key, JObject.Parse(elementPair.Value.ToString()));
                                 
-                                if(dynamicValue == null)
+                                if(typeAndDynamicValueList.type == null)
                                     continue;
                                 
-                                ManageObservableIrrigationData.AddOrUpdateToList(dynamicValue, _observableDict[configuration]);
-                                
-                            }
+                                ManageObservableIrrigationData.AddUpdateOrRemove(typeAndDynamicValueList.type, typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
                         }
                     }
                     catch (Exception e)
