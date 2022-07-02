@@ -11,17 +11,18 @@ namespace Pump.SocketController
 {
     public static class ManageObservableIrrigationData
     {
-        public static void AddUpdateOrRemove<T>(T _, List<T> dynamicValueList, ObservableIrrigation observableIrrigation) where T : IEntity
+        public static void AddUpdateOrRemove<T>(T _, List<IEntity> dynamicValueList, ObservableIrrigation observableIrrigation) where T : IEntity
         {
             var observableType = typeof(ObservableIrrigation);
             var propertyInfo = observableType.GetProperties().FirstOrDefault(x => x.PropertyType == typeof(ObservableCollection<T>));
             if(propertyInfo == null)
                 return;
             var observableCollectionIrrigation = (ObservableCollection<T>) propertyInfo.GetValue(observableIrrigation, null);
+            var incomingRecordList = dynamicValueList.ConvertAll(x => (T) x);
             
-            AddUpdateMissingRecord(dynamicValueList, observableCollectionIrrigation);
+            AddUpdateMissingRecord(incomingRecordList, observableCollectionIrrigation);
             
-            RemoveMissingRecord(dynamicValueList, observableCollectionIrrigation);
+            RemoveMissingRecord(incomingRecordList, observableCollectionIrrigation);
             
             observableIrrigation.LoadedData = true;
         }
@@ -29,11 +30,12 @@ namespace Pump.SocketController
         private static void RemoveMissingRecord<T>(List<T> dynamicValueList, ObservableCollection<T> observableCollectionIrrigation)
             where T : IEntity
         {
-            foreach (var existingEntity in observableCollectionIrrigation)
+            for (var i = 0; i < observableCollectionIrrigation.Count; i++)
             {
-                var existingRecord = dynamicValueList.FirstOrDefault(x => x.Id == existingEntity.Id);
-                if(existingRecord == null)
-                    observableCollectionIrrigation.Remove(existingEntity);
+                var existingRecord = dynamicValueList.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
+                if (existingRecord != null) continue;
+                observableCollectionIrrigation.Remove(observableCollectionIrrigation[i]);
+                i--;
             }
         }
         
@@ -67,9 +69,9 @@ namespace Pump.SocketController
             return irrigationObject;
         }
         
-        public static (dynamic type, List<dynamic> dynamicList) GetDynamicValueListFromJObject(string className,  JObject jObject)
+        public static (dynamic type, List<IEntity> dynamicList) GetDynamicValueListFromJObject(string className,  JObject jObject)
         {
-            var dynamicList = new List<dynamic>();
+            var dynamicList = new List<IEntity>();
             var type = Type.GetType("Pump.IrrigationController."+ className);
             if (type == null) 
                 return (null, dynamicList);

@@ -35,7 +35,6 @@ namespace Pump.SocketController.Firebase
                 {
                     try
                     {
-                        //We get batches, if something is removed, we need to compare Lists
                         if(x.Key == "Config")
                             return;
 
