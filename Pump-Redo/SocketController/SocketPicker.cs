@@ -22,9 +22,9 @@ namespace Pump.SocketController
         {
             _firebaseManager = firebaseManager;
             _observableDict = observableDict;
-            _initializeFirebase = new InitializeFirebase(_firebaseManager, observableIrrigation);
-            _initializeNetwork = new InitializeNetwork(observableIrrigation);
-            _initializeBlueTooth = new InitializeBlueTooth(observableIrrigation);
+            _initializeFirebase = new InitializeFirebase(_firebaseManager, observableDict);
+            //_initializeNetwork = new InitializeNetwork(observableDict);
+            //_initializeBlueTooth = new InitializeBlueTooth(observableDict);
         }
 
         
@@ -46,7 +46,7 @@ namespace Pump.SocketController
 
         public async Task Subscribe(List<IrrigationConfiguration> configurationList, User user = null)
         {
-            _observableIrrigation.IsDisposable = false;
+            //_observableIrrigation.IsDisposable = false;
             
             foreach (var configuration in configurationList)
             {

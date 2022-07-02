@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class SubController
+    public class SubController : IEntity
     {
         [JsonIgnore] public string Id { get; set; }
 
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
-
+        
         public string Name { get; set; }
         public string Mac { get; set; }
         public string IpAddress { get; set; }

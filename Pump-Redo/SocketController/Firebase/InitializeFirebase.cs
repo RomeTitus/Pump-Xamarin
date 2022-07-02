@@ -4,7 +4,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pump.Database.Table;
-using Pump.FirebaseDatabase;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.Firebase
@@ -13,16 +12,18 @@ namespace Pump.SocketController.Firebase
     {
         private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         private IDisposable _subscribeFirebase;
-        private readonly FirebaseManager _manager;
+        private readonly FirebaseManager _firebaseManager;
         private bool _alreadySubscribed;
+        private ManageObservableIrrigationData _manageObservable;
         
-        public InitializeFirebase(FirebaseManager manager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
+        public InitializeFirebase(FirebaseManager firebaseManager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
             _observableDict = observableDict;
-            _manager = manager;
+            _firebaseManager = firebaseManager;
+            _manageObservable = new ManageObservableIrrigationData(observableDict);
         }
 
-        public async void SubscribeFirebase(IrrigationConfiguration irrigationConfiguration)
+        public async void SubscribeFirebase()
         {
             
             if (_observableDict.Keys.Any(x => x.ConnectionType == 1) && _alreadySubscribed == false)
@@ -31,7 +32,7 @@ namespace Pump.SocketController.Firebase
                 _subscribeFirebase.Dispose();
             }
             
-            _subscribeFirebase = _manager.FirebaseQuery
+            _subscribeFirebase = _firebaseManager.FirebaseQuery
                 .AsObservable<JObject>()
                 .Subscribe(x =>
                 {
@@ -48,7 +49,10 @@ namespace Pump.SocketController.Firebase
                             {
                                 var dynamicValue = GetDynamicValueFromObject(elementPair.Key, keyValuePair);
                                 
-                                AddDynamicToObservableIrrigation(dynamicValue, _observableDict.Keys.FirstOrDefault(y => y.Path == elementPair.Key));
+                                if(dynamicValue == null)
+                                    continue;
+                                _manageObservable.AddOrUpdateToList(dynamicValue, _observableDict.Keys.FirstOrDefault(y => y.Path == x.Key));
+                                //AddDynamicToObservableIrrigation(dynamicValue, _observableDict.Keys.FirstOrDefault(y => y.Path == elementPair.Key));
                             }
                         }
                     }
@@ -103,17 +107,17 @@ namespace Pump.SocketController.Firebase
                 });
         }
 
-        private void AddDynamicToObservableIrrigation<T>(IrrigationConfiguration irrigationConfiguration, dynamic dynamicValue)
+        private void AddDynamicToObservableIrrigation(IrrigationConfiguration irrigationConfiguration, dynamic entity)
         {
             if(irrigationConfiguration.ConnectionType != 1)
-                return;
+                return;//<T> where T : IPermissionTreeEntity
             
             
-            if (dynamicValue is CustomSchedule)
+            if (entity is CustomSchedule)
             {
                 if(_observableDict[irrigationConfiguration].CustomScheduleList.Count == 1 && _observableDict[irrigationConfiguration].CustomScheduleList[0] == null)
                     _observableDict[irrigationConfiguration].CustomScheduleList.Clear();
-                CustomSchedule element = dynamicValue;
+                CustomSchedule element = entity;
                 var existingElement = _observableDict[irrigationConfiguration].CustomScheduleList
                     .FirstOrDefault(x => x.Id == element.Id);
                 if(existingElement != null)
@@ -160,16 +164,7 @@ namespace Pump.SocketController.Firebase
             //var test = 65;
             return null;
         }
-        
-        private void Remove(KeyValuePair<string,JToken> keyPair)
-        {
-//            dynamic elementType = null;
-//            switch (keyPair.Key == "CustomSchedule")
-//            {
-//                case 0:
-//                    elementType = keyPair.Value
-//                    break;
-        }
+
 
         /*
         public void SubscribeFirebase()

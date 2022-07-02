@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class ManualSchedule
+    public class ManualSchedule : IEntity
     {
-        [JsonIgnore] public string Id;
+        [JsonIgnore] public string Id { get; set; }
 
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
 

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class Sensor
+    public class Sensor : IEntity
     {
         public Sensor()
         {

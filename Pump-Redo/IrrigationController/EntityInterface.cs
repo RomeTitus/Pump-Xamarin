@@ -1,7 +1,8 @@
 ﻿namespace Pump.IrrigationController
 {
-    public interface EntityInterface
+    public interface IEntity
     {
-        public string Path { get; set; }
+        string Id { get; set; }
+        bool DeleteAwaiting { get; set; }
     }
 }

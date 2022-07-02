@@ -4,23 +4,33 @@ namespace Pump.IrrigationController
 {
     public class ObservableIrrigation
     {
-        public readonly ObservableCollection<Alive> AliveList = new ObservableCollection<Alive> { null };
 
-        public readonly ObservableCollection<CustomSchedule> CustomScheduleList =
-            new ObservableCollection<CustomSchedule> { null };
+        public ObservableIrrigation()
+        {
+            AliveList = new ObservableCollection<Alive> { null };
+            CustomScheduleList = new ObservableCollection<CustomSchedule> { null };
+            EquipmentList = new ObservableCollection<Equipment> { null };
+            ManualScheduleList = new ObservableCollection<ManualSchedule> { null };
+            ScheduleList = new ObservableCollection<Schedule> { null };
+            SensorList = new ObservableCollection<Sensor> { null };
+            SubControllerList = new ObservableCollection<SubController> { null };
+        }
+        
+        public ObservableCollection<Alive> AliveList { get; }
 
-        public readonly ObservableCollection<Equipment> EquipmentList = new ObservableCollection<Equipment> { null };
+        public ObservableCollection<CustomSchedule> CustomScheduleList { get; }
 
-        public readonly ObservableCollection<ManualSchedule> ManualScheduleList =
-            new ObservableCollection<ManualSchedule> { null };
+        public ObservableCollection<Equipment> EquipmentList { get; }
 
-        public readonly ObservableCollection<Schedule> ScheduleList = new ObservableCollection<Schedule> { null };
-        public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor> { null };
+        public ObservableCollection<ManualSchedule> ManualScheduleList { get; }
 
-        public readonly ObservableCollection<SubController> SubControllerList = new ObservableCollection<SubController>
-            { null };
+        public ObservableCollection<Schedule> ScheduleList { get; }
+        public ObservableCollection<Sensor> SensorList { get; }
 
-        public bool IsDisposable = false;
+        public ObservableCollection<SubController> SubControllerList { get; }
+
+        
+        public bool IsDisposable { get; set; }
 
 
         public bool LoadedAllData()

@@ -27,7 +27,7 @@ namespace Pump.Database.Table
 
         public void SerializedControllerPair()
         {
-            ControllerPairsSerialized = JsonConvert.SerializeObject(ControllerPairs);
+            ControllerPairsSerialized = ControllerPairsSerialized == null? string.Empty : JsonConvert.SerializeObject(ControllerPairs);
         }
         public void DeserializedControllerPair()
         {

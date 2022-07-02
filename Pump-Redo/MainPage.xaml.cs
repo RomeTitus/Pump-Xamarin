@@ -7,7 +7,6 @@ using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout;
-using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Pump.SocketController.Firebase;
@@ -22,7 +21,6 @@ namespace Pump
         private readonly AuthenticationScreen _authenticationScreen;
         private readonly NotificationEvent _notificationEvent;
         private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
-        //private readonly ObservableIrrigation _observableIrrigation;
         private readonly SocketPicker _socketPicker;
         private readonly DatabaseController _database;
 
@@ -77,6 +75,8 @@ namespace Pump
         {
             foreach (var configuration in irrigationConfigurationList)
             {
+                _observableDict.Add(configuration, new ObservableIrrigation());
+                
                 var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
                     x.AutomationId == configuration.Id.ToString());
                 if (viewSite != null)
@@ -99,9 +99,9 @@ namespace Pump
             var configList = _database.GetControllerConfigurationList();
             var config = configList.First(x => x.Id.ToString() == stackLayoutGesture.AutomationId);
             _socketPicker.TargetedIrrigation = config;
-            var observableSiteIrrigation = new ObservableSiteFilteredIrrigation(_observableIrrigation, config.ControllerPairs.First().Value.ToList()); //Edit to have selectible sites from diffrent controllers
-            var homeScreen = new HomeScreen(observableSiteIrrigation, _socketPicker);
-            Navigation.PushModalAsync(homeScreen);
+           // var observableSiteIrrigation = new ObservableSiteFilteredIrrigation(_observableIrrigation, config.ControllerPairs.First().Value.ToList()); //Edit to have selectible sites from diffrent controllers
+           // var homeScreen = new HomeScreen(observableSiteIrrigation, _socketPicker);
+           // Navigation.PushModalAsync(homeScreen);
         }
 
         /*
