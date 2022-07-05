@@ -114,10 +114,10 @@ namespace Pump
             
             _socketPicker.TargetedIrrigation = keyPairIrrigation.Key;
 
-            var test = new ObservableFilteredIrrigation(keyPairIrrigation.Value, null);
+            var observableFiltered = new ObservableFilteredIrrigation(keyPairIrrigation.Value, new List<string>{null});
 
-            //var homeScreen = new HomeScreen(keyPairIrrigation.Value, _socketPicker);
-            //Navigation.PushModalAsync(homeScreen);
+            var homeScreen = new HomeScreen(observableFiltered, _socketPicker);
+            Navigation.PushModalAsync(homeScreen);
         }
         private void StartEvent()
         {

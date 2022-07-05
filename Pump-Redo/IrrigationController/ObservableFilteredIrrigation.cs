@@ -3,25 +3,23 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reactive.Linq;
 using Pump.SocketController;
 
 namespace Pump.IrrigationController
 {
     public class ObservableFilteredIrrigation
     {
-        
         public readonly ObservableIrrigation ObservableUnfilteredIrrigation;
-
         public ObservableCollection<CustomSchedule> CustomScheduleList { get; }
-
         public ObservableCollection<Equipment> EquipmentList { get; }
-
         public ObservableCollection<ManualSchedule> ManualScheduleList { get; }
-
         public ObservableCollection<Schedule> ScheduleList { get; }
         public ObservableCollection<Sensor> SensorList { get; }
-
         public ObservableCollection<SubController> SubControllerList { get; }
+        
+        public List<string> ControllerIdList { get; }
+
 
         public ObservableFilteredIrrigation(ObservableIrrigation observableUnfilteredIrrigation, List<string> controllerIdList)
         {
@@ -32,7 +30,7 @@ namespace Pump.IrrigationController
             ScheduleList = new ObservableCollection<Schedule>();
             SensorList = new ObservableCollection<Sensor>();
             SubControllerList = new ObservableCollection<SubController>();
-            
+            ControllerIdList = controllerIdList;
             Subscribe();
 
             /*
@@ -67,9 +65,6 @@ namespace Pump.IrrigationController
 
         private void Subscribe()
         {
-            
-            
-            
             var propertyFilteredObservableInfo = typeof(ObservableFilteredIrrigation).GetProperties();
             
             foreach (var filteredPropertyInfo in propertyFilteredObservableInfo)
@@ -81,14 +76,30 @@ namespace Pump.IrrigationController
                 if(type == null)
                     continue;
                 dynamic instance = Activator.CreateInstance(type);
-                
-                ManageObservableIrrigationData.AddFilteredUpdateOrRemove(instance, this, new List<string>{null});
+                var observableCollection = ManageObservableIrrigationData.NewSiteAddFilteredUpdateOrRemove(instance, this);
+                if(observableCollection is INotifyCollectionChanged notifyCollectionChanged)
+                    notifyCollectionChanged.CollectionChanged += DynamicCollectionChanged;
+
             }
         }
         
-        private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void DynamicCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            
+            if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                foreach (dynamic item in e.NewItems)
+                {
+                    ManageObservableIrrigationData.FilteredAddUpdate(item, this);
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (dynamic item in e.OldItems)
+                {
+                    ManageObservableIrrigationData.FilteredRemove(item, this);
+                }
+            }
         }
 
         /*

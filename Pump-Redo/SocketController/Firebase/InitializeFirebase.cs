@@ -55,7 +55,7 @@ namespace Pump.SocketController.Firebase
                     if(typeAndDynamicValueList.type == null)
                         continue;
                                 
-                    ManageObservableIrrigationData.AddUpdateOrRemove(typeAndDynamicValueList.type, typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
+                    ManageObservableIrrigationData.AddUpdateOrRemoveFromController(typeAndDynamicValueList.type, typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
                 }
             }
             catch (Exception e)
