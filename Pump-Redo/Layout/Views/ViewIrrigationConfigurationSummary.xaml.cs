@@ -12,55 +12,61 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewIrrigationConfigurationSummary
     {
-        public readonly IrrigationConfiguration IrrigationConfiguration;
-
-
-        public ViewIrrigationConfigurationSummary(IrrigationConfiguration irrigationConfiguration)
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
+        public ViewIrrigationConfigurationSummary(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation)
         {
             InitializeComponent();
             if (Device.RuntimePlatform == Device.UWP)
-                ActivityIndicatorUWPLoadingIndicator.IsVisible = true;
+                ActivityIndicatorUwpLoadingIndicator.IsVisible = true;
             else
                 ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
             
-            IrrigationConfiguration = irrigationConfiguration;
-            StackLayoutSiteSummary.AutomationId = irrigationConfiguration.Id.ToString();
-            LabelSiteName.Text = "TEST_SITE_NAME"; //irrigationConfiguration.Path;
+            _keyValueIrrigation = keyValueIrrigation;
+            StackLayoutSiteSummary.AutomationId = keyValueIrrigation.Key.Id.ToString();
+            LabelSiteName.Text = keyValueIrrigation.Key.Path;
         }
-
-        /*
+        
         public void Populate()
         {
-            var scheduleRunning = false;
+            if(_keyValueIrrigation.Value.LoadedData == false)
+                return;
+            
+            
+            var scheduleRunning = RunningCustomSchedule.GetCustomScheduleDetailRunningList(_keyValueIrrigation.Value.CustomScheduleList.ToList()).Any();
 
-            if (Device.RuntimePlatform == Device.UWP)
-                ActivityIndicatorUWPLoadingIndicator.IsVisible = false;
-            else
-                ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
+            if (!scheduleRunning)
+            {
+                scheduleRunning = new RunningSchedule(_keyValueIrrigation.Value.ScheduleList.ToList(),
+                        _keyValueIrrigation.Value.EquipmentList.ToList()).GetRunningSchedule().Any();
+            }
 
-            LabelPressure.IsVisible = true;
-            if (CustomSchedules.Any(customSchedule => IrrigationConfiguration.Attachments.Contains(customSchedule.id_Pump) &&
-                                                      RunningCustomSchedule.GetCustomScheduleDetailRunning(
-                                                          customSchedule) != null))
-                scheduleRunning = true;
-            if (new RunningSchedule(Schedules.Where(x => IrrigationConfiguration.Attachments.Contains(x.id_Pump)), Equipments)
-                .GetRunningSchedule().ToList().Any())
-                scheduleRunning = true;
-            var manualSchedule =
-                ManualSchedules.FirstOrDefault(x =>
-                    x.ManualDetails.Any(z => IrrigationConfiguration.Attachments.Contains(z.id_Equipment)));
-            if (manualSchedule != null)
-                scheduleRunning = true;
+            if (!scheduleRunning)
+            {
+                scheduleRunning = _keyValueIrrigation.Value.ManualScheduleList.Any();
+            }
 
-            SetScheduleRunning(scheduleRunning);
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (Device.RuntimePlatform == Device.UWP)
+                    ActivityIndicatorUwpLoadingIndicator.IsVisible = false;
+                else
+                    ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
+                
+                SetScheduleRunning(scheduleRunning);
 
-            if (sensor != null)
-                if (sensor.TYPE == "Pressure Sensor")
-                    PressureSensor();
+                if (_keyValueIrrigation.Value.SensorList.Any())
+                    PressureSensor(_keyValueIrrigation.Value.SensorList.ToList());
+
+            });
         }
 
-        private void PressureSensor()
+        private void PressureSensor(List<Sensor> sensorList)
         {
+            var sensor = sensorList.FirstOrDefault(x => x.TYPE == "Pressure Sensor");
+            if(sensor == null)
+                return;
+            
+            LabelPressure.IsVisible = true;
             var reading = Convert.ToDouble(sensor.LastReading, CultureInfo.InvariantCulture);
 
             var voltage = reading * 5.0 / 1024.0;
@@ -70,8 +76,7 @@ namespace Pump.Layout.Views
             var bars = pressurePascal / 10e5;
             LabelPressure.Text = bars.ToString("0.##") + " Bar";
         }
-
-*/
+        
         private void SetScheduleRunning(bool running)
         {
             FrameScheduleStatus.BackgroundColor = running ? Color.LawnGreen : Color.White;

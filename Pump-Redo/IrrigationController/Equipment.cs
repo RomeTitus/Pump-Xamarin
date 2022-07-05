@@ -2,7 +2,7 @@
 
 namespace Pump.IrrigationController
 {
-    public class Equipment: IEntity
+    public class Equipment: IEntity, IEquipment
     {
         [JsonIgnore] public string Id { get; set; }
 

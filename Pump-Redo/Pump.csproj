@@ -15,6 +15,7 @@
         <None Remove="Icons\ConnectionDown.png" />
         <None Remove="Icons\CustomSchedule.png" />
         <None Remove="Icons\FieldSun.png" />
+        <None Remove="Icons\gearSetting.png" />
         <None Remove="Icons\Home.png" />
         <None Remove="Icons\Logo.png" />
         <None Remove="Icons\ManualSchedule.png" />
@@ -43,6 +44,7 @@
         <EmbeddedResource Include="Icons\ConnectionDown.png" />
         <EmbeddedResource Include="Icons\CustomSchedule.png" />
         <EmbeddedResource Include="Icons\FieldSun.png" />
+        <EmbeddedResource Include="Icons\gearSetting.png" />
         <EmbeddedResource Include="Icons\Home.png" />
         <EmbeddedResource Include="Icons\Logo.png" />
         <EmbeddedResource Include="Icons\ManualSchedule.png" />

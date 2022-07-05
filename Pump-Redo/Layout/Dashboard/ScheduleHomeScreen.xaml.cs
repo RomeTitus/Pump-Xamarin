@@ -18,11 +18,11 @@ namespace Pump.Layout.Dashboard
     public partial class ScheduleHomeScreen : ContentView
     {
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
-        private readonly ObservableSiteFilteredIrrigation _observableFilteredIrrigation;
+        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
         private readonly SocketPicker _socketPicker;
         private ViewScheduleSummary _viewSchedule;
 
-        public ScheduleHomeScreen(ObservableSiteFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
+        public ScheduleHomeScreen(ObservableFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableFilteredIrrigation = observableFilteredIrrigation;

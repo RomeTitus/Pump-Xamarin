@@ -87,5 +87,94 @@ namespace Pump.SocketController
             var instance = Activator.CreateInstance(type);
             return (instance, dynamicList);
         }
+        
+        
+        public static void AddFilteredUpdateOrRemove<T>(T record, ObservableFilteredIrrigation filteredObservableIrrigation, List<string> subControllerIds) where T : IEntity
+        {
+            var observableType = typeof(ObservableIrrigation);
+            var filterObservableType = typeof(ObservableFilteredIrrigation);
+
+            var propertyInfo = observableType.GetProperties().FirstOrDefault(x => x.PropertyType == typeof(ObservableCollection<T>));
+            var filterPropertyInfo = filterObservableType.GetProperties().FirstOrDefault(x => x.PropertyType == typeof(ObservableCollection<T>));
+            if(propertyInfo == null || filterPropertyInfo == null)
+                return;
+            
+            var observableFilteredCollectionIrrigation = (ObservableCollection<T>) filterPropertyInfo.GetValue(filteredObservableIrrigation, null);
+            var observableCollectionIrrigation = (ObservableCollection<T>) propertyInfo.GetValue(filteredObservableIrrigation.ObservableUnfilteredIrrigation, null);
+
+            if (record is IEquipment)
+            {
+                EquipmentAddUpdateMissingRecord((dynamic)observableCollectionIrrigation, (dynamic) observableFilteredCollectionIrrigation, subControllerIds);
+                EquipmentRemoveMissingRecord((dynamic) observableCollectionIrrigation, (dynamic) observableFilteredCollectionIrrigation, subControllerIds);    
+            }
+
+            if (record is ISchedule)
+            {
+                ScheduleAddUpdateMissingRecord((dynamic)observableCollectionIrrigation, (dynamic) observableFilteredCollectionIrrigation, subControllerIds);
+                ScheduleRemoveMissingRecord((dynamic) observableCollectionIrrigation, (dynamic) observableFilteredCollectionIrrigation, subControllerIds);
+            }
+            
+        }
+        
+        private static void EquipmentRemoveMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
+            where T : IEntity, IEquipment
+        {
+            for (var i = 0; i < filterObservableCollectionIrrigation.Count; i++)
+            {
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
+                if (existingRecord != null) continue;
+                filterObservableCollectionIrrigation.Remove(filterObservableCollectionIrrigation[i]);
+                i--;
+            }
+        }
+        
+        private static void EquipmentAddUpdateMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
+            where T : IEntity, IEquipment
+        {
+            foreach (var entity in observableCollectionIrrigation)
+            {
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id && x.AttachedSubController == entity.AttachedSubController);
+                if(existingRecord == null)
+                    filterObservableCollectionIrrigation.Add(entity);
+                else
+                {
+                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity)) 
+                        continue;
+                    var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
+                    filterObservableCollectionIrrigation[index] = entity;
+                }    
+            }
+        }
+        
+        private static void ScheduleRemoveMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
+            where T : IEntity, ISchedule
+        {
+            for (var i = 0; i < filterObservableCollectionIrrigation.Count; i++)
+            {
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
+                if (existingRecord != null) continue;
+                filterObservableCollectionIrrigation.Remove(filterObservableCollectionIrrigation[i]);
+                i--;
+            }
+        }
+        
+        private static void ScheduleAddUpdateMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
+            where T : IEntity, ISchedule
+        {
+            foreach (var entity in observableCollectionIrrigation)
+            {
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id && x.ScheduleDetails.Any(x => ));
+                if(existingRecord == null)
+                    filterObservableCollectionIrrigation.Add(entity);
+                else
+                {
+                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity)) 
+                        continue;
+                    var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
+                    filterObservableCollectionIrrigation[index] = entity;
+                }
+            }
+        }
+
     }
 }

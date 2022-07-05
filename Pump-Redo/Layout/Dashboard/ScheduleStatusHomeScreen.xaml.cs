@@ -13,9 +13,9 @@ namespace Pump.Layout.Dashboard
     public partial class ScheduleStatusHomeScreen : ContentView
     {
         private const double PopUpSize = 1.5;
-        private readonly ObservableSiteFilteredIrrigation _observableFilteredIrrigation;
+        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
 
-        public ScheduleStatusHomeScreen(ObservableSiteFilteredIrrigation observableFilteredIrrigation)
+        public ScheduleStatusHomeScreen(ObservableFilteredIrrigation observableFilteredIrrigation)
         {
             InitializeComponent();
             _observableFilteredIrrigation = observableFilteredIrrigation;

@@ -74,6 +74,10 @@ namespace Pump.IrrigationController
             return null;
         }
 
+        public static List<ScheduleDetail> GetCustomScheduleDetailRunningList(List<CustomSchedule> customScheduleList)
+        {
+            return customScheduleList.Select(GetCustomScheduleDetailRunning).Where(result => result != null).ToList();
+        }
         public DateTime? getCustomScheduleEndTime(CustomSchedule customScheduleList)
         {
             try

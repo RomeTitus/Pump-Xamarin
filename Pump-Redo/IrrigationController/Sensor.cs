@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class Sensor : IEntity
+    public class Sensor : IEntity, IEquipment
     {
         public Sensor()
         {
@@ -15,6 +15,7 @@ namespace Pump.IrrigationController
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
 
         public string LastReading { get; set; }
+        
         public string Key { get; set; }
         public string NAME { get; set; }
         public string TYPE { get; set; }

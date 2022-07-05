@@ -10,26 +10,26 @@ namespace Pump.Layout.Dashboard
     public partial class SettingPageHomeScreen : ContentView
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly ObservableSiteFilteredIrrigation _observableSiteFilteredIrrigation;
+        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
         private readonly SocketPicker _socketPicker;
 
         public SettingPageHomeScreen(ObservableIrrigation observableIrrigation,
-            ObservableSiteFilteredIrrigation observableSiteFilteredIrrigation, SocketPicker socketPicker)
+            ObservableFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
-            _observableSiteFilteredIrrigation = observableSiteFilteredIrrigation;
+            _observableFilteredIrrigation = observableFilteredIrrigation;
             _observableIrrigation = observableIrrigation;
         }
 
         private void BtnRecordSummary_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new RecordScreen(_observableSiteFilteredIrrigation));
+            Navigation.PushModalAsync(new RecordScreen(_observableFilteredIrrigation));
         }
 
         private void BtnEquipmentDetail_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation, _observableSiteFilteredIrrigation,
+            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation, _observableFilteredIrrigation,
                 _socketPicker));
         }
 

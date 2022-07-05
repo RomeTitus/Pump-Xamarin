@@ -15,7 +15,6 @@ namespace Pump.IrrigationController
             SensorList = new ObservableCollection<Sensor>();
             SubControllerList = new ObservableCollection<SubController>();
         }
-        
         public ObservableCollection<Alive> AliveList { get; }
 
         public ObservableCollection<CustomSchedule> CustomScheduleList { get; }

@@ -3,7 +3,8 @@
 <ContentView
     x:Class="Pump.Layout.Views.ViewIrrigationConfigurationSummary"
     xmlns="http://xamarin.com/schemas/2014/forms"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:extensions="http://xamarin.com/schemas/2020/toolkit">
     <ContentView.Content>
         <Frame
             Padding="1,1,1,1"
@@ -26,7 +27,7 @@
                         <TapGestureRecognizer x:Name="StackLayoutViewSiteTapGesture" />
                     </StackLayout.GestureRecognizers>
                     <ActivityIndicator
-                        x:Name="ActivityIndicatorUWPLoadingIndicator"
+                        x:Name="ActivityIndicatorUwpLoadingIndicator"
                         AutomationId="ActivityIndicator"
                         HorizontalOptions="Center"
                         IsEnabled="True"
@@ -87,6 +88,14 @@
                                     HeightRequest="30"
                                     WidthRequest="30" />
                             </Frame>
+                            <Image Source="{extensions:ImageResourceExtension Pump.Icons.gearSetting.png}"  
+                                   HeightRequest="40">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        x:Name="IrrigationControllerSettingGesture"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+
                         </StackLayout>
                     </StackLayout>
                 </StackLayout>

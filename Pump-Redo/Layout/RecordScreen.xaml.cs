@@ -19,9 +19,9 @@ namespace Pump.Layout
         private readonly List<ChartEntry> _chartEntries = new List<ChartEntry>();
         private readonly List<string> _excludedEntries = new List<string>();
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
-        private readonly ObservableSiteFilteredIrrigation _observableFilteredIrrigation;
+        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
 
-        public RecordScreen(ObservableSiteFilteredIrrigation observableFilteredIrrigation)
+        public RecordScreen(ObservableFilteredIrrigation observableFilteredIrrigation)
         {
             InitializeComponent();
             _observableFilteredIrrigation = observableFilteredIrrigation;

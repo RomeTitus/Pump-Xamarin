@@ -1,24 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using Pump.SocketController;
 
 namespace Pump.IrrigationController
 {
-    public class ObservableSiteFilteredIrrigation
+    public class ObservableFilteredIrrigation
     {
         
         public readonly ObservableIrrigation ObservableUnfilteredIrrigation;
-        public readonly ObservableCollection<CustomSchedule> CustomScheduleList = new ObservableCollection<CustomSchedule>();
-        public readonly ObservableCollection<Equipment> EquipmentList = new ObservableCollection<Equipment>();
-        public readonly ObservableCollection<ManualSchedule> ManualScheduleList = new ObservableCollection<ManualSchedule>();
-        public readonly ObservableCollection<Schedule> ScheduleList = new ObservableCollection<Schedule>();
-        public readonly ObservableCollection<Sensor> SensorList = new ObservableCollection<Sensor>();
 
-        public ObservableSiteFilteredIrrigation(ObservableIrrigation observableUnfilteredIrrigation, List<string> controllerIdList)
+        public ObservableCollection<CustomSchedule> CustomScheduleList { get; }
+
+        public ObservableCollection<Equipment> EquipmentList { get; }
+
+        public ObservableCollection<ManualSchedule> ManualScheduleList { get; }
+
+        public ObservableCollection<Schedule> ScheduleList { get; }
+        public ObservableCollection<Sensor> SensorList { get; }
+
+        public ObservableCollection<SubController> SubControllerList { get; }
+
+        public ObservableFilteredIrrigation(ObservableIrrigation observableUnfilteredIrrigation, List<string> controllerIdList)
         {
             ObservableUnfilteredIrrigation = observableUnfilteredIrrigation;
+            CustomScheduleList = new ObservableCollection<CustomSchedule>();
+            EquipmentList = new ObservableCollection<Equipment> ();
+            ManualScheduleList = new ObservableCollection<ManualSchedule>();
+            ScheduleList = new ObservableCollection<Schedule>();
+            SensorList = new ObservableCollection<Sensor>();
+            SubControllerList = new ObservableCollection<SubController>();
+            
+            Subscribe();
 
+            /*
             foreach (var equipment in observableUnfilteredIrrigation.EquipmentList.Where(x => controllerIdList.Contains(x?.Id)))
                 EquipmentList.Add(equipment);
             observableUnfilteredIrrigation.EquipmentList.CollectionChanged += CollectionChanged;
@@ -45,9 +62,30 @@ namespace Pump.IrrigationController
                          controllerIdList.Contains(x.id_Pump)))
                 CustomScheduleList.Add(customSchedule);
             observableUnfilteredIrrigation.CustomScheduleList.CollectionChanged += CollectionChanged;
+        */
         }
 
-
+        private void Subscribe()
+        {
+            
+            
+            
+            var propertyFilteredObservableInfo = typeof(ObservableFilteredIrrigation).GetProperties();
+            
+            foreach (var filteredPropertyInfo in propertyFilteredObservableInfo)
+            {
+                var name = filteredPropertyInfo.Name;
+                if(name == nameof(ObservableUnfilteredIrrigation))
+                    continue;
+                var type = Type.GetType("Pump.IrrigationController."+ name.Replace("List", ""));
+                if(type == null)
+                    continue;
+                dynamic instance = Activator.CreateInstance(type);
+                
+                ManageObservableIrrigationData.AddFilteredUpdateOrRemove(instance, this, new List<string>{null});
+            }
+        }
+        
         private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             
@@ -247,8 +285,7 @@ namespace Pump.IrrigationController
 
         public bool LoadedAllData()
         {
-            return !EquipmentList.Contains(null) && !SensorList.Contains(null) && !ManualScheduleList.Contains(null) &&
-                   !ScheduleList.Contains(null) && !CustomScheduleList.Contains(null);
+            return ObservableUnfilteredIrrigation.LoadedData;
         }
     }
 }

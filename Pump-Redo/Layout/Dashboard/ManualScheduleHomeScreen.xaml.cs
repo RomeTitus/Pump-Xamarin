@@ -15,11 +15,11 @@ namespace Pump.Layout.Dashboard
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ManualScheduleHomeScreen : ContentView
     {
-        private readonly ObservableSiteFilteredIrrigation _observableFilteredIrrigation;
+        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
         private readonly SocketPicker _socketPicker;
         private FloatingScreenScroll _floatingScreenScroll;
 
-        public ManualScheduleHomeScreen(ObservableSiteFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
+        public ManualScheduleHomeScreen(ObservableFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableFilteredIrrigation = observableFilteredIrrigation;
