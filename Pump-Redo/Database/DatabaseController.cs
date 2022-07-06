@@ -19,17 +19,18 @@ namespace Pump.Database
             _database.CreateTable<UserAuthentication>();
         }
 
-        public List<IrrigationConfiguration> GetControllerConfigurationList()
+        public List<IrrigationConfiguration> GetIrrigationConfigurationList()
         {
             lock (Locker)
             {
                 var irrigationConfigurationList = _database.Table<IrrigationConfiguration>();
-                irrigationConfigurationList.ForEach(x => x.DeserializedControllerPair());
-                return irrigationConfigurationList.ToList();
+                var configList = irrigationConfigurationList.ToList();
+                configList.ForEach(x => x.DeserializedControllerPair());
+                return configList;
             }
         }
         
-        public void SaveControllerConnection(IrrigationConfiguration irrigationConfiguration)
+        public void SaveIrrigationConfiguration(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {
@@ -48,7 +49,7 @@ namespace Pump.Database
             }
         }
 
-        public void DeleteControllerConnection(IrrigationConfiguration irrigationConfiguration)
+        public void DeleteIrrigationConfigurationConnection(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {

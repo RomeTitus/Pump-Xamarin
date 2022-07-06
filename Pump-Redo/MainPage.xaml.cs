@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Firebase.Auth;
 using Pump.Class;
 using Pump.Database;
@@ -14,6 +15,8 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Timers;
 using Pump.Layout.Dashboard;
+using Rg.Plugins.Popup.Services;
+using Xamarin.Forms.Internals;
 
 namespace Pump
 {
@@ -52,19 +55,33 @@ namespace Pump
                 if (_authenticationScreen.IsDisplayed)
                     _authenticationScreen.ClosePage();
                 _authenticationScreen.IsDisplayed = false;
-
-                var configList = _database.GetControllerConfigurationList();
+                var configList = _database.GetIrrigationConfigurationList();
+                if (!configList.Any())
+                    configList = await GetIrrigationConfigFromFirebase(e.User);
                 if (!configList.Any())
                     Device.BeginInvokeOnMainThread(SetupNewController);
                 else
                 {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
                     PopulateSavedIrrigation(configList);
+                    });
                     await _socketPicker.Subscribe(configList, e.User);
+
                 }
                     
             }
         }
-        
+
+        private async Task<List<IrrigationConfiguration>> GetIrrigationConfigFromFirebase(User user)
+        {
+            var loadingScreen = new PopupLoading("Retrieving");
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
+            var configList = await _socketPicker.GetIrrigationConfigurations(user);
+            configList.ForEach(x => _database.SaveIrrigationConfiguration(x));
+            await PopupNavigation.Instance.PopAllAsync();
+            return configList;
+        }
         private void SetupNewController()
         {
             var connectionScreen = new ScanBluetooth( _notificationEvent, _socketPicker.BluetoothManager(), _database);
@@ -91,8 +108,8 @@ namespace Pump
                 
                 if (viewSite == null)
                 {
-                    var viewSiteSummary = new ViewIrrigationConfigurationSummary(_observableDict.First(x => x.Key.Id == configuration.Id));
-                    viewSiteSummary.GetTapGestureRecognizer().Tapped += OnTapped_HomeScreen;
+                    var viewSiteSummary = new ViewIrrigationConfigurationSummary(_observableDict.First(x => x.Key.Id == configuration.Id), _socketPicker);
+                    viewSiteSummary.GetTapGestureRecognizerList().ForEach(x => x.Tapped += OnTapped_HomeScreen);
                     ScrollViewSite.Children.Add(viewSiteSummary);
                 }
             }
@@ -110,13 +127,10 @@ namespace Pump
         private void OnTapped_HomeScreen(object sender, EventArgs e)
         {
             var stackLayoutGesture = (StackLayout) sender;
-            var keyPairIrrigation = _observableDict.First(x => x.Key.Id.ToString() == stackLayoutGesture.AutomationId);
-            
-            _socketPicker.TargetedIrrigation = keyPairIrrigation.Key;
-
-            var observableFiltered = new ObservableFilteredIrrigation(keyPairIrrigation.Value, new List<string>{null});
-
-            var homeScreen = new HomeScreen(observableFiltered, _socketPicker);
+            var configurationSummary = (ViewIrrigationConfigurationSummary)stackLayoutGesture.Parent.Parent.Parent;
+            if(configurationSummary.ObservableFiltered == null)
+                return;
+            var homeScreen = new HomeScreen(configurationSummary.ObservableFiltered, _socketPicker);
             Navigation.PushModalAsync(homeScreen);
         }
         private void StartEvent()
@@ -129,7 +143,7 @@ namespace Pump
         private void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _timer.Enabled = false;
-            var configList = _database.GetControllerConfigurationList();
+            var configList = _database.GetIrrigationConfigurationList();
             if (configList.Any())
             {
                 UpdateSavedIrrigation();

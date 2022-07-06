@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Type = System.Type;
 
@@ -11,64 +13,6 @@ namespace Pump.SocketController
 {
     public static class ManageObservableIrrigationData
     {
-        public static void AddUpdateOrRemoveFromController<T>(T _, List<IEntity> dynamicValueList, ObservableIrrigation observableIrrigation) where T : IEntity
-        {
-            var observableType = typeof(ObservableIrrigation);
-            var propertyInfo = observableType.GetProperties().FirstOrDefault(x => x.PropertyType == typeof(ObservableCollection<T>));
-            if(propertyInfo == null)
-                return;
-            var observableCollectionIrrigation = (ObservableCollection<T>) propertyInfo.GetValue(observableIrrigation, null);
-            var incomingRecordList = dynamicValueList.ConvertAll(x => (T) x);
-            
-            AddUpdateMissingRecord(incomingRecordList, observableCollectionIrrigation);
-            
-            RemoveMissingRecord(incomingRecordList, observableCollectionIrrigation);
-            
-            observableIrrigation.LoadedData = true;
-        }
-
-        private static void RemoveMissingRecord<T>(List<T> dynamicValueList, ObservableCollection<T> observableCollectionIrrigation)
-            where T : IEntity
-        {
-            for (var i = 0; i < observableCollectionIrrigation.Count; i++)
-            {
-                var existingRecord = dynamicValueList.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
-                if (existingRecord != null) continue;
-                observableCollectionIrrigation.Remove(observableCollectionIrrigation[i]);
-                i--;
-            }
-        }
-        
-        private static void AddUpdateMissingRecord<T>(List<T> dynamicValueList, ObservableCollection<T> observableCollectionIrrigation)
-            where T : IEntity
-        {
-            foreach (var entity in dynamicValueList)
-            {
-                var existingRecord = observableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
-                if(existingRecord == null)
-                    observableCollectionIrrigation.Add(entity);
-                else
-                {
-                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity)) 
-                        continue;
-                    var index = observableCollectionIrrigation.IndexOf(existingRecord);
-                    observableCollectionIrrigation[index] = entity;
-                }    
-            }
-        }
-
-        public static dynamic GetDynamicValueFromObject(string className,  KeyValuePair<string,JToken> keyValuePair)
-        {
-            var elementObject = keyValuePair.Value.ToString();
-            var type = Type.GetType("Pump.IrrigationController."+ className);
-            if (type == null) 
-                return null;
-            var irrigationObject = JsonConvert.DeserializeObject(elementObject, type);
-            if (!(irrigationObject is IEntity entity)) return null;
-            entity.Id = keyValuePair.Key;
-            return irrigationObject;
-        }
-        
         public static (dynamic type, List<IEntity> dynamicList) GetDynamicValueListFromJObject(string className,  JObject jObject)
         {
             var dynamicList = new List<IEntity>();
@@ -87,7 +31,95 @@ namespace Pump.SocketController
             var instance = Activator.CreateInstance(type);
             return (instance, dynamicList);
         }
+        
+        public static List<IrrigationConfiguration> GetConfigurationListFromJObject(JObject jObject)
+        {
+            var configList = new List<IrrigationConfiguration>();
+            foreach (var keyValuePair in jObject)
+            {
+                var elementObject = keyValuePair.Value.ToString();
+                var irrigationObject = JsonConvert.DeserializeObject<IrrigationConfiguration>(elementObject);
+                configList.Add(irrigationObject);
+            }
+            return configList;
+        }
 
+        public static void AddUpdateOrRemoveConfigFromController(Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict, List<IrrigationConfiguration> newConfigLists, DatabaseController databaseController)
+        {
+            foreach (var config in newConfigLists)
+            {
+                    
+                var existingConfig = observableDict.Keys.FirstOrDefault(x => x.Path == config.Path);
+                if (existingConfig == null)
+                {
+                    observableDict.Add(config, new ObservableIrrigation());
+                }
+                else
+                {
+                    if (JsonConvert.SerializeObject(config) == JsonConvert.SerializeObject(existingConfig)) 
+                        continue;
+                    
+                    existingConfig.Mac = config.Mac;
+                    existingConfig.Path = config.Path;
+                    existingConfig.ConnectionType = config.ConnectionType;
+                    existingConfig.ControllerPairs = config.ControllerPairs;
+                    existingConfig.ExternalPath = config.ExternalPath;
+                    existingConfig.ExternalPort = config.ExternalPort;
+                    existingConfig.InternalPath = config.InternalPath;
+                    existingConfig.InternalPort = config.InternalPort;
+                    databaseController.SaveIrrigationConfiguration(existingConfig);
+                }
+            }
+            
+            var deletedConfigPair = observableDict.Where(x => newConfigLists.Select(y => y.Path).Contains(x.Key.Path) == false);
+            foreach (var deletedConfig in deletedConfigPair)
+            {
+                databaseController.DeleteIrrigationConfigurationConnection(deletedConfig.Key);
+                observableDict.Remove(deletedConfig.Key);
+            }
+        }
+        
+        public static void AddUpdateOrRemoveRecordFromController<T>(T _, List<IEntity> dynamicValueList, ObservableIrrigation observableIrrigation) where T : IEntity
+        {
+            var observableType = typeof(ObservableIrrigation);
+            var propertyInfo = observableType.GetProperties().FirstOrDefault(x => x.PropertyType == typeof(ObservableCollection<T>));
+            if(propertyInfo == null)
+                return;
+            var observableCollectionIrrigation = (ObservableCollection<T>) propertyInfo.GetValue(observableIrrigation, null);
+            var incomingRecordList = dynamicValueList.ConvertAll(x => (T) x);
+            
+            AddUpdateRemoveMissingRecord(incomingRecordList, observableCollectionIrrigation);
+            
+            observableIrrigation.LoadedData = true;
+        }
+        
+        private static void AddUpdateRemoveMissingRecord<T>(List<T> dynamicValueList, ObservableCollection<T> observableCollectionIrrigation)
+            where T : IEntity
+        {
+            foreach (var entity in dynamicValueList)
+            {
+                var existingRecord = observableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
+                if(existingRecord == null)
+                    observableCollectionIrrigation.Add(entity);
+                else
+                {
+                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity)) 
+                        continue;
+                    var index = observableCollectionIrrigation.IndexOf(existingRecord);
+                    observableCollectionIrrigation[index] = entity;
+                }    
+            }
+            
+            for (var i = 0; i < observableCollectionIrrigation.Count; i++)
+            {
+                var existingRecord = dynamicValueList.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
+                if (existingRecord != null) continue;
+                observableCollectionIrrigation.Remove(observableCollectionIrrigation[i]);
+                i--;
+            }
+        }
+        
+        
         public static ObservableCollection<T> NewSiteAddFilteredUpdateOrRemove<T>(T record, ObservableFilteredIrrigation filteredObservableIrrigation) where T : IEntity
         {
             var observableType = typeof(ObservableIrrigation);
@@ -119,18 +151,6 @@ namespace Pump.SocketController
             return observableCollectionIrrigation;
         }
         
-        private static void NewSiteEquipmentRemoveMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation)
-            where T : IEntity, IEquipment
-        {
-            for (var i = 0; i < filterObservableCollectionIrrigation.Count; i++)
-            {
-                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
-                if (existingRecord != null) continue;
-                filterObservableCollectionIrrigation.Remove(filterObservableCollectionIrrigation[i]);
-                i--;
-            }
-        }
-        
         private static void NewSiteEquipmentAddUpdateMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
             where T : IEntity, IEquipment
         {
@@ -139,7 +159,7 @@ namespace Pump.SocketController
                 var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
                 if (existingRecord == null)
                 {
-                    if(subControllerIds.Contains(entity.Id))
+                    if(subControllerIds.Contains(entity.AttachedSubController))
                         filterObservableCollectionIrrigation.Add(entity);
                 }
                 else
@@ -149,18 +169,6 @@ namespace Pump.SocketController
                     var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
                     filterObservableCollectionIrrigation[index] = entity;
                 }    
-            }
-        }
-        
-        private static void NewSiteScheduleRemoveMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation)
-            where T : IEntity, ISchedule
-        {
-            for (var i = 0; i < filterObservableCollectionIrrigation.Count; i++)
-            {
-                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
-                if (existingRecord != null) continue;
-                filterObservableCollectionIrrigation.Remove(filterObservableCollectionIrrigation[i]);
-                i--;
             }
         }
         
@@ -188,19 +196,7 @@ namespace Pump.SocketController
                 }
             }
         }
-        
-        private static void NewSiteManualRemoveMissingRecord<T>(ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation)
-            where T : IEntity, IManualSchedule
-        {
-            for (var i = 0; i < filterObservableCollectionIrrigation.Count; i++)
-            {
-                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == observableCollectionIrrigation[i].Id);
-                if (existingRecord != null) continue;
-                filterObservableCollectionIrrigation.Remove(filterObservableCollectionIrrigation[i]);
-                i--;
-            }
-        }
-        
+
         private static void NewSiteManualAddUpdateMissingRecord<T>(ObservableFilteredIrrigation filteredObservableIrrigation, ObservableCollection<T> observableCollectionIrrigation, ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
             where T : IEntity, IManualSchedule
         {
@@ -226,7 +222,6 @@ namespace Pump.SocketController
                 }
             }
         }
-        
         
         public static void FilteredAddUpdate<T>(T record, ObservableFilteredIrrigation filteredObservableIrrigation) where T : IEntity
         {

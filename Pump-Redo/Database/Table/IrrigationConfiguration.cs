@@ -23,11 +23,11 @@ namespace Pump.Database.Table
         [Ignore]
         public Dictionary<string, List<string>> ControllerPairs { get; set; }
 
-        private string ControllerPairsSerialized { get; set; }
+        public string ControllerPairsSerialized { get; set; }
 
         public void SerializedControllerPair()
         {
-            ControllerPairsSerialized = ControllerPairsSerialized == null? string.Empty : JsonConvert.SerializeObject(ControllerPairs);
+            ControllerPairsSerialized = ControllerPairs == null? string.Empty : JsonConvert.SerializeObject(ControllerPairs);
         }
         public void DeserializedControllerPair()
         {

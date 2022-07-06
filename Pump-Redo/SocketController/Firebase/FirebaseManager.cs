@@ -5,6 +5,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Newtonsoft.Json.Linq;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.Firebase
@@ -21,9 +22,27 @@ namespace Pump.SocketController.Firebase
             FirebaseQuery = new FirebaseClient("https://pump-25eee.firebaseio.com/").Child(user.Uid);
 
         }
-        
 
- 
+        public async Task<List<IrrigationConfiguration>> GetIrrigationConfigList()
+        {
+            try
+            {
+                var result = await FirebaseQuery.Child("Config").OnceAsync<JObject>();
+                var convertedJObject = new JObject();
+
+                foreach (var firebaseObject in result)
+                {
+                    convertedJObject.Add(firebaseObject.Key, firebaseObject.Object);
+                }
+                return ManageObservableIrrigationData.GetConfigurationListFromJObject(convertedJObject);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return new List<IrrigationConfiguration>();
+        }
+
         //Schedule
         private async Task<string> SetSchedule(Schedule schedule, string path)
         {

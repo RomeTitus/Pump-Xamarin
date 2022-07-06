@@ -96,5 +96,11 @@ namespace Pump.SocketController
         {
             return _initializeBlueTooth.BlueToothManager;
         }
+
+        public async Task<List<IrrigationConfiguration>> GetIrrigationConfigurations(User user)
+        {
+            _firebaseManager.InitializeFirebase(user);
+            return await _firebaseManager.GetIrrigationConfigList();
+        }
     }
 }

@@ -31,6 +31,7 @@
         VerticalOptions="Center"
         WidthRequest="100">
         <Label
+            x:Name="LoadingLabel"
             HorizontalOptions="CenterAndExpand"
             Text="Loading"/>
         <ActivityIndicator

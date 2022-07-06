@@ -28,7 +28,7 @@ namespace Pump.Layout
             _timer.Elapsed += ScanTimerEvent;
             _database = database;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += AdapterBleOnScanTimeoutElapsed;
-            StackLayoutBack.IsVisible = _database.GetControllerConfigurationList().Any();
+            StackLayoutBack.IsVisible = _database.GetIrrigationConfigurationList().Any();
             BtScan();
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;

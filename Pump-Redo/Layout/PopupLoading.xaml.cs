@@ -6,9 +6,12 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class PopupLoading : PopupPage
     {
-        public PopupLoading()
+        public PopupLoading(string label = null, bool closeWhenBackgroundIsClicked = false)
         {
             InitializeComponent();
+            if (label != null)
+                LoadingLabel.Text = label;
+            CloseWhenBackgroundIsClicked = closeWhenBackgroundIsClicked;
         }
 
 

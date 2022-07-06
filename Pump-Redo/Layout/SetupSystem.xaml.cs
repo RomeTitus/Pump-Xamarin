@@ -281,7 +281,7 @@ namespace Pump.Layout
             }
             
             var  irrigationController =JsonConvert.DeserializeObject<IrrigationConfiguration>(result);
-            _database.SaveControllerConnection(irrigationController);
+            _database.SaveIrrigationConfiguration(irrigationController);
         }
 
         private string Validation()

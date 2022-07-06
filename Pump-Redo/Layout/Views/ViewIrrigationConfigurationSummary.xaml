@@ -21,7 +21,6 @@
                 HasShadow="False"
                 HorizontalOptions="FillAndExpand">
 
-
                 <StackLayout x:Name="StackLayoutSiteSummary" Margin="0,0,0,5">
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer x:Name="StackLayoutViewSiteTapGesture" />
@@ -67,6 +66,7 @@
                                 VerticalOptions="Center"
                                 Color="Black" />
                             <Frame
+                                x:Name="FrameSchedule"
                                 Margin="0"
                                 Padding="1"
                                 BackgroundColor="White"
@@ -89,7 +89,7 @@
                                     WidthRequest="30" />
                             </Frame>
                             <Image Source="{extensions:ImageResourceExtension Pump.Icons.gearSetting.png}"  
-                                   HeightRequest="40">
+                                   HeightRequest="40" x:Name="ImageSetting">
                                 <Image.GestureRecognizers>
                                     <TapGestureRecognizer
                                         x:Name="IrrigationControllerSettingGesture"/>
@@ -98,6 +98,7 @@
 
                         </StackLayout>
                     </StackLayout>
+                    <StackLayout x:Name="SiteChildren"/>
                 </StackLayout>
             </Frame>
         </Frame>

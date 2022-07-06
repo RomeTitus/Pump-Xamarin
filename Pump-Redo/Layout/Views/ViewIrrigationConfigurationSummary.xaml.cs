@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
+using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,7 +17,9 @@ namespace Pump.Layout.Views
     public partial class ViewIrrigationConfigurationSummary
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
-        public ViewIrrigationConfigurationSummary(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation)
+        public readonly ObservableFilteredIrrigation ObservableFiltered;
+        private readonly SocketPicker _socketPicker;
+        public ViewIrrigationConfigurationSummary(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker, string siteKey = null)
         {
             InitializeComponent();
             if (Device.RuntimePlatform == Device.UWP)
@@ -21,41 +27,104 @@ namespace Pump.Layout.Views
             else
                 ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
             
+            
             _keyValueIrrigation = keyValueIrrigation;
-            StackLayoutSiteSummary.AutomationId = keyValueIrrigation.Key.Id.ToString();
-            LabelSiteName.Text = keyValueIrrigation.Key.Path;
+            _socketPicker = socketPicker;
+            ImageSetting.IsVisible = siteKey == null;
+            FrameSchedule.IsVisible = siteKey != null || keyValueIrrigation.Key.ControllerPairs.Count == 1;
+            
+            //FrameSiteSummary.BackgroundColor = siteKey == null && keyValueIrrigation.Key.ControllerPairs.Count > 1? Color.Coral: Color.White;
+            
+            if (siteKey != null)
+            {
+                AutomationId = siteKey;
+                LabelSiteName.Text = siteKey;
+            }
+            else
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    AutomationId = keyValueIrrigation.Key.ControllerPairs.Keys.First();
+                    LabelSiteName.Text = keyValueIrrigation.Key.ControllerPairs.Keys.First();
+                    FrameSiteSummary.BackgroundColor = Color.Coral;
+                    keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
+                    subscribeToOnlineStatus(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                });
+                
+            }
+
+            if(siteKey == null && keyValueIrrigation.Key.ControllerPairs.Count == 1)
+                ObservableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value, keyValueIrrigation.Key.ControllerPairs.Values.First());
+            else if(siteKey != null)
+            {
+                ObservableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value, keyValueIrrigation.Key.ControllerPairs.First(x => x.Key == siteKey).Value);
+            }
+
+            if (siteKey == null)
+            {
+                SetSites();
+            }
         }
-        
+
+        private void SetSites()
+        {
+            if (_keyValueIrrigation.Key.ControllerPairs.Count <= 1)
+                return;
+
+            foreach (var controllerPair in _keyValueIrrigation.Key.ControllerPairs
+                         .Where(x => SiteChildren.Children.Select(y => y.AutomationId).Contains(x.Key) == false))
+            {
+                var filteredSiteSummary = new ViewIrrigationConfigurationSummary(_keyValueIrrigation, _socketPicker, controllerPair.Key);
+                SiteChildren.Children.Add(filteredSiteSummary);
+            }
+        }
+
         public void Populate()
+        {
+            foreach (var view in SiteChildren.Children)
+            {
+                var siteView = (ViewIrrigationConfigurationSummary)view;
+                siteView.SetConfigurationSummary();
+            }
+
+            SetConfigurationSummary();
+        }
+        private void SetConfigurationSummary()
         {
             if(_keyValueIrrigation.Value.LoadedData == false)
                 return;
             
-            
-            var scheduleRunning = RunningCustomSchedule.GetCustomScheduleDetailRunningList(_keyValueIrrigation.Value.CustomScheduleList.ToList()).Any();
-
-            if (!scheduleRunning)
-            {
-                scheduleRunning = new RunningSchedule(_keyValueIrrigation.Value.ScheduleList.ToList(),
-                        _keyValueIrrigation.Value.EquipmentList.ToList()).GetRunningSchedule().Any();
-            }
-
-            if (!scheduleRunning)
-            {
-                scheduleRunning = _keyValueIrrigation.Value.ManualScheduleList.Any();
-            }
-
             Device.BeginInvokeOnMainThread(() =>
             {
                 if (Device.RuntimePlatform == Device.UWP)
                     ActivityIndicatorUwpLoadingIndicator.IsVisible = false;
                 else
                     ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
-                
+
+            });
+
+            if(ObservableFiltered == null)
+                return;
+            
+            var scheduleRunning = RunningCustomSchedule.GetCustomScheduleDetailRunningList(ObservableFiltered.CustomScheduleList.ToList()).Any();
+
+            if (!scheduleRunning)
+            {
+                scheduleRunning = new RunningSchedule(ObservableFiltered.ScheduleList.ToList(),
+                        ObservableFiltered.EquipmentList.ToList()).GetRunningSchedule().Any();
+            }
+
+            if (!scheduleRunning)
+            {
+                scheduleRunning = ObservableFiltered.ManualScheduleList.Any();
+            }
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
                 SetScheduleRunning(scheduleRunning);
 
-                if (_keyValueIrrigation.Value.SensorList.Any())
-                    PressureSensor(_keyValueIrrigation.Value.SensorList.ToList());
+                if (ObservableFiltered.SensorList.Any())
+                    PressureSensor(ObservableFiltered.SensorList.ToList());
 
             });
         }
@@ -87,9 +156,70 @@ namespace Pump.Layout.Views
             FrameSiteSummary.BackgroundColor = color;
         }
 
-        public TapGestureRecognizer GetTapGestureRecognizer()
+        public List<TapGestureRecognizer> GetTapGestureRecognizerList()
         {
-            return StackLayoutViewSiteTapGesture;
+            var tapGestureList = new List<TapGestureRecognizer> { StackLayoutViewSiteTapGesture };
+            foreach (var view in SiteChildren.Children)
+            {
+                var siteView = (ViewIrrigationConfigurationSummary)view;
+                tapGestureList.Add(siteView.StackLayoutViewSiteTapGesture);
+            }
+
+            return tapGestureList;
+        }
+        
+        private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_keyValueIrrigation.Value.AliveList.Any())
+            {
+                var result = await ConnectionSuccessful();
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    FrameSiteSummary.BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
+                });
+            }
+        }
+        
+        private async Task<bool> ConnectionSuccessful()
+        {
+            _keyValueIrrigation.Value.AliveList.CollectionChanged -= subscribeToOnlineStatus;
+            var oldTime = ScheduleTime.GetUnixTimeStampUtcNow();
+            var now = ScheduleTime.GetUnixTimeStampUtcNow();
+            var requestedOnlineStatus = false;
+            var delay = 16;
+            while (now < oldTime + delay) //seconds Delay
+            {
+                //See if Requested in Greater than response :/
+                var aliveStatus = _keyValueIrrigation.Value.AliveList.First();
+
+                //No Point in trying to request OnlineStatus if someone else has already tried and failed 1-delay seconds ago
+                if (aliveStatus.ResponseTime < aliveStatus.RequestedTime - delay &&
+                    aliveStatus.RequestedTime > now - delay && !requestedOnlineStatus)
+                {
+                    _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
+                    return false;
+                }
+                if (aliveStatus.ResponseTime <= now - 600 &&
+                    aliveStatus.ResponseTime >=
+                    aliveStatus.RequestedTime) // 10 Minutes before We try Request Online Status Again
+                {
+                    aliveStatus.RequestedTime = now;
+                    requestedOnlineStatus = true;
+                    await _socketPicker.SendCommand(aliveStatus);
+                    oldTime = now;
+                }
+                else if (aliveStatus.ResponseTime >= aliveStatus.RequestedTime && aliveStatus.ResponseTime >= now - 599)
+                {
+                    _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
+                    return true;
+                }
+
+                now = ScheduleTime.GetUnixTimeStampUtcNow();
+                await Task.Delay(400);
+            }
+
+            _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
+            return false;
         }
     }
 }

@@ -100,7 +100,6 @@ namespace Pump.Layout.Dashboard
             TabViewHome.TabItems.Add(navigationCustomScheduleHomeScreen);
             TabViewHome.TabItems.Add(navigationScheduleHomeScreen);
             TabViewHome.TabItems.Add(navigationSettingPageHomeScreen);
-            //TabViewHome.SelectedIndex = 0;
         }
 
         public Button GetSiteButton()
