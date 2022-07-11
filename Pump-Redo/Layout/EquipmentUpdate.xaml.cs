@@ -5,9 +5,11 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout
@@ -15,28 +17,29 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EquipmentUpdate : ContentPage
     {
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly Equipment _equipment;
         private readonly List<Equipment> _equipmentList;
         private readonly SocketPicker _socketPicker;
-        private readonly List<SubController> _subControllerList;
         private List<long> _avalibleGpio;
 
-        public EquipmentUpdate(List<Equipment> equipmentList, List<SubController> subControllerList,
+        public EquipmentUpdate(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
             SocketPicker socketPicker, Equipment equipment = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
-            _equipmentList = equipmentList;
-            _subControllerList = subControllerList;
+            _observableFilterKeyValuePair = observableFilterKeyValuePair;
+
+            _equipmentList = new List<Equipment>();
+            observableFilterKeyValuePair.Value.EquipmentList.ForEach(x => _equipmentList.Add(x));
             if (equipment == null)
             {
-                equipment = new Equipment();
                 ButtonUpdateEquipment.Text = "Create";
+                _equipment = new Equipment();
             }
+                
             else
-            {
                 _equipmentList.Remove(equipment);
-            }
             _equipment = equipment;
             Populate();
         }
@@ -48,7 +51,7 @@ namespace Pump.Layout
             SystemPicker.Items.Add("Main");
             SystemPicker.SelectedIndex = 0;
             var index = 1;
-            foreach (var subController in _subControllerList)
+            foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
             {
                 SystemPicker.Items.Add(subController.Name);
                 if (_equipment.AttachedSubController != null && _equipment.AttachedSubController == subController.Id)
@@ -107,11 +110,10 @@ namespace Pump.Layout
             var systemPicker = (Picker)sender;
             var selectedIndex = systemPicker.SelectedIndex;
             _avalibleGpio = new GpioPins().GetDigitalGpioList();
-            var usedEquipment = selectedIndex == 0
-                ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
+            var usedEquipment = selectedIndex == 0 ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
                 : _equipmentList.Where(y =>
                     !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
-                    _subControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
+                    _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
             var usedPins = usedEquipment.Select(x => x.GPIO).ToList();
             usedPins.AddRange(
                 usedEquipment.Where(x => x.DirectOnlineGPIO != null).Select(y => y.DirectOnlineGPIO.Value));
@@ -166,8 +168,8 @@ namespace Pump.Layout
                     _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
                 _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0
                     ? null
-                    : _subControllerList[SystemPicker.SelectedIndex - 1].Id;
-                await _socketPicker.SendCommand(_equipment);
+                    : _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id;
+                await _socketPicker.SendCommand(_equipment, _observableFilterKeyValuePair.Key);
                 await Navigation.PopModalAsync();
             }
         }

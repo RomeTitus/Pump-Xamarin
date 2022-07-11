@@ -12,15 +12,15 @@ namespace Pump.SocketController.BT
 {
     internal class InitializeBlueTooth
     {
-        private readonly ObservableIrrigation _observableIrrigation;
+        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         public readonly BluetoothManager BlueToothManager;
         public readonly Stopwatch RequestIrrigationTimer;
         private bool _isSubscribed;
         public bool RequestNow;
 
-        public InitializeBlueTooth(ObservableIrrigation observableIrrigation)
+        public InitializeBlueTooth(Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
-            _observableIrrigation = observableIrrigation;
+            _observableDict = observableDict;
             RequestIrrigationTimer = new Stopwatch();
             BlueToothManager = new BluetoothManager();
         }
@@ -83,7 +83,7 @@ namespace Pump.SocketController.BT
                         IrrigationConvert.CheckUpdatedStatus(irrigationTuple, oldIrrigationTuple);
 
 
-                    IrrigationConvert.UpdateObservableIrrigation(_observableIrrigation, irrigationTupleEditState);
+                    //IrrigationConvert.UpdateObservableIrrigation(_observableIrrigation, irrigationTupleEditState);
                     oldIrrigationTuple = irrigationTuple;
                 }
                 catch (Exception)
@@ -100,6 +100,7 @@ namespace Pump.SocketController.BT
 
         private void OnConnectionLost()
         {
+            /*
             _observableIrrigation.EquipmentList.Clear();
             _observableIrrigation.SensorList.Clear();
             _observableIrrigation.ManualScheduleList.Clear();
@@ -107,14 +108,7 @@ namespace Pump.SocketController.BT
             _observableIrrigation.CustomScheduleList.Clear();
             _observableIrrigation.SubControllerList.Clear();
             _observableIrrigation.AliveList.Clear();
-
-            _observableIrrigation.EquipmentList.Add(null);
-            _observableIrrigation.SensorList.Add(null);
-            _observableIrrigation.ManualScheduleList.Add(null);
-            _observableIrrigation.ScheduleList.Add(null);
-            _observableIrrigation.CustomScheduleList.Add(null);
-            _observableIrrigation.SubControllerList.Add(null);
-            _observableIrrigation.AliveList.Add(null);
+            */
         }
 
         private async Task<string> GetIrrigationData()

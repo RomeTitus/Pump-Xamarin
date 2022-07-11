@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -12,33 +14,27 @@ namespace Pump.Layout
     {
         private readonly SocketPicker _socketPicker;
         private readonly SubController _subController;
+        private readonly IrrigationConfiguration _configuration;
 
-        public SubControllerUpdate(SocketPicker socketPicker, SubController subController = null)
+        public SubControllerUpdate(SocketPicker socketPicker, SubController subController, IrrigationConfiguration configuration)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
-            if (subController == null)
-            {
-                _subController = new SubController();
-            }
-            else
-            {
-                _subController = subController;
-                PopulateSubController();
-            }
+            _subController = subController;
+            _configuration = configuration;
+            PopulateSubController();
         }
 
-        private void PopulateSubController()
+        private async void PopulateSubController()
         {
-            LabelHeading.Text = "Update Sub Controller";
-            ButtonUpdateSubController.Text = "Update";
-            ComKeyStackLayout.IsVisible = true;
-            SubControllerMac.IsEnabled = false;
+            await SetFocus();
+            LabelSubController.Text = _subController.Name;
             SubControllerName.Text = _subController.Name;
             SubControllerMac.Text = _subController.Mac;
             SubControllerIp.Text = _subController.IpAddress;
             SubControllerPort.Text = _subController.Port.ToString();
             SubControllerLoRa.IsChecked = _subController.UseLoRa;
+            StackLayoutKeys.IsVisible = _subController.UseLoRa;
             IncomingKey.Text = _subController.IncomingKey.ToString();
             for (var i = 0; i < _subController.OutgoingKey?.Count; i++)
             {
@@ -46,6 +42,21 @@ namespace Pump.Layout
                 if (i != _subController.OutgoingKey.Count - 1)
                     OutgoingKey.Text += ",";
             }
+        }
+        
+        private async Task SetFocus()
+        {
+            await Task.Delay(200);
+            SubControllerName.TextBox_Focused(this, new FocusEventArgs(this, true));
+            SubControllerMac.TextBox_Focused(this, new FocusEventArgs(this, true));
+            IncomingKey.TextBox_Focused(this, new FocusEventArgs(this, true));
+            OutgoingKey.TextBox_Focused(this, new FocusEventArgs(this, true));
+            if(_subController.IpAddress != null)
+                SubControllerIp.TextBox_Focused(this, new FocusEventArgs(this, true));
+            if(string.IsNullOrEmpty(_subController.Port.ToString()) == false)
+                SubControllerPort.TextBox_Focused(this, new FocusEventArgs(this, true));
+
+            await Task.Delay(300);
         }
 
         private void ButtonBack_OnClicked(object sender, EventArgs e)
@@ -67,8 +78,18 @@ namespace Pump.Layout
         private async void ButtonUpdateSubController_OnClicked(object sender, EventArgs e)
         {
             SetSubControllerVariables();
-            await _socketPicker.SendCommand(_subController);
+            await _socketPicker.SendCommand(_subController, _configuration);
             await Navigation.PopModalAsync();
+        }
+
+        private void TapGestureLoRa_OnTapped(object sender, EventArgs e)
+        {
+            SubControllerLoRa.IsChecked = !SubControllerLoRa.IsChecked;
+        }
+
+        private void SubControllerLoRa_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            StackLayoutKeys.IsVisible = e.Value;
         }
     }
 }

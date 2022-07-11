@@ -1,40 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController.Network
 {
     internal class InitializeNetwork
     {
-        private readonly ObservableIrrigation _observableIrrigation;
+        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         public readonly NetworkManager NetworkManager;
-        private readonly DatabaseController _database;
         public readonly Stopwatch RequestIrrigationTimer;
-        private bool _isSubscribed;
+        private bool _alreadySubscribed;
         public bool RequestNow;
 
-        public InitializeNetwork(ObservableIrrigation observableIrrigation)
+        public InitializeNetwork(Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
-            _observableIrrigation = observableIrrigation;
+            _observableDict = observableDict;
             RequestIrrigationTimer = new Stopwatch();
-            _database = new DatabaseController();
             NetworkManager = new NetworkManager();
         }
 
 
         public async Task SubscribeNetwork()
         {
-            _isSubscribed = true;
-            await ConnectToDevice();
+            if (_observableDict.Keys.Any(x => x.ConnectionType == 1) && _alreadySubscribed == false)
+            {
+                _alreadySubscribed = true;
+                await ConnectToDevice();
+                
+            }
+            
         }
 
         public void Disposable()
         {
-            _isSubscribed = false;
+            _alreadySubscribed = false;
         }
 
 
@@ -46,7 +51,7 @@ namespace Pump.SocketController.Network
                 (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(),
                     new List<ManualSchedule>(), new List<Sensor>(), new List<SubController>());
             RequestNow = true;
-            while (_isSubscribed)
+            while (_alreadySubscribed)
             {
                 while (CanRequestIrrigationData()) await Task.Delay(500);
 
@@ -67,7 +72,7 @@ namespace Pump.SocketController.Network
                 }
                 catch (Exception)
                 {
-                    _isSubscribed = false;
+                    _alreadySubscribed = false;
                     RequestIrrigationTimer.Stop();
                     OnConnectionLost();
                     break;
@@ -88,6 +93,7 @@ namespace Pump.SocketController.Network
 
         private void OnConnectionLost()
         {
+            /*
             _observableIrrigation.EquipmentList.Clear();
             _observableIrrigation.SensorList.Clear();
             _observableIrrigation.ManualScheduleList.Clear();
@@ -95,14 +101,7 @@ namespace Pump.SocketController.Network
             _observableIrrigation.CustomScheduleList.Clear();
             _observableIrrigation.SubControllerList.Clear();
             _observableIrrigation.AliveList.Clear();
-
-            _observableIrrigation.EquipmentList.Add(null);
-            _observableIrrigation.SensorList.Add(null);
-            _observableIrrigation.ManualScheduleList.Add(null);
-            _observableIrrigation.ScheduleList.Add(null);
-            _observableIrrigation.CustomScheduleList.Add(null);
-            _observableIrrigation.SubControllerList.Add(null);
-            _observableIrrigation.AliveList.Add(null);
+            */
         }
 
         /*

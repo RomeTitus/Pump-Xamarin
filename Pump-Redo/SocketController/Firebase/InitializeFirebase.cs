@@ -26,14 +26,12 @@ namespace Pump.SocketController.Firebase
 
         public void SubscribeFirebase()
         {
-            if (_observableDict.Keys.Any(x => x.ConnectionType == 1) && _alreadySubscribed == false)
+            if (_observableDict.Keys.Any(x => x.ConnectionType == 0) && _alreadySubscribed == false)
             {
                 _alreadySubscribed = true;
-                _subscribeFirebase.Dispose();
+                _subscribeFirebase = _firebaseManager.FirebaseQuery
+                    .AsObservable<JObject>().Subscribe(OnNext);
             }
-            
-            _subscribeFirebase = _firebaseManager.FirebaseQuery
-                .AsObservable<JObject>().Subscribe(OnNext);
         }
 
         private void OnNext(FirebaseEvent<JObject> obj)

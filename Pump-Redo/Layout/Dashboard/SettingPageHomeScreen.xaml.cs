@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
@@ -10,26 +12,26 @@ namespace Pump.Layout.Dashboard
     public partial class SettingPageHomeScreen : ContentView
     {
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly SocketPicker _socketPicker;
 
         public SettingPageHomeScreen(ObservableIrrigation observableIrrigation,
-            ObservableFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
-            _observableFilteredIrrigation = observableFilteredIrrigation;
+            _observableFilterKeyValuePair = observableFilterKeyValuePair;
             _observableIrrigation = observableIrrigation;
         }
 
         private void BtnRecordSummary_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new RecordScreen(_observableFilteredIrrigation));
+            Navigation.PushModalAsync(new RecordScreen(_observableFilterKeyValuePair.Value));
         }
 
         private void BtnEquipmentDetail_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentScreen(_observableIrrigation, _observableFilteredIrrigation,
+            Navigation.PushModalAsync(new EquipmentScreen(_observableFilterKeyValuePair,
                 _socketPicker));
         }
 

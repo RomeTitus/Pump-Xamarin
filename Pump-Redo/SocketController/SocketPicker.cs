@@ -16,15 +16,14 @@ namespace Pump.SocketController
         private readonly InitializeNetwork _initializeNetwork;
         private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         private readonly FirebaseManager _firebaseManager;
-        public IrrigationConfiguration TargetedIrrigation { get; set; }
 
         public SocketPicker(FirebaseManager firebaseManager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
             _firebaseManager = firebaseManager;
             _observableDict = observableDict;
             _initializeFirebase = new InitializeFirebase(_firebaseManager, observableDict);
-            //_initializeNetwork = new InitializeNetwork(observableDict);
-            //_initializeBlueTooth = new InitializeBlueTooth(observableDict);
+            _initializeNetwork = new InitializeNetwork(observableDict);
+            _initializeBlueTooth = new InitializeBlueTooth(observableDict);
         }
 
         
@@ -65,19 +64,19 @@ namespace Pump.SocketController
            
         }
 
-        public async Task<string> SendCommand(object sendObject)
+        public async Task<string> SendCommand(object sendObject, IrrigationConfiguration targetedIrrigation)
         {
             string result;
-            switch (TargetedIrrigation.ConnectionType)
+            switch (targetedIrrigation.ConnectionType)
             {
                 case 0:
-                    result = await _firebaseManager.Description(sendObject, TargetedIrrigation.Path);
+                    result = await _firebaseManager.Description(sendObject, targetedIrrigation.Path);
                     break;
                 case 1:
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
                     result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
-                        SocketCommands.Descript(sendObject), TargetedIrrigation);
+                        SocketCommands.Descript(sendObject), targetedIrrigation);
                     break;
                 case 2:
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();

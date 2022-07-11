@@ -16,7 +16,6 @@ using Xamarin.Forms.Xaml;
 using System.Timers;
 using Pump.Layout.Dashboard;
 using Rg.Plugins.Popup.Services;
-using Xamarin.Forms.Internals;
 
 namespace Pump
 {
@@ -62,14 +61,14 @@ namespace Pump
                     Device.BeginInvokeOnMainThread(SetupNewController);
                 else
                 {
-                    Device.BeginInvokeOnMainThread(() =>
+                    await Device.InvokeOnMainThreadAsync(async () =>
                     {
                     PopulateSavedIrrigation(configList);
-                    });
                     await _socketPicker.Subscribe(configList, e.User);
+                    });
+                    
 
                 }
-                    
             }
         }
 
@@ -79,7 +78,8 @@ namespace Pump
             await PopupNavigation.Instance.PushAsync(loadingScreen);
             var configList = await _socketPicker.GetIrrigationConfigurations(user);
             configList.ForEach(x => _database.SaveIrrigationConfiguration(x));
-            await PopupNavigation.Instance.PopAllAsync();
+            if(PopupNavigation.Instance.PopupStack.Any())
+                await PopupNavigation.Instance.PopAllAsync();
             return configList;
         }
         private void SetupNewController()
@@ -110,11 +110,12 @@ namespace Pump
                 {
                     var viewSiteSummary = new ViewIrrigationConfigurationSummary(_observableDict.First(x => x.Key.Id == configuration.Id), _socketPicker);
                     viewSiteSummary.GetTapGestureRecognizerList().ForEach(x => x.Tapped += OnTapped_HomeScreen);
+                    viewSiteSummary.GetTapGestureSettings().Tapped += OnTapped_Settings;
                     ScrollViewSite.Children.Add(viewSiteSummary);
                 }
             }
         }
-
+        
         private void UpdateSavedIrrigation()
         {
             foreach (var view in ScrollViewSite.Children.Where(x => x is ViewIrrigationConfigurationSummary))
@@ -124,13 +125,20 @@ namespace Pump
             }
         }
 
+        private void OnTapped_Settings(object sender, EventArgs e)
+        {
+            var imageGesture = (Image) sender;
+            var configurationSummary = (ViewIrrigationConfigurationSummary)imageGesture.Parent.Parent.Parent.Parent.Parent.Parent;
+            var settingsScreen = new IrrigationControllerSettings(configurationSummary.GetIrrigationConfigAndObservable(), _socketPicker);
+            Navigation.PushModalAsync(settingsScreen);
+        }
         private void OnTapped_HomeScreen(object sender, EventArgs e)
         {
             var stackLayoutGesture = (StackLayout) sender;
             var configurationSummary = (ViewIrrigationConfigurationSummary)stackLayoutGesture.Parent.Parent.Parent;
-            if(configurationSummary.ObservableFiltered == null)
+            if(configurationSummary.GetIrrigationFilterConfigAndObservable().Value == null)
                 return;
-            var homeScreen = new HomeScreen(configurationSummary.ObservableFiltered, _socketPicker);
+            var homeScreen = new HomeScreen(configurationSummary.GetIrrigationFilterConfigAndObservable(), _socketPicker);
             Navigation.PushModalAsync(homeScreen);
         }
         private void StartEvent()
@@ -155,5 +163,7 @@ namespace Pump
         {
             Device.BeginInvokeOnMainThread(SetupNewController);
         }
+        
+        
     }
 }

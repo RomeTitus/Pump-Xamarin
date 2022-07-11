@@ -7,24 +7,40 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewSubControllerSummary : ContentView
     {
-        public readonly SubController SubController;
-
+        public bool LoadedData;
+        public ViewSubControllerSummary(string subControllerId)
+        {
+            InitializeComponent();
+            AutomationId = subControllerId;
+            LabelSubControllerName.IsVisible = false;
+            LabelType.IsVisible = false;
+            ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
+        }
         public ViewSubControllerSummary(SubController subController)
         {
             InitializeComponent();
-            SubController = subController;
-            stackLayoutSubControllerSummary.AutomationId = SubController.Id;
-            AutomationId = SubController.Id;
-            Populate();
+            AutomationId = subController?.Id;
+            Populate(subController);
         }
-
-        public void Populate()
+        
+        public void Populate(SubController subController)
         {
-            LabelSubControllerName.Text = SubController.Name;
-            if (SubController.UseLoRa)
+            LoadedData = true;
+            LabelSubControllerName.IsVisible = true;
+            ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
+
+            if (subController == null)
+            {
+                LabelSubControllerName.Text = "Main Controller";
+                return;
+            }
+            LabelType.IsVisible = true;
+
+            LabelSubControllerName.Text = subController.Name;
+            if (subController.UseLoRa)
                 LabelType.Text = "Long Range";
         }
-
+        
         public TapGestureRecognizer GetTapGestureRecognizer()
         {
             return StackLayoutViewSubControllerTapGesture;

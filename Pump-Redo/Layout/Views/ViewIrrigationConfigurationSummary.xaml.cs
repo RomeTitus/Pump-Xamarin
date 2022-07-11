@@ -17,7 +17,7 @@ namespace Pump.Layout.Views
     public partial class ViewIrrigationConfigurationSummary
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
-        public readonly ObservableFilteredIrrigation ObservableFiltered;
+        private readonly ObservableFilteredIrrigation _observableFiltered;
         private readonly SocketPicker _socketPicker;
         public ViewIrrigationConfigurationSummary(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker, string siteKey = null)
         {
@@ -32,9 +32,7 @@ namespace Pump.Layout.Views
             _socketPicker = socketPicker;
             ImageSetting.IsVisible = siteKey == null;
             FrameSchedule.IsVisible = siteKey != null || keyValueIrrigation.Key.ControllerPairs.Count == 1;
-            
-            //FrameSiteSummary.BackgroundColor = siteKey == null && keyValueIrrigation.Key.ControllerPairs.Count > 1? Color.Coral: Color.White;
-            
+
             if (siteKey != null)
             {
                 AutomationId = siteKey;
@@ -54,10 +52,10 @@ namespace Pump.Layout.Views
             }
 
             if(siteKey == null && keyValueIrrigation.Key.ControllerPairs.Count == 1)
-                ObservableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value, keyValueIrrigation.Key.ControllerPairs.Values.First());
+                _observableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value, keyValueIrrigation.Key.ControllerPairs.Values.First());
             else if(siteKey != null)
             {
-                ObservableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value, keyValueIrrigation.Key.ControllerPairs.First(x => x.Key == siteKey).Value);
+                _observableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value, keyValueIrrigation.Key.ControllerPairs.First(x => x.Key == siteKey).Value);
             }
 
             if (siteKey == null)
@@ -103,28 +101,28 @@ namespace Pump.Layout.Views
 
             });
 
-            if(ObservableFiltered == null)
+            if(_observableFiltered == null)
                 return;
             
-            var scheduleRunning = RunningCustomSchedule.GetCustomScheduleDetailRunningList(ObservableFiltered.CustomScheduleList.ToList()).Any();
+            var scheduleRunning = RunningCustomSchedule.GetCustomScheduleDetailRunningList(_observableFiltered.CustomScheduleList.ToList()).Any();
 
             if (!scheduleRunning)
             {
-                scheduleRunning = new RunningSchedule(ObservableFiltered.ScheduleList.ToList(),
-                        ObservableFiltered.EquipmentList.ToList()).GetRunningSchedule().Any();
+                scheduleRunning = new RunningSchedule(_observableFiltered.ScheduleList.ToList(),
+                        _observableFiltered.EquipmentList.ToList()).GetRunningSchedule().Any();
             }
 
             if (!scheduleRunning)
             {
-                scheduleRunning = ObservableFiltered.ManualScheduleList.Any();
+                scheduleRunning = _observableFiltered.ManualScheduleList.Any();
             }
 
             Device.BeginInvokeOnMainThread(() =>
             {
                 SetScheduleRunning(scheduleRunning);
 
-                if (ObservableFiltered.SensorList.Any())
-                    PressureSensor(ObservableFiltered.SensorList.ToList());
+                if (_observableFiltered.SensorList.Any())
+                    PressureSensor(_observableFiltered.SensorList.ToList());
 
             });
         }
@@ -168,6 +166,10 @@ namespace Pump.Layout.Views
             return tapGestureList;
         }
         
+        public TapGestureRecognizer GetTapGestureSettings()
+        { 
+            return IrrigationControllerSettingGesture;
+        }
         private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (_keyValueIrrigation.Value.AliveList.Any())
@@ -205,7 +207,7 @@ namespace Pump.Layout.Views
                 {
                     aliveStatus.RequestedTime = now;
                     requestedOnlineStatus = true;
-                    await _socketPicker.SendCommand(aliveStatus);
+                    await _socketPicker.SendCommand(aliveStatus, _keyValueIrrigation.Key);
                     oldTime = now;
                 }
                 else if (aliveStatus.ResponseTime >= aliveStatus.RequestedTime && aliveStatus.ResponseTime >= now - 599)
@@ -220,6 +222,16 @@ namespace Pump.Layout.Views
 
             _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
             return false;
+        }
+
+        public KeyValuePair<IrrigationConfiguration, ObservableIrrigation> GetIrrigationConfigAndObservable()
+        {
+            return _keyValueIrrigation;
+        }
+
+        public KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> GetIrrigationFilterConfigAndObservable()
+        {
+            return new KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>(_keyValueIrrigation.Key, _observableFiltered);
         }
     }
 }

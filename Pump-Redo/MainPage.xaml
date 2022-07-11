@@ -18,7 +18,6 @@
                         TextDecorations="Underline"
                         VerticalOptions="Center" />
                 </StackLayout>
-
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black"
@@ -26,11 +25,7 @@
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
                     <ScrollView HeightRequest="100">
-                        <StackLayout x:Name="ScrollViewSite">
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer x:Name="ScrollViewSiteTap" />
-                            </StackLayout.GestureRecognizers>
-                        </StackLayout>
+                        <StackLayout x:Name="ScrollViewSite"/>
 
                     </ScrollView>
                 </Frame>

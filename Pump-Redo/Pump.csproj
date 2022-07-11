@@ -14,6 +14,7 @@
         <None Remove="Icons\activePump.png" />
         <None Remove="Icons\ConnectionDown.png" />
         <None Remove="Icons\CustomSchedule.png" />
+        <None Remove="Icons\expandImage.png" />
         <None Remove="Icons\FieldSun.png" />
         <None Remove="Icons\gearSetting.png" />
         <None Remove="Icons\Home.png" />
@@ -43,6 +44,7 @@
         <EmbeddedResource Include="Icons\activePump.png" />
         <EmbeddedResource Include="Icons\ConnectionDown.png" />
         <EmbeddedResource Include="Icons\CustomSchedule.png" />
+        <EmbeddedResource Include="Icons\expandImage.png" />
         <EmbeddedResource Include="Icons\FieldSun.png" />
         <EmbeddedResource Include="Icons\gearSetting.png" />
         <EmbeddedResource Include="Icons\Home.png" />
@@ -106,6 +108,10 @@
       </Compile>
       <Compile Update="CustomRender\EntryOutlined.xaml.cs">
         <DependentUpon>ViewException.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Layout\Views\ViewSiteSummary.xaml.cs">
+        <DependentUpon>ViewSiteSummary.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

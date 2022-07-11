@@ -1,10 +1,11 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using EmbeddedImages;
 using Pump.Class;
-using Pump.Database;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.CommunityToolkit.UI.Views;
@@ -16,17 +17,16 @@ namespace Pump.Layout.Dashboard
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : ContentPage
     {
-        private readonly DatabaseController _databaseController = new DatabaseController();
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly SocketPicker _socketPicker;
         private SettingPageHomeScreen _settingPageHomeScreen;
 
-        public HomeScreen(ObservableFilteredIrrigation observableFilteredIrrigation,
+        public HomeScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
             SocketPicker socketPicker)
         {
-            _observableIrrigation = observableFilteredIrrigation.ObservableUnfilteredIrrigation;
-            _observableFilteredIrrigation = observableFilteredIrrigation;
+            _observableFilterKeyValuePair = observableFilterKeyValuePair;
+            _observableIrrigation = observableFilterKeyValuePair.Value.ObservableUnfilteredIrrigation;
             _socketPicker = socketPicker;
             InitializeComponent();
 
@@ -38,12 +38,12 @@ namespace Pump.Layout.Dashboard
 
         private void SetUpNavigationPage()
         {
-            var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableFilteredIrrigation);
-            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableFilteredIrrigation, _socketPicker);
-            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableFilteredIrrigation, _socketPicker);
-            var scheduleHomeScreen = new ScheduleHomeScreen(_observableFilteredIrrigation, _socketPicker);
+            var scheduleStatusHomeScreen = new ScheduleStatusHomeScreen(_observableFilterKeyValuePair);
+            var manualScheduleHomeScreen = new ManualScheduleHomeScreen(_observableFilterKeyValuePair, _socketPicker);
+            var customScheduleHomeScreen = new CustomScheduleHomeScreen(_observableFilterKeyValuePair, _socketPicker);
+            var scheduleHomeScreen = new ScheduleHomeScreen(_observableFilterKeyValuePair, _socketPicker);
             _settingPageHomeScreen =
-                new SettingPageHomeScreen(_observableIrrigation, _observableFilteredIrrigation, _socketPicker);
+                new SettingPageHomeScreen(_observableIrrigation, _observableFilterKeyValuePair, _socketPicker);
 
             var navigationScheduleStatusHomeScreen = new TabViewItem
             {
@@ -158,7 +158,7 @@ namespace Pump.Layout.Dashboard
                 {
                     aliveStatus.RequestedTime = now;
                     requestedOnlineStatus = true;
-                    await _socketPicker.SendCommand(aliveStatus);
+                    await _socketPicker.SendCommand(aliveStatus, _observableFilterKeyValuePair.Key);
                     oldTime = now;
                 }
                 else if (aliveStatus.ResponseTime >= aliveStatus.RequestedTime && aliveStatus.ResponseTime >= now - 599)

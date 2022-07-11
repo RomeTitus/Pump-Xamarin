@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
@@ -14,17 +15,19 @@ namespace Pump.Layout.Schedule
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ScheduleUpdate : ContentPage
     {
-        private readonly List<Equipment> _equipmentList;
         private readonly List<string> _pumpIdList = new List<string>();
         private readonly SocketPicker _socketPicker;
+
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
         private ViewSchedulePumpTime _pumpSelectedTime;
         private IrrigationController.Schedule _schedule;
 
-        public ScheduleUpdate(List<Equipment> equipmentList, SocketPicker socketPicker,
+        public ScheduleUpdate(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker,
             IrrigationController.Schedule schedule = null)
         {
             InitializeComponent();
-            _equipmentList = equipmentList;
+            _observableFilterKeyValuePair = observableFilterKeyValuePair;
             _socketPicker = socketPicker;
             _schedule = schedule;
             if (_schedule == null)
@@ -40,8 +43,6 @@ namespace Pump.Layout.Schedule
                 selectWeekThread.Start();
             }
 
-
-            //SetUpWeekDays(); //Not sure where this should go
             new Thread(SetUpWeekDays).Start();
 
             PopulateEquipment();
@@ -51,7 +52,7 @@ namespace Pump.Layout.Schedule
 
         private void PopulateEquipment()
         {
-            foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length)
+            foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length)
                          .ThenBy(c => c.NAME))
             {
                 PumpPicker.Items.Add(equipment.NAME);
@@ -65,9 +66,9 @@ namespace Pump.Layout.Schedule
             try
             {
                 ScrollViewZoneDetail.Children.Clear();
-                if (_equipmentList.Count(equipment => equipment.isPump == false) == 0)
+                if (_observableFilterKeyValuePair.Value.EquipmentList.Count(equipment => equipment.isPump == false) == 0)
                     ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
-                foreach (var equipment in _equipmentList.Where(equipment => equipment.isPump == false)
+                foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.Where(equipment => equipment.isPump == false)
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =
@@ -216,7 +217,7 @@ namespace Pump.Layout.Schedule
                 if (scheduleDetail.Count > 0)
                 {
                     _schedule.ScheduleDetails = scheduleDetail;
-                    await _socketPicker.SendCommand(_schedule);
+                    await _socketPicker.SendCommand(_schedule, _observableFilterKeyValuePair.Key);
 
                     await Navigation.PopModalAsync();
                 }
@@ -225,7 +226,7 @@ namespace Pump.Layout.Schedule
                     var floatingScreen = new FloatingScreen();
                     await PopupNavigation.Instance.PushAsync(floatingScreen);
                     _pumpSelectedTime = new ViewSchedulePumpTime(_schedule,
-                        _equipmentList.First(x => x?.Id == _schedule.id_Pump));
+                        _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == _schedule.id_Pump));
                     _pumpSelectedTime.GetPumpDurationButton().Pressed += UpdateSchedulePumpDuration_Pressed;
                     floatingScreen.SetFloatingScreen(new List<object> { _pumpSelectedTime });
                 }
@@ -334,7 +335,7 @@ namespace Pump.Layout.Schedule
                         DURATION = _pumpSelectedTime.GetPumpDurationTime().Text
                     }
                 };
-                await _socketPicker.SendCommand(_schedule);
+                await _socketPicker.SendCommand(_schedule, _observableFilterKeyValuePair.Key);
             }
 
             await Navigation.PopModalAsync();

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
@@ -12,19 +14,16 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EquipmentScreen : ContentPage
     {
-        private readonly ObservableIrrigation _observableIrrigation;
-        private readonly ObservableFilteredIrrigation _observableFilteredIrrigation;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly SocketPicker _socketPicker;
 
-        public EquipmentScreen(ObservableIrrigation observableIrrigation,
-            ObservableFilteredIrrigation observableFilteredIrrigation, SocketPicker socketPicker)
+        public EquipmentScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
         {
             InitializeComponent();
-            _observableFilteredIrrigation = observableFilteredIrrigation;
-            _observableIrrigation = observableIrrigation;
+            _observableFilterKeyValuePair = observableFilterKeyValuePair;
             _socketPicker = socketPicker;
-            _observableFilteredIrrigation.EquipmentList.CollectionChanged += PopulateEquipmentEvent;
-            _observableFilteredIrrigation.SensorList.CollectionChanged += PopulateSensorEvent;
+            _observableFilterKeyValuePair.Value.EquipmentList.CollectionChanged += PopulateEquipmentEvent;
+            _observableFilterKeyValuePair.Value.SensorList.CollectionChanged += PopulateSensorEvent;
             PopulateEquipment();
             PopulateSensor();
         }
@@ -39,10 +38,10 @@ namespace Pump.Layout
             ScreenCleanupForEquipment();
             try
             {
-                if (_observableFilteredIrrigation.EquipmentList.Contains(null)) return;
+                if (_observableFilterKeyValuePair.Value.EquipmentList.Contains(null)) return;
                 BtnAddEquipment.IsEnabled = true;
-                if (_observableFilteredIrrigation.EquipmentList.Any())
-                    foreach (var equipment in _observableFilteredIrrigation.EquipmentList.OrderBy(c => c.NAME.Length)
+                if (_observableFilterKeyValuePair.Value.EquipmentList.Any())
+                    foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.OrderBy(c => c.NAME.Length)
                                  .ThenBy(c => c.NAME))
                     {
                         var viewEquipment = ScrollViewEquipment.Children.FirstOrDefault(x =>
@@ -72,9 +71,9 @@ namespace Pump.Layout
         {
             try
             {
-                if (_observableFilteredIrrigation.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilteredIrrigation.EquipmentList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.EquipmentList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -121,10 +120,10 @@ namespace Pump.Layout
 
             try
             {
-                if (_observableFilteredIrrigation.EquipmentList.Contains(null)) return;
+                if (_observableFilterKeyValuePair.Value.EquipmentList.Contains(null)) return;
                 BtnAddSensor.IsEnabled = true;
-                if (_observableFilteredIrrigation.SensorList.Any())
-                    foreach (var sensor in _observableFilteredIrrigation.SensorList)
+                if (_observableFilterKeyValuePair.Value.SensorList.Any())
+                    foreach (var sensor in _observableFilterKeyValuePair.Value.SensorList)
                     {
                         var viewSensorChild = ScrollViewSensor.Children.FirstOrDefault(x =>
                             x.AutomationId == sensor.Id);
@@ -157,9 +156,9 @@ namespace Pump.Layout
         {
             try
             {
-                if (_observableFilteredIrrigation.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilteredIrrigation.SensorList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
                     for (var index = 0; index < ScrollViewSensor.Children.Count; index++)
@@ -199,29 +198,28 @@ namespace Pump.Layout
         private async void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
         {
             var viewEquipment = (StackLayout)sender;
-            var equipment = _observableFilteredIrrigation.EquipmentList.First(x => x?.Id == viewEquipment.AutomationId);
+            var equipment = _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == viewEquipment.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + equipment.NAME,
                 "Cancel", null, "Update", "Delete");
             if (action == null) return;
 
             if (action == "Update")
-                await Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(),
-                    _observableIrrigation.SubControllerList.ToList(), _socketPicker, equipment));
+                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, equipment));
             else if (action == "Delete")
                 if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + equipment.NAME, "Delete",
                         "Cancel"))
                 {
                     equipment.DeleteAwaiting = true;
-                    await _socketPicker.SendCommand(equipment);
+                    await _socketPicker.SendCommand(equipment, _observableFilterKeyValuePair.Key);
                 }
         }
 
         private async void ViewSensorScreen_Tapped(object sender, EventArgs e)
         {
             var viewSensor = (StackLayout)sender;
-            var sensor = _observableFilteredIrrigation.SensorList.First(x => x?.Id == viewSensor.AutomationId);
+            var sensor = _observableFilterKeyValuePair.Value.SensorList.First(x => x?.Id == viewSensor.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + sensor.NAME,
                 "Cancel", null, "Update", "Delete");
@@ -229,8 +227,7 @@ namespace Pump.Layout
 
             if (action == "Update")
             {
-                await Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(),
-                    _observableIrrigation.SubControllerList.ToList(), _observableFilteredIrrigation.EquipmentList.ToList(), _socketPicker, sensor));
+                await Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, sensor));
             }
             else
             {
@@ -239,7 +236,7 @@ namespace Pump.Layout
                         "Cancel"))
                 {
                     sensor.DeleteAwaiting = true;
-                    await _socketPicker.SendCommand(sensor);
+                    await _socketPicker.SendCommand(sensor, _observableFilterKeyValuePair.Key);
                 }
             }
         }
@@ -251,14 +248,12 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new EquipmentUpdate(_observableIrrigation.EquipmentList.ToList(),
-                _observableIrrigation.SubControllerList.ToList(), _socketPicker));
+            Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(new SensorUpdate(_observableIrrigation.SensorList.ToList(),
-                _observableIrrigation.SubControllerList.ToList(), _observableFilteredIrrigation.EquipmentList.ToList(), _socketPicker));
+            Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker));
         }
     }
 }

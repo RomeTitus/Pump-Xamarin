@@ -21,7 +21,7 @@
                 HasShadow="False"
                 HorizontalOptions="FillAndExpand">
 
-                <StackLayout x:Name="StackLayoutSiteSummary" Margin="0,0,0,5">
+                <StackLayout Margin="0,0,0,5">
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer x:Name="StackLayoutViewSiteTapGesture" />
                     </StackLayout.GestureRecognizers>
