@@ -371,6 +371,23 @@ namespace Pump.SocketController.Firebase
 
             return null;
         }
+        
+        public async Task<string> UpdateIrrigationConfig(IrrigationConfiguration config)
+        {
+            try
+            {
+                var result = await FirebaseQuery
+                        .Child("/Config/ " + config.Path)
+                        .PostAsync(config);
+                    return result.Key;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return null;
+        }
 
         public async Task<IReadOnlyCollection<FirebaseObject<JObject>>> GetRecordingBetweenDates(long startFrom,
             long endOn, string path)

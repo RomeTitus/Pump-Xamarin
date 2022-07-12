@@ -7,6 +7,7 @@ using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -108,13 +109,8 @@ namespace Pump.Layout
 
             return notification;
         }
-        
-        private async void Button_OnPressed_Back(object sender, EventArgs e)
-        {
-            await Navigation.PopModalAsync();
-        }
 
-                
+
         private string ValidateIpTextChange(EntryOutlined entry, string interfaceName = "")
         {
             List<char> allowedCharacters = new List<char> { '0','1','2','3','4','5','6','7','8','9','.'};
@@ -216,8 +212,20 @@ namespace Pump.Layout
                 }
             }
             
+            var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
+            
+            //Force Firebase
+            await _socketPicker.UpdateIrrigationConfig(irrigationConfiguration);
+            await PopupNavigation.Instance.PopAllAsync();
+            await Navigation.PopModalAsync();
+            
         }
 
+        private async void Button_OnPressed_Back(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
+        }
         private static int? StringToInt(string value)
         {
             if (string.IsNullOrEmpty(value))
