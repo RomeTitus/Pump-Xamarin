@@ -10,7 +10,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewSensorDetail : ContentView
+    public partial class ViewSensorDetail
     {
         public readonly Sensor Sensor;
         private string _image = "";
@@ -21,7 +21,7 @@ namespace Pump.Layout.Views
             InitializeComponent();
             Sensor = sensor;
             AutomationId = Sensor.Id;
-            PopulateSensor();
+            Populate();
         }
 
         public ViewSensorDetail(Sensor sensor, double size)
@@ -32,10 +32,10 @@ namespace Pump.Layout.Views
             HeightRequest = 150 * size;
             LabelSensorType.FontSize *= size;
             LabelSensorName.FontSize *= size;
-            PopulateSensor();
+            Populate();
         }
 
-        public void PopulateSensor()
+        public void Populate()
         {
             LabelSensorType.Text = Sensor.TYPE;
             LabelSensorName.Text = Sensor.NAME;
@@ -43,23 +43,27 @@ namespace Pump.Layout.Views
                 LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime()
                     .ToString("dd/MM/yyyy HH:mm")
                     .ToString(CultureInfo.InvariantCulture);
-            switch (Sensor.TYPE)
-            {
-                case "Pressure Sensor":
-                    PressureSensor();
-                    break;
-                case "Temperature Sensor":
-                    TemperatureSensor();
-                    break;
-            }
 
-            if (_oldImage != _image)
+            Device.BeginInvokeOnMainThread(() =>
             {
-                _oldImage = _image;
-                ImageSensor.Source = ImageSource.FromResource(
-                    _image,
-                    typeof(ImageResourceExtension).GetTypeInfo().Assembly);
-            }
+                switch (Sensor.TYPE)
+                {
+                    case "Pressure Sensor":
+                        PressureSensor();
+                        break;
+                    case "Temperature Sensor":
+                        TemperatureSensor();
+                        break;
+                }
+
+                if (_oldImage != _image)
+                {
+                    _oldImage = _image;
+                    ImageSensor.Source = ImageSource.FromResource(
+                        _image,
+                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
+                }
+            });
         }
 
         private void PressureSensor()

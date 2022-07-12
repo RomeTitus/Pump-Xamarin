@@ -49,26 +49,41 @@ namespace Pump.SocketController.Firebase
                 if (configuration == null)
                     throw new Exception("Configuration does not exist for :" + obj.Key);
 
+                if (obj.Object.ContainsKey("Equipment"))
+                {
+                    var jProperty = obj.Object.Property("Equipment");
+                    //FirebaseToObservable()
+                    FirebaseToObservable(new KeyValuePair<string, JToken>(jProperty.Name, jProperty.Value),
+                        configuration);
+                    obj.Object.Remove("Equipment");
+                }
+                
                 foreach (var elementPair in obj.Object)
                 {
-                    if (!elementPair.Value.Any())
-                        continue;
-
-                    var typeAndDynamicValueList =
-                        ManageObservableIrrigationData.GetDynamicValueListFromJObject(elementPair.Key,
-                            JObject.Parse(elementPair.Value.ToString()));
-
-                    if (typeAndDynamicValueList.type == null)
-                        continue;
-
-                    ManageObservableIrrigationData.AddUpdateOrRemoveRecordFromController(typeAndDynamicValueList.type,
-                        typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
+                    FirebaseToObservable(elementPair, configuration);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+        }
+
+        private void FirebaseToObservable( KeyValuePair<string,JToken> elementPair,  IrrigationConfiguration configuration)
+        {
+            if (!elementPair.Value.Any())
+                return;
+
+            var typeAndDynamicValueList =
+                ManageObservableIrrigationData.GetDynamicValueListFromJObject(elementPair.Key,
+                    JObject.Parse(elementPair.Value.ToString()));
+
+            if (typeAndDynamicValueList.type == null)
+                return;
+
+            ManageObservableIrrigationData.AddUpdateOrRemoveRecordFromController(typeAndDynamicValueList.type,
+                typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
+
         }
 
         private void UpdateConfiguration(Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict,
