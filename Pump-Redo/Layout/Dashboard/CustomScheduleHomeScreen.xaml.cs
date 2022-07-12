@@ -50,7 +50,7 @@ namespace Pump.Layout.Dashboard
 
             try
             {
-                if (!_observableFilterKeyValuePair.Value.LoadedAllData()) return;
+                if (!_observableFilterKeyValuePair.Value.LoadedData) return;
                 if (_observableFilterKeyValuePair.Value.CustomScheduleList.Any())
                 {
                     foreach (var customSchedule in _observableFilterKeyValuePair.Value.CustomScheduleList)
@@ -97,7 +97,7 @@ namespace Pump.Layout.Dashboard
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.CustomScheduleList
                         .Select(x => x?.Id).ToList();

@@ -116,6 +116,15 @@ namespace Pump
             }
         }
 
+        public void UpdateSiteNames(IrrigationConfiguration irrigationConfiguration)
+        {
+            var viewSiteSummary = (ViewIrrigationConfigurationSummary) ScrollViewSite.Children.First(x =>
+                x.AutomationId == irrigationConfiguration.Path);
+
+            viewSiteSummary.ReLoadChildren();
+            viewSiteSummary.GetTapGestureRecognizerList().ForEach(x => x.Tapped += OnTapped_HomeScreen);
+        }
+
         private void UpdateSavedIrrigation()
         {
             foreach (var view in ScrollViewSite.Children.Where(x => x is ViewIrrigationConfigurationSummary))
@@ -131,7 +140,7 @@ namespace Pump
             var configurationSummary =
                 (ViewIrrigationConfigurationSummary)imageGesture.Parent.Parent.Parent.Parent.Parent.Parent;
             var settingsScreen =
-                new IrrigationControllerSettings(configurationSummary.GetIrrigationConfigAndObservable(),
+                new IrrigationControllerSettings(this, configurationSummary.GetIrrigationConfigAndObservable(),
                     _socketPicker);
             Navigation.PushModalAsync(settingsScreen);
         }
@@ -139,10 +148,12 @@ namespace Pump
         private void OnTapped_HomeScreen(object sender, EventArgs e)
         {
             var stackLayoutGesture = (StackLayout)sender;
-            var configurationSummary = (ViewIrrigationConfigurationSummary)stackLayoutGesture.Parent.Parent.Parent;
-            if (configurationSummary.GetIrrigationFilterConfigAndObservable().Value == null)
+            var siteSummary = (ViewIrrigationSiteSummary)stackLayoutGesture.Parent.Parent.Parent;
+            var configurationSummary = (ViewIrrigationConfigurationSummary) siteSummary.Parent.Parent.Parent.Parent.Parent;
+            
+            if (configurationSummary.GetIrrigationFilterConfigAndObservable(siteSummary.ObservableFiltered).Value == null)
                 return;
-            var homeScreen = new HomeScreen(configurationSummary.GetIrrigationFilterConfigAndObservable(),
+            var homeScreen = new HomeScreen(configurationSummary.GetIrrigationFilterConfigAndObservable(siteSummary.ObservableFiltered),
                 _socketPicker);
             Navigation.PushModalAsync(homeScreen);
         }

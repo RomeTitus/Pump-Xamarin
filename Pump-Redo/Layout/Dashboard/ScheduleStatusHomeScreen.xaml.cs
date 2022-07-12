@@ -49,7 +49,7 @@ namespace Pump.Layout.Dashboard
             try
             {
                 ScreenCleanupForSchedule();
-                if (!_observableFilterKeyValuePair.Value.LoadedAllData()) return;
+                if (!_observableFilterKeyValuePair.Value.LoadedData) return;
 
                 var manualSchedule = _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault();
 
@@ -186,7 +186,7 @@ namespace Pump.Layout.Dashboard
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var runningScheduleList =
                         new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
@@ -273,7 +273,7 @@ namespace Pump.Layout.Dashboard
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var itemsThatAreOnDisplay =
                         _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();

@@ -14,16 +14,18 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class IrrigationControllerSettings : ContentPage
+    public partial class IrrigationControllerSettings
     {
         private readonly List<string> _connectionLabel = new List<string> { "Cloud", "Network", "Bluetooth" };
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
         private readonly SocketPicker _socketPicker;
+        private readonly MainPage _mainPage;
 
-        public IrrigationControllerSettings(
+        public IrrigationControllerSettings(MainPage mainPage,
             KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
+            _mainPage = mainPage;
             _keyValueIrrigation = keyValueIrrigation;
             _socketPicker = socketPicker;
             Populate();
@@ -96,13 +98,13 @@ namespace Pump.Layout
             notification += ValidatePortTextChange(InternalPortEntry, "Internal Port");
             notification += ValidatePortTextChange(ExternalPortEntry, "External Port");
 
-            if (InternalIpEntry.Text.Any() || string.IsNullOrEmpty(InternalPortEntry.Text))
+            if (string.IsNullOrEmpty(InternalIpEntry.Text) == false && InternalIpEntry.Text.Any() && string.IsNullOrEmpty(InternalPortEntry.Text))
             {
                 notification += "\n\u2022 Internal port cannot be empty when Internal IP is filled in";
                 SetPlaceholderColor(InternalPortEntry, Color.Red, Color.Red);
             }
 
-            if (ExternalIpEntry.Text.Any() || string.IsNullOrEmpty(ExternalPortEntry.Text))
+            if (string.IsNullOrEmpty(ExternalIpEntry.Text) == false && ExternalIpEntry.Text.Any() && string.IsNullOrEmpty(ExternalPortEntry.Text))
             {
                 notification += "\n\u2022 External port cannot be empty when External IP is filled in";
                 SetPlaceholderColor(ExternalPortEntry, Color.Red, Color.Red);
@@ -116,6 +118,9 @@ namespace Pump.Layout
         {
             var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
 
+            if (string.IsNullOrEmpty(entry.Text))
+                return string.Empty;
+            
             if (entry.Text.Any(charValue => !allowedCharacters.Contains(charValue)))
             {
                 SetPlaceholderColor(entry, Color.Red, Color.Red);
@@ -205,7 +210,7 @@ namespace Pump.Layout
             {
                 var viewSite = (ViewSiteSummary)view;
                 var keyPair = viewSite.GetKeyValuePair();
-                var newSiteName = viewSite.SiteNameEntry.Text;
+                var newSiteName = viewSite.GetSiteNameEntry().Text;
                 if (newSiteName != keyPair.Key)
                 {
                     irrigationConfiguration.ControllerPairs.Add(newSiteName, keyPair.Value);
@@ -217,7 +222,12 @@ namespace Pump.Layout
             await PopupNavigation.Instance.PushAsync(loadingScreen);
 
             //Force Firebase
-            await _socketPicker.UpdateIrrigationConfig(irrigationConfiguration);
+            var result = await _socketPicker.UpdateIrrigationConfig(irrigationConfiguration);
+            if (result)
+            {
+                _mainPage.UpdateSiteNames(irrigationConfiguration);
+            }
+            //_mainPage.
             await PopupNavigation.Instance.PopAllAsync();
             await Navigation.PopModalAsync();
         }

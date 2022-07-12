@@ -48,7 +48,7 @@ namespace Pump.Layout.Dashboard
             ScreenCleanupForSchedules();
             try
             {
-                if (!_observableFilterKeyValuePair.Value.LoadedAllData()) return;
+                if (!_observableFilterKeyValuePair.Value.LoadedData) return;
                 if (_observableFilterKeyValuePair.Value.ScheduleList.Any())
                 {
                     foreach (var schedule in _observableFilterKeyValuePair.Value.ScheduleList.ToList())
@@ -96,7 +96,7 @@ namespace Pump.Layout.Dashboard
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var itemsThatAreOnDisplay =
                         _observableFilterKeyValuePair.Value.ScheduleList.Select(x => x?.Id).ToList();

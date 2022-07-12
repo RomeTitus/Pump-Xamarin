@@ -91,7 +91,7 @@ namespace Pump.SocketController
             return result;
         }
 
-        public async Task<string> UpdateIrrigationConfig(IrrigationConfiguration configuration)
+        public async Task<bool> UpdateIrrigationConfig(IrrigationConfiguration configuration)
         {
             return await _firebaseManager.UpdateIrrigationConfig(configuration);
         }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using EmbeddedImages;
 using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
@@ -17,63 +17,37 @@ namespace Pump.Layout.Views
     public partial class ViewIrrigationConfigurationSummary
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
-        private readonly ObservableFilteredIrrigation _observableFiltered;
         private readonly SocketPicker _socketPicker;
-
-        public ViewIrrigationConfigurationSummary(
-            KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker,
-            string siteKey = null)
+        
+        public ViewIrrigationConfigurationSummary(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
-            if (Device.RuntimePlatform == Device.UWP)
-                ActivityIndicatorUwpLoadingIndicator.IsVisible = true;
-            else
-                ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
-
-
             _keyValueIrrigation = keyValueIrrigation;
             _socketPicker = socketPicker;
-            ImageSetting.IsVisible = siteKey == null;
-            FrameSchedule.IsVisible = siteKey != null || keyValueIrrigation.Key.ControllerPairs.Count == 1;
-
-            if (siteKey != null)
+            AutomationId = keyValueIrrigation.Key.Path;
+            Device.BeginInvokeOnMainThread(() =>
             {
-                AutomationId = siteKey;
-                LabelSiteName.Text = siteKey;
-            }
-            else
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    AutomationId = keyValueIrrigation.Key.ControllerPairs.Keys.First();
-                    LabelSiteName.Text = keyValueIrrigation.Key.ControllerPairs.Keys.First();
-                    FrameSiteSummary.BackgroundColor = Color.Coral;
-                    keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
-                    subscribeToOnlineStatus(this,
-                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                });
-            }
-
-            if (siteKey == null && keyValueIrrigation.Key.ControllerPairs.Count == 1)
-                _observableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value,
-                    keyValueIrrigation.Key.ControllerPairs.Values.First());
-            else if (siteKey != null)
-                _observableFiltered = new ObservableFilteredIrrigation(keyValueIrrigation.Value,
-                    keyValueIrrigation.Key.ControllerPairs.First(x => x.Key == siteKey).Value);
-
-            if (siteKey == null) SetSites();
+                if (Device.RuntimePlatform == Device.UWP)
+                    ActivityIndicatorUwpLoadingIndicator.IsVisible = true;
+                else
+                    ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
+                LabelControllerConfigName.Text = keyValueIrrigation.Key.Path;
+                FrameSiteSummary.BackgroundColor = Color.Coral;
+            });
+            
+            keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
+            subscribeToOnlineStatus(this,
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            
+            SetExistingSites();
         }
 
-        private void SetSites()
+        private void SetExistingSites()
         {
-            if (_keyValueIrrigation.Key.ControllerPairs.Count <= 1)
-                return;
-
             foreach (var controllerPair in _keyValueIrrigation.Key.ControllerPairs
                          .Where(x => SiteChildren.Children.Select(y => y.AutomationId).Contains(x.Key) == false))
             {
-                var filteredSiteSummary =
-                    new ViewIrrigationConfigurationSummary(_keyValueIrrigation, _socketPicker, controllerPair.Key);
+                var filteredSiteSummary = new ViewIrrigationSiteSummary(_keyValueIrrigation.Value, controllerPair);
                 SiteChildren.Children.Add(filteredSiteSummary);
             }
         }
@@ -82,84 +56,23 @@ namespace Pump.Layout.Views
         {
             foreach (var view in SiteChildren.Children)
             {
-                var siteView = (ViewIrrigationConfigurationSummary)view;
+                var siteView = (ViewIrrigationSiteSummary)view;
                 siteView.SetConfigurationSummary();
             }
 
-            SetConfigurationSummary();
-        }
-
-        private void SetConfigurationSummary()
-        {
-            if (_keyValueIrrigation.Value.LoadedData == false)
-                return;
-
-            Device.BeginInvokeOnMainThread(() =>
+            if (_keyValueIrrigation.Value.LoadedData)
             {
-                if (Device.RuntimePlatform == Device.UWP)
+                Device.BeginInvokeOnMainThread(() =>
+                {
                     ActivityIndicatorUwpLoadingIndicator.IsVisible = false;
-                else
                     ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
-            });
-
-            if (_observableFiltered == null)
-                return;
-
-            var scheduleRunning = RunningCustomSchedule
-                .GetCustomScheduleDetailRunningList(_observableFiltered.CustomScheduleList.ToList()).Any();
-
-            if (!scheduleRunning)
-                scheduleRunning = new RunningSchedule(_observableFiltered.ScheduleList.ToList(),
-                    _observableFiltered.EquipmentList.ToList()).GetRunningSchedule().Any();
-
-            if (!scheduleRunning) scheduleRunning = _observableFiltered.ManualScheduleList.Any();
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                SetScheduleRunning(scheduleRunning);
-
-                if (_observableFiltered.SensorList.Any())
-                    PressureSensor(_observableFiltered.SensorList.ToList());
-            });
+                });
+            }
         }
-
-        private void PressureSensor(List<Sensor> sensorList)
-        {
-            var sensor = sensorList.FirstOrDefault(x => x.TYPE == "Pressure Sensor");
-            if (sensor == null)
-                return;
-
-            LabelPressure.IsVisible = true;
-            var reading = Convert.ToDouble(sensor.LastReading, CultureInfo.InvariantCulture);
-
-            var voltage = reading * 5.0 / 1024.0;
-
-            var pressurePascal = 3.0 * (voltage - 0.47) * 1000000.0;
-
-            var bars = pressurePascal / 10e5;
-            LabelPressure.Text = bars.ToString("0.##") + " Bar";
-        }
-
-        private void SetScheduleRunning(bool running)
-        {
-            FrameScheduleStatus.BackgroundColor = running ? Color.LawnGreen : Color.White;
-        }
-
-        public void SetBackgroundColor(Color color)
-        {
-            FrameSiteSummary.BackgroundColor = color;
-        }
-
+        
         public List<TapGestureRecognizer> GetTapGestureRecognizerList()
         {
-            var tapGestureList = new List<TapGestureRecognizer> { StackLayoutViewSiteTapGesture };
-            foreach (var view in SiteChildren.Children)
-            {
-                var siteView = (ViewIrrigationConfigurationSummary)view;
-                tapGestureList.Add(siteView.StackLayoutViewSiteTapGesture);
-            }
-
-            return tapGestureList;
+            return (from ViewIrrigationSiteSummary siteView in SiteChildren.Children select siteView.GestureRecognizer()).ToList();
         }
 
         public TapGestureRecognizer GetTapGestureSettings()
@@ -169,18 +82,29 @@ namespace Pump.Layout.Views
 
         private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (_keyValueIrrigation.Value.AliveList.Any())
+            var result = await ConnectionSuccessful();
+            
+            Device.BeginInvokeOnMainThread(() =>
             {
-                var result = await ConnectionSuccessful();
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    FrameSiteSummary.BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
-                });
-            }
+                FrameSiteSummary.BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
+                SetSignalStrength(result? 5 : 0);
+            });
+            
+        }
+
+        private void SetSignalStrength(int signal)
+        {
+            ImageSignalStrengthNoSignal.IsVisible = signal == 0;
+            ImageSignalStrength1.IsVisible = signal == 1;
+            ImageSignalStrength2.IsVisible = signal == 2;
+            ImageSignalStrength3.IsVisible = signal == 3;
+            ImageSignalStrength4.IsVisible = signal == 4;
+            ImageSignalStrength5.IsVisible = signal == 5;
         }
 
         private async Task<bool> ConnectionSuccessful()
         {
+            int signalStrength = 2;
             _keyValueIrrigation.Value.AliveList.CollectionChanged -= subscribeToOnlineStatus;
             var oldTime = ScheduleTime.GetUnixTimeStampUtcNow();
             var now = ScheduleTime.GetUnixTimeStampUtcNow();
@@ -189,17 +113,17 @@ namespace Pump.Layout.Views
             while (now < oldTime + delay) //seconds Delay
             {
                 //See if Requested in Greater than response :/
-                var aliveStatus = _keyValueIrrigation.Value.AliveList.First();
+                var aliveStatus = _keyValueIrrigation.Value.AliveList.FirstOrDefault();
 
                 //No Point in trying to request OnlineStatus if someone else has already tried and failed 1-delay seconds ago
-                if (aliveStatus.ResponseTime < aliveStatus.RequestedTime - delay &&
+                if (aliveStatus?.ResponseTime < aliveStatus?.RequestedTime - delay &&
                     aliveStatus.RequestedTime > now - delay && !requestedOnlineStatus)
                 {
                     _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
                     return false;
                 }
 
-                if (aliveStatus.ResponseTime <= now - 600 &&
+                if (aliveStatus?.ResponseTime <= now - 600 &&
                     aliveStatus.ResponseTime >=
                     aliveStatus.RequestedTime) // 10 Minutes before We try Request Online Status Again
                 {
@@ -208,7 +132,7 @@ namespace Pump.Layout.Views
                     await _socketPicker.SendCommand(aliveStatus, _keyValueIrrigation.Key);
                     oldTime = now;
                 }
-                else if (aliveStatus.ResponseTime >= aliveStatus.RequestedTime && aliveStatus.ResponseTime >= now - 599)
+                else if (aliveStatus?.ResponseTime >= aliveStatus?.RequestedTime && aliveStatus.ResponseTime >= now - 599)
                 {
                     _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
                     return true;
@@ -216,6 +140,10 @@ namespace Pump.Layout.Views
 
                 now = ScheduleTime.GetUnixTimeStampUtcNow();
                 await Task.Delay(400);
+                SetSignalStrength(signalStrength);
+                signalStrength++;
+                if (signalStrength > 5)
+                    signalStrength = 1;
             }
 
             _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
@@ -227,11 +155,16 @@ namespace Pump.Layout.Views
             return _keyValueIrrigation;
         }
 
-        public KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
-            GetIrrigationFilterConfigAndObservable()
+        public KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>  GetIrrigationFilterConfigAndObservable(ObservableFilteredIrrigation observableFiltered)
         {
             return new KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>(_keyValueIrrigation.Key,
-                _observableFiltered);
+                observableFiltered);
+        }
+
+        public void ReLoadChildren()
+        {
+            SiteChildren.Children.Clear();
+            SetExistingSites();
         }
     }
 }

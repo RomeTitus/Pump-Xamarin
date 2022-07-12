@@ -45,7 +45,7 @@ namespace Pump.Layout.Dashboard
             ScreenCleanupForManualScreen();
             try
             {
-                if (!_observableFilterKeyValuePair.Value.LoadedAllData()) return;
+                if (!_observableFilterKeyValuePair.Value.LoadedData) return;
 
                 foreach (var pump in _observableFilterKeyValuePair.Value.EquipmentList.Where(x => x.isPump)
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
@@ -118,7 +118,7 @@ namespace Pump.Layout.Dashboard
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var pumpsThatAreOnDisplay = _observableFilterKeyValuePair.Value.EquipmentList.Where(x => x.isPump)
                         .Select(y => y.Id).ToList();

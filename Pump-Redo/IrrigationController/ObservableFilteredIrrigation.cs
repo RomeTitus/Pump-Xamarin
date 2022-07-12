@@ -31,6 +31,8 @@ namespace Pump.IrrigationController
         public ObservableCollection<Sensor> SensorList { get; }
         public ObservableCollection<SubController> SubControllerList { get; }
         public List<string> ControllerIdList { get; }
+        
+        public bool LoadedData => ObservableUnfilteredIrrigation.LoadedData;
 
         private void Filter()
         {
@@ -61,11 +63,6 @@ namespace Pump.IrrigationController
             if (e.Action == NotifyCollectionChangedAction.Remove)
                 foreach (dynamic item in e.OldItems)
                     ManageObservableIrrigationData.FilteredRemove(item, this);
-        }
-
-        public bool LoadedAllData()
-        {
-            return ObservableUnfilteredIrrigation.LoadedData;
         }
     }
 }

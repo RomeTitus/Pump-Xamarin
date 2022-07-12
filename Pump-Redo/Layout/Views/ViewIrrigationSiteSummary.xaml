@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <ContentView
-    x:Class="Pump.Layout.Views.ViewIrrigationConfigurationSummary"
+    x:Class="Pump.Layout.Views.ViewIrrigationSiteSummary"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:extensions="http://xamarin.com/schemas/2020/toolkit">
@@ -37,7 +37,7 @@
                     <StackLayout Orientation="Horizontal">
                         <StackLayout Orientation="Vertical">
                             <Label
-                                x:Name="LabelControllerConfigName"
+                                x:Name="LabelSiteName"
                                 FontSize="Medium"
                                 TextColor="Gray"
                                 HorizontalOptions="Start"
@@ -65,26 +65,31 @@
                                 IsVisible="False"
                                 VerticalOptions="Center"
                                 Color="Black" />
-                            <RelativeLayout>
-                                <Image HeightRequest="40" x:Name="ImageSignalStrength1" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_1.png}" IsVisible="True"/>
-                                <Image HeightRequest="40" x:Name="ImageSignalStrength2" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_2.png}" IsVisible="False"/>
-                                <Image HeightRequest="40" x:Name="ImageSignalStrength3" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_3.png}" IsVisible="False"/>
-                                <Image HeightRequest="40" x:Name="ImageSignalStrength4" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_4.png}" IsVisible="False"/>
-                                <Image HeightRequest="40" x:Name="ImageSignalStrength5" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_5.png}" IsVisible="False"/>
-                                <Image HeightRequest="40" x:Name="ImageSignalStrengthNoSignal" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" IsVisible="False"/>
-
-                            </RelativeLayout>
-                            <Image Source="{extensions:ImageResourceExtension Pump.Icons.gearSetting.png}"
-                                   HeightRequest="40">
-                                <Image.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        x:Name="IrrigationControllerSettingGesture" />
-                                </Image.GestureRecognizers>
-                            </Image>
-
+                            <Frame
+                                x:Name="FrameSchedule"
+                                Margin="0"
+                                Padding="1"
+                                BackgroundColor="White"
+                                BorderColor="DarkGreen"
+                                CornerRadius="30"
+                                HasShadow="False"
+                                HeightRequest="30"
+                                HorizontalOptions="EndAndExpand"
+                                VerticalOptions="CenterAndExpand"
+                                WidthRequest="30">
+                                <Frame
+                                    x:Name="FrameScheduleStatus"
+                                    Margin="0"
+                                    Padding="1"
+                                    BackgroundColor="White"
+                                    BorderColor="DarkGreen"
+                                    CornerRadius="30"
+                                    HasShadow="False"
+                                    HeightRequest="30"
+                                    WidthRequest="30" />
+                            </Frame>
                         </StackLayout>
                     </StackLayout>
-                    <StackLayout x:Name="SiteChildren" />
                 </StackLayout>
             </Frame>
         </Frame>

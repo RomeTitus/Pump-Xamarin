@@ -76,7 +76,7 @@ namespace Pump.Layout
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var itemsThatAreOnDisplay =
                         _observableFilterKeyValuePair.Value.EquipmentList.Select(x => x?.Id).ToList();
@@ -162,7 +162,7 @@ namespace Pump.Layout
         {
             try
             {
-                if (_observableFilterKeyValuePair.Value.LoadedAllData())
+                if (_observableFilterKeyValuePair.Value.LoadedData)
                 {
                     var itemsThatAreOnDisplay =
                         _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();

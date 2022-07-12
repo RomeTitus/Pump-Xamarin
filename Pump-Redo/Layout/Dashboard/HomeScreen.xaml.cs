@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using EmbeddedImages;
-using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
@@ -15,7 +11,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Dashboard
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class HomeScreen : ContentPage
+    public partial class HomeScreen
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
@@ -32,10 +28,6 @@ namespace Pump.Layout.Dashboard
             _observableIrrigation = observableFilterKeyValuePair.Value.ObservableUnfilteredIrrigation;
             _socketPicker = socketPicker;
             InitializeComponent();
-
-            subscribeToOnlineStatus(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
-            HomeScreenSite(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             SetUpNavigationPage();
         }
 
@@ -103,89 +95,6 @@ namespace Pump.Layout.Dashboard
             TabViewHome.TabItems.Add(navigationCustomScheduleHomeScreen);
             TabViewHome.TabItems.Add(navigationScheduleHomeScreen);
             TabViewHome.TabItems.Add(navigationSettingPageHomeScreen);
-        }
-
-        public Button GetSiteButton()
-        {
-            return _settingPageHomeScreen.GetSiteButton();
-        }
-
-        private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (_observableIrrigation.AliveList.Any() && !_observableIrrigation.AliveList.Contains(null))
-            {
-                var result = await ConnectionSuccessful();
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    SignalImage.Source = ImageSource.FromResource(
-                        result ? "Pump.Icons.Signal_5.png" : "Pump.Icons.Signal_NoSignal.png",
-                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
-                    BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
-                });
-            }
-        }
-
-        private void HomeScreenSite(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            //var site = _observableIrrigation.SiteList.FirstOrDefault(x =>
-            //    x?.ID == _databaseController.GetControllerConnectionSelection().SiteSelectedId);
-            //if (site == null || LabelSite.Text == site.NAME)
-            //    return;
-            //Device.BeginInvokeOnMainThread(() => { LabelSite.Text = site.NAME; });
-        }
-
-        private async Task<bool> ConnectionSuccessful()
-        {
-            _observableIrrigation.AliveList.CollectionChanged -= subscribeToOnlineStatus;
-            var oldTime = ScheduleTime.GetUnixTimeStampUtcNow();
-            var now = ScheduleTime.GetUnixTimeStampUtcNow();
-            var count = 1;
-            var requestedOnlineStatus = false;
-            var delay = 16;
-            while (now < oldTime + delay) //seconds Delay
-            {
-                //See if Requested in Greater than response :/
-                var aliveStatus = _observableIrrigation.AliveList.First();
-
-                //No Point in trying to request OnlineStatus if someone else has already tried and failed 1-delay seconds ago
-                if (aliveStatus.ResponseTime < aliveStatus.RequestedTime - delay &&
-                    aliveStatus.RequestedTime > now - delay && !requestedOnlineStatus)
-                {
-                    _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
-                    return false;
-                }
-
-                if (aliveStatus.ResponseTime <= now - 600 &&
-                    aliveStatus.ResponseTime >=
-                    aliveStatus.RequestedTime) // 10 Minutes before We try Request Online Status Again
-                {
-                    aliveStatus.RequestedTime = now;
-                    requestedOnlineStatus = true;
-                    await _socketPicker.SendCommand(aliveStatus, _observableFilterKeyValuePair.Key);
-                    oldTime = now;
-                }
-                else if (aliveStatus.ResponseTime >= aliveStatus.RequestedTime && aliveStatus.ResponseTime >= now - 599)
-                {
-                    _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
-                    return true;
-                }
-
-                now = ScheduleTime.GetUnixTimeStampUtcNow();
-                var count1 = count;
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    SignalImage.Source = ImageSource.FromResource(
-                        "Pump.Icons.Signal_" + count1 + ".png",
-                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
-                });
-                count++;
-                if (count > 5)
-                    count = 1;
-                await Task.Delay(400);
-            }
-
-            _observableIrrigation.AliveList.CollectionChanged += subscribeToOnlineStatus;
-            return false;
         }
     }
 }
