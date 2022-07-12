@@ -13,14 +13,10 @@ namespace Pump.SocketController.Firebase
     public class FirebaseManager
     {
         public ChildQuery FirebaseQuery { get; private set; }
-        public FirebaseManager()
-        {
-        }
 
         public void InitializeFirebase(User user)
         {
             FirebaseQuery = new FirebaseClient("https://pump-25eee.firebaseio.com/").Child(user.Uid);
-
         }
 
         public async Task<List<IrrigationConfiguration>> GetIrrigationConfigList()
@@ -30,16 +26,14 @@ namespace Pump.SocketController.Firebase
                 var result = await FirebaseQuery.Child("Config").OnceAsync<JObject>();
                 var convertedJObject = new JObject();
 
-                foreach (var firebaseObject in result)
-                {
-                    convertedJObject.Add(firebaseObject.Key, firebaseObject.Object);
-                }
+                foreach (var firebaseObject in result) convertedJObject.Add(firebaseObject.Key, firebaseObject.Object);
                 return ManageObservableIrrigationData.GetConfigurationListFromJObject(convertedJObject);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+
             return new List<IrrigationConfiguration>();
         }
 
@@ -317,7 +311,7 @@ namespace Pump.SocketController.Firebase
             try
             {
                 await FirebaseQuery
-                   .Child(path + "/SubController/" + subControllerId)
+                    .Child(path + "/SubController/" + subControllerId)
                     .DeleteAsync();
 
                 return subControllerId;
@@ -334,19 +328,19 @@ namespace Pump.SocketController.Firebase
         {
             try
             {
-                    if (notificationToken.Id == null)
-                    {
-                        var result = await FirebaseQuery
-                            .Child(path + "/NotificationToken")
-                            .PostAsync(notificationToken);
-                        notificationToken.Id = result.Key;
-                        return result.Key;
-                    }
+                if (notificationToken.Id == null)
+                {
+                    var result = await FirebaseQuery
+                        .Child(path + "/NotificationToken")
+                        .PostAsync(notificationToken);
+                    notificationToken.Id = result.Key;
+                    return result.Key;
+                }
 
-                    await FirebaseQuery
-                        .Child(path + "/NotificationToken/" + notificationToken.Id)
-                        .PutAsync(notificationToken);
-                    return notificationToken.Id;
+                await FirebaseQuery
+                    .Child(path + "/NotificationToken/" + notificationToken.Id)
+                    .PutAsync(notificationToken);
+                return notificationToken.Id;
             }
             catch (Exception e)
             {
@@ -360,9 +354,9 @@ namespace Pump.SocketController.Firebase
         {
             try
             {
-                    await FirebaseQuery
-                        .Child(path + "/NotificationToken/" + notificationTokenId)
-                        .DeleteAsync();
+                await FirebaseQuery
+                    .Child(path + "/NotificationToken/" + notificationTokenId)
+                    .DeleteAsync();
             }
             catch (Exception e)
             {
@@ -371,15 +365,15 @@ namespace Pump.SocketController.Firebase
 
             return null;
         }
-        
+
         public async Task<string> UpdateIrrigationConfig(IrrigationConfiguration config)
         {
             try
             {
                 var result = await FirebaseQuery
-                        .Child("/Config/ " + config.Path)
-                        .PostAsync(config);
-                    return result.Key;
+                    .Child("/Config/ " + config.Path)
+                    .PostAsync(config);
+                return result.Key;
             }
             catch (Exception e)
             {
@@ -414,26 +408,32 @@ namespace Pump.SocketController.Firebase
             {
                 var manualSchedule = (ManualSchedule)entity;
                 return manualSchedule.DeleteAwaiting
-                    ? await DeleteManualSchedule(manualSchedule.Id, path) : await SetManualSchedule(manualSchedule, path);
+                    ? await DeleteManualSchedule(manualSchedule.Id, path)
+                    : await SetManualSchedule(manualSchedule, path);
             }
 
             if (entity.GetType() == typeof(Schedule))
             {
                 var schedule = (Schedule)entity;
-                return schedule.DeleteAwaiting ? await DeleteSchedule(schedule.Id, path) : await SetSchedule(schedule, path);
+                return schedule.DeleteAwaiting
+                    ? await DeleteSchedule(schedule.Id, path)
+                    : await SetSchedule(schedule, path);
             }
 
             if (entity.GetType() == typeof(CustomSchedule))
             {
                 var customSchedule = (CustomSchedule)entity;
                 return customSchedule.DeleteAwaiting
-                    ? await DeleteCustomSchedule(customSchedule.Id, path) : await SetCustomSchedule(customSchedule, path);
+                    ? await DeleteCustomSchedule(customSchedule.Id, path)
+                    : await SetCustomSchedule(customSchedule, path);
             }
 
             if (entity.GetType() == typeof(Equipment))
             {
                 var equipment = (Equipment)entity;
-                return equipment.DeleteAwaiting ? await DeleteEquipment(equipment.Id, path) : await SetEquipment(equipment, path);
+                return equipment.DeleteAwaiting
+                    ? await DeleteEquipment(equipment.Id, path)
+                    : await SetEquipment(equipment, path);
             }
 
             if (entity.GetType() == typeof(Sensor))

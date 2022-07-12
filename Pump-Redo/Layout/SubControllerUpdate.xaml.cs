@@ -12,11 +12,12 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SubControllerUpdate : ContentPage
     {
+        private readonly IrrigationConfiguration _configuration;
         private readonly SocketPicker _socketPicker;
         private readonly SubController _subController;
-        private readonly IrrigationConfiguration _configuration;
 
-        public SubControllerUpdate(SocketPicker socketPicker, SubController subController, IrrigationConfiguration configuration)
+        public SubControllerUpdate(SocketPicker socketPicker, SubController subController,
+            IrrigationConfiguration configuration)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
@@ -43,7 +44,7 @@ namespace Pump.Layout
                     OutgoingKey.Text += ",";
             }
         }
-        
+
         private async Task SetFocus()
         {
             await Task.Delay(200);
@@ -51,9 +52,9 @@ namespace Pump.Layout
             SubControllerMac.TextBox_Focused(this, new FocusEventArgs(this, true));
             IncomingKey.TextBox_Focused(this, new FocusEventArgs(this, true));
             OutgoingKey.TextBox_Focused(this, new FocusEventArgs(this, true));
-            if(_subController.IpAddress != null)
+            if (_subController.IpAddress != null)
                 SubControllerIp.TextBox_Focused(this, new FocusEventArgs(this, true));
-            if(string.IsNullOrEmpty(_subController.Port.ToString()) == false)
+            if (string.IsNullOrEmpty(_subController.Port.ToString()) == false)
                 SubControllerPort.TextBox_Focused(this, new FocusEventArgs(this, true));
 
             await Task.Delay(300);

@@ -1,9 +1,11 @@
 ﻿using Pump.CustomRender;
 using Pump_Redo.iOS.CustomRender;
+using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
 [assembly: ExportRenderer(typeof(BorderlessEntry), typeof(BorderlessEntryRenderer))]
+
 namespace Pump_Redo.iOS.CustomRender
 {
     public class BorderlessEntryRenderer : EntryRenderer
@@ -16,7 +18,7 @@ namespace Pump_Redo.iOS.CustomRender
             if (Control != null)
             {
                 Control.Layer.BorderWidth = 0;
-                Control.BorderStyle = UIKit.UITextBorderStyle.None;
+                Control.BorderStyle = UITextBorderStyle.None;
             }
         }
     }

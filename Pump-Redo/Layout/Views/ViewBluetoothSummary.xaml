@@ -28,7 +28,7 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     HeightRequest="40"
                     HorizontalOptions="EndAndExpand"
-                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />   
+                    Source="{embeddedImages:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
             </StackLayout>
         </StackLayout>
     </ContentView.Content>

@@ -11,13 +11,14 @@ namespace Pump.SocketController
 {
     public class SocketPicker
     {
+        private readonly FirebaseManager _firebaseManager;
         private readonly InitializeBlueTooth _initializeBlueTooth;
         private readonly InitializeFirebase _initializeFirebase;
         private readonly InitializeNetwork _initializeNetwork;
         private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
-        private readonly FirebaseManager _firebaseManager;
 
-        public SocketPicker(FirebaseManager firebaseManager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
+        public SocketPicker(FirebaseManager firebaseManager,
+            Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
             _firebaseManager = firebaseManager;
             _observableDict = observableDict;
@@ -26,7 +27,6 @@ namespace Pump.SocketController
             _initializeBlueTooth = new InitializeBlueTooth(observableDict);
         }
 
-        
 
         private void Disposable()
         {
@@ -46,22 +46,21 @@ namespace Pump.SocketController
         public async Task Subscribe(List<IrrigationConfiguration> configurationList, User user = null)
         {
             //_observableIrrigation.IsDisposable = false;
-            
+
             foreach (var configuration in configurationList)
-            {
                 if (configuration.ConnectionType == 0)
                 {
-                    if(user!= null)
+                    if (user != null)
                         _firebaseManager.InitializeFirebase(user);
                     _initializeFirebase.SubscribeFirebase();
                 }
-                    
+
                 else if (configuration.ConnectionType == 1)
+                {
                     await _initializeNetwork.SubscribeNetwork();
-                //else if (IrrigationConfiguration.ConnectionType == 2) 
-                //    await _initializeBlueTooth.SubscribeBle();
-            }
-           
+                }
+            //else if (IrrigationConfiguration.ConnectionType == 2) 
+            //    await _initializeBlueTooth.SubscribeBle();
         }
 
         public async Task<string> SendCommand(object sendObject, IrrigationConfiguration targetedIrrigation)
@@ -88,6 +87,7 @@ namespace Pump.SocketController
                     result = "Unknown Operation/Could not Identify user operations";
                     break;
             }
+
             return result;
         }
 

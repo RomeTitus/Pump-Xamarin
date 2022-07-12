@@ -15,9 +15,12 @@ namespace Pump.Layout.Dashboard
     public partial class ScheduleStatusHomeScreen : ContentView
     {
         private const double PopUpSize = 1.5;
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
 
-        public ScheduleStatusHomeScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair)
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
+        public ScheduleStatusHomeScreen(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair)
         {
             InitializeComponent();
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
@@ -59,10 +62,12 @@ namespace Pump.Layout.Dashboard
                 }
 
                 var runningScheduleList =
-                    new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList, _observableFilterKeyValuePair.Value.EquipmentList)
+                    new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
+                            _observableFilterKeyValuePair.Value.EquipmentList)
                         .GetRunningSchedule().ToList();
                 var activeCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(
-                    _observableFilterKeyValuePair.Value.CustomScheduleList.ToList(), _observableFilterKeyValuePair.Value.EquipmentList.ToList());
+                    _observableFilterKeyValuePair.Value.CustomScheduleList.ToList(),
+                    _observableFilterKeyValuePair.Value.EquipmentList.ToList());
                 runningScheduleList.AddRange(
                     new RunningCustomSchedule().GetRunningCustomSchedule(activeCustomScheduleList));
 
@@ -93,10 +98,12 @@ namespace Pump.Layout.Dashboard
 
 
                 var queScheduleList =
-                    new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList, _observableFilterKeyValuePair.Value.EquipmentList)
+                    new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
+                            _observableFilterKeyValuePair.Value.EquipmentList)
                         .GetQueSchedule().ToList();
                 var queCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(
-                    _observableFilterKeyValuePair.Value.CustomScheduleList.ToList(), _observableFilterKeyValuePair.Value.EquipmentList.ToList());
+                    _observableFilterKeyValuePair.Value.CustomScheduleList.ToList(),
+                    _observableFilterKeyValuePair.Value.EquipmentList.ToList());
                 queScheduleList.AddRange(new RunningCustomSchedule().GetQueCustomSchedule(queCustomScheduleList));
 
                 if (queScheduleList.Any())
@@ -182,7 +189,8 @@ namespace Pump.Layout.Dashboard
                 if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
                     var runningScheduleList =
-                        new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList, _observableFilterKeyValuePair.Value.EquipmentList)
+                        new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
+                                _observableFilterKeyValuePair.Value.EquipmentList)
                             .GetRunningSchedule().ToList();
                     var activeCustomScheduleList = new RunningCustomSchedule().GetActiveCustomSchedule(
                         _observableFilterKeyValuePair.Value.CustomScheduleList.ToList(),
@@ -191,13 +199,15 @@ namespace Pump.Layout.Dashboard
                         new RunningCustomSchedule().GetRunningCustomSchedule(activeCustomScheduleList));
 
                     var queScheduleList =
-                        new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList, _observableFilterKeyValuePair.Value.EquipmentList)
+                        new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
+                                _observableFilterKeyValuePair.Value.EquipmentList)
                             .GetQueSchedule().ToList();
                     queScheduleList.AddRange(
                         new RunningCustomSchedule().GetQueCustomSchedule(activeCustomScheduleList));
 
                     var itemsThatAreOnDisplay = runningScheduleList.Select(x => x.Id).ToList();
-                    itemsThatAreOnDisplay.AddRange(_observableFilterKeyValuePair.Value.ManualScheduleList.Select(x => x?.Id));
+                    itemsThatAreOnDisplay.AddRange(
+                        _observableFilterKeyValuePair.Value.ManualScheduleList.Select(x => x?.Id));
 
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
@@ -265,7 +275,8 @@ namespace Pump.Layout.Dashboard
             {
                 if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay =
+                        _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -309,7 +320,8 @@ namespace Pump.Layout.Dashboard
                 _observableFilterKeyValuePair.Value.CustomScheduleList.Contains(null))
                 return;
             var runningStatusViews =
-                new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList, _observableFilterKeyValuePair.Value.EquipmentList)
+                new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
+                        _observableFilterKeyValuePair.Value.EquipmentList)
                     .GetRunningSchedule().ToList()
                     .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
 
@@ -320,7 +332,8 @@ namespace Pump.Layout.Dashboard
                 .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
             runningStatusViews.AddRange(activeCustomScheduleList);
 
-            var manualSchedule = _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault(x => x.ManualDetails.Any());
+            var manualSchedule =
+                _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault(x => x.ManualDetails.Any());
 
             if (manualSchedule != null)
                 runningStatusViews.Insert(0, new ViewManualSchedule(manualSchedule));
@@ -338,7 +351,8 @@ namespace Pump.Layout.Dashboard
             if (_observableFilterKeyValuePair.Value.ScheduleList.Contains(null))
                 return;
             var queueStatusViews =
-                new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList, _observableFilterKeyValuePair.Value.EquipmentList)
+                new RunningSchedule(_observableFilterKeyValuePair.Value.ScheduleList,
+                        _observableFilterKeyValuePair.Value.EquipmentList)
                     .GetQueSchedule().ToList()
                     .Select(queue => new ViewActiveScheduleSummary(queue, PopUpSize)).Cast<View>().ToList();
 

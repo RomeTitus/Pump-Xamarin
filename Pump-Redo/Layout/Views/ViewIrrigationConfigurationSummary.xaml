@@ -88,17 +88,17 @@
                                     HeightRequest="30"
                                     WidthRequest="30" />
                             </Frame>
-                            <Image Source="{extensions:ImageResourceExtension Pump.Icons.gearSetting.png}"  
+                            <Image Source="{extensions:ImageResourceExtension Pump.Icons.gearSetting.png}"
                                    HeightRequest="40" x:Name="ImageSetting">
                                 <Image.GestureRecognizers>
                                     <TapGestureRecognizer
-                                        x:Name="IrrigationControllerSettingGesture"/>
+                                        x:Name="IrrigationControllerSettingGesture" />
                                 </Image.GestureRecognizers>
                             </Image>
 
                         </StackLayout>
                     </StackLayout>
-                    <StackLayout x:Name="SiteChildren"/>
+                    <StackLayout x:Name="SiteChildren" />
                 </StackLayout>
             </Frame>
         </Frame>

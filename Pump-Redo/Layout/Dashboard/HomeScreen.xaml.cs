@@ -17,12 +17,15 @@ namespace Pump.Layout.Dashboard
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomeScreen : ContentPage
     {
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly SocketPicker _socketPicker;
         private SettingPageHomeScreen _settingPageHomeScreen;
 
-        public HomeScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+        public HomeScreen(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
             SocketPicker socketPicker)
         {
             _observableFilterKeyValuePair = observableFilterKeyValuePair;

@@ -11,12 +11,15 @@ namespace Pump.Layout.Dashboard
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SettingPageHomeScreen : ContentView
     {
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly ObservableIrrigation _observableIrrigation;
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly SocketPicker _socketPicker;
 
         public SettingPageHomeScreen(ObservableIrrigation observableIrrigation,
-            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker)
         {
             InitializeComponent();
             _socketPicker = socketPicker;

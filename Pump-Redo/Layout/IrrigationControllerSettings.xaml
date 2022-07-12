@@ -2,13 +2,13 @@
 
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
              xmlns:customRender="clr-namespace:Pump.CustomRender;assembly=Pump"
              x:Class="Pump.Layout.IrrigationControllerSettings"
              BackgroundColor="DeepSkyBlue">
     <ContentPage.Content>
         <StackLayout Margin="15" HorizontalOptions="FillAndExpand">
-            <Label x:Name="LabelName" Text="Unknown" TextColor="White" FontSize="Large" HorizontalOptions="CenterAndExpand"/>
+            <Label x:Name="LabelName" Text="Unknown" TextColor="White" FontSize="Large"
+                   HorizontalOptions="CenterAndExpand" />
             <StackLayout VerticalOptions="FillAndExpand">
                 <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                     <Label
@@ -25,10 +25,10 @@
                             Margin="10,0,10,0"
                             BackgroundColor="AliceBlue"
                             CornerRadius="30">
-                                <Picker
-                                    x:Name="ConnectionTypePicker"
-                                    TextColor="DarkSlateBlue"
-                                    HorizontalOptions="FillAndExpand"/>
+                            <Picker
+                                x:Name="ConnectionTypePicker"
+                                TextColor="DarkSlateBlue"
+                                HorizontalOptions="FillAndExpand" />
                         </Frame>
                     </StackLayout>
                 </StackLayout>
@@ -53,17 +53,17 @@
                                 x:Name="InternalIpEntry"
                                 Placeholder="Internal IP"
                                 BorderColor="Black"
-                                PlaceholderColor="Navy" 
-                                TextChanged= "IpEntry_OnTextChanged"/>
-                
-                            <customRender:EntryOutlined 
+                                PlaceholderColor="Navy"
+                                TextChanged="IpEntry_OnTextChanged" />
+
+                            <customRender:EntryOutlined
                                 HorizontalOptions="FillAndExpand"
                                 Margin="0,7,0,0"
                                 x:Name="InternalPortEntry"
                                 Placeholder="Port"
                                 BorderColor="Black"
-                                PlaceholderColor="Navy" 
-                                TextChanged= "PortEntry_OnTextChanged"/>
+                                PlaceholderColor="Navy"
+                                TextChanged="PortEntry_OnTextChanged" />
                         </StackLayout>
                         <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
                             <customRender:EntryOutlined
@@ -72,17 +72,17 @@
                                 x:Name="ExternalIpEntry"
                                 Placeholder="External IP"
                                 BorderColor="Black"
-                                PlaceholderColor="Navy" 
-                                TextChanged= "IpEntry_OnTextChanged"/>
-                
-                            <customRender:EntryOutlined 
+                                PlaceholderColor="Navy"
+                                TextChanged="IpEntry_OnTextChanged" />
+
+                            <customRender:EntryOutlined
                                 HorizontalOptions="FillAndExpand"
                                 Margin="0,7,0,0"
                                 x:Name="ExternalPortEntry"
                                 Placeholder="Port"
                                 BorderColor="Black"
-                                PlaceholderColor="Navy" 
-                                TextChanged= "PortEntry_OnTextChanged"/>
+                                PlaceholderColor="Navy"
+                                TextChanged="PortEntry_OnTextChanged" />
                         </StackLayout>
                     </StackLayout>
                 </Frame>
@@ -100,16 +100,16 @@
                     HorizontalOptions="FillAndExpand"
                     VerticalOptions="FillAndExpand">
                     <ScrollView>
-                        <StackLayout x:Name="SiteLayout"/>
+                        <StackLayout x:Name="SiteLayout" />
                     </ScrollView>
                 </Frame>
                 <StackLayout VerticalOptions="End">
                     <Button
                         Text="Update"
-                        Pressed="Button_OnPressed_Update"/>
+                        Pressed="Button_OnPressed_Update" />
                     <Button
                         Text="Back"
-                        Pressed="Button_OnPressed_Back"/>
+                        Pressed="Button_OnPressed_Back" />
                 </StackLayout>
             </StackLayout>
         </StackLayout>

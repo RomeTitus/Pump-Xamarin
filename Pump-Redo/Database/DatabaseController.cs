@@ -2,7 +2,6 @@
 using Pump.Database.Table;
 using SQLite;
 using Xamarin.Forms;
-using Xamarin.Forms.Internals;
 
 namespace Pump.Database
 {
@@ -29,23 +28,19 @@ namespace Pump.Database
                 return configList;
             }
         }
-        
+
         public void SaveIrrigationConfiguration(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)
             {
                 irrigationConfiguration.SerializedControllerPair();
-                
+
                 var existingIrrigationConfiguration = _database.Table<IrrigationConfiguration>()
                     .FirstOrDefault(x => x.Mac.Equals(irrigationConfiguration.Mac));
                 if (existingIrrigationConfiguration != null)
-                {
                     _database.Update(irrigationConfiguration);
-                }
                 else
-                {
                     _database.Insert(irrigationConfiguration);
-                }
             }
         }
 
@@ -56,6 +51,7 @@ namespace Pump.Database
                 _database.Delete(irrigationConfiguration);
             }
         }
+
         public UserAuthentication GetUserAuthentication()
         {
             lock (Locker)
@@ -63,7 +59,7 @@ namespace Pump.Database
                 return _database.Table<UserAuthentication>().FirstOrDefault();
             }
         }
-        
+
         public void DeleteUserAuthentication()
         {
             lock (Locker)
@@ -71,6 +67,7 @@ namespace Pump.Database
                 _database.DeleteAll<UserAuthentication>();
             }
         }
+
         public void SaveUserAuthentication(UserAuthentication userAuthentication)
         {
             lock (Locker)

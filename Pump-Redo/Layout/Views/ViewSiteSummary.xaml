@@ -24,19 +24,19 @@
                         Placeholder="Site Name"
                         BorderColor="Black"
                         PlaceholderColor="Navy"
-                        TextChanged="SiteNameEntry_OnTextChanged"/>
+                        TextChanged="SiteNameEntry_OnTextChanged" />
                     <Image
                         x:Name="ExpandImage"
                         HeightRequest="40"
                         HorizontalOptions="End"
-                        Source="{embeddedImages:ImageResourceExtension Pump.Icons.expandImage.png}"> 
+                        Source="{embeddedImages:ImageResourceExtension Pump.Icons.expandImage.png}">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer
-                               Tapped="TapGestureExpandSite_OnTapped"/>
+                                Tapped="TapGestureExpandSite_OnTapped" />
                         </Image.GestureRecognizers>
                     </Image>
                 </StackLayout>
-                <StackLayout x:Name="StackLayoutSubController" IsVisible="False"/>
+                <StackLayout x:Name="StackLayoutSubController" IsVisible="False" />
             </StackLayout>
         </Frame>
     </ContentView.Content>

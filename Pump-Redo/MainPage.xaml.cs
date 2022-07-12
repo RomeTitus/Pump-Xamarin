@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using Firebase.Auth;
 using Pump.Class;
 using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout;
+using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Pump.SocketController.Firebase;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.Timers;
-using Pump.Layout.Dashboard;
-using Rg.Plugins.Popup.Services;
 
 namespace Pump
 {
@@ -23,10 +23,10 @@ namespace Pump
     public partial class MainPage
     {
         private readonly AuthenticationScreen _authenticationScreen;
+        private readonly DatabaseController _database;
         private readonly NotificationEvent _notificationEvent;
         private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         private readonly SocketPicker _socketPicker;
-        private readonly DatabaseController _database;
         private Timer _timer;
 
         public MainPage(FirebaseAuthClient client)
@@ -37,7 +37,7 @@ namespace Pump
             _database = new DatabaseController();
             _socketPicker = new SocketPicker(new FirebaseManager(), _observableDict);
             _authenticationScreen = new AuthenticationScreen(client);
-            
+
             client.AuthStateChanged += ClientOnAuthStateChanged;
             StartEvent();
         }
@@ -60,15 +60,11 @@ namespace Pump
                 if (!configList.Any())
                     Device.BeginInvokeOnMainThread(SetupNewController);
                 else
-                {
                     await Device.InvokeOnMainThreadAsync(async () =>
                     {
-                    PopulateSavedIrrigation(configList);
-                    await _socketPicker.Subscribe(configList, e.User);
+                        PopulateSavedIrrigation(configList);
+                        await _socketPicker.Subscribe(configList, e.User);
                     });
-                    
-
-                }
             }
         }
 
@@ -78,13 +74,14 @@ namespace Pump
             await PopupNavigation.Instance.PushAsync(loadingScreen);
             var configList = await _socketPicker.GetIrrigationConfigurations(user);
             configList.ForEach(x => _database.SaveIrrigationConfiguration(x));
-            if(PopupNavigation.Instance.PopupStack.Any())
+            if (PopupNavigation.Instance.PopupStack.Any())
                 await PopupNavigation.Instance.PopAllAsync();
             return configList;
         }
+
         private void SetupNewController()
         {
-            var connectionScreen = new ScanBluetooth( _notificationEvent, _socketPicker.BluetoothManager(), _database);
+            var connectionScreen = new ScanBluetooth(_notificationEvent, _socketPicker.BluetoothManager(), _database);
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
         }
@@ -95,27 +92,30 @@ namespace Pump
             {
                 if (_observableDict.Keys.Any())
                 {
-                    if(_observableDict.Keys.FirstOrDefault(x => x.Path == configuration.Path) == null)
+                    if (_observableDict.Keys.FirstOrDefault(x => x.Path == configuration.Path) == null)
                         _observableDict.Add(configuration, new ObservableIrrigation());
                 }
                 else
+                {
                     _observableDict.Add(configuration, new ObservableIrrigation());
-                
-                    
+                }
+
 
                 var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
                     x.AutomationId == configuration.Id.ToString());
-                
+
                 if (viewSite == null)
                 {
-                    var viewSiteSummary = new ViewIrrigationConfigurationSummary(_observableDict.First(x => x.Key.Id == configuration.Id), _socketPicker);
+                    var viewSiteSummary =
+                        new ViewIrrigationConfigurationSummary(_observableDict.First(x => x.Key.Id == configuration.Id),
+                            _socketPicker);
                     viewSiteSummary.GetTapGestureRecognizerList().ForEach(x => x.Tapped += OnTapped_HomeScreen);
                     viewSiteSummary.GetTapGestureSettings().Tapped += OnTapped_Settings;
                     ScrollViewSite.Children.Add(viewSiteSummary);
                 }
             }
         }
-        
+
         private void UpdateSavedIrrigation()
         {
             foreach (var view in ScrollViewSite.Children.Where(x => x is ViewIrrigationConfigurationSummary))
@@ -127,20 +127,26 @@ namespace Pump
 
         private void OnTapped_Settings(object sender, EventArgs e)
         {
-            var imageGesture = (Image) sender;
-            var configurationSummary = (ViewIrrigationConfigurationSummary)imageGesture.Parent.Parent.Parent.Parent.Parent.Parent;
-            var settingsScreen = new IrrigationControllerSettings(configurationSummary.GetIrrigationConfigAndObservable(), _socketPicker);
+            var imageGesture = (Image)sender;
+            var configurationSummary =
+                (ViewIrrigationConfigurationSummary)imageGesture.Parent.Parent.Parent.Parent.Parent.Parent;
+            var settingsScreen =
+                new IrrigationControllerSettings(configurationSummary.GetIrrigationConfigAndObservable(),
+                    _socketPicker);
             Navigation.PushModalAsync(settingsScreen);
         }
+
         private void OnTapped_HomeScreen(object sender, EventArgs e)
         {
-            var stackLayoutGesture = (StackLayout) sender;
+            var stackLayoutGesture = (StackLayout)sender;
             var configurationSummary = (ViewIrrigationConfigurationSummary)stackLayoutGesture.Parent.Parent.Parent;
-            if(configurationSummary.GetIrrigationFilterConfigAndObservable().Value == null)
+            if (configurationSummary.GetIrrigationFilterConfigAndObservable().Value == null)
                 return;
-            var homeScreen = new HomeScreen(configurationSummary.GetIrrigationFilterConfigAndObservable(), _socketPicker);
+            var homeScreen = new HomeScreen(configurationSummary.GetIrrigationFilterConfigAndObservable(),
+                _socketPicker);
             Navigation.PushModalAsync(homeScreen);
         }
+
         private void StartEvent()
         {
             _timer = new Timer(800);
@@ -152,18 +158,13 @@ namespace Pump
         {
             _timer.Enabled = false;
             var configList = _database.GetIrrigationConfigurationList();
-            if (configList.Any())
-            {
-                UpdateSavedIrrigation();
-            }
+            if (configList.Any()) UpdateSavedIrrigation();
             _timer.Enabled = true;
         }
-        
+
         private void ButtonScanForControllers_OnPressed(object sender, EventArgs e)
         {
             Device.BeginInvokeOnMainThread(SetupNewController);
         }
-        
-        
     }
 }

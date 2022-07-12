@@ -9,7 +9,8 @@ namespace Pump.IrrigationController
     internal static class IrrigationConvert
     {
         public static
-            Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<SubController>> IrrigationJObjectToList(JObject irrigationJObject)
+            Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                List<SubController>> IrrigationJObjectToList(JObject irrigationJObject)
         {
             var customScheduleList = new List<CustomSchedule>();
             var scheduleList = new List<Schedule>();
@@ -211,10 +212,10 @@ namespace Pump.IrrigationController
                     var index = observableIrrigation.SensorList.IndexOf(sensorEditSate.Values.First());
                     observableIrrigation.SensorList[index] = sensorEditSate.Values.First();
                 }
-            
+
             if (observableIrrigation.SubControllerList.Count > 0 && observableIrrigation.SubControllerList[0] == null)
                 observableIrrigation.SubControllerList.Clear();
-            
+
             foreach (var subControllerEditSate in irrigationTupleEditState.Item6)
                 if (subControllerEditSate.ContainsKey(EditState.Deleted))
                 {
@@ -252,7 +253,7 @@ namespace Pump.IrrigationController
             return new Tuple<List<Dictionary<EditState, CustomSchedule>>, List<Dictionary<EditState, Schedule>>,
                 List<Dictionary<EditState, Equipment>>,
                 List<Dictionary<EditState, ManualSchedule>>, List<Dictionary<EditState, Sensor>>,
-                 List<Dictionary<EditState, SubController>>>
+                List<Dictionary<EditState, SubController>>>
             (customScheduleEditState, scheduleEditState, equipmentEditState, manualScheduleEditState,
                 sensorEditState, subControllerEditState);
         }

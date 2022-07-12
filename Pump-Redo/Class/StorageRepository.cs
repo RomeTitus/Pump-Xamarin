@@ -11,7 +11,7 @@ namespace Pump.Class
     {
         private readonly DatabaseController _database = new DatabaseController();
 
-       
+
         public Task<bool> UserExistsAsync()
         {
             return Task.FromResult(_database.GetUserAuthentication() != null);
@@ -32,7 +32,7 @@ namespace Pump.Class
                 UserInfo = JsonConvert.SerializeObject(user.Info),
                 FirebaseCredential = JsonConvert.SerializeObject(user.Credential)
             };
-            
+
             _database.SaveUserAuthentication(userAuthentication);
             return Task.CompletedTask;
         }

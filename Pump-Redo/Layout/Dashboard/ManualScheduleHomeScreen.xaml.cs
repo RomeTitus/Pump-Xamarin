@@ -16,11 +16,15 @@ namespace Pump.Layout.Dashboard
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ManualScheduleHomeScreen : ContentView
     {
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly SocketPicker _socketPicker;
         private FloatingScreenScroll _floatingScreenScroll;
 
-        public ManualScheduleHomeScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
+        public ManualScheduleHomeScreen(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
@@ -86,7 +90,8 @@ namespace Pump.Layout.Dashboard
                     //Populate
                     ButtonStopManual.IsEnabled = true;
                     ButtonStartManual.Text = "UPDATE";
-                    var selectedManualSchedule = _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault();
+                    var selectedManualSchedule =
+                        _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault();
                     if (selectedManualSchedule != null)
                         MaskedEntryTime.Text = ScheduleTime.ConvertTimeSpanToString(
                             ScheduleTime.FromUnixTimeStampUtc(selectedManualSchedule.EndTime) - DateTime.UtcNow);
@@ -295,7 +300,8 @@ namespace Pump.Layout.Dashboard
 
         private async void ButtonStopManual_Clicked(object sender, EventArgs e)
         {
-            var manualSchedule = _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault() ?? new ManualSchedule();
+            var manualSchedule = _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault() ??
+                                 new ManualSchedule();
             manualSchedule.DeleteAwaiting = true;
             await _socketPicker.SendCommand(manualSchedule, _observableFilterKeyValuePair.Key);
         }
@@ -325,7 +331,8 @@ namespace Pump.Layout.Dashboard
             if (_observableFilterKeyValuePair.Value.EquipmentList.Contains(null))
                 return;
             var buttonList = new List<Button>();
-            foreach (var pump in _observableFilterKeyValuePair.Value.EquipmentList.Where(x => x.isPump).OrderBy(c => c.NAME.Length)
+            foreach (var pump in _observableFilterKeyValuePair.Value.EquipmentList.Where(x => x.isPump)
+                         .OrderBy(c => c.NAME.Length)
                          .ThenBy(c => c.NAME))
             {
                 var button = CreateEquipmentButton(pump);

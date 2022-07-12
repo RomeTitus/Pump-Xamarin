@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 
@@ -32,9 +30,7 @@ namespace Pump.SocketController.Network
             {
                 _alreadySubscribed = true;
                 await ConnectToDevice();
-                
             }
-            
         }
 
         public void Disposable()
@@ -47,7 +43,8 @@ namespace Pump.SocketController.Network
         {
             RequestIrrigationTimer.Start();
             var oldIrrigationTuple =
-                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>, List<SubController>>
+                new Tuple<List<CustomSchedule>, List<Schedule>, List<Equipment>, List<ManualSchedule>, List<Sensor>,
+                    List<SubController>>
                 (new List<CustomSchedule>(), new List<Schedule>(), new List<Equipment>(),
                     new List<ManualSchedule>(), new List<Sensor>(), new List<SubController>());
             RequestNow = true;

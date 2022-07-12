@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Timers;
 using Plugin.BLE.Abstractions.Contracts;
 using Pump.Class;
+using Pump.Database;
 using Pump.Layout.Views;
 using Pump.SocketController.BT;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
-using System.Timers;
-using Pump.Database;
 
 namespace Pump.Layout
 {
     public partial class ScanBluetooth : ContentPage
     {
         private readonly BluetoothManager _bluetoothManager;
-        private readonly Timer _timer;
-        private int _scanCounter;
         private readonly DatabaseController _database;
         private readonly NotificationEvent _notificationEvent;
+        private readonly Timer _timer;
+        private int _scanCounter;
 
-        public ScanBluetooth(NotificationEvent notificationEvent, BluetoothManager bluetoothManager, DatabaseController database)
+        public ScanBluetooth(NotificationEvent notificationEvent, BluetoothManager bluetoothManager,
+            DatabaseController database)
         {
             InitializeComponent();
             _bluetoothManager = bluetoothManager;
@@ -36,10 +37,9 @@ namespace Pump.Layout
 
         private void ScanTimerEvent(object sender, ElapsedEventArgs e)
         {
-            
             Device.BeginInvokeOnMainThread(() =>
             {
-                    switch (_scanCounter % 6)
+                switch (_scanCounter % 6)
                 {
                     case 0:
                         LabelBtScan.Text = "Scan.";
@@ -60,9 +60,9 @@ namespace Pump.Layout
                         LabelBtScan.Text = "Scan......";
                         break;
                 }
+
                 _scanCounter++;
             });
-            
         }
 
         private async void BtScan()
@@ -76,7 +76,7 @@ namespace Pump.Layout
                     {
                         var template = ScrollViewSetupSystem.Children.FirstOrDefault(x =>
                             x.AutomationId == bluetoothDevice.Id.ToString());
-                        if(template != null)
+                        if (template != null)
                             continue;
                         var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
                         blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
@@ -86,7 +86,6 @@ namespace Pump.Layout
             _scanCounter = 1;
             _timer.Enabled = true;
             await _bluetoothManager.StartScanning(Guid.Empty);
-            
         }
 
         private void AdapterBleOnScanTimeoutElapsed(object sender, EventArgs e)
@@ -128,15 +127,15 @@ namespace Pump.Layout
                     await DisplayAlert("Connect Exception!", exception.Message, "Understood");
                 }
         }
-        
+
         private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
         {
             await Navigation.PopModalAsync();
         }
-        
+
         private void LabelBTScan_OnTapped(object sender, EventArgs e)
         {
-            if(_timer.Enabled == false)
+            if (_timer.Enabled == false)
                 BtScan();
         }
 

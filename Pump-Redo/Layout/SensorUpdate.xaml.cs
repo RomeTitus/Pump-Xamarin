@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
@@ -15,14 +14,18 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SensorUpdate : ContentPage
     {
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly Sensor _sensor;
         private readonly List<string> _sensorTypesList = new List<string> { "Pressure Sensor", "Temperature Sensor" };
         private readonly SocketPicker _socketPicker;
         private List<long> _avalibleGpio;
         private List<long> _usableGpio;
 
-        public SensorUpdate(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker, Sensor sensor = null)
+        public SensorUpdate(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker, Sensor sensor = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
@@ -97,11 +100,11 @@ namespace Pump.Layout
 
             if (SystemPicker.SelectedIndex == -1)
                 notification += "\n\u2022 Select a Sub-Controller";
-            
+
 
             if (SensorTypePicker.SelectedIndex == -1)
                 notification += "\n\u2022 Select a Sensor Type";
-            
+
 
             if (GpioPicker.SelectedIndex == -1)
                 notification += "\n\u2022 Select a Pin";
@@ -127,7 +130,8 @@ namespace Pump.Layout
                 if (SystemPicker.SelectedIndex == 0)
                     _sensor.AttachedSubController = null;
                 else
-                    _sensor.AttachedSubController = _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id;
+                    _sensor.AttachedSubController = _observableFilterKeyValuePair.Value
+                        .SubControllerList[SystemPicker.SelectedIndex - 1].Id;
 
                 _sensor.AttachedEquipment.Clear();
                 foreach (var viewAttachedEquipment in ScrollViewAttachedEquipment.Children)
@@ -176,7 +180,8 @@ namespace Pump.Layout
             var selectedIndex = systemPicker.SelectedIndex;
             _avalibleGpio = new GpioPins().GetAnalogGpioList();
             var usedSensors = selectedIndex == 0
-                ? _observableFilterKeyValuePair.Value.SensorList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
+                ? _observableFilterKeyValuePair.Value.SensorList
+                    .Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
                 : _observableFilterKeyValuePair.Value.SensorList.Where(y =>
                     !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
                     _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();

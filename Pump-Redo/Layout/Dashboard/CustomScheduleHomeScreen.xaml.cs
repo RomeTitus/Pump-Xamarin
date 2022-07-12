@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
@@ -20,17 +19,23 @@ namespace Pump.Layout.Dashboard
     public partial class CustomScheduleHomeScreen : ContentView
     {
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
+
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly SocketPicker _socketPicker;
         private ViewCustomScheduleSummary _viewSchedule;
 
-        public CustomScheduleHomeScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
+        public CustomScheduleHomeScreen(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
             _socketPicker = socketPicker;
             _observableFilterKeyValuePair.Value.EquipmentList.CollectionChanged += PopulateCustomScheduleStatusEvent;
-            _observableFilterKeyValuePair.Value.CustomScheduleList.CollectionChanged += PopulateCustomScheduleStatusEvent;
+            _observableFilterKeyValuePair.Value.CustomScheduleList.CollectionChanged +=
+                PopulateCustomScheduleStatusEvent;
             PopulateCustomScheduleStatus();
         }
 
@@ -94,7 +99,8 @@ namespace Pump.Layout.Dashboard
             {
                 if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.CustomScheduleList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.CustomScheduleList
+                        .Select(x => x?.Id).ToList();
                     if (!itemsThatAreOnDisplay.Any())
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -145,7 +151,8 @@ namespace Pump.Layout.Dashboard
             try
             {
                 var updateSchedule =
-                    _observableFilterKeyValuePair.Value.CustomScheduleList.First(x => x?.Id == scheduleSwitch.AutomationId);
+                    _observableFilterKeyValuePair.Value.CustomScheduleList.First(x =>
+                        x?.Id == scheduleSwitch.AutomationId);
 
                 updateSchedule.StartTime = scheduleSwitch.IsToggled ? ScheduleTime.GetUnixTimeStampUtcNow() : 0;
 
@@ -220,7 +227,8 @@ namespace Pump.Layout.Dashboard
                 }
 
 
-                _viewSchedule = new ViewCustomScheduleSummary(schedule, _observableFilterKeyValuePair.Value.EquipmentList.ToList());
+                _viewSchedule = new ViewCustomScheduleSummary(schedule,
+                    _observableFilterKeyValuePair.Value.EquipmentList.ToList());
 
                 _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
                 _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;
@@ -253,7 +261,8 @@ namespace Pump.Layout.Dashboard
             PopupNavigation.Instance.PopAsync();
             var edit = (Button)sender;
             var customSchedule =
-                _observableFilterKeyValuePair.Value.CustomScheduleList.First(schedule => schedule.Id == edit.AutomationId);
+                _observableFilterKeyValuePair.Value.CustomScheduleList.First(schedule =>
+                    schedule.Id == edit.AutomationId);
             Navigation.PushModalAsync(new CustomScheduleUpdate(_observableFilterKeyValuePair,
                 _socketPicker, customSchedule));
         }
@@ -262,7 +271,8 @@ namespace Pump.Layout.Dashboard
         {
             var delete = (Button)sender;
             var customSchedule =
-                _observableFilterKeyValuePair.Value.CustomScheduleList.First(schedule => schedule.Id == delete.AutomationId);
+                _observableFilterKeyValuePair.Value.CustomScheduleList.First(schedule =>
+                    schedule.Id == delete.AutomationId);
             var deleteConfirm = new ViewDeleteConfirmation(customSchedule);
             _floatingScreen.SetFloatingScreen(new List<object> { deleteConfirm });
             deleteConfirm.GetDeleteButton().Clicked += DeleteConfirmButton_Tapped;
@@ -272,7 +282,8 @@ namespace Pump.Layout.Dashboard
         {
             await PopupNavigation.Instance.PopAsync();
             var delete = (Button)sender;
-            await _socketPicker.SendCommand(new CustomSchedule { Id = delete.AutomationId, DeleteAwaiting = true }, _observableFilterKeyValuePair.Key);
+            await _socketPicker.SendCommand(new CustomSchedule { Id = delete.AutomationId, DeleteAwaiting = true },
+                _observableFilterKeyValuePair.Key);
         }
 
         private async void SkipCustomSchedule_Tapped(object sender, EventArgs e)
@@ -289,7 +300,8 @@ namespace Pump.Layout.Dashboard
 
             if (!await Application.Current.MainPage.DisplayAlert("Are you sure?",
                     "You have selected " +
-                    _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == selectedCustomScheduleDetails.id_Equipment)
+                    _observableFilterKeyValuePair.Value.EquipmentList
+                        .First(x => x?.Id == selectedCustomScheduleDetails.id_Equipment)
                         .NAME + "\nConfirm to skip to this zone ?", "Confirm",
                     "cancel")) return;
             if (_viewSchedule == null) return;

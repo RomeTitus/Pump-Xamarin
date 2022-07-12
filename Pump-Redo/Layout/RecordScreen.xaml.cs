@@ -5,7 +5,6 @@ using Firebase.Database;
 using Microcharts;
 using Newtonsoft.Json.Linq;
 using Pump.IrrigationController;
-using Pump.SocketController.Firebase;
 using Rg.Plugins.Popup.Services;
 using SkiaSharp;
 using Xamarin.Forms;

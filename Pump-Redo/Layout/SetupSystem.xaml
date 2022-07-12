@@ -41,7 +41,7 @@
                         VerticalOptions="Center"
                         WidthRequest="300" />
                 </StackLayout>
-                
+
                 <StackLayout>
                     <Label
                         CharacterSpacing="1"
@@ -60,25 +60,25 @@
                             IsVisible="True"
                             VerticalOptions="Center"
                             Color="Black" />
-                        
+
                         <Grid x:Name="GridNetworkDetail" IsVisible="True">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
-                            
+
                             <StackLayout Grid.Column="0" Orientation="Horizontal" HorizontalOptions="FillAndExpand">
                                 <StackLayout Margin="20,0,0,0">
                                     <Label CharacterSpacing="1"
-                                           FontSize="Small"  
-                                           x:Name="LabelWiFiName" 
+                                           FontSize="Small"
+                                           x:Name="LabelWiFiName"
                                            Text="WiFi"
-                                           TextColor="White"/>
+                                           TextColor="White" />
                                     <Label x:Name="LabelWiFiIp"
                                            CharacterSpacing="1"
                                            Text="Not Connected"
                                            FontSize="Small"
-                                           TextColor="White"/>
+                                           TextColor="White" />
                                     <Label Text="Scan"
                                            FontAttributes="Bold"
                                            TextDecorations="Underline"
@@ -91,35 +91,35 @@
 
                                 </StackLayout>
                                 <StackLayout>
-                                <Image
-                                    x:Name="SignalImage"
-                                    AbsoluteLayout.LayoutBounds="1, -1, -1, 1"
-                                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                                    HeightRequest="40"
-                                    HorizontalOptions="EndAndExpand"
-                                    Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
-                                <Label x:Name="WiFiDhcp" 
-                                       Text="Modify" 
-                                       VerticalOptions="EndAndExpand"
-                                       FontAttributes="Bold"
-                                       TextDecorations="Underline"
-                                       FontSize="Small"
-                                       TextColor="White">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="SetDHCPInterface_OnTapped" />
-                                    </Label.GestureRecognizers>
-                                </Label>
+                                    <Image
+                                        x:Name="SignalImage"
+                                        AbsoluteLayout.LayoutBounds="1, -1, -1, 1"
+                                        AbsoluteLayout.LayoutFlags="PositionProportional"
+                                        HeightRequest="40"
+                                        HorizontalOptions="EndAndExpand"
+                                        Source="{localImage:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" />
+                                    <Label x:Name="WiFiDhcp"
+                                           Text="Modify"
+                                           VerticalOptions="EndAndExpand"
+                                           FontAttributes="Bold"
+                                           TextDecorations="Underline"
+                                           FontSize="Small"
+                                           TextColor="White">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="SetDHCPInterface_OnTapped" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
                                 </StackLayout>
                             </StackLayout>
-                            
-                            <StackLayout  Grid.Column="1" HorizontalOptions="FillAndExpand" Margin="10,0,5,0">
+
+                            <StackLayout Grid.Column="1" HorizontalOptions="FillAndExpand" Margin="10,0,5,0">
                                 <Label Text="Lan Network"
                                        FontSize="Small"
-                                       TextColor="White"/>
+                                       TextColor="White" />
                                 <Label Text="Not connected" x:Name="LabelLanIp"
                                        FontSize="Small"
-                                       TextColor="White"/>
-                                <Label x:Name="LanDhcp" 
+                                       TextColor="White" />
+                                <Label x:Name="LanDhcp"
                                        Text="Modify Lan"
                                        VerticalOptions="EndAndExpand"
                                        HorizontalOptions="Start"
@@ -132,9 +132,9 @@
                                     </Label.GestureRecognizers>
                                 </Label>
                             </StackLayout>
-                            </Grid>
+                        </Grid>
                     </StackLayout>
-                    
+
                     <StackLayout IsVisible="False">
                         <StackLayout Orientation="Horizontal">
                             <Label
@@ -154,59 +154,59 @@
                         </StackLayout>
 
                         <StackLayout>
-                        <StackLayout
-                            VerticalOptions="EndAndExpand">
-                            <Label
-                                CharacterSpacing="1"
-                                FontSize="Large"
-                                HorizontalOptions="Center"
-                                Text="Main Controller"
-                                TextColor="White"
-                                VerticalOptions="Center" />
-                            <Frame
-                                Margin="0,0,10,0"
-                                Padding="10,0,10,0"
-                                BackgroundColor="AliceBlue"
-                                CornerRadius="30"
-                                HorizontalOptions="Fill">
-                                <StackLayout Orientation="Horizontal">
-                                    <Image HeightRequest="18"
-                                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
-                                    <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand"
-                                            TextColor="DarkSlateBlue" />
-                                </StackLayout>
-                            </Frame>
-                        </StackLayout>
-                        <StackLayout Orientation="Horizontal">
-                            <StackLayout>
+                            <StackLayout
+                                VerticalOptions="EndAndExpand">
                                 <Label
-                                    Margin="3,0,0,0"
                                     CharacterSpacing="1"
-                                    FontSize="Medium"
+                                    FontSize="Large"
                                     HorizontalOptions="Center"
-                                    Text="Use LoRa over Network"
+                                    Text="Main Controller"
                                     TextColor="White"
                                     VerticalOptions="Center" />
-                                <Label
-                                    Margin="3,0,0,0"
-                                    CharacterSpacing="1"
-                                    FontSize="Medium"
-                                    HorizontalOptions="Center"
-                                    Text="(Experimental)"
-                                    TextColor="White"
+                                <Frame
+                                    Margin="0,0,10,0"
+                                    Padding="10,0,10,0"
+                                    BackgroundColor="AliceBlue"
+                                    CornerRadius="30"
+                                    HorizontalOptions="Fill">
+                                    <StackLayout Orientation="Horizontal">
+                                        <Image HeightRequest="18"
+                                               Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
+                                        <Picker x:Name="ControllerPicker" HorizontalOptions="FillAndExpand"
+                                                TextColor="DarkSlateBlue" />
+                                    </StackLayout>
+                                </Frame>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal">
+                                <StackLayout>
+                                    <Label
+                                        Margin="3,0,0,0"
+                                        CharacterSpacing="1"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="Use LoRa over Network"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Margin="3,0,0,0"
+                                        CharacterSpacing="1"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="(Experimental)"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                </StackLayout>
+                                <CheckBox
+                                    x:Name="UseLoRa"
+                                    Margin="15,0,0,0"
+                                    HorizontalOptions="StartAndExpand"
+                                    IsChecked="False"
                                     VerticalOptions="Center" />
                             </StackLayout>
-                            <CheckBox
-                                x:Name="UseLoRa"
-                                Margin="15,0,0,0"
-                                HorizontalOptions="StartAndExpand"
-                                IsChecked="False"
-                                VerticalOptions="Center" />
                         </StackLayout>
                     </StackLayout>
-                    </StackLayout>
                 </StackLayout>
-                
+
                 <StackLayout VerticalOptions="EndAndExpand">
 
                     <Button

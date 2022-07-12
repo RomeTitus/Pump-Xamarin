@@ -16,17 +16,19 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class IrrigationControllerSettings : ContentPage
     {
+        private readonly List<string> _connectionLabel = new List<string> { "Cloud", "Network", "Bluetooth" };
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
-        private readonly List<string> _connectionLabel = new List<string>{"Cloud", "Network", "Bluetooth"};
         private readonly SocketPicker _socketPicker;
-        public IrrigationControllerSettings(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker)
+
+        public IrrigationControllerSettings(
+            KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _keyValueIrrigation = keyValueIrrigation;
             _socketPicker = socketPicker;
             Populate();
         }
-        
+
         private async void Populate()
         {
             LabelName.Text = _keyValueIrrigation.Key.Path;
@@ -43,31 +45,29 @@ namespace Pump.Layout
         private void PopulateSites()
         {
             foreach (var keyControllerPair in _keyValueIrrigation.Key.ControllerPairs)
-            {
                 SiteLayout.Children.Add(new ViewSiteSummary(keyControllerPair, _keyValueIrrigation, _socketPicker));
-            }
         }
-        
+
         private async Task SetFocus()
         {
             await Task.Delay(200);
-            
-            if(_keyValueIrrigation.Key.InternalPath != null)
+
+            if (_keyValueIrrigation.Key.InternalPath != null)
                 InternalIpEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
             else
                 InternalIpEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
 
-            if(_keyValueIrrigation.Key.InternalPort != null)
+            if (_keyValueIrrigation.Key.InternalPort != null)
                 InternalPortEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
             else
                 InternalPortEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
-            
-            if(_keyValueIrrigation.Key.ExternalPath != null)
+
+            if (_keyValueIrrigation.Key.ExternalPath != null)
                 ExternalIpEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
             else
                 ExternalIpEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
 
-            if(_keyValueIrrigation.Key.ExternalPort != null)
+            if (_keyValueIrrigation.Key.ExternalPort != null)
                 ExternalPortEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
             else
                 ExternalPortEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
@@ -81,7 +81,7 @@ namespace Pump.Layout
 
             foreach (var view in SiteLayout.Children)
             {
-                var viewSite = (ViewSiteSummary) view;
+                var viewSite = (ViewSiteSummary)view;
                 var entry = viewSite.GetSiteNameEntry();
                 if (string.IsNullOrEmpty(entry.Text))
                 {
@@ -89,6 +89,7 @@ namespace Pump.Layout
                     SetPlaceholderColor(entry, Color.Red, Color.Red);
                 }
             }
+
             notification += ValidateIpTextChange(InternalIpEntry, "Internal IP");
             notification += ValidateIpTextChange(ExternalIpEntry, "External IP");
 
@@ -113,7 +114,7 @@ namespace Pump.Layout
 
         private string ValidateIpTextChange(EntryOutlined entry, string interfaceName = "")
         {
-            List<char> allowedCharacters = new List<char> { '0','1','2','3','4','5','6','7','8','9','.'};
+            var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
 
             if (entry.Text.Any(charValue => !allowedCharacters.Contains(charValue)))
             {
@@ -126,14 +127,14 @@ namespace Pump.Layout
                 SetPlaceholderColor(entry, Color.Red, Color.Red);
                 return "\n\u2022" + interfaceName + " incorrect format";
             }
-            
+
             var ipArray = entry.Text.Split('.');
             if (ipArray.Any(subIp => subIp.Length > 3))
             {
                 SetPlaceholderColor(entry, Color.Red, Color.Red);
                 return "\n\u2022" + interfaceName + " incorrect format";
             }
-            
+
             SetPlaceholderColor(entry, Color.Navy, Color.Black);
             return string.Empty;
         }
@@ -154,11 +155,11 @@ namespace Pump.Layout
         {
             Device.BeginInvokeOnMainThread(() =>
             {
-                entry.PlaceholderColor =placeholderColor;
+                entry.PlaceholderColor = placeholderColor;
                 entry.BorderColor = borderColor;
             });
         }
-        
+
         private void IpEntry_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             var entry = (EntryOutlined)sender;
@@ -167,9 +168,9 @@ namespace Pump.Layout
 
         private void PortEntry_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            var allowedCharacters = new List<char> { '0','1','2','3','4','5','6','7','8','9'};
+            var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
-            var entryOutline = (EntryOutlined) sender;
+            var entryOutline = (EntryOutlined)sender;
             var invalidChar = e.NewTextValue?.Where(charValue => !allowedCharacters.Contains(charValue));
             if (invalidChar != null && invalidChar.Any())
                 entryOutline.Text = e.OldTextValue;
@@ -184,25 +185,25 @@ namespace Pump.Layout
                 await DisplayAlert("Setup", notification, "Understood");
                 return;
             }
+
             var irrigationConfiguration = _keyValueIrrigation.Key;
             irrigationConfiguration.ConnectionType = ConnectionTypePicker.SelectedIndex;
 
-            
-            if(InternalIpEntry.Text != irrigationConfiguration.InternalPath)
+            if (InternalIpEntry.Text != irrigationConfiguration.InternalPath)
                 irrigationConfiguration.InternalPath = InternalIpEntry.Text;
 
             if (InternalPortEntry.Text != irrigationConfiguration.InternalPort.ToString())
                 irrigationConfiguration.InternalPort = StringToInt(InternalPortEntry.Text);
-            
-            if(ExternalIpEntry.Text != irrigationConfiguration.ExternalPath)
+
+            if (ExternalIpEntry.Text != irrigationConfiguration.ExternalPath)
                 irrigationConfiguration.ExternalPath = ExternalIpEntry.Text;
-            
+
             if (ExternalPortEntry.Text != irrigationConfiguration.ExternalPort.ToString())
                 irrigationConfiguration.ExternalPort = StringToInt(ExternalPortEntry.Text);
 
             foreach (var view in SiteLayout.Children)
             {
-                var viewSite = (ViewSiteSummary) view;
+                var viewSite = (ViewSiteSummary)view;
                 var keyPair = viewSite.GetKeyValuePair();
                 var newSiteName = viewSite.SiteNameEntry.Text;
                 if (newSiteName != keyPair.Key)
@@ -211,27 +212,26 @@ namespace Pump.Layout
                     irrigationConfiguration.ControllerPairs.Remove(keyPair.Key);
                 }
             }
-            
+
             var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
             await PopupNavigation.Instance.PushAsync(loadingScreen);
-            
+
             //Force Firebase
             await _socketPicker.UpdateIrrigationConfig(irrigationConfiguration);
             await PopupNavigation.Instance.PopAllAsync();
             await Navigation.PopModalAsync();
-            
         }
 
         private async void Button_OnPressed_Back(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();
         }
+
         private static int? StringToInt(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return null;
             return Convert.ToInt32(value);
-
         }
     }
 }

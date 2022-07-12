@@ -46,7 +46,7 @@ namespace Pump.SocketController
             tempDhcpConfigCommand["Task"]["TempDhcpConfig"] = dhcpConfig;
             return tempDhcpConfigCommand;
         }
-        
+
         public static JObject SetupFirebaseController(JObject controllerConfig)
         {
             var wiFiCommand = new JObject { { "Task", new JObject() } };
@@ -174,7 +174,8 @@ namespace Pump.SocketController
             {
                 var manualSchedule = (ManualSchedule)entity;
                 return CleanJObject(manualSchedule.DeleteAwaiting
-                    ? DeleteManualSchedule(manualSchedule) : SetManualSchedule(manualSchedule));
+                    ? DeleteManualSchedule(manualSchedule)
+                    : SetManualSchedule(manualSchedule));
             }
 
             if (entity.GetType() == typeof(Schedule))
@@ -187,7 +188,8 @@ namespace Pump.SocketController
             {
                 var customSchedule = (CustomSchedule)entity;
                 return CleanJObject(customSchedule.DeleteAwaiting
-                    ? DeleteCustomSchedule(customSchedule) : SetCustomSchedule(customSchedule));
+                    ? DeleteCustomSchedule(customSchedule)
+                    : SetCustomSchedule(customSchedule));
             }
 
             if (entity.GetType() == typeof(Equipment))
@@ -201,12 +203,13 @@ namespace Pump.SocketController
                 var sensor = (Sensor)entity;
                 return CleanJObject(sensor.DeleteAwaiting ? DeleteSensor(sensor) : SetSensor(sensor));
             }
-            
+
             if (entity.GetType() == typeof(SubController))
             {
                 var subController = (SubController)entity;
                 return CleanJObject(subController.DeleteAwaiting
-                    ? DeleteSubController(subController) : SetSubController(subController));
+                    ? DeleteSubController(subController)
+                    : SetSubController(subController));
             }
 
             //TODO see how this will work with BlueTooth / Socket

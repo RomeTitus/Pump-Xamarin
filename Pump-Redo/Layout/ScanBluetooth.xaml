@@ -9,38 +9,38 @@
     BackgroundColor="DeepSkyBlue"
     mc:Ignorable="d">
     <StackLayout Margin="20">
-            <Label
-                Margin="0,15,0,0"
-                FontSize="Title"
-                HorizontalOptions="CenterAndExpand"
-                Text="Nearby Controllers"
-                TextColor="White"
-                TextDecorations="Underline"
-                VerticalOptions="Center" />
-            <StackLayout VerticalOptions="FillAndExpand">
-                <Frame
-                    BackgroundColor="White"
-                    BorderColor="Black"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand">
-                    <ScrollView HeightRequest="100">
-                        <StackLayout x:Name="ScrollViewSetupSystem" />
-                    </ScrollView>
-                </Frame>
-            </StackLayout>
-            <StackLayout HorizontalOptions="EndAndExpand">
-                <StackLayout HorizontalOptions="End" WidthRequest="75">
-                    <Label x:Name="LabelBtScan" Text="Rescan    " HorizontalOptions="Start" TextColor="White">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="LabelBTScan_OnTapped" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                </StackLayout>
-            </StackLayout>
-            <StackLayout HorizontalOptions="FillAndExpand" x:Name="StackLayoutBack" Margin="0,30,0,0">
-                <Button
-                    Text="Back"
-                    Pressed="ButtonBack_OnPressed"/>
+        <Label
+            Margin="0,15,0,0"
+            FontSize="Title"
+            HorizontalOptions="CenterAndExpand"
+            Text="Nearby Controllers"
+            TextColor="White"
+            TextDecorations="Underline"
+            VerticalOptions="Center" />
+        <StackLayout VerticalOptions="FillAndExpand">
+            <Frame
+                BackgroundColor="White"
+                BorderColor="Black"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand">
+                <ScrollView HeightRequest="100">
+                    <StackLayout x:Name="ScrollViewSetupSystem" />
+                </ScrollView>
+            </Frame>
+        </StackLayout>
+        <StackLayout HorizontalOptions="EndAndExpand">
+            <StackLayout HorizontalOptions="End" WidthRequest="75">
+                <Label x:Name="LabelBtScan" Text="Rescan    " HorizontalOptions="Start" TextColor="White">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="LabelBTScan_OnTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
             </StackLayout>
         </StackLayout>
+        <StackLayout HorizontalOptions="FillAndExpand" x:Name="StackLayoutBack" Margin="0,30,0,0">
+            <Button
+                Text="Back"
+                Pressed="ButtonBack_OnPressed" />
+        </StackLayout>
+    </StackLayout>
 </ContentPage>

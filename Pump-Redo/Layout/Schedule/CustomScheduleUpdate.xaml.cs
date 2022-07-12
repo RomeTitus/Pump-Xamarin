@@ -13,14 +13,16 @@ namespace Pump.Layout.Schedule
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CustomScheduleUpdate : ContentPage
     {
-        private readonly List<string> _pumpIdList = new List<string>();
-        private readonly SocketPicker _socketPicker;
-
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
+
+        private readonly List<string> _pumpIdList = new List<string>();
+        private readonly SocketPicker _socketPicker;
         private CustomSchedule _customSchedule;
 
-        public CustomScheduleUpdate(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker,
+        public CustomScheduleUpdate(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker,
             CustomSchedule schedule = null)
         {
             InitializeComponent();
@@ -45,7 +47,8 @@ namespace Pump.Layout.Schedule
 
         private void PopulateEquipment()
         {
-            foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length)
+            foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList
+                         .Where(equipment => equipment.isPump).OrderBy(c => c.NAME.Length)
                          .ThenBy(c => c.NAME))
             {
                 CustomPumpPicker.Items.Add(equipment.NAME);
@@ -60,9 +63,11 @@ namespace Pump.Layout.Schedule
             try
             {
                 ScrollViewZoneDetail.Children.Clear();
-                if (_observableFilterKeyValuePair.Value.EquipmentList.Count(equipment => equipment.isPump == false) == 0)
+                if (_observableFilterKeyValuePair.Value.EquipmentList.Count(equipment => equipment.isPump == false) ==
+                    0)
                     ScrollViewZoneDetail.Children.Add(new ViewEmptySchedule("No Zones Found"));
-                foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.Where(equipment => equipment.isPump == false)
+                foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList
+                             .Where(equipment => equipment.isPump == false)
                              .OrderBy(c => c.NAME.Length).ThenBy(c => c.NAME))
                 {
                     var scheduleDetail =

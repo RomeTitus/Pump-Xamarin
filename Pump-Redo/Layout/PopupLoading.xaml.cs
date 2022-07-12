@@ -13,7 +13,5 @@ namespace Pump.Layout
                 LoadingLabel.Text = label;
             CloseWhenBackgroundIsClicked = closeWhenBackgroundIsClicked;
         }
-
-
     }
 }

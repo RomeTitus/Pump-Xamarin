@@ -8,6 +8,7 @@ namespace Pump.Layout.Views
     public partial class ViewSubControllerSummary : ContentView
     {
         public bool LoadedData;
+
         public ViewSubControllerSummary(string subControllerId)
         {
             InitializeComponent();
@@ -16,13 +17,14 @@ namespace Pump.Layout.Views
             LabelType.IsVisible = false;
             ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
         }
+
         public ViewSubControllerSummary(SubController subController)
         {
             InitializeComponent();
             AutomationId = subController?.Id;
             Populate(subController);
         }
-        
+
         public void Populate(SubController subController)
         {
             LoadedData = true;
@@ -34,13 +36,14 @@ namespace Pump.Layout.Views
                 LabelSubControllerName.Text = "Main Controller";
                 return;
             }
+
             LabelType.IsVisible = true;
 
             LabelSubControllerName.Text = subController.Name;
             if (subController.UseLoRa)
                 LabelType.Text = "Long Range";
         }
-        
+
         public TapGestureRecognizer GetTapGestureRecognizer()
         {
             return StackLayoutViewSubControllerTapGesture;

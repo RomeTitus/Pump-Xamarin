@@ -1,6 +1,4 @@
 ﻿using System;
-using Pump.SocketController;
-using Pump.SocketController.Network;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 

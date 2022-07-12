@@ -33,7 +33,7 @@
         <Label
             x:Name="LoadingLabel"
             HorizontalOptions="CenterAndExpand"
-            Text="Loading"/>
+            Text="Loading" />
         <ActivityIndicator
             x:Name="ActivityIndicatorScreen"
             HorizontalOptions="Center"

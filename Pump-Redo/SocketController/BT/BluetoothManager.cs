@@ -11,14 +11,13 @@ using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
-using Pump.Database;
 using Xamarin.Forms;
 
 namespace Pump.SocketController.BT
 {
     public class BluetoothManager
     {
-        private readonly Guid _irrigationService; 
+        private readonly Guid _irrigationService;
         private ICharacteristic _loadedCharacteristic;
 
         public BluetoothManager()
@@ -56,7 +55,7 @@ namespace Pump.SocketController.BT
             AdapterBle.ScanMode = ScanMode.LowLatency;
             await AdapterBle.StartScanningForDevicesAsync();
         }
-        
+
 
         public async Task<bool> ConnectToDevice(IDevice device, int retry = 0)
         {
@@ -68,30 +67,31 @@ namespace Pump.SocketController.BT
             {
                 var connected = true;
                 var cancellationToken = new CancellationTokenSource();
-                    cancellationToken.CancelAfter(23000);
-                    
-                    try
-                    {
-                        await AdapterBle.StopScanningForDevicesAsync();
-                        await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
-                    }
-                    catch (DeviceConnectionException deviceConnectionException)
-                    {
-                        connected = false;
-                        tries++;
-                        if (tries == retry)
-                            throw new ArgumentException("Failed to connect \n" + deviceConnectionException.Message);
-                    }
+                cancellationToken.CancelAfter(23000);
 
-                    catch (Exception)
-                    {
-                        connected = false;
-                        tries++;
-                        if (tries == retry)
-                            throw;
-                    }
-                    if (connected)
-                        break;
+                try
+                {
+                    await AdapterBle.StopScanningForDevicesAsync();
+                    await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+                }
+                catch (DeviceConnectionException deviceConnectionException)
+                {
+                    connected = false;
+                    tries++;
+                    if (tries == retry)
+                        throw new ArgumentException("Failed to connect \n" + deviceConnectionException.Message);
+                }
+
+                catch (Exception)
+                {
+                    connected = false;
+                    tries++;
+                    if (tries == retry)
+                        throw;
+                }
+
+                if (connected)
+                    break;
             }
 
             BleDevice = device;
@@ -176,7 +176,7 @@ namespace Pump.SocketController.BT
                     if (dataToSend.ContainsKey("Task"))
                         try
                         {
-                            if(dataToSend["Task"].Type != JTokenType.String)
+                            if (dataToSend["Task"].Type != JTokenType.String)
                                 dataToSend["Task"]["Part"] = partNumber;
                         }
                         catch
@@ -201,10 +201,10 @@ namespace Pump.SocketController.BT
                         fullData = true;
                     partNumber++;
                 }
-                
+
                 return ConvertForApplication(Encoding.ASCII.GetString(bleReplyBytes.ToArray(), 0, bleReplyBytes.Count));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 await Application.Current.MainPage.DisplayAlert("Bluetooth Exception",
                     e.Message, "Understood");

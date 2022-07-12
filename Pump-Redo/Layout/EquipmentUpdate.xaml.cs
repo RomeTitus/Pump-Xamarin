@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Pump.Class;
-using Pump.Database;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
@@ -17,13 +14,17 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EquipmentUpdate : ContentPage
     {
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
         private readonly Equipment _equipment;
         private readonly List<Equipment> _equipmentList;
+
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly SocketPicker _socketPicker;
         private List<long> _avalibleGpio;
 
-        public EquipmentUpdate(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+        public EquipmentUpdate(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
             SocketPicker socketPicker, Equipment equipment = null)
         {
             InitializeComponent();
@@ -37,9 +38,12 @@ namespace Pump.Layout
                 ButtonUpdateEquipment.Text = "Create";
                 _equipment = new Equipment();
             }
-                
+
             else
+            {
                 _equipmentList.Remove(equipment);
+            }
+
             _equipment = equipment;
             Populate();
         }
@@ -71,7 +75,7 @@ namespace Pump.Layout
             var notification = "";
 
             if (string.IsNullOrWhiteSpace(EquipmentName.Text))
-            { 
+            {
                 notification += "\n\u2022 Equipment name required";
                 EquipmentName.PlaceholderColor = Color.Red;
                 EquipmentName.Placeholder = "Equipment name";
@@ -79,15 +83,15 @@ namespace Pump.Layout
 
             if (SystemPicker.SelectedIndex == -1)
                 notification += "\n\u2022 Select a Sub-Controller";
-            
 
-            if (GpioPicker.SelectedIndex == -1) 
-                    notification += "\n\u2022 Select a Pin";
-            
+
+            if (GpioPicker.SelectedIndex == -1)
+                notification += "\n\u2022 Select a Pin";
+
 
             if (DirectOnlineGpioPicker.SelectedIndex == -1 && IsDirectOnlineCheckBox.IsChecked)
-                    notification += "\n\u2022 Select a Direct Online Pin";
-            
+                notification += "\n\u2022 Select a Direct Online Pin";
+
             return notification;
         }
 
@@ -110,7 +114,8 @@ namespace Pump.Layout
             var systemPicker = (Picker)sender;
             var selectedIndex = systemPicker.SelectedIndex;
             _avalibleGpio = new GpioPins().GetDigitalGpioList();
-            var usedEquipment = selectedIndex == 0 ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
+            var usedEquipment = selectedIndex == 0
+                ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
                 : _equipmentList.Where(y =>
                     !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
                     _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();

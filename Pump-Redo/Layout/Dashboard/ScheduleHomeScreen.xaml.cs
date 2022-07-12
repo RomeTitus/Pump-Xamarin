@@ -19,11 +19,16 @@ namespace Pump.Layout.Dashboard
     public partial class ScheduleHomeScreen : ContentView
     {
         private readonly FloatingScreen _floatingScreen = new FloatingScreen();
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
+
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly SocketPicker _socketPicker;
         private ViewScheduleSummary _viewSchedule;
 
-        public ScheduleHomeScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
+        public ScheduleHomeScreen(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
@@ -53,7 +58,8 @@ namespace Pump.Layout.Dashboard
                         if (viewSchedule != null)
                         {
                             var equipment =
-                                _observableFilterKeyValuePair.Value.EquipmentList.FirstOrDefault(x => x?.Id == schedule.id_Pump);
+                                _observableFilterKeyValuePair.Value.EquipmentList.FirstOrDefault(x =>
+                                    x?.Id == schedule.id_Pump);
                             var viewScheduleStatus = (ViewScheduleSettingSummary)viewSchedule;
                             viewScheduleStatus.Schedule.NAME = schedule.NAME;
                             viewScheduleStatus.Schedule.TIME = schedule.TIME;
@@ -66,7 +72,8 @@ namespace Pump.Layout.Dashboard
                         else
                         {
                             var viewScheduleSettingSummary = new ViewScheduleSettingSummary(schedule,
-                                _observableFilterKeyValuePair.Value.EquipmentList.FirstOrDefault(x => x?.Id == schedule.id_Pump));
+                                _observableFilterKeyValuePair.Value.EquipmentList.FirstOrDefault(x =>
+                                    x?.Id == schedule.id_Pump));
                             ScrollViewScheduleDetail.Children.Add(viewScheduleSettingSummary);
                             viewScheduleSettingSummary.GetSwitch().Toggled += ScheduleSwitch_Toggled;
                             viewScheduleSettingSummary.GetTapGestureRecognizer().Tapped += ViewScheduleScreen_Tapped;
@@ -91,7 +98,8 @@ namespace Pump.Layout.Dashboard
             {
                 if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.ScheduleList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay =
+                        _observableFilterKeyValuePair.Value.ScheduleList.Select(x => x?.Id).ToList();
                     if (!itemsThatAreOnDisplay.Any())
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -137,7 +145,8 @@ namespace Pump.Layout.Dashboard
                 try
                 {
                     _floatingScreen.SetFloatingScreen(
-                        GetScheduleSummaryObject(_observableFilterKeyValuePair.Value.ScheduleList.FirstOrDefault(x => x?.Id == id)));
+                        GetScheduleSummaryObject(
+                            _observableFilterKeyValuePair.Value.ScheduleList.FirstOrDefault(x => x?.Id == id)));
                 }
                 catch (Exception e)
                 {
@@ -159,7 +168,8 @@ namespace Pump.Layout.Dashboard
                 }
 
 
-                _viewSchedule = new ViewScheduleSummary(schedule, _observableFilterKeyValuePair.Value.EquipmentList.ToList());
+                _viewSchedule =
+                    new ViewScheduleSummary(schedule, _observableFilterKeyValuePair.Value.EquipmentList.ToList());
 
                 _viewSchedule.GetButtonEdit().Clicked += EditButton_Tapped;
                 _viewSchedule.GetButtonDelete().Clicked += DeleteButton_Tapped;

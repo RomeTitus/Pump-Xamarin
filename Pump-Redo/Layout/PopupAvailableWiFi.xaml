@@ -6,7 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
     xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup">
-    
+
     <pages:PopupPage.Animation>
         <animations:ScaleAnimation
             DurationIn="200"
@@ -19,42 +19,43 @@
             ScaleIn="0.7"
             ScaleOut="1.5" />
     </pages:PopupPage.Animation>
-    
+
     <Frame
         Margin="20,60,20,60"
         BackgroundColor="Azure"
         CornerRadius="10"
         BorderColor="Black"
         VerticalOptions="FillAndExpand">
-        
+
         <StackLayout HeightRequest="400">
-                <StackLayout VerticalOptions="FillAndExpand">
-                    <StackLayout>
-                        <Label
-                            CharacterSpacing="1"
-                            FontSize="Large"
-                            HorizontalOptions="CenterAndExpand"
-                            Text="Available WiFis"
-                            VerticalOptions="Center" />
-                    </StackLayout>
-                    
-                    <StackLayout Padding="10" VerticalOptions="Center">
-                        <Frame
-                            BackgroundColor="White"
-                            BorderColor="Gray"
-                            HorizontalOptions="FillAndExpand"
-                            VerticalOptions="FillAndExpand">
-                            <ScrollView VerticalOptions="FillAndExpand">
-                                <StackLayout x:Name="ScrollViewWiFiDetail" VerticalOptions="FillAndExpand" HeightRequest="400"/>
-                            </ScrollView>
-                        </Frame>
-                    </StackLayout>
-                    <StackLayout VerticalOptions="EndAndExpand">
-                        <Button
-                            Clicked="ButtonCancel_OnClicked"
-                            Text="Cancel" />
-                    </StackLayout>
+            <StackLayout VerticalOptions="FillAndExpand">
+                <StackLayout>
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="CenterAndExpand"
+                        Text="Available WiFis"
+                        VerticalOptions="Center" />
+                </StackLayout>
+
+                <StackLayout Padding="10" VerticalOptions="Center">
+                    <Frame
+                        BackgroundColor="White"
+                        BorderColor="Gray"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
+                        <ScrollView VerticalOptions="FillAndExpand">
+                            <StackLayout x:Name="ScrollViewWiFiDetail" VerticalOptions="FillAndExpand"
+                                         HeightRequest="400" />
+                        </ScrollView>
+                    </Frame>
+                </StackLayout>
+                <StackLayout VerticalOptions="EndAndExpand">
+                    <Button
+                        Clicked="ButtonCancel_OnClicked"
+                        Text="Cancel" />
                 </StackLayout>
             </StackLayout>
-        </Frame>
+        </StackLayout>
+    </Frame>
 </pages:PopupPage>

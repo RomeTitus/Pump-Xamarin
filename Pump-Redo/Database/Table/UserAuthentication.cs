@@ -1,5 +1,4 @@
-﻿using Firebase.Auth;
-using SQLite;
+﻿using SQLite;
 
 namespace Pump.Database.Table
 {

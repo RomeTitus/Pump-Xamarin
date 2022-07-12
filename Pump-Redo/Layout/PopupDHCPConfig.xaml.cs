@@ -16,6 +16,7 @@ namespace Pump.Layout
     {
         private readonly DHCPConfig _dhcpConfig;
         private readonly List<string> _dhcpInterface;
+
         public PopupDHCPConfig(List<string> dhcpInterface, DHCPConfig dhcpConfig = null)
         {
             InitializeComponent();
@@ -26,7 +27,7 @@ namespace Pump.Layout
 
         private void DhcpPickerOnSelectedIndexChanged(object sender, EventArgs e)
         {
-            if(DhcpPicker.SelectedIndex == 0) 
+            if (DhcpPicker.SelectedIndex == 0)
                 StackLayoutDhcpConfig.IsVisible = false;
             else
                 StackLayoutDhcpConfig.IsVisible = true;
@@ -49,9 +50,8 @@ namespace Pump.Layout
                 EntryIP.Text = _dhcpInterface[1];
                 DhcpPicker.SelectedIndex = 0;
             }
-                
         }
-        
+
         protected override async void OnAppearing()
         {
             base.OnAppearing();
@@ -74,9 +74,10 @@ namespace Pump.Layout
                 EntryGateway.TextBox_Unfocused(this, new FocusEventArgs(this, false));
                 EntryDNS.TextBox_Unfocused(this, new FocusEventArgs(this, false));
             }
+
             await Task.Delay(200);
         }
-        
+
         private async Task SetFocusIpAddress()
         {
             await Task.Delay(100);
@@ -97,13 +98,10 @@ namespace Pump.Layout
 
         private void ValidateIpTextChange(EntryOutlined entry, string textValue)
         {
-            List<char> allowedCharacters = new List<char> { '0','1','2','3','4','5','6','7','8','9','.',',',' '};
+            var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', ' ' };
             var invalid = false;
-            foreach (var _ in textValue.Where(charValue => !allowedCharacters.Contains(charValue)))
-            {
-                invalid = true;
-            }
-            
+            foreach (var _ in textValue.Where(charValue => !allowedCharacters.Contains(charValue))) invalid = true;
+
             if (invalid == false)
                 invalid = textValue.Length > 3 && !textValue.Contains(".");
 
@@ -111,13 +109,11 @@ namespace Pump.Layout
             {
                 var ipArray = textValue.Split('.');
                 foreach (var subIp in ipArray)
-                {
                     if (subIp.Length > 3)
                     {
                         invalid = true;
                         break;
                     }
-                }
             }
 
             Device.BeginInvokeOnMainThread(() =>
@@ -131,7 +127,6 @@ namespace Pump.Layout
                 {
                     entry.PlaceholderColor = Color.Navy;
                     entry.BorderColor = Color.Black;
-
                 }
             });
         }
@@ -147,7 +142,7 @@ namespace Pump.Layout
             {
                 DHCPinterface = _dhcpInterface[0]
             };
-            if (DhcpPicker.SelectedIndex == 0) 
+            if (DhcpPicker.SelectedIndex == 0)
                 return dhcpConfig;
             dhcpConfig.ip_address = EntryIP.Text;
             dhcpConfig.routers = EntryGateway.Text;

@@ -78,6 +78,7 @@ namespace Pump.IrrigationController
         {
             return customScheduleList.Select(GetCustomScheduleDetailRunning).Where(result => result != null).ToList();
         }
+
         public DateTime? getCustomScheduleEndTime(CustomSchedule customScheduleList)
         {
             try

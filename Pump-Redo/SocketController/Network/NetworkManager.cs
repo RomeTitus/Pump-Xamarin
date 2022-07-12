@@ -68,7 +68,8 @@ namespace Pump.SocketController.Network
                 networkReplyBytes.Count));
         }
 
-        private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, IrrigationConfiguration connection, int timeout = 0)
+        private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, IrrigationConfiguration connection,
+            int timeout = 0)
         {
             //Return nothing if there is no network path
             if (connection.InternalPort == -1 && connection.ExternalPort == -1)

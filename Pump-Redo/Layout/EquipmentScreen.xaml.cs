@@ -14,10 +14,14 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class EquipmentScreen : ContentPage
     {
-        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> _observableFilterKeyValuePair;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
+            _observableFilterKeyValuePair;
+
         private readonly SocketPicker _socketPicker;
 
-        public EquipmentScreen(KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair, SocketPicker socketPicker)
+        public EquipmentScreen(
+            KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
+            SocketPicker socketPicker)
         {
             InitializeComponent();
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
@@ -41,7 +45,8 @@ namespace Pump.Layout
                 if (_observableFilterKeyValuePair.Value.EquipmentList.Contains(null)) return;
                 BtnAddEquipment.IsEnabled = true;
                 if (_observableFilterKeyValuePair.Value.EquipmentList.Any())
-                    foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.OrderBy(c => c.NAME.Length)
+                    foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList
+                                 .OrderBy(c => c.NAME.Length)
                                  .ThenBy(c => c.NAME))
                     {
                         var viewEquipment = ScrollViewEquipment.Children.FirstOrDefault(x =>
@@ -73,7 +78,8 @@ namespace Pump.Layout
             {
                 if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.EquipmentList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay =
+                        _observableFilterKeyValuePair.Value.EquipmentList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
@@ -158,7 +164,8 @@ namespace Pump.Layout
             {
                 if (_observableFilterKeyValuePair.Value.LoadedAllData())
                 {
-                    var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
+                    var itemsThatAreOnDisplay =
+                        _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
                     if (itemsThatAreOnDisplay.Count == 0)
                         itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
                     for (var index = 0; index < ScrollViewSensor.Children.Count; index++)
@@ -198,14 +205,16 @@ namespace Pump.Layout
         private async void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
         {
             var viewEquipment = (StackLayout)sender;
-            var equipment = _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == viewEquipment.AutomationId);
+            var equipment =
+                _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == viewEquipment.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + equipment.NAME,
                 "Cancel", null, "Update", "Delete");
             if (action == null) return;
 
             if (action == "Update")
-                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, equipment));
+                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker,
+                    equipment));
             else if (action == "Delete")
                 if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + equipment.NAME, "Delete",

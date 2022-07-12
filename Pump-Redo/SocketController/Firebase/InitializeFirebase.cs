@@ -11,13 +11,14 @@ namespace Pump.SocketController.Firebase
 {
     internal class InitializeFirebase
     {
-        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
-        private IDisposable _subscribeFirebase;
-        private readonly FirebaseManager _firebaseManager;
-        private bool _alreadySubscribed;
         private readonly DatabaseController _databaseController;
-        
-        public InitializeFirebase(FirebaseManager firebaseManager, Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
+        private readonly FirebaseManager _firebaseManager;
+        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
+        private bool _alreadySubscribed;
+        private IDisposable _subscribeFirebase;
+
+        public InitializeFirebase(FirebaseManager firebaseManager,
+            Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict)
         {
             _observableDict = observableDict;
             _firebaseManager = firebaseManager;
@@ -43,22 +44,25 @@ namespace Pump.SocketController.Firebase
                     UpdateConfiguration(_observableDict, obj.Object);
                     return;
                 }
-                    
+
                 var configuration = _observableDict.Keys.FirstOrDefault(y => y.Path == obj.Key);
                 if (configuration == null)
                     throw new Exception("Configuration does not exist for :" + obj.Key);
-                        
+
                 foreach (var elementPair in obj.Object)
                 {
-                    if(!elementPair.Value.Any())
+                    if (!elementPair.Value.Any())
                         continue;
-                            
-                    var typeAndDynamicValueList = ManageObservableIrrigationData.GetDynamicValueListFromJObject(elementPair.Key, JObject.Parse(elementPair.Value.ToString()));
-                                
-                    if(typeAndDynamicValueList.type == null)
+
+                    var typeAndDynamicValueList =
+                        ManageObservableIrrigationData.GetDynamicValueListFromJObject(elementPair.Key,
+                            JObject.Parse(elementPair.Value.ToString()));
+
+                    if (typeAndDynamicValueList.type == null)
                         continue;
-                                
-                    ManageObservableIrrigationData.AddUpdateOrRemoveRecordFromController(typeAndDynamicValueList.type, typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
+
+                    ManageObservableIrrigationData.AddUpdateOrRemoveRecordFromController(typeAndDynamicValueList.type,
+                        typeAndDynamicValueList.dynamicList, _observableDict[configuration]);
                 }
             }
             catch (Exception e)
@@ -67,17 +71,19 @@ namespace Pump.SocketController.Firebase
             }
         }
 
-        private void UpdateConfiguration(Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict, JObject configObject)
+        private void UpdateConfiguration(Dictionary<IrrigationConfiguration, ObservableIrrigation> observableDict,
+            JObject configObject)
         {
             foreach (var elementPair in configObject)
             {
-                if(!elementPair.Value.Any())
+                if (!elementPair.Value.Any())
                     continue;
                 var configLists = ManageObservableIrrigationData.GetConfigurationListFromJObject(configObject);
-                ManageObservableIrrigationData.AddUpdateOrRemoveConfigFromController(observableDict, configLists, _databaseController);
+                ManageObservableIrrigationData.AddUpdateOrRemoveConfigFromController(observableDict, configLists,
+                    _databaseController);
             }
         }
-        
+
         public void Disposable(IrrigationConfiguration irrigationConfiguration)
         {
             if (_observableDict.Keys.Any(x => x.ConnectionType == 1) == false && _alreadySubscribed)
@@ -93,7 +99,6 @@ namespace Pump.SocketController.Firebase
             _observableDict[irrigationConfiguration].CustomScheduleList.Clear();
             _observableDict[irrigationConfiguration].SubControllerList.Clear();
             _observableDict[irrigationConfiguration].AliveList.Clear();
-            
         }
     }
 }
