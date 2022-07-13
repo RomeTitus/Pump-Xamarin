@@ -17,14 +17,13 @@ namespace Pump.Database
             _database.CreateTable<IrrigationConfiguration>();
             _database.CreateTable<UserAuthentication>();
         }
-
         public List<IrrigationConfiguration> GetIrrigationConfigurationList()
         {
             lock (Locker)
             {
                 var irrigationConfigurationList = _database.Table<IrrigationConfiguration>();
                 var configList = irrigationConfigurationList.ToList();
-                configList.ForEach(x => x.DeserializedControllerPair());
+                configList.ForEach(x => x.DeserializedProperties());
                 return configList;
             }
         }
@@ -33,14 +32,25 @@ namespace Pump.Database
         {
             lock (Locker)
             {
-                irrigationConfiguration.SerializedControllerPair();
-
                 var existingIrrigationConfiguration = _database.Table<IrrigationConfiguration>()
                     .FirstOrDefault(x => x.Mac.Equals(irrigationConfiguration.Mac));
                 if (existingIrrigationConfiguration != null)
-                    _database.Update(irrigationConfiguration);
+                {
+                    existingIrrigationConfiguration.ConnectionType = irrigationConfiguration.ConnectionType;
+                    existingIrrigationConfiguration.ExternalPath = irrigationConfiguration.ExternalPath;
+                    existingIrrigationConfiguration.ExternalPort = irrigationConfiguration.ExternalPort;
+                    existingIrrigationConfiguration.InternalPath = irrigationConfiguration.InternalPath;
+                    existingIrrigationConfiguration.InternalPort = irrigationConfiguration.InternalPort;
+                    existingIrrigationConfiguration.ControllerPairs = irrigationConfiguration.ControllerPairs;
+                    existingIrrigationConfiguration.DeviceGuid = irrigationConfiguration.DeviceGuid;
+                    existingIrrigationConfiguration.SerializedProperties();
+                    _database.Update(existingIrrigationConfiguration);
+                }
                 else
+                {
+                    irrigationConfiguration.SerializedProperties();
                     _database.Insert(irrigationConfiguration);
+                }
             }
         }
 

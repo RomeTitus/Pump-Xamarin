@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Timers;
 using Plugin.BLE.Abstractions.Contracts;
 using Pump.Class;
 using Pump.Database;
+using Pump.Database.Table;
 using Pump.Layout.Views;
 using Pump.SocketController.BT;
 using Rg.Plugins.Popup.Services;
@@ -15,21 +17,21 @@ namespace Pump.Layout
     public partial class ScanBluetooth : ContentPage
     {
         private readonly BluetoothManager _bluetoothManager;
-        private readonly DatabaseController _database;
         private readonly NotificationEvent _notificationEvent;
         private readonly Timer _timer;
+        private readonly List<IrrigationConfiguration> _irrigationConfiguration;
         private int _scanCounter;
 
-        public ScanBluetooth(NotificationEvent notificationEvent, BluetoothManager bluetoothManager,
+        public ScanBluetooth(List<IrrigationConfiguration> irrigationConfiguration, NotificationEvent notificationEvent, BluetoothManager bluetoothManager,
             DatabaseController database)
         {
             InitializeComponent();
             _bluetoothManager = bluetoothManager;
+            _irrigationConfiguration = irrigationConfiguration;
             _timer = new Timer(300); // 0.3 seconds
             _timer.Elapsed += ScanTimerEvent;
-            _database = database;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += AdapterBleOnScanTimeoutElapsed;
-            StackLayoutBack.IsVisible = _database.GetIrrigationConfigurationList().Any();
+            StackLayoutBack.IsVisible = database.GetIrrigationConfigurationList().Any();
             BtScan();
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
@@ -118,7 +120,9 @@ namespace Pump.Layout
                         if (!await DisplayAlert("Irrigation", "Not verified controller", "Continue", "Cancel"))
                             return;
 
-                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent));
+                    var existing = _irrigationConfiguration.Any(x => new Guid(x.DeviceGuid) == _bluetoothManager.BleDevice.Id);
+                    
+                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent, existing));
                 }
 
                 catch (Exception exception)

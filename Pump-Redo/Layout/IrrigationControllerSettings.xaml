@@ -104,9 +104,16 @@
                     </ScrollView>
                 </Frame>
                 <StackLayout VerticalOptions="End">
-                    <Button
-                        Text="Update"
-                        Pressed="Button_OnPressed_Update" />
+                    <StackLayout Orientation="Horizontal">
+                        <Button
+                            Text="Update"
+                            HorizontalOptions="FillAndExpand"
+                            Pressed="Button_OnPressed_Update" />
+                        <Button 
+                            Text="Config" 
+                            HorizontalOptions="FillAndExpand"
+                            Pressed= "Button_OnPressed_IrrigationConfig"/>
+                    </StackLayout>
                     <Button
                         Text="Back"
                         Pressed="Button_OnPressed_Back" />

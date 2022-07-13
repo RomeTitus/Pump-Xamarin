@@ -70,6 +70,7 @@ namespace Pump.SocketController
                     existingConfig.ExternalPort = config.ExternalPort;
                     existingConfig.InternalPath = config.InternalPath;
                     existingConfig.InternalPort = config.InternalPort;
+                    existingConfig.DeviceGuid = config.DeviceGuid;
                     databaseController.SaveIrrigationConfiguration(existingConfig);
                 }
             }

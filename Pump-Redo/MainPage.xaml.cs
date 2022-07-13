@@ -39,7 +39,6 @@ namespace Pump
             _authenticationScreen = new AuthenticationScreen(client);
 
             client.AuthStateChanged += ClientOnAuthStateChanged;
-            StartEvent();
         }
 
         private async void ClientOnAuthStateChanged(object sender, UserEventArgs e)
@@ -65,6 +64,7 @@ namespace Pump
                         PopulateSavedIrrigation(configList);
                         await _socketPicker.Subscribe(configList, e.User);
                     });
+                StartEvent();
             }
         }
 
@@ -81,7 +81,7 @@ namespace Pump
 
         private void SetupNewController()
         {
-            var connectionScreen = new ScanBluetooth(_notificationEvent, _socketPicker.BluetoothManager(), _database);
+            var connectionScreen = new ScanBluetooth(_observableDict.Keys.ToList(), _notificationEvent, _socketPicker.BluetoothManager(), _database);
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
         }

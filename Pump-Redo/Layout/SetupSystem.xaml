@@ -15,11 +15,11 @@
                         CharacterSpacing="2"
                         FontSize="Large"
                         HorizontalTextAlignment="Center"
-                        Text="Setup"
+                        Text="Configuration"
                         FontAttributes="Bold"
                         TextColor="White" />
                 </StackLayout>
-                <StackLayout>
+                <StackLayout x:Name="StackLayoutControllerName">
                     <Label
                         x:Name="LabelControllerName"
                         CharacterSpacing="1"
@@ -210,6 +210,7 @@
                 <StackLayout VerticalOptions="EndAndExpand">
 
                     <Button
+                        x:Name="ButtonCreate"
                         Clicked="ButtonCreate_OnClicked"
                         Text="Create" />
                     <Button

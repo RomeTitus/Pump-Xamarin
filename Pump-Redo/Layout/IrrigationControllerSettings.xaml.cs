@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Pump.Class;
 using Pump.CustomRender;
 using Pump.Database.Table;
 using Pump.IrrigationController;
@@ -242,6 +244,33 @@ namespace Pump.Layout
             if (string.IsNullOrEmpty(value))
                 return null;
             return Convert.ToInt32(value);
+        }
+
+        private async void Button_OnPressed_IrrigationConfig(object sender, EventArgs e)
+        {
+            await Device.InvokeOnMainThreadAsync(async () =>
+            {
+                try
+                {
+                    var loadingScreen = new PopupLoading("Connecting...");
+                    await PopupNavigation.Instance.PushAsync(loadingScreen);
+
+                    var blueToothManager = _socketPicker.BluetoothManager();
+                    await blueToothManager.ConnectToKnownDevice(new Guid(_keyValueIrrigation.Key.DeviceGuid), new CancellationToken(), 3);
+                    await blueToothManager.IsValidController();
+                    await PopupNavigation.Instance.PopAllAsync();
+                    
+                    await Navigation.PushModalAsync(new SetupSystem(blueToothManager, new NotificationEvent(), true));
+                }
+                catch(Exception exception)
+                {
+                    await PopupNavigation.Instance.PopAllAsync();
+                    await DisplayAlert("Connect Exception!", exception.Message, "Understood");
+                }
+                    
+                
+            });
+            //Connect using Bluetooth :)
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class Equipment : IEntity, IEquipment
+    public class Equipment : IEntity, IEquipment, IStatus
     {
         public string NAME { get; set; }
 
@@ -15,5 +16,9 @@ namespace Pump.IrrigationController
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
 
         public string AttachedSubController { get; set; }
+        
+        public bool Failed { get; }
+        public bool Complete { get; }
+        public List<string> Steps { get; }
     }
 }

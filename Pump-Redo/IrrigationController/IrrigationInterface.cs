@@ -23,4 +23,11 @@ namespace Pump.IrrigationController
     {
         List<ManualScheduleEquipment> ManualDetails { get; set; }
     }
+    
+    public interface IStatus
+    {
+        bool Failed { get; }
+        bool Complete { get; }
+        List<string> Steps { get; }
+    }
 }

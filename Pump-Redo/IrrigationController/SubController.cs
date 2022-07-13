@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class SubController : IEntity
+    public class SubController : IEntity, IStatus
     {
         public string Name { get; set; }
         public string Mac { get; set; }
@@ -15,5 +15,9 @@ namespace Pump.IrrigationController
         [JsonIgnore] public string Id { get; set; }
 
         [JsonIgnore] public bool DeleteAwaiting { get; set; }
+        
+        public bool Failed { get; }
+        public bool Complete { get; }
+        public List<string> Steps { get; }
     }
 }

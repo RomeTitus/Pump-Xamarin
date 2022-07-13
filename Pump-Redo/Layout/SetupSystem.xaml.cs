@@ -30,14 +30,22 @@ namespace Pump.Layout
         private WiFiContainer _selectedWiFiContainer;
         private List<WiFiContainer> _wiFiContainers;
 
-        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent)
+        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, bool isSetup)
         {
             InitializeComponent();
             _blueToothManage = blueToothManager;
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             _database = new DatabaseController();
+            if(isSetup)
+                SetControllerStatus();
             GetConnectionInfo();
+        }
+
+        private void SetControllerStatus()
+        {
+            StackLayoutControllerName.IsVisible = false;
+            ButtonCreate.IsVisible = false;
         }
 
         private async void GetConnectionInfo(string connection = null)

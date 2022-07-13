@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Plugin.BLE;
+using Plugin.BLE.Abstractions;
 using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
@@ -131,10 +132,46 @@ namespace Pump.SocketController.BT
             }
         }
 
+        public async  Task<bool> ConnectToKnownDevice(Guid id, CancellationToken cancellationToken, int retry = 0)
+        {
+            var tries = -1;
+
+            IDevice device = null;
+            while (tries < retry)
+            {
+                var connected = true;
+                try
+                {
+                    device = await AdapterBle.ConnectToKnownDeviceAsync(id, ConnectParameters.None, cancellationToken);
+                }
+                catch (DeviceConnectionException deviceConnectionException)
+                {
+                    connected = false;
+                    tries++;
+                    if (tries == retry)
+                        throw new ArgumentException("Failed to connect \n" + deviceConnectionException.Message);
+                }
+
+                catch (Exception)
+                {
+                    connected = false;
+                    tries++;
+                    if (tries == retry)
+                        throw;
+                }
+
+                if (connected)
+                    break;
+            }
+            BleDevice = device;
+            return true;
+        }
+
         public async Task<bool> IsValidController()
         {
             var services = await BleDevice.GetServicesAsync();
             return services.FirstOrDefault(x => x.Id == _irrigationService) != null;
+            
         }
 
         private string ConvertForIrrigation(string dataToBeConverted)
