@@ -26,8 +26,6 @@ namespace Pump.IrrigationController
     
     public interface IStatus
     {
-        bool Failed { get; }
-        bool Complete { get; }
-        List<string> Steps { get; }
+        ControllerStatus ControllerStatus { get; }
     }
 }

@@ -24,8 +24,6 @@ namespace Pump.IrrigationController
         public string id_Pump { get; set; }
 
         public List<ScheduleDetail> ScheduleDetails { get; set; }
-        public bool Failed { get; }
-        public bool Complete { get; }
-        public List<string> Steps { get; }
+        public ControllerStatus ControllerStatus { get; }
     }
 }
