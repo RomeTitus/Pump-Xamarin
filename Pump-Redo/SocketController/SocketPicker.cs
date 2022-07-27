@@ -61,24 +61,24 @@ namespace Pump.SocketController
             //    await _initializeBlueTooth.SubscribeBle();
         }
 
-        public async Task<string> SendCommand(object sendObject, IrrigationConfiguration targetedIrrigation)
+        public async Task<string> SendCommand<T>(T entity, IrrigationConfiguration targetedIrrigation) where T : IEntity
         {
             string result;
             switch (targetedIrrigation.ConnectionType)
             {
                 case 0:
-                    result = await _firebaseManager.Description(sendObject, targetedIrrigation.Path);
+                    result = await _firebaseManager.Description(entity, targetedIrrigation.Path);
                     break;
                 case 1:
                     _initializeNetwork.RequestIrrigationTimer.Restart();
                     _initializeNetwork.RequestNow = true;
                     result = await _initializeNetwork.NetworkManager.SendAndReceiveToNetwork(
-                        SocketCommands.Descript(sendObject), targetedIrrigation);
+                        SocketCommands.Descript(entity), targetedIrrigation);
                     break;
                 case 2:
                     _initializeBlueTooth.RequestIrrigationTimer.Restart();
                     result = await _initializeBlueTooth.BlueToothManager.SendAndReceiveToBleAsync(
-                        SocketCommands.Descript(sendObject));
+                        SocketCommands.Descript(entity));
                     _initializeBlueTooth.RequestNow = true;
                     break;
                 default:

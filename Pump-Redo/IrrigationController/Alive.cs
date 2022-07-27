@@ -4,6 +4,10 @@ namespace Pump.IrrigationController
 {
     public class Alive : IEntity
     {
+        public Alive()
+        {
+            Id = "Status";
+        }
         public long RequestedTime { get; set; }
         public long ResponseTime { get; set; }
 

@@ -39,6 +39,8 @@ namespace Pump.SocketController.Firebase
         {
             try
             {
+                var entitiesList = new List<string> { nameof(CustomSchedule), nameof(Equipment), nameof(ManualSchedule), nameof(Schedule), nameof(Sensor), nameof(SubController)};
+                
                 if (obj.Key == "Config")
                 {
                     UpdateConfiguration(_observableDict, obj.Object);
@@ -51,16 +53,24 @@ namespace Pump.SocketController.Firebase
 
                 if (obj.Object.ContainsKey("Equipment"))
                 {
+                   
                     var jProperty = obj.Object.Property("Equipment");
-                    //FirebaseToObservable()
                     FirebaseToObservable(new KeyValuePair<string, JToken>(jProperty.Name, jProperty.Value),
                         configuration);
                     obj.Object.Remove("Equipment");
+                    entitiesList.Remove(jProperty.Name);
                 }
-                
+
                 foreach (var elementPair in obj.Object)
                 {
                     FirebaseToObservable(elementPair, configuration);
+                    entitiesList.Remove(elementPair.Key);
+                }
+
+                foreach (var entity in entitiesList)
+                {
+                    FirebaseToObservable(new KeyValuePair<string, JToken>(entity, "{}"),
+                        configuration);
                 }
             }
             catch (Exception e)
@@ -69,9 +79,9 @@ namespace Pump.SocketController.Firebase
             }
         }
 
-        private void FirebaseToObservable( KeyValuePair<string,JToken> elementPair,  IrrigationConfiguration configuration)
+        private void FirebaseToObservable(KeyValuePair<string,JToken> elementPair,  IrrigationConfiguration configuration)
         {
-            if (!elementPair.Value.Any())
+            if (elementPair.Value.ToString() != "{}" && !elementPair.Value.Any())
                 return;
 
             var typeAndDynamicValueList =

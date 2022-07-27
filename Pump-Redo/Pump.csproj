@@ -15,6 +15,7 @@
         <None Remove="Icons\ConnectionDown.png" />
         <None Remove="Icons\CustomSchedule.png" />
         <None Remove="Icons\expandImage.png" />
+        <None Remove="Icons\Failed.png" />
         <None Remove="Icons\FieldSun.png" />
         <None Remove="Icons\gearSetting.png" />
         <None Remove="Icons\Home.png" />
@@ -39,6 +40,9 @@
         <None Remove="Icons\Temp_High.png" />
         <None Remove="Icons\Temp_Low.png" />
         <None Remove="Icons\Temp_Unknown.png" />
+        <None Remove="Icons\Transceiver_1.png" />
+        <None Remove="Icons\Transceiver_2.png" />
+        <None Remove="Icons\Transceiver_Success.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -46,6 +50,7 @@
         <EmbeddedResource Include="Icons\ConnectionDown.png" />
         <EmbeddedResource Include="Icons\CustomSchedule.png" />
         <EmbeddedResource Include="Icons\expandImage.png" />
+        <EmbeddedResource Include="Icons\Failed.png" />
         <EmbeddedResource Include="Icons\FieldSun.png" />
         <EmbeddedResource Include="Icons\gearSetting.png" />
         <EmbeddedResource Include="Icons\Home.png" />
@@ -69,6 +74,9 @@
         <EmbeddedResource Include="Icons\Temp_High.png" />
         <EmbeddedResource Include="Icons\Temp_Low.png" />
         <EmbeddedResource Include="Icons\Temp_Unknown.png" />
+        <EmbeddedResource Include="Icons\Transceiver_1.png" />
+        <EmbeddedResource Include="Icons\Transceiver_2.png" />
+        <EmbeddedResource Include="Icons\Transceiver_Success.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -117,6 +125,10 @@
         </Compile>
         <Compile Update="Layout\Views\ViewIrrigationSiteSummary.xaml.cs">
           <DependentUpon>ViewIrrigationSiteSummary.xaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Layout\Views\ViewStatus.xaml.cs">
+          <DependentUpon>ViewStatus.xaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

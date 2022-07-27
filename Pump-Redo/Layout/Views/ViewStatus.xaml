@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView
+    x:Class="Pump.Layout.Views.ViewStatus"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:localImage="clr-namespace:EmbeddedImages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+        <RelativeLayout VerticalOptions="CenterAndExpand">
+            <Image x:Name="Transceiver1" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_1.png}" VerticalOptions="Center" IsVisible="True"/>
+            <Image x:Name="Transceiver2" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_2.png}" VerticalOptions="Center" IsVisible="False"/>
+            <Image x:Name="ImageFailed" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Failed.png}" VerticalOptions="Center" IsVisible="False"/>
+            <Image x:Name="TransceiverSuccess" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_Success.png}" VerticalOptions="Center" IsVisible="False"/>
+        </RelativeLayout>
+</ContentView>

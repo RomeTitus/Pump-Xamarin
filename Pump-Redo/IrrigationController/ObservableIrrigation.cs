@@ -16,7 +16,6 @@ namespace Pump.IrrigationController
         }
 
         public ObservableCollection<Alive> AliveList { get; }
-
         public ObservableCollection<CustomSchedule> CustomScheduleList { get; }
 
         public ObservableCollection<Equipment> EquipmentList { get; }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class Schedule : IEntity, ISchedule, IStatus
+    public class Schedule : ISchedule
     {
         public Schedule()
         {
@@ -20,7 +20,7 @@ namespace Pump.IrrigationController
 
         [JsonIgnore] public string Id { get; set; }
 
-        [JsonIgnore] public bool DeleteAwaiting { get; set; }
+        public bool DeleteAwaiting { get; set; }
         public string id_Pump { get; set; }
 
 

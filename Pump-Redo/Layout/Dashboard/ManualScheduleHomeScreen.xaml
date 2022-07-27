@@ -18,12 +18,25 @@
                 VerticalOptions="Center">
 
                 <StackLayout>
-                    <Label
-                        FontSize="Subtitle"
-                        HorizontalOptions="Center"
-                        Text="Pump"
-                        TextColor="White"
-                        TextDecorations="Underline" />
+                    <AbsoluteLayout HorizontalOptions="FillAndExpand">
+                        <Label
+                            AbsoluteLayout.LayoutBounds="0.5, 0, -1, -1"
+                            AbsoluteLayout.LayoutFlags="PositionProportional"
+                            FontSize="Subtitle"
+                            HorizontalOptions="CenterAndExpand"
+                            Text="Pump"
+                            TextColor="White"
+                            TextDecorations="Underline"/>
+                        
+                        <StackLayout x:Name="StackLayoutStatus"
+                                     AbsoluteLayout.LayoutBounds="1, 0, -1, -1"
+                                     AbsoluteLayout.LayoutFlags="PositionProportional"
+                                     HorizontalOptions="End" 
+                                     VerticalOptions="CenterAndExpand" 
+                                     WidthRequest="50" 
+                                     HeightRequest="50"/>
+
+                    </AbsoluteLayout>
                     <Frame
                         BackgroundColor="White"
                         BorderColor="Black"
@@ -120,12 +133,6 @@
                         Text="Run with Schedule"
                         TextColor="White"
                         VerticalOptions="Center" />
-                    <Switch
-                        x:Name="SwitchRunWithSchedule"
-                        HorizontalOptions="EndAndExpand"
-                        IsVisible="false "
-                        VerticalOptions="Center" />
-
                 </StackLayout>
 
                 <StackLayout>

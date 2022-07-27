@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class ManualSchedule : IEntity, IManualSchedule, IStatus
+    public class ManualSchedule : IManualSchedule
     {
         public long EndTime { get; set; }
 
@@ -11,8 +11,9 @@ namespace Pump.IrrigationController
         public bool RunWithSchedule { get; set; }
         [JsonIgnore] public string Id { get; set; }
 
-        [JsonIgnore] public bool DeleteAwaiting { get; set; }
+        public bool DeleteAwaiting { get; set; }
         public List<ManualScheduleEquipment> ManualDetails { get; set; }
+        
         public ControllerStatus ControllerStatus { get; }
     }
 

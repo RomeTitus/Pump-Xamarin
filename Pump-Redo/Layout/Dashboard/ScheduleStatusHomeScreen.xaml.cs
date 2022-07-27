@@ -184,25 +184,18 @@ namespace Pump.Layout.Dashboard
 
         private void ScreenCleanupForSensor()
         {
-            try
+            if (_observableFilterKeyValuePair.Value.LoadedData)
             {
-                if (_observableFilterKeyValuePair.Value.LoadedData)
-                {
-                    var sensorsDisplay =
-                        _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
-                    if (sensorsDisplay.Count == 0)
-                        sensorsDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
+                var sensorsDisplay =
+                    _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
+                if (sensorsDisplay.Count == 0)
+                    sensorsDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
-                    RemoveUnusedViews(ScrollViewSensorStatus, sensorsDisplay);
-                }
-                else
-                {
-                    DisplayActivityLoading(ScrollViewSensorStatus);
-                }
+                RemoveUnusedViews(ScrollViewSensorStatus, sensorsDisplay);
             }
-            catch
+            else
             {
-                // ignored
+                DisplayActivityLoading(ScrollViewSensorStatus);
             }
         }
         
