@@ -27,7 +27,7 @@ namespace Pump.IrrigationController
         public List<ScheduleDetail> ScheduleDetails { get; set; }
 
 
-        public ControllerStatus ControllerStatus { get; }
+        public ControllerStatus ControllerStatus { get; set; }
     }
 
     public class ScheduleDetail

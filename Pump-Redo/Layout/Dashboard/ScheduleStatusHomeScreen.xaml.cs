@@ -165,20 +165,20 @@ namespace Pump.Layout.Dashboard
                 if (activeScheduleOnDisplay.Count == 0)
                     activeScheduleOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
                     
-                RemoveUnusedViews(ScrollViewScheduleStatus, activeScheduleOnDisplay);
+                ScrollViewScheduleStatus.RemoveUnusedViews(activeScheduleOnDisplay);
 
                 //Que Schedule
                 var queScheduleOnDisplay = queScheduleList.Select(x => x?.Id).ToList();
                 if (queScheduleOnDisplay.Count == 0)
                     queScheduleOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
-                RemoveUnusedViews(ScrollViewQueueStatus, queScheduleOnDisplay);
+                ScrollViewQueueStatus.RemoveUnusedViews(queScheduleOnDisplay);
             }
             else
             {
-                DisplayActivityLoading(ScrollViewScheduleStatus);
+                ScrollViewScheduleStatus.DisplayActivityLoading();
 
-                DisplayActivityLoading(ScrollViewQueueStatus);
+                ScrollViewQueueStatus.DisplayActivityLoading();
             }
         }
 
@@ -191,41 +191,11 @@ namespace Pump.Layout.Dashboard
                 if (sensorsDisplay.Count == 0)
                     sensorsDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
 
-                RemoveUnusedViews(ScrollViewSensorStatus, sensorsDisplay);
+                ScrollViewSensorStatus.RemoveUnusedViews(sensorsDisplay);
             }
             else
             {
-                DisplayActivityLoading(ScrollViewSensorStatus);
-            }
-        }
-        
-        private void RemoveUnusedViews(StackLayout stackLayout, List<string> itemsThatAreOnDisplay)
-        {
-            for (var index = 0; index < stackLayout.Children.Count; index++)
-            {
-                var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
-                    x == stackLayout.Children[index].AutomationId);
-                if (existingItems != null) continue;
-                stackLayout.Children.RemoveAt(index);
-                index--;
-            }
-        }
-
-        private void DisplayActivityLoading(StackLayout stackLayout)
-        {
-            var loadingIcon = new ActivityIndicator
-            {
-                AutomationId = "ActivityIndicatorSiteLoading",
-                HorizontalOptions = LayoutOptions.Center,
-                IsEnabled = true,
-                IsRunning = true,
-                IsVisible = true,
-                VerticalOptions = LayoutOptions.Center
-            };
-            
-            if (stackLayout.Children.Count == 0)
-            {
-                stackLayout.Children.Add(loadingIcon);
+                ScrollViewSensorStatus.DisplayActivityLoading();
             }
         }
         private List<ActiveSchedule> GetActiveSchedules(List<ActiveSchedule> activeCustomScheduleList)

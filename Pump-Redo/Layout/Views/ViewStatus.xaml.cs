@@ -6,7 +6,7 @@ using System.Timers;
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewStatus : ContentView
+    public partial class ViewStatus
     {
         private ControllerStatus _status;
         private readonly Timer _timer;
@@ -14,49 +14,46 @@ namespace Pump.Layout.Views
         public ViewStatus(ControllerStatus status)
         {
             InitializeComponent();
-            _status = status;
-            _timer = new Timer(1000);
+            _timer = new Timer(500);
             _timer.Elapsed += TimerOnElapsed;
-
-            
-            //observableFilteredIrrigation.ObservableUnfilteredIrrigation.ControllerStatusList.CollectionChanged += ControllerStatusListOnCollectionChanged;
-            
-            //var status = observableFilteredIrrigation.ObservableUnfilteredIrrigation.ControllerStatusList.FirstOrDefault(x =>
-            //    x.EntityType + x.Id == key);
-            //if(status != null)
-            //    UpdateControllerStatus(status);
-            
+            UpdateView(status);
         }
 
-        private void UpdateControllerStatus(ControllerStatus status)
+        public void UpdateView(ControllerStatus status)
         {
-            _timer.Enabled = !status.Complete;
+            _status = status;
+            _timer.Enabled = !_status.Complete;
 
-            if (status.Complete)
+            Device.BeginInvokeOnMainThread(() =>
             {
-                Device.BeginInvokeOnMainThread(() =>
+                if (_status.Complete)
+                {
+                    Transceiver1.IsVisible = false;
+                        Transceiver2.IsVisible = false;
+                        ImageFailed.IsVisible = _status.Failed;
+                        TransceiverSuccess.IsVisible = !_status.Failed;
+                }
+                else
                 {
                     Transceiver1.IsVisible = false;
                     Transceiver2.IsVisible = false;
-                    ImageFailed.IsVisible = status.Failed;
-                    TransceiverSuccess.IsVisible = !status.Failed;
-                });
-            }
-            
+                    ImageFailed.IsVisible = false;
+                    TransceiverSuccess.IsVisible = false;
+                }
+            });
         }
         
         private void TimerOnElapsed(object sender, ElapsedEventArgs e)
         {
             Device.BeginInvokeOnMainThread(() =>
             {
+                if (Transceiver1.IsVisible == Transceiver2.IsVisible)
+                {
+                    Transceiver2.IsVisible = !Transceiver1.IsVisible;
+                }
                 Transceiver1.IsVisible = !Transceiver1.IsVisible;
                 Transceiver2.IsVisible = !Transceiver2.IsVisible;
             });
         }
-        
-
-        
-        
-        
     }
 }

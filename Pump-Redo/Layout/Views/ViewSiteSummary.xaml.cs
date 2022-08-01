@@ -58,6 +58,8 @@ namespace Pump.Layout.Views
 
         private async void OnTapped_SubController(object sender, EventArgs e)
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SubControllerUpdate)))
+                return;
             var stackLayout = (StackLayout)sender;
             var subController = _observableKeyValuePair.Value.SubControllerList.First(x =>
                 x.Id == ((ViewSubControllerSummary)stackLayout.Parent).AutomationId);

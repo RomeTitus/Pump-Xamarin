@@ -23,6 +23,6 @@ namespace Pump.IrrigationController
 
         public bool DeleteAwaiting { get; set; }
         public string AttachedSubController { get; set; }
-        public ControllerStatus ControllerStatus { get; }
+        public ControllerStatus ControllerStatus { get; set;  }
     }
 }

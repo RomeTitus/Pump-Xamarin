@@ -81,6 +81,8 @@ namespace Pump
 
         private void SetupNewController()
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(ScanBluetooth)))
+                return;
             var connectionScreen = new ScanBluetooth(_observableDict.Keys.ToList(), _notificationEvent, _socketPicker.BluetoothManager(), _database);
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
@@ -136,6 +138,8 @@ namespace Pump
 
         private void OnTapped_Settings(object sender, EventArgs e)
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(IrrigationControllerSettings)))
+                return;
             var imageGesture = (Image)sender;
             var configurationSummary =
                 (ViewIrrigationConfigurationSummary)imageGesture.Parent.Parent.Parent.Parent.Parent.Parent;
@@ -147,6 +151,9 @@ namespace Pump
 
         private void OnTapped_HomeScreen(object sender, EventArgs e)
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(HomeScreen)))
+                return;
+            
             var stackLayoutGesture = (StackLayout)sender;
             var siteSummary = (ViewIrrigationSiteSummary)stackLayoutGesture.Parent.Parent.Parent;
             var configurationSummary = (ViewIrrigationConfigurationSummary) siteSummary.Parent.Parent.Parent.Parent.Parent;

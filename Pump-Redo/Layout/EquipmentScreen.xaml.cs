@@ -213,8 +213,13 @@ namespace Pump.Layout
             if (action == null) return;
 
             if (action == "Update")
+            {
+                if (Navigation.ModalStack.Any(x => x.GetType() == typeof(EquipmentUpdate)))
+                    return;
                 await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker,
                     equipment));
+            }
+                
             else if (action == "Delete")
                 if (await DisplayAlert("Are you sure?",
                         "Confirm to delete " + equipment.NAME, "Delete",
@@ -236,6 +241,8 @@ namespace Pump.Layout
 
             if (action == "Update")
             {
+                if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SensorUpdate)))
+                    return;
                 await Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, sensor));
             }
             else
@@ -257,11 +264,15 @@ namespace Pump.Layout
 
         private void BtnAddEquipment_OnPressed(object sender, EventArgs e)
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(EquipmentUpdate)))
+                return;
             Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SensorUpdate)))
+                return;
             Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker));
         }
     }

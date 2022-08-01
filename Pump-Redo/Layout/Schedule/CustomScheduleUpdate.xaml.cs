@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Pump.Database.Table;
 using Pump.IrrigationController;
+using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,13 +21,15 @@ namespace Pump.Layout.Schedule
         private readonly List<string> _pumpIdList = new List<string>();
         private readonly SocketPicker _socketPicker;
         private CustomSchedule _customSchedule;
+        private readonly CustomScheduleHomeScreen _customScheduleHomeScreen;
 
         public CustomScheduleUpdate(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
-            SocketPicker socketPicker,
+            SocketPicker socketPicker, CustomScheduleHomeScreen customScheduleHomeScreen,
             CustomSchedule schedule = null)
         {
             InitializeComponent();
+            _customScheduleHomeScreen = customScheduleHomeScreen;
             _socketPicker = socketPicker;
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
             if (schedule != null)
@@ -157,8 +161,7 @@ namespace Pump.Layout.Schedule
             }
             else
             {
-                if (_customSchedule == null)
-                    _customSchedule = new CustomSchedule();
+                _customSchedule ??= new CustomSchedule();
                 _customSchedule.NAME = ScheduleName.Text;
                 _customSchedule.id_Pump = _pumpIdList[CustomPumpPicker.SelectedIndex];
                 long.TryParse(MaskedEntryRepeat.Text, out var repeat);
@@ -167,7 +170,25 @@ namespace Pump.Layout.Schedule
                 if (scheduleDetail.Count > 0)
                 {
                     _customSchedule.ScheduleDetails = scheduleDetail;
+                    
+                    
+                    var loadingScreen = new PopupLoading ("Uploading");
+                    await PopupNavigation.Instance.PushAsync(loadingScreen);
                     await _socketPicker.SendCommand(_customSchedule, _observableFilterKeyValuePair.Key);
+                    await PopupNavigation.Instance.PopAllAsync();
+                    
+                    
+                    if (_observableFilterKeyValuePair.Value.CustomScheduleList.Any(x => x.Id == _customSchedule.Id))
+                    {
+                        var index = _observableFilterKeyValuePair.Value.CustomScheduleList.IndexOf(_customSchedule);
+                        _observableFilterKeyValuePair.Value.CustomScheduleList[index] = _customSchedule;
+                    }
+                    else
+                    {
+                        _observableFilterKeyValuePair.Value.CustomScheduleList.Add(_customSchedule);
+                    }
+
+                    _customScheduleHomeScreen.AddLoadingScreenFromId(_customSchedule.Id);   
                     await Navigation.PopModalAsync();
                 }
                 else
@@ -176,7 +197,6 @@ namespace Pump.Layout.Schedule
                 }
             }
         }
-
         private async void ButtonBack_OnClicked(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();

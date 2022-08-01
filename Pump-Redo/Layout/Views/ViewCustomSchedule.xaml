@@ -18,7 +18,7 @@
                 <StackLayout>
                     <StackLayout Orientation="Horizontal">
                         <Label
-                            x:Name="labelScheduleName"
+                            x:Name="LabelScheduleName"
                             Text="Schedule Name"
                             VerticalOptions="CenterAndExpand" />
                     </StackLayout>
@@ -47,14 +47,18 @@
                 </StackLayout>
 
             </StackLayout>
-
+            <StackLayout x:Name="StackLayoutStatus"
+                         HorizontalOptions="EndAndExpand" 
+                         VerticalOptions="CenterAndExpand" 
+                         WidthRequest="50" 
+                         HeightRequest="50"/>
 
             <StackLayout HorizontalOptions="EndAndExpand" Orientation="Horizontal">
                 <StackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_OnTapped" />
                 </StackLayout.GestureRecognizers>
                 <Switch
-                    x:Name="switchScheduleIsActive"
+                    x:Name="SwitchScheduleIsActive"
                     HorizontalOptions="Center"
                     VerticalOptions="Center" />
             </StackLayout>

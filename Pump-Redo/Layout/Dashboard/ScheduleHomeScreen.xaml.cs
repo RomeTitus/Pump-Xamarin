@@ -199,6 +199,8 @@ namespace Pump.Layout.Dashboard
         private void EditButton_Tapped(object sender, EventArgs e)
         {
             PopupNavigation.Instance.PopAsync();
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(ScheduleUpdate)))
+                return;
             var edit = (Button)sender;
             var schedule = _observableFilterKeyValuePair.Value.ScheduleList.First(x => x?.Id == edit.AutomationId);
             Navigation.PushModalAsync(new ScheduleUpdate(_observableFilterKeyValuePair, _socketPicker,
@@ -225,6 +227,8 @@ namespace Pump.Layout.Dashboard
 
         private async void ButtonCreateSchedule_OnClicked(object sender, EventArgs e)
         {
+            if (Navigation.ModalStack.Any(x => x.GetType() == typeof(ScheduleUpdate)))
+                return;
             if (_observableFilterKeyValuePair.Value.EquipmentList.Count > 0)
                 await Navigation.PushModalAsync(new ScheduleUpdate(_observableFilterKeyValuePair,
                     _socketPicker));

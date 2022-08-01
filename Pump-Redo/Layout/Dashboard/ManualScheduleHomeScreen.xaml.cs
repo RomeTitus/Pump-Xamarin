@@ -14,7 +14,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Dashboard
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ManualScheduleHomeScreen : ContentView
+    public partial class ManualScheduleHomeScreen
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
@@ -73,7 +73,7 @@ namespace Pump.Layout.Dashboard
                 ScrollViewManualPump.Children.Add(new ViewException(e));
                 ScrollViewManualZone.Children.Add(new ViewException(e));
             }
-            AddRemoveStatus(_observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault()?.ControllerStatus);
+            StackLayoutStatus.AddUpdateRemoveStatus(_observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault()?.ControllerStatus);
         }
 
         private void DisplayActiveButtons()
@@ -117,84 +117,20 @@ namespace Pump.Layout.Dashboard
                 if (pumpsThatAreOnDisplay.Count == 0)
                     pumpsThatAreOnDisplay.Add(new ViewEmptySchedule().AutomationId);
 
-                RemoveUnusedViews(ScrollViewManualPump, pumpsThatAreOnDisplay);
+                ScrollViewManualPump.RemoveUnusedViews(pumpsThatAreOnDisplay);
                 
                 if (zonesThatAreOnDisplay.Count == 0)
                     zonesThatAreOnDisplay.Add(new ViewEmptySchedule().AutomationId);
 
-                RemoveUnusedViews(ScrollViewManualZone, zonesThatAreOnDisplay);
+                ScrollViewManualZone.RemoveUnusedViews(zonesThatAreOnDisplay);
             }
             else
             {
-                DisplayActivityLoading(ScrollViewManualPump);
-                DisplayActivityLoading(ScrollViewManualZone);
-            }
-        }
-        
-        private void RemoveUnusedViews(FlexLayout stackLayout, List<string> itemsThatAreOnDisplay)
-        {
-            for (var index = 0; index < stackLayout.Children.Count; index++)
-            {
-                var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
-                    x == stackLayout.Children[index].AutomationId);
-                if (existingItems != null) continue;
-                stackLayout.Children.RemoveAt(index);
-                index--;
-            }
-        }
-        
-        private void DisplayActivityLoading(FlexLayout stackLayout)
-        {
-            var loadingIcon = new ActivityIndicator
-            {
-                AutomationId = "ActivityIndicatorSiteLoading",
-                HorizontalOptions = LayoutOptions.Center,
-                IsEnabled = true,
-                IsRunning = true,
-                IsVisible = true,
-                VerticalOptions = LayoutOptions.Center
-            };
-            
-            if (stackLayout.Children.Count == 0)
-            {
-                stackLayout.Children.Add(loadingIcon);
+                ScrollViewManualPump.DisplayActivityLoading();
+                ScrollViewManualZone.DisplayActivityLoading();
             }
         }
 
-        private async void AddRemoveStatus(ControllerStatus status)
-        {
-            var viewStatus = (ViewStatus) StackLayoutStatus.Children.FirstOrDefault(x => x is ViewStatus);
-
-            if (status is null && viewStatus is not null)
-            {
-                
-            }
-            //if(status == null && )
-            /*
-            if(selectedManualSchedule == null)
-                return;
-
-            if (!string.IsNullOrEmpty(selectedManualSchedule.Key))
-            {
-                var viewStatus = StackLayoutStatus.Children.FirstOrDefault(x => x is ViewStatus);
-                if (viewStatus == null)
-                {
-                    StackLayoutStatus.Children.Add(new ViewStatus(_observableFilterKeyValuePair.Value, nameof(ManualSchedule) + selectedManualSchedule.Key));
-                }
-                else
-                {
-                    if (viewStatus.AutomationId != nameof(ManualSchedule) + selectedManualSchedule.Key)
-                    {
-                        StackLayoutStatus.Children.Clear();
-                        StackLayoutStatus.Children.Add(new ViewStatus(_observableFilterKeyValuePair.Value, nameof(ManualSchedule) + selectedManualSchedule.Key));
-                    }
-                }
-            }
-            */    
-            
-            
-        }
-        
         private Button CreateEquipmentButton(Equipment equipment)
         {
             var button = new Button
@@ -305,17 +241,17 @@ namespace Pump.Layout.Dashboard
                     .Select(queue => new ManualScheduleEquipment { id_Equipment = queue }).ToList();
             }
 
+            StackLayoutStatus.AddStatusActivityIndicator();
             await _socketPicker.SendCommand(manualSchedule, _observableFilterKeyValuePair.Key);
         }
-
         private async void ButtonStopManual_Clicked(object sender, EventArgs e)
         {
             var manualSchedule = _observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault() ??
                                  new ManualSchedule();
             manualSchedule.DeleteAwaiting = true;
+            StackLayoutStatus.AddStatusActivityIndicator();
             await _socketPicker.SendCommand(manualSchedule, _observableFilterKeyValuePair.Key);
         }
-
 
         private void ScrollViewManualZoneTap_Tapped(object sender, EventArgs e)
         {

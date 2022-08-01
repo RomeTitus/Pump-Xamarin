@@ -15,20 +15,20 @@ namespace Pump.Layout.Views
             AutomationId = schedule.Id;
             Schedule = schedule;
             Equipment = equipment;
-            Populate();
+            Populate(schedule);
         }
 
         public CustomSchedule Schedule { get; set; }
-        public Equipment Equipment { get; }
+        private Equipment Equipment { get; }
 
 
-        public void Populate()
+        public void Populate(CustomSchedule schedule)
         {
             var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(Schedule);
-            if (switchScheduleIsActive.AutomationId == null)
-                switchScheduleIsActive.AutomationId = Schedule.Id;
-            if (StackLayoutViewSchedule.AutomationId == null)
-                StackLayoutViewSchedule.AutomationId = Schedule.Id;
+            
+            SwitchScheduleIsActive.AutomationId ??= Schedule.Id;
+            StackLayoutViewSchedule.AutomationId ??= Schedule.Id;
+            
             LabelScheduleRepeat.Text = "Repeat: " + Schedule.Repeat;
             if (endTime != null)
             {
@@ -36,25 +36,32 @@ namespace Pump.Layout.Views
                 {
                     var timeLeft = (TimeSpan)(endTime - DateTime.UtcNow);
                     LabelScheduleTime.Text = "Time left: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
-                    switchScheduleIsActive.IsToggled = true;
+                    SwitchScheduleIsActive.IsToggled = true;
                 }
                 else
                 {
                     var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(Schedule.StartTime));
                     LabelScheduleTime.Text = "Duration: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);
-                    switchScheduleIsActive.IsToggled = false;
+                    SwitchScheduleIsActive.IsToggled = false;
                 }
             }
 
-            labelScheduleName.Text = Schedule.NAME;
+            LabelScheduleName.Text = Schedule.NAME;
 
             if (Equipment != null)
                 LabelPumpName.Text = Equipment.NAME;
+            StackLayoutStatus.AddUpdateRemoveStatus(schedule.ControllerStatus);
+
+        }
+
+        public void AddStatusActivityIndicator()
+        {
+            StackLayoutStatus.AddStatusActivityIndicator();
         }
 
         public Switch GetSwitch()
         {
-            return switchScheduleIsActive;
+            return SwitchScheduleIsActive;
         }
 
         public TapGestureRecognizer GetTapGestureRecognizer()
@@ -64,7 +71,7 @@ namespace Pump.Layout.Views
 
         private void TapGestureRecognizer_OnTapped(object sender, EventArgs e)
         {
-            switchScheduleIsActive.IsToggled = !switchScheduleIsActive.IsToggled;
+            SwitchScheduleIsActive.IsToggled = !SwitchScheduleIsActive.IsToggled;
         }
     }
 }

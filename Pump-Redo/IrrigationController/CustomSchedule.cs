@@ -24,6 +24,6 @@ namespace Pump.IrrigationController
         public string id_Pump { get; set; }
 
         public List<ScheduleDetail> ScheduleDetails { get; set; }
-        public ControllerStatus ControllerStatus { get; }
+        public ControllerStatus ControllerStatus { get; set; }
     }
 }

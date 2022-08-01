@@ -31,6 +31,6 @@ namespace Pump.IrrigationController
     
     public interface IStatus
     {
-        ControllerStatus ControllerStatus { get; }
+        ControllerStatus ControllerStatus { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace Pump.IrrigationController
         public bool DeleteAwaiting { get; set; }
         public List<ManualScheduleEquipment> ManualDetails { get; set; }
         
-        public ControllerStatus ControllerStatus { get; }
+        public ControllerStatus ControllerStatus { get; set; }
     }
 
     public class ManualScheduleEquipment

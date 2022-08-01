@@ -37,21 +37,19 @@ namespace Pump.SocketController.Firebase
             return new List<IrrigationConfiguration>();
         }
 
-        private async void Set<T>(T entity, string path) where T : IEntity
+        private async Task Set<T>(T entity, string path) where T : IEntity
         {
             try
             {
                 if (entity.Id == null)
                 {
-                    var result = await FirebaseQuery
+                    entity.Id = (await FirebaseQuery
                         .Child(path + "/" + entity.GetType().Name)
-                        .PostAsync(entity);
-                    entity.Id = result.Key;
-                }
-
-                await FirebaseQuery
-                    .Child(path + "/" + entity.GetType().Name + "/" + entity.Id)
-                    .PutAsync(entity);
+                        .PostAsync(entity)).Key;
+                }else
+                    await FirebaseQuery
+                        .Child(path + "/" + entity.GetType().Name + "/" + entity.Id)
+                        .PutAsync(entity);
             }
             catch (Exception e)
             {
@@ -96,71 +94,11 @@ namespace Pump.SocketController.Firebase
 
         public async Task<string> Description(dynamic entity, string path)
         {
-
-            Set(entity, path);
-            
-            /*
-            if (entity.GetType() == typeof(ManualSchedule))
+            if (entity is IStatus status)
             {
-                var manualSchedule = (ManualSchedule)entity;
-                return manualSchedule.DeleteAwaiting
-                    ? await DeleteManualSchedule(manualSchedule.Id, path)
-                    : await SetManualSchedule(manualSchedule, path);
+                status.ControllerStatus = new ControllerStatus();
             }
-
-            if (entity.GetType() == typeof(Schedule))
-            {
-                var schedule = (Schedule)entity;
-                return schedule.DeleteAwaiting
-                    ? await DeleteSchedule(schedule.Id, path)
-                    : await Set(schedule, path);
-            }
-
-            if (entity.GetType() == typeof(CustomSchedule))
-            {
-                var customSchedule = (CustomSchedule)entity;
-                return customSchedule.DeleteAwaiting
-                    ? await DeleteCustomSchedule(customSchedule.Id, path)
-                    : await SetCustomSchedule(customSchedule, path);
-            }
-
-            if (entity.GetType() == typeof(Equipment))
-            {
-                var equipment = (Equipment)entity;
-                return equipment.DeleteAwaiting
-                    ? await DeleteEquipment(equipment.Id, path)
-                    : await SetEquipment(equipment, path);
-            }
-
-            if (entity.GetType() == typeof(Sensor))
-            {
-                var sensor = (Sensor)entity;
-                return sensor.DeleteAwaiting ? await DeleteSensor(sensor.Id, path) : await SetSensor(sensor, path);
-            }
-
-            if (entity.GetType() == typeof(Alive))
-            {
-                var alive = (Alive)entity;
-                return await SetAlive(alive, path);
-            }
-
-            if (entity.GetType() == typeof(NotificationToken))
-            {
-                var notificationToken = (NotificationToken)entity;
-                return notificationToken.DeleteAwaiting
-                    ? await DeleteNotificationToken(notificationToken.Id, path)
-                    : await SetNotificationToken(notificationToken, path);
-            }
-
-            if (entity.GetType() == typeof(SubController))
-            {
-                var subController = (SubController)entity;
-                return subController.DeleteAwaiting
-                    ? await DeleteSubController(subController.Id, path)
-                    : await SetSubController(subController, path);
-            }
-
-*/
+            await Set(entity, path);
             return "";
         }
     }
