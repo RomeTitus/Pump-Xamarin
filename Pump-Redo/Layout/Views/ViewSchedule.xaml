@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<ContentView
+    x:Class="Pump.Layout.Views.ViewSchedule"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump">
+    <ContentView.Content>
+        <StackLayout
+            x:Name="StackLayoutViewSchedule"
+            Margin="15"
+            Orientation="Horizontal">
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer x:Name="StackLayoutViewScheduleTapGesture" />
+            </StackLayout.GestureRecognizers>
+
+            <StackLayout Orientation="Vertical">
+                <StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Label
+                            x:Name="LabelScheduleName"
+                            Text="Schedule Name"
+                            VerticalOptions="CenterAndExpand" />
+                    </StackLayout>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        x:Name="LabelSunday"
+                        Text="S"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelMonday"
+                        Text="M"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelTuesday"
+                        Text="T"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelWednesday"
+                        Text="W"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelThursday"
+                        Text="T"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelFriday"
+                        Text="F"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                    <Label
+                        x:Name="LabelSaturday"
+                        Text="S"
+                        TextColor="Gray"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+            <StackLayout HorizontalOptions="CenterAndExpand" Orientation="Vertical">
+                <StackLayout Orientation="Horizontal">
+                    <Image HeightRequest="15"
+                           Source="{embeddedImages:ImageResourceExtension Pump.Icons.activePump.png}" />
+                    <Label
+                        x:Name="LabelPumpName"
+                        Text="Unknown"
+                        VerticalOptions="Center" />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <Label
+                        x:Name="LabelScheduleTime"
+                        Text="20:30"
+                        VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+            <StackLayout x:Name="StackLayoutStatus"
+                         HorizontalOptions="EndAndExpand" 
+                         VerticalOptions="CenterAndExpand" 
+                         WidthRequest="50" 
+                         HeightRequest="50"/>
+
+            <StackLayout HorizontalOptions="EndAndExpand" Orientation="Horizontal">
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="SwitchTapGestureRecognizer" />
+                </StackLayout.GestureRecognizers>
+                <Switch
+                    x:Name="SwitchScheduleIsActive"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center" />
+            </StackLayout>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

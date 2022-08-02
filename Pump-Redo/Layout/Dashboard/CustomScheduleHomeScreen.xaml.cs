@@ -139,7 +139,7 @@ namespace Pump.Layout.Dashboard
                 async void Action()
                 {
                     viewCustomSchedule.GetSwitch().Toggled -= ScheduleSwitch_Toggled;
-                    viewCustomSchedule.Populate(schedule);
+                    //viewCustomSchedule.Populate(schedule);
                     viewCustomSchedule.GetSwitch().Toggled += ScheduleSwitch_Toggled;
                     
                     viewCustomSchedule.AddStatusActivityIndicator();
@@ -263,7 +263,7 @@ namespace Pump.Layout.Dashboard
             await _socketPicker.SendCommand(customSchedule,
                 _observableFilterKeyValuePair.Key);
         }
-
+        
         private async void SkipCustomSchedule_Tapped(object sender, EventArgs e)
         {
             var gridEquipmentAndTime = (Grid)sender;

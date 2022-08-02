@@ -34,7 +34,7 @@
                 </Frame>
             </StackLayout>
 
-            <StackLayout Padding="20,0,20,10" VerticalOptions="End">
+            <StackLayout Padding="5,0,5,10" VerticalOptions="End">
                 <Button
                     x:Name="ButtonCreateCustomSchedule"
                     BackgroundColor="DeepSkyBlue"

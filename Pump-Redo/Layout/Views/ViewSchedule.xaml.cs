@@ -2,82 +2,76 @@
 using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewScheduleSettingSummary : ContentView
+    public partial class ViewSchedule
     {
-        public readonly Equipment Equipment;
-        public IrrigationController.Schedule Schedule;
+        private readonly Equipment _equipment;
 
-        public ViewScheduleSettingSummary(IrrigationController.Schedule schedule, Equipment equipment)
+        public ViewSchedule(IrrigationController.Schedule schedule, Equipment equipment)
         {
             InitializeComponent();
-            Schedule = schedule;
-            Equipment = equipment ?? new Equipment();
+            _equipment = equipment ?? new Equipment();
             AutomationId = schedule.Id;
-            switchScheduleIsActive.AutomationId = Schedule.Id;
-            StackLayoutViewSchedule.AutomationId = Schedule.Id;
-            Populate();
+            Populate(schedule);
         }
 
-        public void Populate()
+        public void Populate(IrrigationController.Schedule schedule)
         {
-            labelScheduleName.Text = Schedule.NAME;
-            labelScheduleTime.Text = Schedule.TIME;
-
-            LabelPumpName.Text = Equipment.NAME;
-
-            switchScheduleIsActive.IsToggled = !Schedule.isActive.Contains("0");
-            SetWeek();
+            LabelScheduleName.Text = schedule.NAME;
+            LabelScheduleTime.Text = schedule.TIME;
+            LabelPumpName.Text = _equipment.NAME;
+            SwitchScheduleIsActive.IsToggled = !schedule.isActive.Contains("0");
+            SetWeek(schedule.WEEK);
+            StackLayoutStatus.AddUpdateRemoveStatus(schedule.ControllerStatus);
         }
 
-        private void SetWeek()
+        private void SetWeek(string week)
         {
-            if (Schedule.WEEK.Contains("SUNDAY"))
+            if (week.Contains("SUNDAY"))
             {
                 LabelSunday.TextColor = Color.Black;
                 LabelSunday.FontAttributes = FontAttributes.Bold;
                 LabelSunday.FontSize = 12;
             }
 
-            if (Schedule.WEEK.Contains("MONDAY"))
+            if (week.Contains("MONDAY"))
             {
                 LabelMonday.TextColor = Color.Black;
                 LabelMonday.FontAttributes = FontAttributes.Bold;
                 LabelMonday.FontSize = 12;
             }
 
-            if (Schedule.WEEK.Contains("TUESDAY"))
+            if (week.Contains("TUESDAY"))
             {
                 LabelTuesday.TextColor = Color.Black;
                 LabelTuesday.FontAttributes = FontAttributes.Bold;
                 LabelTuesday.FontSize = 12;
             }
 
-            if (Schedule.WEEK.Contains("WEDNESDAY"))
+            if (week.Contains("WEDNESDAY"))
             {
                 LabelWednesday.TextColor = Color.Black;
                 LabelWednesday.FontAttributes = FontAttributes.Bold;
                 LabelWednesday.FontSize = 12;
             }
 
-            if (Schedule.WEEK.Contains("THURSDAY"))
+            if (week.Contains("THURSDAY"))
             {
                 LabelThursday.TextColor = Color.Black;
                 LabelThursday.FontAttributes = FontAttributes.Bold;
                 LabelThursday.FontSize = 12;
             }
 
-            if (Schedule.WEEK.Contains("FRIDAY"))
+            if (week.Contains("FRIDAY"))
             {
                 LabelFriday.TextColor = Color.Black;
                 LabelFriday.FontAttributes = FontAttributes.Bold;
                 LabelFriday.FontSize = 12;
             }
 
-            if (Schedule.WEEK.Contains("SATURDAY"))
+            if (week.Contains("SATURDAY"))
             {
                 LabelSaturday.TextColor = Color.Black;
                 LabelSaturday.FontAttributes = FontAttributes.Bold;
@@ -87,7 +81,7 @@ namespace Pump.Layout.Views
 
         public Switch GetSwitch()
         {
-            return switchScheduleIsActive;
+            return SwitchScheduleIsActive;
         }
 
         public TapGestureRecognizer GetTapGestureRecognizer()
@@ -97,7 +91,12 @@ namespace Pump.Layout.Views
 
         private void SwitchTapGestureRecognizer(object sender, EventArgs e)
         {
-            switchScheduleIsActive.IsToggled = !switchScheduleIsActive.IsToggled;
+            SwitchScheduleIsActive.IsToggled = !SwitchScheduleIsActive.IsToggled;
+        }
+        
+        public void AddStatusActivityIndicator()
+        {
+            StackLayoutStatus.AddStatusActivityIndicator();
         }
     }
 }

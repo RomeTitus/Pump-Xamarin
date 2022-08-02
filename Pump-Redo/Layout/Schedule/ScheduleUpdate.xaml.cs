@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Pump.Database.Table;
 using Pump.IrrigationController;
+using Pump.Layout.Dashboard;
 using Pump.Layout.Views;
 using Pump.SocketController;
 using Rg.Plugins.Popup.Services;
@@ -22,13 +23,15 @@ namespace Pump.Layout.Schedule
         private readonly SocketPicker _socketPicker;
         private ViewSchedulePumpTime _pumpSelectedTime;
         private IrrigationController.Schedule _schedule;
+        private readonly ScheduleHomeScreen _scheduleHomeScreen;
 
         public ScheduleUpdate(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
-            SocketPicker socketPicker,
+            SocketPicker socketPicker, ScheduleHomeScreen scheduleHomeScreen,
             IrrigationController.Schedule schedule = null)
         {
             InitializeComponent();
+            _scheduleHomeScreen = scheduleHomeScreen;
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
             _socketPicker = socketPicker;
             _schedule = schedule;
@@ -222,8 +225,23 @@ namespace Pump.Layout.Schedule
                 if (scheduleDetail.Count > 0)
                 {
                     _schedule.ScheduleDetails = scheduleDetail;
+                    var loadingScreen = new PopupLoading ("Uploading");
+                    await PopupNavigation.Instance.PushAsync(loadingScreen);
                     await _socketPicker.SendCommand(_schedule, _observableFilterKeyValuePair.Key);
+                    await PopupNavigation.Instance.PopAllAsync();
+                    
+                    if (_observableFilterKeyValuePair.Value.ScheduleList.Any(x => x.Id == _schedule.Id))
+                    {
+                        var index = _observableFilterKeyValuePair.Value.ScheduleList.IndexOf(_schedule);
+                        _observableFilterKeyValuePair.Value.ScheduleList[index] = _schedule;
+                    }
+                    else
+                    {
+                        _observableFilterKeyValuePair.Value.ScheduleList.Add(_schedule);
+                    }
 
+                    _scheduleHomeScreen.AddLoadingScreenFromId(_schedule.Id);   
+                    
                     await Navigation.PopModalAsync();
                 }
                 else
@@ -340,7 +358,23 @@ namespace Pump.Layout.Schedule
                         DURATION = _pumpSelectedTime.GetPumpDurationTime().Text
                     }
                 };
+                
+                var loadingScreen = new PopupLoading ("Uploading");
+                await PopupNavigation.Instance.PushAsync(loadingScreen);
                 await _socketPicker.SendCommand(_schedule, _observableFilterKeyValuePair.Key);
+                await PopupNavigation.Instance.PopAllAsync();
+                    
+                if (_observableFilterKeyValuePair.Value.ScheduleList.Any(x => x.Id == _schedule.Id))
+                {
+                    var index = _observableFilterKeyValuePair.Value.ScheduleList.IndexOf(_schedule);
+                    _observableFilterKeyValuePair.Value.ScheduleList[index] = _schedule;
+                }
+                else
+                {
+                    _observableFilterKeyValuePair.Value.ScheduleList.Add(_schedule);
+                }
+
+                _scheduleHomeScreen.AddLoadingScreenFromId(_schedule.Id);
             }
 
             await Navigation.PopModalAsync();
