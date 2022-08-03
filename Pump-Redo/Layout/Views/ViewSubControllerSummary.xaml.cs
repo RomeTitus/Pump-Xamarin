@@ -5,7 +5,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ViewSubControllerSummary : ContentView
+    public partial class ViewSubControllerSummary
     {
         public bool LoadedData;
 
@@ -42,11 +42,17 @@ namespace Pump.Layout.Views
             LabelSubControllerName.Text = subController.Name;
             if (subController.UseLoRa)
                 LabelType.Text = "Long Range";
+            StackLayoutStatus.AddUpdateRemoveStatus(subController.ControllerStatus);
         }
 
         public TapGestureRecognizer GetTapGestureRecognizer()
         {
-            return StackLayoutViewSubControllerTapGesture;
+            return GridViewSubControllerTapGesture;
+        }
+        
+        public void AddStatusActivityIndicator()
+        {
+            StackLayoutStatus.AddStatusActivityIndicator();
         }
     }
 }

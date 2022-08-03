@@ -10,7 +10,7 @@ namespace Pump.IrrigationController
         public string Key { get; set; }
         public bool RunWithSchedule { get; set; }
         [JsonIgnore] public string Id { get; set; }
-
+        [JsonIgnore] public bool HasUpdated { get; set; }
         public bool DeleteAwaiting { get; set; }
         public List<ManualScheduleEquipment> ManualDetails { get; set; }
         

@@ -32,5 +32,6 @@ namespace Pump.IrrigationController
     public interface IStatus
     {
         ControllerStatus ControllerStatus { get; set; }
+        bool HasUpdated { get; set; }
     }
 }

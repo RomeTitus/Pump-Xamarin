@@ -19,7 +19,7 @@ namespace Pump.IrrigationController
         public long Repeat { get; set; }
 
         [JsonIgnore] public string Id { get; set; }
-
+        [JsonIgnore] public bool HasUpdated { get; set; }
         public bool DeleteAwaiting { get; set; }
         public string id_Pump { get; set; }
 

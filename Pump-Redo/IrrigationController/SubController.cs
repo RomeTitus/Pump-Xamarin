@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Pump.IrrigationController
 {
-    public class SubController : IEntity
+    public class SubController : ISubController
     {
         public string Name { get; set; }
         public string Mac { get; set; }
@@ -13,6 +13,10 @@ namespace Pump.IrrigationController
         public List<int> OutgoingKey { get; set; }
         public bool UseLoRa { get; set; }
         [JsonIgnore] public string Id { get; set; }
+        public ControllerStatus ControllerStatus { get; set; }
+        [JsonIgnore] public bool HasUpdated { get; set; }
         public bool DeleteAwaiting { get; set; }
+        
+        [JsonIgnore] public string Key { get; set; }
     }
 }

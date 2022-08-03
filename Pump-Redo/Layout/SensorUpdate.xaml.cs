@@ -6,84 +6,95 @@ using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.Layout.Views;
 using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class SensorUpdate : ContentPage
+    public partial class SensorUpdate
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
 
         private readonly Sensor _sensor;
+        private readonly EquipmentScreen _equipmentScreen;
         private readonly List<string> _sensorTypesList = new List<string> { "Pressure Sensor", "Temperature Sensor" };
         private readonly SocketPicker _socketPicker;
-        private List<long> _avalibleGpio;
-        private List<long> _usableGpio;
+        private readonly List<Sensor> _sensorList;
 
         public SensorUpdate(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
-            SocketPicker socketPicker, Sensor sensor = null)
+            SocketPicker socketPicker, EquipmentScreen equipmentScreen, Sensor sensor = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
+            _equipmentScreen = equipmentScreen;
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
+            _sensorList = new List<Sensor>();
+            
+            observableFilterKeyValuePair.Value.SensorList.ForEach(x => _sensorList.Add(x));
+            
             if (sensor == null)
             {
-                sensor = new Sensor();
                 ButtonUpdateSensor.Text = "Create";
+                _sensor = new Sensor();
+                PopulateCreate();
+            }
+            else
+            {
+                _sensorList.Remove(sensor);
+                _sensor = sensor;
+                PopulateUpdate();
             }
 
-            _sensor = sensor;
-            Populate();
+           
         }
 
-        private void Populate()
+        private void PopulateCreate()
         {
+            PopulateCommon();
             SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
-            SensorName.Text = _sensor.NAME;
+        }
+        
+        private void PopulateUpdate()
+        {
+            FrameSystemPicker.BackgroundColor = Color.Gray;
+            SystemPicker.IsEnabled = false;
+            PopulateCommon();
+        }
 
-
-            SystemPicker.Items.Add("Main");
-            SystemPicker.SelectedIndex = 0;
-            var index = 1;
-            foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
+        
+        private void PopulateCommon()
+        {
+            foreach (var sensorType in _sensorTypesList)
             {
-                SystemPicker.Items.Add(subController.Name);
-                if (_sensor.AttachedSubController != null && _sensor.AttachedSubController == subController.Id)
-                    SystemPicker.SelectedIndex = index;
-                index++;
-            }
-
-            foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.OrderBy(x => !x.isPump))
-                ScrollViewAttachedEquipment.Children.Add(new ViewAttachedEquipment(equipment, _sensor));
-
-            index = 0;
-            foreach (var sensor in _sensorTypesList)
-            {
-                SensorTypePicker.Items.Add(sensor);
-                if (_sensor.TYPE == sensor)
-                    SensorTypePicker.SelectedIndex = index;
-                index++;
+                SensorTypePicker.Items.Add(sensorType);
+                if (_sensor.TYPE == sensorType)
+                    SystemPicker.SelectedItem = _sensor.TYPE;
             }
 
             if (SensorTypePicker.SelectedIndex == -1)
                 SensorTypePicker.SelectedIndex = 0;
-        }
+            
+            
+            SensorName.Text = _sensor.NAME;
 
-        private void UpdateGpioPicker()
-        {
-            GpioPicker.Items.Clear();
-            var index = 0;
-            foreach (var gpio in _usableGpio)
+            SystemPicker.Items.Add("Main");
+            SystemPicker.SelectedIndex = 0;
+            foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
             {
-                GpioPicker.Items.Add("Pin: " + gpio);
-                if (_sensor.GPIO == gpio)
-                    GpioPicker.SelectedIndex = index;
-                index++;
+                SystemPicker.Items.Add(subController.Name);
+                if (subController.Id == _sensor.AttachedSubController)
+                    SystemPicker.SelectedItem = subController.Name;
             }
+            
+            foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.OrderByDescending(x => x.isPump))
+                ScrollViewAttachedEquipment.Children.Add(new ViewAttachedEquipment(equipment, _sensor));
+            
+            PopulateAvailablePins(SystemPicker.SelectedIndex);
         }
 
         private string SensorValidate()
@@ -111,6 +122,41 @@ namespace Pump.Layout
 
             return notification;
         }
+        
+        private void SensorTypePicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(SystemPicker.SelectedIndex != -1)
+                PopulateAvailablePins(SystemPicker.SelectedIndex);
+        }
+
+        private void SystemPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            var systemPicker = (Picker)sender;
+            if(SensorTypePicker.SelectedIndex != -1)
+                PopulateAvailablePins(systemPicker.SelectedIndex);
+        }
+        
+        private void PopulateAvailablePins(int selectedIndex)
+        {
+            var controllerSensor = selectedIndex == 0
+                ? _sensorList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
+                : _sensorList.Where(y =>
+                    y.AttachedSubController == _observableFilterKeyValuePair.Value
+                        .SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
+
+            GpioPicker.Items.Clear();
+            var gpioPins =
+                SensorTypePicker.SelectedItem.ToString() == "Pressure Sensor" ||
+                SensorTypePicker.SelectedItem.ToString() == "Temperature Sensor"
+                    ? GpioPins.GetAnalogGpioList()
+                    : GpioPins.GetDigitalGpioList();
+            foreach (var pin in gpioPins.Where(x => controllerSensor.Select(y => y.GPIO).Contains(x) == false))
+            {
+                GpioPicker.Items.Add("Pin: " + pin);
+            }
+            
+            GpioPicker.SelectedIndex = GpioPicker.Items.IndexOf("Pin: " + _sensor.GPIO);
+        }
 
         private async void ButtonUpdateSensor_OnClicked(object sender, EventArgs e)
         {
@@ -123,7 +169,7 @@ namespace Pump.Layout
             else
             {
                 _sensor.NAME = SensorName.Text;
-                _sensor.GPIO = _usableGpio[GpioPicker.SelectedIndex];
+                _sensor.GPIO = long.Parse(GpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
 
                 _sensor.TYPE = _sensorTypesList[SensorTypePicker.SelectedIndex];
 
@@ -133,80 +179,45 @@ namespace Pump.Layout
                     _sensor.AttachedSubController = _observableFilterKeyValuePair.Value
                         .SubControllerList[SystemPicker.SelectedIndex - 1].Id;
 
-                _sensor.AttachedEquipment.Clear();
-                foreach (var viewAttachedEquipment in ScrollViewAttachedEquipment.Children)
+                _sensor.AttachedEquipment = GetAttachedEquipment();
+                
+                var loadingScreen = new PopupLoading ("Uploading");
+                await PopupNavigation.Instance.PushAsync(loadingScreen);
+                await _socketPicker.SendCommand(_sensor, _observableFilterKeyValuePair.Key);
+                await PopupNavigation.Instance.PopAllAsync();
+                
+                if (_observableFilterKeyValuePair.Value.SensorList.Any(x => x.Id == _sensor.Id))
                 {
-                    var attachedEquipment = (ViewAttachedEquipment)viewAttachedEquipment;
-                    if (!attachedEquipment.IsSelected()) continue;
-                    _sensor.AttachedEquipment.Add(attachedEquipment.GetAttachedSensorDetail());
+                    var index = _observableFilterKeyValuePair.Value.SensorList.IndexOf(_sensor);
+                    _observableFilterKeyValuePair.Value.SensorList[index] = _sensor;
+                }
+                else
+                {
+                    _observableFilterKeyValuePair.Value.SensorList.Add(_sensor);
                 }
 
-                await _socketPicker.SendCommand(_sensor, _observableFilterKeyValuePair.Key);
+                _equipmentScreen.AddLoadingSensorScreenFromId(_sensor.Id);   
+                
                 await Navigation.PopModalAsync();
             }
+        }
+
+        private List<AttachedSensor> GetAttachedEquipment()
+        {
+            var attachedSensors = new List<AttachedSensor>();
+            foreach (var viewAttachedEquipment in ScrollViewAttachedEquipment.Children)
+            {
+                var attachedEquipment = (ViewAttachedEquipment)viewAttachedEquipment;
+                if (!attachedEquipment.IsSelected()) continue;
+                attachedSensors.Add(attachedEquipment.GetAttachedSensorDetail());
+            }
+
+            return attachedSensors;
         }
 
         private void ButtonBack_OnClicked(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
-        }
-
-        private async void SensorTypePicker_OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            var sensorType = (Picker)sender;
-            if (sensorType.SelectedIndex == -1)
-                return;
-            if (sensorType.Items[sensorType.SelectedIndex] == "Pressure Sensor" ||
-                sensorType.Items[sensorType.SelectedIndex] == "Temperature Sensor")
-                _usableGpio = new GpioPins().GetAnalogGpioList().Where(x => _avalibleGpio.Contains(x)).Select(x => x)
-                    .ToList();
-            else
-                _usableGpio = new GpioPins().GetDigitalGpioList().Where(x => _avalibleGpio.Contains(x)).Select(x => x)
-                    .ToList();
-
-            UpdateGpioPicker();
-
-            if (!_usableGpio.Any())
-            {
-                ButtonUpdateSensor.IsEnabled = false;
-                await DisplayAlert("Notification",
-                    "No Available pins for " + sensorType.Items[sensorType.SelectedIndex], "Understood");
-            }
-        }
-
-        private void SystemPicker_OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            var systemPicker = (Picker)sender;
-            var selectedIndex = systemPicker.SelectedIndex;
-            _avalibleGpio = new GpioPins().GetAnalogGpioList();
-            var usedSensors = selectedIndex == 0
-                ? _observableFilterKeyValuePair.Value.SensorList
-                    .Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
-                : _observableFilterKeyValuePair.Value.SensorList.Where(y =>
-                    !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
-                    _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
-            var usedPins = usedSensors.Where(x => x.Id != _sensor.Id).Select(x => x.GPIO).ToList();
-
-            for (var i = 0; i < _avalibleGpio.Count; i++)
-            {
-                if (!usedPins.Contains(_avalibleGpio[i])) continue;
-                _avalibleGpio.RemoveAt(i);
-                i--;
-            }
-
-            GpioPicker.Items.Clear();
-            var index = 0;
-            foreach (var gpio in _avalibleGpio)
-            {
-                GpioPicker.Items.Add("Pin: " + gpio);
-                if (_sensor.GPIO == gpio &&
-                    (usedSensors.FirstOrDefault(x => x.AttachedSubController == _sensor.AttachedSubController) !=
-                        null || usedSensors.Count == 0))
-                    GpioPicker.SelectedIndex = index;
-                index++;
-            }
-
-            SensorTypePicker_OnSelectedIndexChanged(SensorTypePicker, null);
         }
     }
 }

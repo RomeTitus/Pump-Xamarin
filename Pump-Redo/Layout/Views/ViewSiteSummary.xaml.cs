@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -30,6 +31,12 @@ namespace Pump.Layout.Views
             InitializeComponent();
             StartEvent();
             Populate();
+            observableKeyValuePair.Value.SubControllerList.CollectionChanged += PopulateSubControllerEvent;
+        }
+        
+        private void PopulateSubControllerEvent(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            Device.BeginInvokeOnMainThread(UpdateExisting);
         }
 
         private async void Populate()
@@ -60,11 +67,12 @@ namespace Pump.Layout.Views
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SubControllerUpdate)))
                 return;
-            var stackLayout = (StackLayout)sender;
+            var stackLayout = (Grid)sender;
             var subController = _observableKeyValuePair.Value.SubControllerList.First(x =>
                 x.Id == ((ViewSubControllerSummary)stackLayout.Parent).AutomationId);
+            
             await Navigation.PushModalAsync(new SubControllerUpdate(_socketPicker, subController,
-                _observableKeyValuePair.Key));
+                _observableKeyValuePair, (ViewSubControllerSummary) stackLayout.Parent));
         }
 
         private void UpdateExisting()

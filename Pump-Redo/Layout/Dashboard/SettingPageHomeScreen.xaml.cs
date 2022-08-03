@@ -37,10 +37,5 @@ namespace Pump.Layout.Dashboard
             Navigation.PushModalAsync(new EquipmentScreen(_observableFilterKeyValuePair,
                 _socketPicker));
         }
-
-        public Button GetSiteButton()
-        {
-            return BtnSites;
-        }
     }
 }

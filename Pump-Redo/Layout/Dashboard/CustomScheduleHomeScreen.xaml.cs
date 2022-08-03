@@ -152,6 +152,8 @@ namespace Pump.Layout.Dashboard
 
         private void ViewScheduleSummary(string id)
         {
+            if(PopupNavigation.Instance.PopupStack.FirstOrDefault(x => x.GetType() == _floatingScreen.GetType()) != null)
+                return;
             PopupNavigation.Instance.PushAsync(_floatingScreen);
             new Thread(() => GetScheduleSummary(id)).Start();
         }
@@ -257,9 +259,11 @@ namespace Pump.Layout.Dashboard
 
             var customSchedule = viewDeleteConfirm.GetCustomSchedule();
             customSchedule.DeleteAwaiting = true;
+            
             var viewCustomSchedule = (ViewCustomSchedule)
                 ScrollViewCustomScheduleDetail.Children.FirstOrDefault(x => x.AutomationId == customSchedule.Id);
             viewCustomSchedule?.AddStatusActivityIndicator();
+            
             await _socketPicker.SendCommand(customSchedule,
                 _observableFilterKeyValuePair.Key);
         }

@@ -114,7 +114,7 @@ namespace Pump.SocketController
                 }
                 else
                 {
-                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity))
+                    if (CompareTwoObjects(existingRecord, entity))
                         continue;
                     var index = observableCollectionIrrigation.IndexOf(existingRecord);
                     observableCollectionIrrigation[index] = entity;
@@ -129,7 +129,6 @@ namespace Pump.SocketController
                 i--;
             }
         }
-
 
         public static ObservableCollection<T> NewSiteAddFilteredUpdateOrRemove<T>(T record,
             ObservableFilteredIrrigation filteredObservableIrrigation) where T : IEntity
@@ -163,6 +162,10 @@ namespace Pump.SocketController
                 NewSiteManualAddUpdateMissingRecord(filteredObservableIrrigation,
                     (dynamic)observableCollectionIrrigation, (dynamic)observableFilteredCollectionIrrigation,
                     filteredObservableIrrigation.ControllerIdList);
+            
+            else if (record is ISubController)
+                NewSiteSubControllerAddUpdateMissingRecord((dynamic)observableCollectionIrrigation, (dynamic)observableFilteredCollectionIrrigation,
+                    filteredObservableIrrigation.ControllerIdList);
 
             return observableCollectionIrrigation;
         }
@@ -172,20 +175,20 @@ namespace Pump.SocketController
             ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
             where T : IEntity, IEquipment
         {
-            foreach (var entity in observableCollectionIrrigation)
+            foreach (var record in observableCollectionIrrigation)
             {
-                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == record.Id);
                 if (existingRecord == null)
                 {
-                    if (subControllerIds.Contains(entity.AttachedSubController))
-                        filterObservableCollectionIrrigation.Add(entity);
+                    if (subControllerIds.Contains(record.AttachedSubController))
+                        filterObservableCollectionIrrigation.Add(record);
                 }
                 else
                 {
-                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity))
+                    if (CompareTwoObjects(existingRecord, record))
                         continue;
                     var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
-                    filterObservableCollectionIrrigation[index] = entity;
+                    filterObservableCollectionIrrigation[index] = record;
                 }
             }
         }
@@ -199,23 +202,23 @@ namespace Pump.SocketController
             var filteredEquipmentIds = filteredObservableIrrigation.ObservableUnfilteredIrrigation.EquipmentList
                 .Where(x => subControllerIds.Contains(x.AttachedSubController)).Select(x => x.Id).ToList().ToList();
 
-            foreach (var entity in observableCollectionIrrigation)
+            foreach (var record in observableCollectionIrrigation)
             {
-                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == record.Id);
                 if (existingRecord == null)
                 {
-                    var scheduleEquipmentIds = entity.ScheduleDetails.Select(x => x.id_Equipment);
+                    var scheduleEquipmentIds = record.ScheduleDetails.Select(x => x.id_Equipment);
                     var matchIds =
                         scheduleEquipmentIds.Intersect(filteredEquipmentIds, StringComparer.OrdinalIgnoreCase);
                     if (matchIds.Any())
-                        filterObservableCollectionIrrigation.Add(entity);
+                        filterObservableCollectionIrrigation.Add(record);
                 }
                 else
                 {
-                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity))
+                    if (CompareTwoObjects(existingRecord, record))
                         continue;
                     var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
-                    filterObservableCollectionIrrigation[index] = entity;
+                    filterObservableCollectionIrrigation[index] = record;
                 }
             }
         }
@@ -229,25 +232,49 @@ namespace Pump.SocketController
             var filteredEquipmentIds = filteredObservableIrrigation.ObservableUnfilteredIrrigation.EquipmentList
                 .Where(x => subControllerIds.Contains(x.AttachedSubController)).Select(x => x.Id).ToList().ToList();
 
-            foreach (var entity in observableCollectionIrrigation)
+            foreach (var record in observableCollectionIrrigation)
             {
-                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == entity.Id);
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == record.Id);
                 if (existingRecord == null)
                 {
-                    var manualEquipmentIds = entity.ManualDetails.Select(x => x.id_Equipment);
+                    var manualEquipmentIds = record.ManualDetails.Select(x => x.id_Equipment);
                     var matchIds = manualEquipmentIds.Intersect(filteredEquipmentIds, StringComparer.OrdinalIgnoreCase);
                     if (matchIds.Any())
-                        filterObservableCollectionIrrigation.Add(entity);
+                        filterObservableCollectionIrrigation.Add(record);
                 }
                 else
                 {
-                    if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(entity))
+                    if (CompareTwoObjects(existingRecord, record))
                         continue;
                     var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
-                    filterObservableCollectionIrrigation[index] = entity;
+                    filterObservableCollectionIrrigation[index] = record;
                 }
             }
         }
+        
+        private static void NewSiteSubControllerAddUpdateMissingRecord<T>(
+            ObservableCollection<T> observableCollectionIrrigation,
+            ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
+            where T : IEntity, ISubController
+        {
+            foreach (var record in observableCollectionIrrigation.Where(x => subControllerIds.Contains(x.Id)))
+            {
+                var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == record.Id);
+                
+                if (existingRecord == null)
+                {
+                    filterObservableCollectionIrrigation.Add(record);
+                }
+                else
+                {
+                    if (CompareTwoObjects(existingRecord, record))
+                        continue;
+                    var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
+                    filterObservableCollectionIrrigation[index] = record;
+                }
+            }
+        }
+        
 
         public static void FilteredAddUpdate<T>(T record, ObservableFilteredIrrigation filteredObservableIrrigation)
             where T : IEntity
@@ -272,6 +299,10 @@ namespace Pump.SocketController
             else if (record is IManualSchedule)
                 SiteManualAddUpdate(record, filteredObservableIrrigation,
                     (dynamic)observableFilteredCollectionIrrigation);
+            
+            else if (record is ISubController)
+                SiteSubControllerAddUpdate(record, (dynamic)observableFilteredCollectionIrrigation,
+                    filteredObservableIrrigation.ControllerIdList);
         }
 
         public static void FilteredRemove<T>(T record, ObservableFilteredIrrigation filteredObservableIrrigation)
@@ -305,7 +336,7 @@ namespace Pump.SocketController
             }
             else
             {
-                if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(record))
+                if (CompareTwoObjects(existingRecord, record))
                     return;
                 var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
                 filterObservableCollectionIrrigation[index] = record;
@@ -331,7 +362,7 @@ namespace Pump.SocketController
             }
             else
             {
-                if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(record))
+                if (CompareTwoObjects(existingRecord, record))
                     return;
                 var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
                 filterObservableCollectionIrrigation[index] = record;
@@ -356,11 +387,44 @@ namespace Pump.SocketController
             }
             else
             {
-                if (JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(record))
+                if (CompareTwoObjects(existingRecord, record))
                     return;
                 var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
                 filterObservableCollectionIrrigation[index] = record;
             }
+        }
+        
+        private static void SiteSubControllerAddUpdate<T>(T record,
+            ObservableCollection<T> filterObservableCollectionIrrigation, List<string> subControllerIds)
+            where T : IEntity, ISubController
+        {
+            if (!subControllerIds.Contains(record.Id))
+                return;
+
+            var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == record.Id);
+            if (existingRecord == null)
+            {
+                filterObservableCollectionIrrigation.Add(record);
+            }
+            else
+            {
+                if (CompareTwoObjects(existingRecord, record))
+                    return;
+                var index = filterObservableCollectionIrrigation.IndexOf(existingRecord);
+                filterObservableCollectionIrrigation[index] = record;
+            }
+        }
+        
+        
+        private static bool CompareTwoObjects<T>(T existingRecord,
+            T incomingEntity)
+            where T : IEntity
+        {
+            if(existingRecord.GetType() == incomingEntity.GetType() && existingRecord is IStatus existingStatus)
+                if (existingStatus.HasUpdated != ((IStatus)incomingEntity).HasUpdated)
+                    return false;
+            
+            return JsonConvert.SerializeObject(existingRecord) == JsonConvert.SerializeObject(incomingEntity);
         }
     }
 }

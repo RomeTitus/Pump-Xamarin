@@ -12,9 +12,9 @@ namespace Pump.IrrigationController
         public bool isPump { get; set; }
         public long? DirectOnlineGPIO { get; set; }
         [JsonIgnore] public string Id { get; set; }
+        [JsonIgnore] public bool HasUpdated { get; set; }
         public bool DeleteAwaiting { get; set; }
         public string AttachedSubController { get; set; }
-        
         public ControllerStatus ControllerStatus { get; set;  }
     }
 }

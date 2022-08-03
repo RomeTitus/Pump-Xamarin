@@ -143,6 +143,8 @@ namespace Pump.Layout.Dashboard
 
         private void ViewScheduleScreen_Tapped(object sender, EventArgs e)
         {
+            if(PopupNavigation.Instance.PopupStack.FirstOrDefault(x => x.GetType() == _floatingScreen.GetType()) != null)
+                return;
             var scheduleSwitch = ((View)sender).Parent;
             PopupNavigation.Instance.PushAsync(_floatingScreen);
             GetScheduleSummary(scheduleSwitch.AutomationId);

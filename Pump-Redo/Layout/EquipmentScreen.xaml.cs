@@ -12,7 +12,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class EquipmentScreen : ContentPage
+    public partial class EquipmentScreen
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
@@ -42,28 +42,27 @@ namespace Pump.Layout
             ScreenCleanupForEquipment();
             try
             {
-                if (_observableFilterKeyValuePair.Value.EquipmentList.Contains(null)) return;
+                if (!_observableFilterKeyValuePair.Value.LoadedData) return;
                 BtnAddEquipment.IsEnabled = true;
-                if (_observableFilterKeyValuePair.Value.EquipmentList.Any())
-                    foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList
-                                 .OrderBy(c => c.NAME.Length)
-                                 .ThenBy(c => c.NAME))
+                foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.OrderByDescending(x => x.isPump))
+                {
+                    var viewSchedule = ScrollViewEquipment.Children.FirstOrDefault(x =>
+                        x?.AutomationId == equipment.Id);
+                    if (viewSchedule != null)
                     {
-                        var viewEquipment = ScrollViewEquipment.Children.FirstOrDefault(x =>
-                            x.AutomationId == equipment.Id);
-                        if (viewEquipment != null)
-                        {
-                            var viewScheduleStatus = (ViewEquipmentSummary)viewEquipment;
-                            viewScheduleStatus.Populate();
-                        }
-                        else
-                        {
-                            var viewEquipmentSummary = new ViewEquipmentSummary(equipment);
-                            ScrollViewEquipment.Children.Add(viewEquipmentSummary);
-                            viewEquipmentSummary.GetTapGestureRecognizer().Tapped += ViewEquipmentScreen_Tapped;
-                        }
+                        var viewScheduleStatus = (ViewEquipment)viewSchedule;
+                        viewScheduleStatus.Populate(equipment);
                     }
-                else
+                    else
+                    {
+                        var viewEquipmentSummary = new ViewEquipment(equipment);
+                        ScrollViewEquipment.Children.Add(viewEquipmentSummary);
+                        viewEquipmentSummary.GetTapGestureRecognizer().Tapped += ViewEquipmentScreen_Tapped;
+                    }
+                }
+            
+            
+                if (ScrollViewEquipment.Children.Count == 0)
                     ScrollViewEquipment.Children.Add(new ViewEmptySchedule("No Equipments Here"));
             }
             catch (Exception e)
@@ -74,44 +73,18 @@ namespace Pump.Layout
 
         private void ScreenCleanupForEquipment()
         {
-            try
+            if (_observableFilterKeyValuePair.Value.LoadedData)
             {
-                if (_observableFilterKeyValuePair.Value.LoadedData)
-                {
-                    var itemsThatAreOnDisplay =
-                        _observableFilterKeyValuePair.Value.EquipmentList.Select(x => x?.Id).ToList();
-                    if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
-
-                    for (var index = 0; index < ScrollViewEquipment.Children.Count; index++)
-                    {
-                        var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
-                            x == ScrollViewEquipment.Children[index].AutomationId);
-                        if (existingItems != null) continue;
-                        ScrollViewEquipment.Children.RemoveAt(index);
-                        index--;
-                    }
-                }
-                else
-                {
-                    if (ScrollViewEquipment.Children.Count == 1 && ScrollViewEquipment.Children.First().AutomationId ==
-                        "ActivityIndicatorSiteLoading") return;
-                    ScrollViewEquipment.Children.Clear();
-                    var loadingIcon = new ActivityIndicator
-                    {
-                        AutomationId = "ActivityIndicatorSiteLoading",
-                        HorizontalOptions = LayoutOptions.Center,
-                        IsEnabled = true,
-                        IsRunning = true,
-                        IsVisible = true,
-                        VerticalOptions = LayoutOptions.Center
-                    };
-                    ScrollViewEquipment.Children.Add(loadingIcon);
-                }
+                var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.EquipmentList
+                    .Select(x => x?.Id).ToList();
+                
+                if (itemsThatAreOnDisplay.Count == 0)
+                    itemsThatAreOnDisplay.Add(new ViewEmptySchedule().AutomationId);
+                ScrollViewEquipment.RemoveUnusedViews(itemsThatAreOnDisplay);
             }
-            catch
+            else
             {
-                // ignored
+                ScrollViewEquipment.DisplayActivityLoading();
             }
         }
 
@@ -123,90 +96,59 @@ namespace Pump.Layout
         private void PopulateSensor()
         {
             ScreenCleanupForSensor();
-
             try
             {
-                if (_observableFilterKeyValuePair.Value.EquipmentList.Contains(null)) return;
+                if (!_observableFilterKeyValuePair.Value.LoadedData) return;
                 BtnAddSensor.IsEnabled = true;
-                if (_observableFilterKeyValuePair.Value.SensorList.Any())
-                    foreach (var sensor in _observableFilterKeyValuePair.Value.SensorList)
+                foreach (var sensor in _observableFilterKeyValuePair.Value.SensorList)
+                {
+                    var viewSchedule = ScrollViewSensor.Children.FirstOrDefault(x =>
+                        x?.AutomationId == sensor.Id);
+                    if (viewSchedule != null)
                     {
-                        var viewSensorChild = ScrollViewSensor.Children.FirstOrDefault(x =>
-                            x.AutomationId == sensor.Id);
-                        if (viewSensorChild != null)
-                        {
-                            var viewSensor = (ViewSensorSummary)viewSensorChild;
-                            viewSensor._sensor.NAME = sensor.NAME;
-                            viewSensor._sensor.TYPE = sensor.TYPE;
-                            viewSensor._sensor.AttachedSubController = sensor.AttachedSubController;
-                            viewSensor._sensor.GPIO = sensor.GPIO;
-                            viewSensor.Populate();
-                        }
-                        else
-                        {
-                            var viewSensorSummary = new ViewSensorSummary(sensor);
-                            ScrollViewSensor.Children.Add(viewSensorSummary);
-                            viewSensorSummary.GetTapGestureRecognizer().Tapped += ViewSensorScreen_Tapped;
-                        }
+                        var viewScheduleStatus = (ViewSensor)viewSchedule;
+                        viewScheduleStatus.Populate(sensor);
                     }
-                else
-                    ScrollViewSensor.Children.Add(new ViewEmptySchedule("No Sensor Here"));
+                    else
+                    {
+                        var viewEquipmentSummary = new ViewSensor(sensor);
+                        ScrollViewSensor.Children.Add(viewEquipmentSummary);
+                        viewEquipmentSummary.GetTapGestureRecognizer().Tapped += ViewSensorScreen_Tapped;
+                    }
+                }
+                
+                if (ScrollViewSensor.Children.Count == 0)
+                    ScrollViewSensor.Children.Add(new ViewEmptySchedule("No Sensors Here"));
             }
             catch (Exception e)
             {
-                ScrollViewEquipment.Children.Add(new ViewException(e));
+                ScrollViewSensor.Children.Add(new ViewException(e));
             }
         }
 
         private void ScreenCleanupForSensor()
         {
-            try
+            if (_observableFilterKeyValuePair.Value.LoadedData)
             {
-                if (_observableFilterKeyValuePair.Value.LoadedData)
-                {
-                    var itemsThatAreOnDisplay =
-                        _observableFilterKeyValuePair.Value.SensorList.Select(x => x?.Id).ToList();
-                    if (itemsThatAreOnDisplay.Count == 0)
-                        itemsThatAreOnDisplay.Add(new ViewEmptySchedule(string.Empty).AutomationId);
-                    for (var index = 0; index < ScrollViewSensor.Children.Count; index++)
-                    {
-                        var existingItems = itemsThatAreOnDisplay.FirstOrDefault(x =>
-                            x == ScrollViewSensor.Children[index].AutomationId);
-                        if (existingItems != null) continue;
-                        ScrollViewSensor.Children.RemoveAt(index);
-                        index--;
-                    }
-                }
-                else
-                {
-                    if (ScrollViewSensor.Children.Count == 1 && ScrollViewSensor.Children.First().AutomationId ==
-                        "ActivityIndicatorSiteLoading") return;
-
-                    ScrollViewSensor.Children.Clear();
-                    var loadingIcon = new ActivityIndicator
-                    {
-                        AutomationId = "ActivityIndicatorSiteLoading",
-                        HorizontalOptions = LayoutOptions.Center,
-                        IsEnabled = true,
-                        IsRunning = true,
-                        IsVisible = true,
-                        VerticalOptions = LayoutOptions.Center
-                    };
-                    ScrollViewSensor.Children.Add(loadingIcon);
-                }
+                var itemsThatAreOnDisplay = _observableFilterKeyValuePair.Value.SensorList
+                    .Select(x => x?.Id).ToList();
+                
+                if (itemsThatAreOnDisplay.Count == 0)
+                    itemsThatAreOnDisplay.Add(new ViewEmptySchedule().AutomationId);
+                ScrollViewSensor.RemoveUnusedViews(itemsThatAreOnDisplay);
             }
-            catch
+            else
             {
-                // ignored
+                ScrollViewSensor.DisplayActivityLoading();
             }
         }
 
 
         private async void ViewEquipmentScreen_Tapped(object sender, EventArgs e)
         {
-            var viewEquipment = (StackLayout)sender;
+            var gridEquipment = ((Grid)sender).Parent;
             var equipment =
-                _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == viewEquipment.AutomationId);
+                _observableFilterKeyValuePair.Value.EquipmentList.First(x => x?.Id == gridEquipment.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + equipment.NAME,
                 "Cancel", null, "Update", "Delete");
@@ -216,7 +158,7 @@ namespace Pump.Layout
             {
                 if (Navigation.ModalStack.Any(x => x.GetType() == typeof(EquipmentUpdate)))
                     return;
-                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker,
+                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, this,
                     equipment));
             }
                 
@@ -225,14 +167,32 @@ namespace Pump.Layout
                         "Confirm to delete " + equipment.NAME, "Delete",
                         "Cancel"))
                 {
-                    equipment.DeleteAwaiting = true;
-                    await _socketPicker.SendCommand(equipment, _observableFilterKeyValuePair.Key);
+                    DeleteEquipment(equipment);
                 }
+        }
+
+        private async void DeleteEquipment(Equipment equipment)
+        {
+            var notification = EquipmentScheduleValidate(equipment);
+            if (!string.IsNullOrWhiteSpace(notification))
+            {
+                await DisplayAlert("Incomplete", notification, "Understood");
+            }
+            else
+            {
+                equipment.DeleteAwaiting = true;
+                        
+                var viewEquipment = (ViewEquipment)
+                    ScrollViewEquipment.Children.FirstOrDefault(x => x.AutomationId == equipment.Id);
+                viewEquipment?.AddStatusActivityIndicator();
+                        
+                await _socketPicker.SendCommand(equipment, _observableFilterKeyValuePair.Key);
+            }
         }
 
         private async void ViewSensorScreen_Tapped(object sender, EventArgs e)
         {
-            var viewSensor = (StackLayout)sender;
+            var viewSensor = ((Grid)sender).Parent;
             var sensor = _observableFilterKeyValuePair.Value.SensorList.First(x => x?.Id == viewSensor.AutomationId);
 
             var action = await DisplayActionSheet("You have selected " + sensor.NAME,
@@ -243,7 +203,7 @@ namespace Pump.Layout
             {
                 if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SensorUpdate)))
                     return;
-                await Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, sensor));
+                await Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, this, sensor));
             }
             else
             {
@@ -256,7 +216,20 @@ namespace Pump.Layout
                 }
             }
         }
-
+        
+        public void AddLoadingEquipmentScreenFromId(string id)
+        {
+            var viewCustomSchedule = (ViewEquipment)
+                ScrollViewEquipment.Children.FirstOrDefault(x => x.AutomationId == id);
+            viewCustomSchedule?.AddStatusActivityIndicator();
+        }
+        
+        public void AddLoadingSensorScreenFromId(string id)
+        {
+            var viewSensor = (ViewSensor)
+                ScrollViewSensor.Children.FirstOrDefault(x => x.AutomationId == id);
+            viewSensor?.AddStatusActivityIndicator();
+        }
         private void BtnBack_OnPressed(object sender, EventArgs e)
         {
             Navigation.PopModalAsync();
@@ -266,14 +239,23 @@ namespace Pump.Layout
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(EquipmentUpdate)))
                 return;
-            Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker));
+            Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, this));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SensorUpdate)))
                 return;
-            Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker));
+            Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, this));
+        }
+
+        private string EquipmentScheduleValidate(Equipment equipment)
+        {
+            var notification = _observableFilterKeyValuePair.Value.ScheduleList.Where(schedule => schedule.ScheduleDetails.Select(x => x.id_Equipment).Contains(equipment.Id) || schedule.id_Pump == equipment.Id).Aggregate("", (current, schedule) => current + ("\n\u2022 Schedule " + schedule.NAME + " requires this"));
+
+            notification = _observableFilterKeyValuePair.Value.CustomScheduleList.Where(customSchedule => customSchedule.ScheduleDetails.Select(x => x.id_Equipment).Contains(equipment.Id) || customSchedule.id_Pump == equipment.Id).Aggregate(notification, (current, customSchedule) => current + ("\n\u2022 Custom Schedule " + customSchedule.NAME + " requires this"));
+
+            return _observableFilterKeyValuePair.Value.ManualScheduleList.Where(manualSchedule => manualSchedule.ManualDetails.Select(x => x.id_Equipment).Contains(equipment.Id)).Aggregate(notification, (current, _) => current + "\n\u2022 The current Manual Schedule running requires this");
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Pump.Database.Table;
 using Pump.IrrigationController;
+using Pump.Layout.Views;
 using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -12,17 +15,19 @@ namespace Pump.Layout
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SubControllerUpdate : ContentPage
     {
-        private readonly IrrigationConfiguration _configuration;
+        private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _observableKeyValuePair;
         private readonly SocketPicker _socketPicker;
         private readonly SubController _subController;
+        private readonly ViewSubControllerSummary _subControllerSummary;
 
         public SubControllerUpdate(SocketPicker socketPicker, SubController subController,
-            IrrigationConfiguration configuration)
+            KeyValuePair<IrrigationConfiguration, ObservableIrrigation> observableKeyValuePair, ViewSubControllerSummary subControllerSummary)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
             _subController = subController;
-            _configuration = configuration;
+            _observableKeyValuePair = observableKeyValuePair;
+            _subControllerSummary = subControllerSummary;
             PopulateSubController();
         }
 
@@ -79,7 +84,19 @@ namespace Pump.Layout
         private async void ButtonUpdateSubController_OnClicked(object sender, EventArgs e)
         {
             SetSubControllerVariables();
-            await _socketPicker.SendCommand(_subController, _configuration);
+            
+            
+            var loadingScreen = new PopupLoading ("Uploading");
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
+            _subControllerSummary.LoadedData = false; //Force reload 
+            await _socketPicker.SendCommand(_subController, _observableKeyValuePair.Key);
+            await PopupNavigation.Instance.PopAllAsync();
+            _subControllerSummary.AddStatusActivityIndicator();
+            var index = _observableKeyValuePair.Value.SubControllerList.IndexOf(_subController);
+            _observableKeyValuePair.Value.SubControllerList[index] = _subController;
+
+            
+
             await Navigation.PopModalAsync();
         }
 

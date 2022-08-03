@@ -5,6 +5,7 @@ using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
 using Pump.SocketController;
+using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
@@ -12,7 +13,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class EquipmentUpdate : ContentPage
+    public partial class EquipmentUpdate
     {
         private readonly Equipment _equipment;
         private readonly List<Equipment> _equipmentList;
@@ -20,54 +21,113 @@ namespace Pump.Layout
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
 
+        private readonly EquipmentScreen _equipmentScreen;
         private readonly SocketPicker _socketPicker;
-        private List<long> _avalibleGpio;
 
         public EquipmentUpdate(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
-            SocketPicker socketPicker, Equipment equipment = null)
+            SocketPicker socketPicker, EquipmentScreen equipmentScreen, Equipment equipment = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
-
+            _equipmentScreen = equipmentScreen;
             _equipmentList = new List<Equipment>();
+            
             observableFilterKeyValuePair.Value.EquipmentList.ForEach(x => _equipmentList.Add(x));
+            
             if (equipment == null)
             {
                 ButtonUpdateEquipment.Text = "Create";
                 _equipment = new Equipment();
+                PopulateCreate();
             }
 
             else
             {
                 _equipmentList.Remove(equipment);
+                _equipment = equipment;
+                PopulateUpdate();
             }
-
-            _equipment = equipment;
-            Populate();
         }
 
-        private void Populate()
+        private void PopulateCreate()
         {
             SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
+            PopulateCommon();
+        }
+
+        private void PopulateUpdate()
+        {
+            FrameSystemPicker.BackgroundColor = Color.Gray;
+            IsPumpCheckBox.Color = Color.Gray;
+            SystemPicker.IsEnabled = false;
+            IsPumpCheckBox.IsEnabled = false;
+            PopulateCommon();
+        }
+
+        private void PopulateCommon()
+        {
             EquipmentName.Text = _equipment.NAME;
             SystemPicker.Items.Add("Main");
             SystemPicker.SelectedIndex = 0;
-            var index = 1;
             foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
             {
                 SystemPicker.Items.Add(subController.Name);
-                if (_equipment.AttachedSubController != null && _equipment.AttachedSubController == subController.Id)
-                    SystemPicker.SelectedIndex = index;
-                index++;
+                if (subController.Id == _equipment.AttachedSubController)
+                    SystemPicker.SelectedItem = subController.Name;
             }
-
             if (_equipment.isPump)
-            {
                 IsPumpCheckBox.IsChecked = true;
-                if (_equipment.DirectOnlineGPIO != null) IsDirectOnlineCheckBox.IsChecked = true;
+            if (_equipment.DirectOnlineGPIO != null) 
+                IsDirectOnlineCheckBox.IsChecked = true;
+        }
+        
+        private void IsPumpCheckBox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            var isPumpCheckBox = (CheckBox)sender;
+            StackLayoutPump.IsVisible = isPumpCheckBox.IsChecked;
+            if (isPumpCheckBox.IsChecked == false)
+                IsDirectOnlineCheckBox.IsChecked = false;
+        }
+
+        private void IsDirectOnlineCheckBox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            var isDirectOnlineCheckBox = (CheckBox)sender;
+            StackLayoutDirectOnline.IsVisible = isDirectOnlineCheckBox.IsChecked;
+        }
+
+        private void SystemPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            var systemPicker = (Picker)sender;
+            PopulateAvailablePins(systemPicker.SelectedIndex);
+        }
+
+        private void PopulateAvailablePins(int selectedIndex)
+        {
+            var controllerEquipment = selectedIndex == 0
+                ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
+                : _equipmentList.Where(y =>
+                    y.AttachedSubController == _observableFilterKeyValuePair.Value
+                        .SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
+
+            GpioPicker.Items.Clear();
+            DirectOnlineGpioPicker.Items.Clear();
+            foreach (var pin in GpioPins.GetDigitalGpioList()
+                         .Where(x => controllerEquipment.Select(y => y.GPIO).Contains(x) == false && 
+                                     controllerEquipment.Select(y => y.DirectOnlineGPIO).Contains(x) == false))
+            {
+                if(_equipment.DirectOnlineGPIO is null || pin != _equipment.DirectOnlineGPIO)
+                    GpioPicker.Items.Add("Pin: " + pin);
+                
+                if(pin != _equipment.GPIO)
+                    DirectOnlineGpioPicker.Items.Add("Pin: " + pin);
             }
+            
+            GpioPicker.SelectedIndex = GpioPicker.Items.IndexOf("Pin: " + _equipment.GPIO);
+            
+            if (_equipment.DirectOnlineGPIO is not null)
+                DirectOnlineGpioPicker.SelectedIndex = DirectOnlineGpioPicker.Items.IndexOf("Pin: " + _equipment.DirectOnlineGPIO);
         }
 
         private string EquipmentValidate()
@@ -95,67 +155,6 @@ namespace Pump.Layout
             return notification;
         }
 
-        private void IsPumpCheckBox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
-        {
-            var isPumpCheckBox = (CheckBox)sender;
-            StackLayoutPump.IsVisible = isPumpCheckBox.IsChecked;
-            if (isPumpCheckBox.IsChecked == false)
-                IsDirectOnlineCheckBox.IsChecked = false;
-        }
-
-        private void IsDirectOnlineCheckBox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
-        {
-            var isDirectOnlineCheckBox = (CheckBox)sender;
-            StackLayoutDirectOnline.IsVisible = isDirectOnlineCheckBox.IsChecked;
-        }
-
-        private void SystemPicker_OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            var systemPicker = (Picker)sender;
-            var selectedIndex = systemPicker.SelectedIndex;
-            _avalibleGpio = new GpioPins().GetDigitalGpioList();
-            var usedEquipment = selectedIndex == 0
-                ? _equipmentList.Where(y => string.IsNullOrEmpty(y.AttachedSubController)).ToList()
-                : _equipmentList.Where(y =>
-                    !string.IsNullOrEmpty(y.AttachedSubController) && y.AttachedSubController ==
-                    _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id).ToList();
-            var usedPins = usedEquipment.Select(x => x.GPIO).ToList();
-            usedPins.AddRange(
-                usedEquipment.Where(x => x.DirectOnlineGPIO != null).Select(y => y.DirectOnlineGPIO.Value));
-
-            for (var i = 0; i < _avalibleGpio.Count; i++)
-            {
-                if (!usedPins.Contains(_avalibleGpio[i])) continue;
-                _avalibleGpio.RemoveAt(i);
-                i--;
-            }
-
-            GpioPicker.Items.Clear();
-            var index = 0;
-            foreach (var gpio in _avalibleGpio)
-            {
-                GpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.GPIO == gpio &&
-                    (usedEquipment.FirstOrDefault(x => x.AttachedSubController == _equipment.AttachedSubController) !=
-                        null || usedEquipment.Count == 0))
-                    GpioPicker.SelectedIndex = index;
-                index++;
-            }
-
-            index = 0;
-            foreach (var gpio in _avalibleGpio)
-            {
-                DirectOnlineGpioPicker.Items.Add("Pin: " + gpio);
-                if (_equipment.DirectOnlineGPIO != null &&
-                    ((_equipment.DirectOnlineGPIO == gpio &&
-                      usedEquipment.FirstOrDefault(x =>
-                          x.AttachedSubController == _equipment.AttachedSubController) != null) ||
-                     usedEquipment.Count == 0))
-                    DirectOnlineGpioPicker.SelectedIndex = index;
-                index++;
-            }
-        }
-
         private async void ButtonUpdateEquipment_OnClicked(object sender, EventArgs e)
         {
             var notification = EquipmentValidate();
@@ -167,14 +166,34 @@ namespace Pump.Layout
             else
             {
                 _equipment.NAME = EquipmentName.Text;
-                _equipment.GPIO = _avalibleGpio[GpioPicker.SelectedIndex];
+                _equipment.GPIO = long.Parse(GpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
                 _equipment.isPump = IsPumpCheckBox.IsChecked;
                 if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
-                    _equipment.DirectOnlineGPIO = _avalibleGpio[DirectOnlineGpioPicker.SelectedIndex];
+                    _equipment.DirectOnlineGPIO =
+                        long.Parse(DirectOnlineGpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
                 _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0
                     ? null
                     : _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id;
+                
+                
+                
+                var loadingScreen = new PopupLoading ("Uploading");
+                await PopupNavigation.Instance.PushAsync(loadingScreen);
                 await _socketPicker.SendCommand(_equipment, _observableFilterKeyValuePair.Key);
+                await PopupNavigation.Instance.PopAllAsync();
+                    
+                    
+                if (_observableFilterKeyValuePair.Value.EquipmentList.Any(x => x.Id == _equipment.Id))
+                {
+                    var index = _observableFilterKeyValuePair.Value.EquipmentList.IndexOf(_equipment);
+                    _observableFilterKeyValuePair.Value.EquipmentList[index] = _equipment;
+                }
+                else
+                {
+                    _observableFilterKeyValuePair.Value.EquipmentList.Add(_equipment);
+                }
+
+                _equipmentScreen.AddLoadingEquipmentScreenFromId(_equipment.Id);   
                 await Navigation.PopModalAsync();
             }
         }

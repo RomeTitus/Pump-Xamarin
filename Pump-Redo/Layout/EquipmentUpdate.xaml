@@ -53,6 +53,7 @@
                         TextColor="White"
                         VerticalOptions="Center" />
                     <Frame
+                        x:Name="FrameSystemPicker"
                         Margin="0,0,10,0"
                         Padding="10,0,10,0"
                         BackgroundColor="AliceBlue"
@@ -131,7 +132,6 @@
 
                     <StackLayout
                         x:Name="StackLayoutDirectOnline"
-                        HeightRequest="50"
                         HorizontalOptions="FillAndExpand"
                         IsVisible="False"
                         Orientation="Horizontal">
@@ -139,12 +139,13 @@
                             CharacterSpacing="1"
                             FontSize="Large"
                             HorizontalOptions="Start"
-                            Text="Select DirectOnline"
+                            Text="DirectOnline Pin"
                             TextColor="White"
                             VerticalOptions="Center" />
                         <Frame
                             Margin="0,0,10,0"
                             Padding="10,0,10,0"
+                            HeightRequest="50"
                             BackgroundColor="AliceBlue"
                             CornerRadius="30"
                             HorizontalOptions="EndAndExpand">
