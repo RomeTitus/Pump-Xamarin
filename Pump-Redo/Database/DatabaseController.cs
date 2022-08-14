@@ -33,7 +33,7 @@ namespace Pump.Database
             lock (Locker)
             {
                 var existingIrrigationConfiguration = _database.Table<IrrigationConfiguration>()
-                    .FirstOrDefault(x => x.Mac.Equals(irrigationConfiguration.Mac));
+                    .FirstOrDefault(x => x.Path.Equals(irrigationConfiguration.Path));
                 if (existingIrrigationConfiguration != null)
                 {
                     existingIrrigationConfiguration.ConnectionType = irrigationConfiguration.ConnectionType;
@@ -59,6 +59,17 @@ namespace Pump.Database
             lock (Locker)
             {
                 _database.Delete(irrigationConfiguration);
+            }
+        }
+        
+        public void DeleteAllIrrigationConfigurationConnection()
+        {
+            lock (Locker)
+            {
+                foreach (var configuration in GetIrrigationConfigurationList())
+                {
+                    _database.Delete(configuration);
+                }
             }
         }
 

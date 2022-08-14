@@ -211,7 +211,7 @@ namespace Pump.Layout.Dashboard
 
                 updateSchedule.isActive = scheduleSwitch.IsToggled ? "1" : "0";
 
-                await ChangeScheduleState(updateSchedule);
+                ChangeScheduleState(updateSchedule);
             }
             catch
             {
@@ -221,7 +221,7 @@ namespace Pump.Layout.Dashboard
             }
         }
 
-        private async Task ChangeScheduleState(IrrigationController.Schedule schedule)
+        private void ChangeScheduleState(IrrigationController.Schedule schedule)
         {
             var viewScheduleScreen =
                 ScrollViewScheduleDetail.Children.First(x =>

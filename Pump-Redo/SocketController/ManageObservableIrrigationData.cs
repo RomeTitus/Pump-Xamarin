@@ -62,7 +62,6 @@ namespace Pump.SocketController
                     if (JsonConvert.SerializeObject(config) == JsonConvert.SerializeObject(existingConfig))
                         continue;
 
-                    existingConfig.Mac = config.Mac;
                     existingConfig.Path = config.Path;
                     existingConfig.ConnectionType = config.ConnectionType;
                     existingConfig.ControllerPairs = config.ControllerPairs;
@@ -97,8 +96,6 @@ namespace Pump.SocketController
             var incomingRecordList = dynamicValueList.ConvertAll(x => (T)x);
 
             AddUpdateRemoveMissingRecord(incomingRecordList, observableCollectionIrrigation);
-
-            observableIrrigation.LoadedData = true;
         }
 
         private static void AddUpdateRemoveMissingRecord<T>(List<T> dynamicValueList,

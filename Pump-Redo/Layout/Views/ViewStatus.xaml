@@ -9,6 +9,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
         <RelativeLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+            <RelativeLayout.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_OnTapped" />
+            </RelativeLayout.GestureRecognizers>
             <Image x:Name="Transceiver1" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_1.png}" VerticalOptions="Center" IsVisible="False"/>
             <Image x:Name="Transceiver2" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_2.png}" VerticalOptions="Center" IsVisible="False"/>
             <Image x:Name="ImageFailed" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Failed.png}" VerticalOptions="Center" IsVisible="False"/>

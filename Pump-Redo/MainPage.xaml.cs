@@ -27,6 +27,7 @@ namespace Pump
         private readonly NotificationEvent _notificationEvent;
         private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
         private readonly SocketPicker _socketPicker;
+        private readonly FirebaseAuthClient _client;
         private Timer _timer;
 
         public MainPage(FirebaseAuthClient client)
@@ -37,7 +38,7 @@ namespace Pump
             _database = new DatabaseController();
             _socketPicker = new SocketPicker(new FirebaseManager(), _observableDict);
             _authenticationScreen = new AuthenticationScreen(client);
-
+            _client = client;
             client.AuthStateChanged += ClientOnAuthStateChanged;
         }
 
@@ -45,6 +46,8 @@ namespace Pump
         {
             if (e.User == null)
             {
+                ScrollViewSite.Children.Clear();
+                _observableDict.Clear();
                 await Navigation.PushModalAsync(_authenticationScreen);
                 _authenticationScreen.IsDisplayed = true;
             }
@@ -83,12 +86,12 @@ namespace Pump
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(ScanBluetooth)))
                 return;
-            var connectionScreen = new ScanBluetooth(_observableDict.Keys.ToList(), _notificationEvent, _socketPicker.BluetoothManager(), _database);
+            var connectionScreen = new ScanBluetooth(_observableDict.Keys.ToList(), _notificationEvent, _socketPicker.BluetoothManager(), _database, this);
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
         }
 
-        private void PopulateSavedIrrigation(List<IrrigationConfiguration> irrigationConfigurationList)
+        public void PopulateSavedIrrigation(List<IrrigationConfiguration> irrigationConfigurationList)
         {
             foreach (var configuration in irrigationConfigurationList)
             {
@@ -183,6 +186,21 @@ namespace Pump
         private void ButtonScanForControllers_OnPressed(object sender, EventArgs e)
         {
             Device.BeginInvokeOnMainThread(SetupNewController);
+        }
+
+        private async void TapGestureRecognizer_SignOut(object sender, EventArgs e)
+        {
+            if (await DisplayAlert("Sign out",
+                    "Are you sure you want to sign out?", "Accept",
+                    "Cancel"))
+            {
+                _database.DeleteAllIrrigationConfigurationConnection();
+                await _client.SignOutAsync();
+            }
+        }
+        public async void SubscribeToNewController(IrrigationConfiguration irrigationConfiguration)
+        {
+            await _socketPicker.Subscribe(new List<IrrigationConfiguration> {irrigationConfiguration}, _client.User);
         }
     }
 }

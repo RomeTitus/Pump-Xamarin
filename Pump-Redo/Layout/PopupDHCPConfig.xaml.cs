@@ -40,14 +40,14 @@ namespace Pump.Layout
             {
                 DhcpPicker.SelectedIndex = 1;
                 await SetFocus(true);
-                EntryIP.Text = _dhcpConfig.ip_address;
-                EntryGateway.Text = _dhcpConfig.routers;
-                EntryDNS.Text = _dhcpConfig.domain_name_servers;
+                EntryIp.Text = _dhcpConfig.IpAddress;
+                EntryGateway.Text = _dhcpConfig.Routers;
+                EntryDns.Text = _dhcpConfig.DomainNameServers;
             }
             else
             {
                 await SetFocusIpAddress();
-                EntryIP.Text = _dhcpInterface[1];
+                EntryIp.Text = _dhcpInterface[1];
                 DhcpPicker.SelectedIndex = 0;
             }
         }
@@ -64,15 +64,15 @@ namespace Pump.Layout
             await Task.Delay(100);
             if (isFocused)
             {
-                EntryIP.TextBox_Focused(this, new FocusEventArgs(this, true));
+                EntryIp.TextBox_Focused(this, new FocusEventArgs(this, true));
                 EntryGateway.TextBox_Focused(this, new FocusEventArgs(this, true));
-                EntryDNS.TextBox_Focused(this, new FocusEventArgs(this, true));
+                EntryDns.TextBox_Focused(this, new FocusEventArgs(this, true));
             }
             else
             {
-                EntryIP.TextBox_Unfocused(this, new FocusEventArgs(this, false));
+                EntryIp.TextBox_Unfocused(this, new FocusEventArgs(this, false));
                 EntryGateway.TextBox_Unfocused(this, new FocusEventArgs(this, false));
-                EntryDNS.TextBox_Unfocused(this, new FocusEventArgs(this, false));
+                EntryDns.TextBox_Unfocused(this, new FocusEventArgs(this, false));
             }
 
             await Task.Delay(200);
@@ -81,7 +81,7 @@ namespace Pump.Layout
         private async Task SetFocusIpAddress()
         {
             await Task.Delay(100);
-            EntryIP.TextBox_Focused(this, new FocusEventArgs(this, true));
+            EntryIp.TextBox_Focused(this, new FocusEventArgs(this, true));
             await Task.Delay(200);
         }
 
@@ -140,13 +140,13 @@ namespace Pump.Layout
         {
             var dhcpConfig = new DHCPConfig
             {
-                DHCPinterface = _dhcpInterface[0]
+                DhcpInterface = _dhcpInterface[0]
             };
             if (DhcpPicker.SelectedIndex == 0)
                 return dhcpConfig;
-            dhcpConfig.ip_address = EntryIP.Text;
-            dhcpConfig.routers = EntryGateway.Text;
-            dhcpConfig.domain_name_servers = EntryDNS.Text;
+            dhcpConfig.IpAddress = EntryIp.Text;
+            dhcpConfig.Routers = EntryGateway.Text;
+            dhcpConfig.DomainNameServers = EntryDns.Text;
 
             return dhcpConfig;
         }

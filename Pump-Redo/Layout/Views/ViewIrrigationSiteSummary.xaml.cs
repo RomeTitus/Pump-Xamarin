@@ -11,7 +11,6 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewIrrigationSiteSummary
     {
-        private KeyValuePair<string, List<string>> _keyValueSites;
         private readonly ObservableFilteredIrrigation _observableFiltered;
         public ObservableFilteredIrrigation ObservableFiltered => _observableFiltered;
         public ViewIrrigationSiteSummary(ObservableIrrigation observableFiltered, KeyValuePair<string, List<string>> keyValueSites)
@@ -25,12 +24,21 @@ namespace Pump.Layout.Views
                     ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
             });
             
-            _keyValueSites = keyValueSites;
-            _observableFiltered = new ObservableFilteredIrrigation(observableFiltered, keyValueSites.Value);
+            _observableFiltered = new ObservableFilteredIrrigation(observableFiltered, GetSubControllerIds(keyValueSites.Value));
             LabelSiteName.Text = keyValueSites.Key;
             SetConfigurationSummary();
         }
-        
+
+        private List<string> GetSubControllerIds(List<string> subControllerIds)
+        {
+            var updatedSubControllerIds = new List<string>();
+            foreach (var controllerId in subControllerIds)
+            {
+                updatedSubControllerIds.Add(controllerId == "MainController" ? null : controllerId);
+            }
+
+            return updatedSubControllerIds;
+        }
         
         public void SetConfigurationSummary()
         {

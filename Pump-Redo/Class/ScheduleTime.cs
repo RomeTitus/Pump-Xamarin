@@ -2,7 +2,7 @@
 
 namespace Pump.Class
 {
-    internal class ScheduleTime
+    internal static class ScheduleTime
     {
         public static string ConvertTimeSpanToString(TimeSpan timeSpan)
         {
@@ -27,11 +27,6 @@ namespace Pump.Class
         public static DateTime FromUnixTimeStampUtc(long unixTimeStamp)
         {
             return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTimeStamp);
-        }
-
-        public int getUnixTimeStampNow()
-        {
-            return (int)DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
         }
 
         public static int GetUnixTimeStampUtcNow()

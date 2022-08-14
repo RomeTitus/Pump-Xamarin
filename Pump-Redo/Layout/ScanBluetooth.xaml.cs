@@ -20,14 +20,16 @@ namespace Pump.Layout
         private readonly NotificationEvent _notificationEvent;
         private readonly Timer _timer;
         private readonly List<IrrigationConfiguration> _irrigationConfiguration;
+        private readonly MainPage _mainPage;
         private int _scanCounter;
 
         public ScanBluetooth(List<IrrigationConfiguration> irrigationConfiguration, NotificationEvent notificationEvent, BluetoothManager bluetoothManager,
-            DatabaseController database)
+            DatabaseController database, MainPage mainPage)
         {
             InitializeComponent();
             _bluetoothManager = bluetoothManager;
             _irrigationConfiguration = irrigationConfiguration;
+            _mainPage = mainPage;
             _timer = new Timer(300); // 0.3 seconds
             _timer.Elapsed += ScanTimerEvent;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += AdapterBleOnScanTimeoutElapsed;
@@ -122,7 +124,7 @@ namespace Pump.Layout
 
                     var existing = _irrigationConfiguration.Any(x => new Guid(x.DeviceGuid) == _bluetoothManager.BleDevice.Id);
                     
-                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent, existing));
+                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent, _mainPage, existing));
                 }
 
                 catch (Exception exception)

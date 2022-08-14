@@ -260,7 +260,7 @@ namespace Pump.Layout
                     await blueToothManager.IsValidController();
                     await PopupNavigation.Instance.PopAllAsync();
                     
-                    await Navigation.PushModalAsync(new SetupSystem(blueToothManager, new NotificationEvent(), true));
+                    await Navigation.PushModalAsync(new SetupSystem(blueToothManager, new NotificationEvent(), null, true));
                 }
                 catch(Exception exception)
                 {

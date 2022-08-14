@@ -10,7 +10,7 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AuthenticationScreen : ContentPage
+    public partial class AuthenticationScreen
     {
         private readonly FirebaseAuthClient _client;
         public bool IsDisplayed = false;

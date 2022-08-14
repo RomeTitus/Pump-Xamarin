@@ -132,5 +132,9 @@
           <DependentUpon>ViewStatus.xaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Layout\PopupControllerStatus.xaml.cs">
+          <DependentUpon>PopupControllerStatus.xaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 </Project>

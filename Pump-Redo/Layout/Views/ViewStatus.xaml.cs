@@ -1,7 +1,10 @@
-﻿using Pump.IrrigationController;
+﻿using System;
+using System.Linq;
+using Pump.IrrigationController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Timers;
+using Rg.Plugins.Popup.Services;
 
 namespace Pump.Layout.Views
 {
@@ -10,12 +13,13 @@ namespace Pump.Layout.Views
     {
         private ControllerStatus _status;
         private readonly Timer _timer;
-
+        private readonly PopupControllerStatus _popupControllerStatus;
         public ViewStatus(ControllerStatus status)
         {
             InitializeComponent();
             _timer = new Timer(500);
             _timer.Elapsed += TimerOnElapsed;
+            _popupControllerStatus = new PopupControllerStatus(status);
             UpdateView(status);
         }
 
@@ -41,6 +45,7 @@ namespace Pump.Layout.Views
                     TransceiverSuccess.IsVisible = false;
                 }
             });
+            _popupControllerStatus.Populate(status);
         }
         
         private void TimerOnElapsed(object sender, ElapsedEventArgs e)
@@ -54,6 +59,14 @@ namespace Pump.Layout.Views
                 Transceiver1.IsVisible = !Transceiver1.IsVisible;
                 Transceiver2.IsVisible = !Transceiver2.IsVisible;
             });
+        }
+
+        private async void TapGestureRecognizer_OnTapped(object sender, EventArgs e)
+        {
+            if(PopupNavigation.Instance.PopupStack.FirstOrDefault(x => x.GetType() == typeof(PopupControllerStatus)) != null)
+                return;
+            _popupControllerStatus.Populate(_status);
+            await PopupNavigation.Instance.PushAsync(_popupControllerStatus);
         }
     }
 }

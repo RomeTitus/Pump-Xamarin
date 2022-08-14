@@ -62,7 +62,7 @@
                     <StackLayout x:Name="StackLayoutDhcpConfig" IsVisible="True">
                         <customRender:EntryOutlined
                             Margin="0,7,0,0"
-                            x:Name="EntryIP"
+                            x:Name="EntryIp"
                             Placeholder="Ip Address"
                             BorderColor="Black"
                             PlaceholderColor="Navy"
@@ -76,7 +76,7 @@
                             TextChanged="EntryDhcpConfig_OnTextChanged" />
                         <customRender:EntryOutlined
                             Margin="0,7,0,0"
-                            x:Name="EntryDNS"
+                            x:Name="EntryDns"
                             Placeholder="DNS"
                             BorderColor="Black"
                             PlaceholderColor="Navy"

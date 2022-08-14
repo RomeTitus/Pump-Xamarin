@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using EmbeddedImages;
 using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;

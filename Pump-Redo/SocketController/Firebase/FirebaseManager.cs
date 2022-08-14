@@ -97,7 +97,6 @@ namespace Pump.SocketController.Firebase
             if (entity is IStatus status)
             {
                 status.ControllerStatus = new ControllerStatus();
-                status.HasUpdated = true;
             }
             await Set(entity, path);
             return "";

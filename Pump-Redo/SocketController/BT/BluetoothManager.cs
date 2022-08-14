@@ -20,7 +20,8 @@ namespace Pump.SocketController.BT
     {
         private readonly Guid _irrigationService;
         private ICharacteristic _loadedCharacteristic;
-
+        private const string IrrigationServiceGuid = "7949B569-7FC4-465E-B35B-1B5B200AC8C3";
+        private const string IrrigationCharacteristicGuid = "00000003-710e-4a5b-8d75-3e5b444bc3cf";
         public BluetoothManager()
         {
             _irrigationService = Guid.Parse("7949B569-7FC4-465E-B35B-1B5B200AC8C3");
@@ -68,12 +69,13 @@ namespace Pump.SocketController.BT
             {
                 var connected = true;
                 var cancellationToken = new CancellationTokenSource();
-                cancellationToken.CancelAfter(23000);
+                cancellationToken.CancelAfter(46000); //23000
 
                 try
                 {
                     await AdapterBle.StopScanningForDevicesAsync();
-                    await AdapterBle.ConnectToDeviceAsync(device, cancellationToken: cancellationToken.Token);
+                    var parameters = new ConnectParameters(forceBleTransport: true);
+                    await AdapterBle.ConnectToDeviceAsync(device, parameters, cancellationToken: cancellationToken.Token);
                 }
                 catch (DeviceConnectionException deviceConnectionException)
                 {
@@ -195,14 +197,12 @@ namespace Pump.SocketController.BT
                 if (_loadedCharacteristic == null)
                 {
                     var services = await BleDevice.GetServicesAsync();
-                    if (services == null || !services.Any())
+                    if (services == null || services.FirstOrDefault(x => x.Id == new Guid(IrrigationServiceGuid)) == null)
                         return null;
-                    var characteristics = await services[0].GetCharacteristicsAsync();
-                    _loadedCharacteristic = characteristics[0];
+                    
+                    var characteristics = await services.First(x => x.Id == new Guid(IrrigationServiceGuid)).GetCharacteristicsAsync();
+                    _loadedCharacteristic = characteristics.First(x => x.Id == new Guid(IrrigationCharacteristicGuid));
                 }
-
-
-                if (_loadedCharacteristic == null || !_loadedCharacteristic.CanWrite) return null;
 
                 var fullData = false;
                 var bleReplyBytes = new List<byte>();

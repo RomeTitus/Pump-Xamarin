@@ -40,6 +40,7 @@ namespace Pump.SocketController.Firebase
             try
             {
                 var entitiesList = new List<string> { nameof(CustomSchedule), nameof(Equipment), nameof(ManualSchedule), nameof(Schedule), nameof(Sensor), nameof(SubController)};
+                var configuration = _observableDict.Keys.FirstOrDefault(y => y.Path == obj.Key);
                 
                 if (obj.Key == "Config")
                 {
@@ -47,10 +48,10 @@ namespace Pump.SocketController.Firebase
                     return;
                 }
 
-                var configuration = _observableDict.Keys.FirstOrDefault(y => y.Path == obj.Key);
                 if (configuration == null)
                     throw new Exception("Configuration does not exist for :" + obj.Key);
 
+                
                 if (obj.Object.ContainsKey("Equipment"))
                 {
                    
@@ -72,6 +73,8 @@ namespace Pump.SocketController.Firebase
                     FirebaseToObservable(new KeyValuePair<string, JToken>(entity, "{}"),
                         configuration);
                 }
+                
+                _observableDict[configuration].LoadedData = true;
             }
             catch (Exception e)
             {

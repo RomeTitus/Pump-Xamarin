@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
-using Plugin.BLE.Abstractions.Contracts;
-using Pump.IrrigationController;
 using SQLite;
 
 namespace Pump.Database.Table
@@ -10,7 +9,6 @@ namespace Pump.Database.Table
     {
         [PrimaryKey] [AutoIncrement] public int Id { get; set; }
         public string Path { get; set; }
-        public string Mac { get; set; }
         public string DeviceGuid { get; set; }
         public int ConnectionType { get; set; }
         public string InternalPath { get; set; }
@@ -31,9 +29,14 @@ namespace Pump.Database.Table
 
         public void DeserializedProperties()
         {
-            ControllerPairs = ControllerPairsSerialized == null
+            ControllerPairs = string.IsNullOrEmpty(ControllerPairsSerialized) 
                 ? new Dictionary<string, List<string>>()
                 : JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(ControllerPairsSerialized);
+
+            if (ControllerPairs.Any() == false && Path != null)
+            {
+                ControllerPairs = new Dictionary<string, List<string>> { { Path, null } };
+            }
         }
     }
 }

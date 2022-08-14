@@ -49,10 +49,10 @@ namespace Pump.SocketController
 
         public static JObject SetupFirebaseController(JObject controllerConfig)
         {
-            var wiFiCommand = new JObject { { "Task", new JObject() } };
-            wiFiCommand["Task"] = new JObject { { "controllerAuth", new JObject() } };
-            wiFiCommand["Task"]["ControllerAuth"] = controllerConfig;
-            return wiFiCommand;
+            var setupControllerCommand = new JObject { { "Task", new JObject() } };
+            setupControllerCommand["Task"] = new JObject { { "ControllerAuth", new JObject() } };
+            setupControllerCommand["Task"]["ControllerAuth"] = controllerConfig;
+            return setupControllerCommand;
         }
 
         public static JObject SetupSubController(SubController subController, string id)

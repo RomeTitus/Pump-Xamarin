@@ -29,11 +29,13 @@ namespace Pump.Layout
         private PopupDHCPConfig _popupDhcpConfig;
         private WiFiContainer _selectedWiFiContainer;
         private List<WiFiContainer> _wiFiContainers;
+        private readonly MainPage _mainPage;
 
-        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, bool isSetup)
+        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, MainPage mainPage, bool isSetup)
         {
             InitializeComponent();
             _blueToothManage = blueToothManager;
+            _mainPage = mainPage;
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             _database = new DatabaseController();
@@ -91,7 +93,7 @@ namespace Pump.Layout
                     foreach (var dhcpConfig in connectionInfo.Value)
                     {
                         var config = JsonConvert.DeserializeObject<DHCPConfig>(dhcpConfig.First.ToString());
-                        config.DHCPinterface = dhcpConfig.Path.Replace("DHCP.", "");
+                        config.DhcpInterface = dhcpConfig.Path.Replace("DHCP.", "");
                         _dhcpConfigList.Add(config);
                     }
                 }
@@ -161,7 +163,7 @@ namespace Pump.Layout
             var networkLabel = (Label)sender;
             _popupDhcpConfig = new PopupDHCPConfig(
                 networkLabel.ClassId.Split('/').ToList(),
-                _dhcpConfigList.FirstOrDefault(x => x.DHCPinterface.Contains(networkLabel.ClassId.Split('/').First())));
+                _dhcpConfigList.FirstOrDefault(x => x.DhcpInterface.Contains(networkLabel.ClassId.Split('/').First())));
             await PopupNavigation.Instance.PushAsync(_popupDhcpConfig);
             _popupDhcpConfig.GetSaveButtonDhcpSaveButton().Pressed += OnPressed;
         }
@@ -287,10 +289,13 @@ namespace Pump.Layout
             if (result == null)
                 return;
 
-            if (result != "Already_Exist") _notificationEvent.UpdateStatus();
-
             var irrigationController = JsonConvert.DeserializeObject<IrrigationConfiguration>(result);
             _database.SaveIrrigationConfiguration(irrigationController);
+
+            if (result == "Already_Exist") return;
+            _notificationEvent.UpdateStatus();
+            _mainPage?.PopulateSavedIrrigation(_database.GetIrrigationConfigurationList());
+            _mainPage?.SubscribeToNewController(irrigationController);
         }
 
         private string Validation()

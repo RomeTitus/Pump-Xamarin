@@ -16,6 +16,17 @@
                         TextColor="White"
                         TextDecorations="Underline"
                         VerticalOptions="Center" />
+                    <Label
+                        FontSize="Subtitle"
+                        HorizontalOptions="End"
+                        Text="Sign out"
+                        TextColor="White"
+                        TextDecorations="Underline"
+                        VerticalOptions="Center" >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="TapGestureRecognizer_SignOut" />
+                        </Label.GestureRecognizers>
+                    </Label>
                 </StackLayout>
                 <Frame
                     BackgroundColor="White"

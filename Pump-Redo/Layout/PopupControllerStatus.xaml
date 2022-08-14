@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<pages:PopupPage
+    x:Class="Pump.Layout.PopupControllerStatus"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+    xmlns:customRender="clr-namespace:Pump.CustomRender;assembly=Pump">
+
+    <pages:PopupPage.Animation>
+        <animations:ScaleAnimation
+            DurationIn="200"
+            DurationOut="200"
+            EasingIn="Linear"
+            EasingOut="Linear"
+            HasBackgroundAnimation="True"
+            PositionIn="Center"
+            PositionOut="Center"
+            ScaleIn="0.7"
+            ScaleOut="1.5" />
+    </pages:PopupPage.Animation>
+
+    <Frame
+        Margin="20,60,20,60"
+        BackgroundColor="Azure"
+        CornerRadius="10"
+        BorderColor="Black"
+        VerticalOptions="FillAndExpand">
+
+        <StackLayout HeightRequest="400">
+            <StackLayout VerticalOptions="FillAndExpand">
+                <StackLayout>
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="CenterAndExpand"
+                        Text="Status"
+                        VerticalOptions="Center" />
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Medium"
+                            HorizontalOptions="Start"
+                            Text="Execution Time: "
+                            VerticalOptions="Center" />
+                        
+                        <Label
+                            x:Name="LabelExecutionTime"
+                            FontSize="Medium"
+                            HorizontalOptions="EndAndExpand"
+                            Text="10.07.2022 16:44"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Medium"
+                            HorizontalOptions="Start"
+                            Text="Completed: "
+                            VerticalOptions="Center" />
+                        <CheckBox x:Name="CheckBoxCompleted" IsEnabled="False" HorizontalOptions="EndAndExpand" Color="Gray"/>
+                    </StackLayout>
+                        
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label
+                            CharacterSpacing="1"
+                            FontSize="Medium"
+                            HorizontalOptions="Start"
+                            Text="Failed: "
+                            VerticalOptions="Center" />
+                        <CheckBox x:Name="CheckBoxFailed" IsEnabled="False" HorizontalOptions="EndAndExpand" Color="Gray"/>
+                    </StackLayout>
+                    
+                    <Label Text="Steps" FontSize="Medium" Margin="0,10,0,0"/>
+                    <Frame
+                        VerticalOptions="EndAndExpand"
+                        Margin="0,0,10,0"
+                        Padding="10,0,10,0"
+                        BorderColor="Black"
+                        CornerRadius="30">
+                        <ScrollView VerticalOptions="FillAndExpand" HeightRequest="300">
+                            <Label x:Name="LabelSteps" Margin="5,0,5,0" FontSize="Subtitle" HorizontalOptions="CenterAndExpand"/>    
+                        </ScrollView>
+                        
+                    </Frame>
+                </StackLayout>
+                <StackLayout VerticalOptions="EndAndExpand">
+                    <Button
+                        Clicked="ButtonCancel_OnClicked"
+                        Text="Back" />
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </Frame>
+</pages:PopupPage>

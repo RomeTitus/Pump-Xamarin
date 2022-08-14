@@ -44,18 +44,37 @@ public static class LayoutHelper
     public static Layout<View> AddUpdateRemoveStatus(this Layout<View> layoutView, ControllerStatus status)
     {
         var viewStatus = (ViewStatus) layoutView.Children.FirstOrDefault(x => x is ViewStatus);
-            
-        var existingActivityIndicator = (ActivityIndicator) layoutView.Children.FirstOrDefault(x => x is ActivityIndicator);
-        if(existingActivityIndicator is not null)
-            layoutView.Children.Remove(existingActivityIndicator);
-            
-        if (status is null && viewStatus is not null)
+        
+        if (status is not null && status.Complete == false && status.Steps == null)
+        {
+            layoutView.AddActivityIndicator();
+        }
+        else if (status is not null)
+        {
+            if (viewStatus is not null)
+                viewStatus.UpdateView(status);
+            else
+            {
+                layoutView.Children.Clear();
+                layoutView.Children.Add(new ViewStatus(status));
+            }
+        }
+        else
+        {
             layoutView.Children.Clear();
-        else if (status is not null && viewStatus is not null)
-            viewStatus.UpdateView(status);
-        else if(status is not null)
-            layoutView.Children.Add(new ViewStatus(status));
+        }
+        
         return layoutView;
+    }
+
+    private static void AddActivityIndicator(this Layout<View> layoutView)
+    {
+        var existingActivityIndicator = (ActivityIndicator) layoutView.Children.FirstOrDefault(x => x is ActivityIndicator);
+
+        if (existingActivityIndicator is not null)
+            return;
+        
+        AddStatusActivityIndicator(layoutView);
     }
     
     public static Layout<View> AddStatusActivityIndicator(this Layout<View> layoutView)
