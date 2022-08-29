@@ -15,7 +15,7 @@
             VerticalOptions="Fill">
             <StackLayout>
                 <StackLayout.GestureRecognizers>
-                    <TapGestureRecognizer x:Name="StackLayoutViewSubControllerTapGesture" />
+                    <TapGestureRecognizer/>
                 </StackLayout.GestureRecognizers>
                 <StackLayout Orientation="Horizontal">
                     <customRender:EntryOutlined

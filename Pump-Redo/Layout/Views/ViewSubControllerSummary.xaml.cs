@@ -21,7 +21,7 @@ namespace Pump.Layout.Views
         public ViewSubControllerSummary(SubController subController)
         {
             InitializeComponent();
-            AutomationId = subController?.Id;
+            AutomationId = subController != null ? subController.Id: "MainController";
             Populate(subController);
         }
 

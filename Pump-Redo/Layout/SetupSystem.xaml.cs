@@ -15,6 +15,7 @@ using Pump.SocketController;
 using Pump.SocketController.BT;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
 
 namespace Pump.Layout
@@ -39,8 +40,10 @@ namespace Pump.Layout
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             _database = new DatabaseController();
-            if(isSetup)
+            if (isSetup)
                 SetControllerStatus();
+            else
+                PopulateSubController();
             GetConnectionInfo();
         }
 
@@ -48,6 +51,20 @@ namespace Pump.Layout
         {
             StackLayoutControllerName.IsVisible = false;
             ButtonCreate.IsVisible = false;
+        }
+
+        private void PopulateSubController()
+        {
+            SubControllerStackLayout.IsVisible = true;
+            if (!_mainPage.ObservableDict.Any()) return;
+            
+            SubControllerCheckbox.IsEnabled = true;
+            SubControllerCheckbox.Color = Color.Crimson;
+
+            foreach (var irrigationConfig in _mainPage.ObservableDict.Keys)
+            {
+                ControllerPicker.Items.Add(irrigationConfig.Path);
+            }
         }
 
         private async void GetConnectionInfo(string connection = null)
@@ -266,6 +283,116 @@ namespace Pump.Layout
             return await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.WiFiConnect(wiFiJson), 8000);
         }
 
+        private string Validation()
+        {
+            var notification = "";
+            if (string.IsNullOrEmpty(TxtControllerName.Text))
+            {
+                notification += "\n\u2022 Controller name required";
+                LabelControllerName.TextColor = Color.Red;
+            }
+
+            if (SubControllerCheckbox.IsChecked == false)
+                return notification;
+            
+            if (SiteLayout.Children.FirstOrDefault(x => x.BackgroundColor == Color.LightCyan) is null)
+            {
+                notification += "\n\u2022 Controller Site is required to add the SubController";
+                SiteLayout.Children.ForEach(x => ((Frame)x).BorderColor = Color.Red );
+            }
+            return notification;
+        }
+
+        private async void ButtonBack_OnClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopModalAsync();
+        }
+
+        private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
+        {
+            await Navigation.PopModalAsync();
+        }
+
+        private void SubControllerCheckbox_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            var checkBox = (CheckBox)sender;
+            PairSubMainStackLayout.IsVisible = checkBox.IsChecked;
+
+            if (checkBox.IsChecked)
+                ControllerPicker.SelectedIndex = _mainPage.ObservableDict.Any() ? 0 : -1;
+            else
+                ControllerPicker.SelectedIndex = -1;
+        }
+
+        private void ControllerPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            SiteLayout.Children.Clear();
+            var picker = (Picker) sender;
+            if(picker.SelectedIndex == -1)
+                return;
+            foreach (var siteName in _mainPage.ObservableDict.Keys.ToList()[picker.SelectedIndex]
+                         .ControllerPairs.Keys)
+            {
+                var tapGestureRecognizer = new TapGestureRecognizer();
+                var frame = new Frame
+                {
+                    BackgroundColor = Color.White,
+                    BorderColor = Color.Black,
+                    CornerRadius = 10,
+                    HorizontalOptions = LayoutOptions.FillAndExpand,
+                    VerticalOptions = LayoutOptions.Fill,
+                    GestureRecognizers = { tapGestureRecognizer },
+                    Content = new Label { Text = siteName, FontSize = 20 }
+                };
+                tapGestureRecognizer.Tapped += PairControllerToSiteTapGesture;
+                SiteLayout.Children.Add(frame);
+            }
+        }
+
+        private void PairControllerToSiteTapGesture(object sender, EventArgs e)
+        {
+            var view = (Frame) sender;
+            view.BackgroundColor = Color.LightCyan;
+
+            foreach (var siteView in SiteLayout.Children.Where(x => x != view))
+            {
+                siteView.BackgroundColor = Color.White;
+            }
+        }
+
+        private async void AddNewSite_OnTapped(object sender, EventArgs e)
+        {
+            
+            var siteName = await DisplayPromptAsync("New Site",
+                "Enter the site name");
+
+            var existingTempView = (Frame) SiteLayout.Children.FirstOrDefault(x => x.AutomationId == "Temp");
+            if (existingTempView is not null)
+            {
+                existingTempView.Content = new Label { Text = siteName, FontSize = 20 };
+                    return;
+            }
+            
+            var tapGestureRecognizer = new TapGestureRecognizer();
+            var frame = new Frame
+            {
+                BackgroundColor = Color.White,
+                BorderColor = Color.Black,
+                CornerRadius = 10,
+                HorizontalOptions = LayoutOptions.FillAndExpand,
+                VerticalOptions = LayoutOptions.Fill,
+                GestureRecognizers = { tapGestureRecognizer },
+                Content = new Label { Text = siteName, FontSize = 20 },
+                AutomationId = "Temp"
+            };
+            tapGestureRecognizer.Tapped += PairControllerToSiteTapGesture;
+            SiteLayout.Children.Add(frame);
+            PairControllerToSiteTapGesture(frame, EventArgs.Empty);
+            await Task.Delay(100);
+            await SiteScroll.ScrollToAsync(frame,  ScrollToPosition.MakeVisible, true);
+            
+        }
+        
         private async void ButtonCreate_OnClicked(object sender, EventArgs e)
         {
             var notification = Validation();
@@ -275,6 +402,16 @@ namespace Pump.Layout
                 return;
             }
 
+            if (SubControllerCheckbox.IsChecked)
+            {
+                
+            }
+            else
+                await CreateMainController();
+        }
+
+        private async Task CreateMainController()
+        {
             var controllerConfig = new JObject();
             controllerConfig["UID"] = JObject.Parse(_database.GetUserAuthentication().UserInfo)["Uid"].ToString();
             controllerConfig["Path"] = TxtControllerName.Text.Replace(" ", "_");
@@ -296,28 +433,6 @@ namespace Pump.Layout
             _notificationEvent.UpdateStatus();
             _mainPage?.PopulateSavedIrrigation(_database.GetIrrigationConfigurationList());
             _mainPage?.SubscribeToNewController(irrigationController);
-        }
-
-        private string Validation()
-        {
-            var notification = "";
-            if (string.IsNullOrEmpty(TxtControllerName.Text))
-            {
-                notification += "\n\u2022 Controller name required";
-                LabelControllerName.TextColor = Color.Red;
-            }
-
-            return notification;
-        }
-
-        private async void ButtonBack_OnClicked(object sender, EventArgs e)
-        {
-            await Navigation.PopModalAsync();
-        }
-
-        private async void NotificationEventOnNewNotification(object sender, ControllerEventArgs e)
-        {
-            await Navigation.PopModalAsync();
         }
     }
 }

@@ -267,10 +267,7 @@ namespace Pump.Layout
                     await PopupNavigation.Instance.PopAllAsync();
                     await DisplayAlert("Connect Exception!", exception.Message, "Understood");
                 }
-                    
-                
             });
-            //Connect using Bluetooth :)
         }
     }
 }

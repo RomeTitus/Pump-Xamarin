@@ -25,7 +25,7 @@ namespace Pump
         private readonly AuthenticationScreen _authenticationScreen;
         private readonly DatabaseController _database;
         private readonly NotificationEvent _notificationEvent;
-        private readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> _observableDict;
+        public readonly Dictionary<IrrigationConfiguration, ObservableIrrigation> ObservableDict;
         private readonly SocketPicker _socketPicker;
         private readonly FirebaseAuthClient _client;
         private Timer _timer;
@@ -34,9 +34,9 @@ namespace Pump
         {
             InitializeComponent();
             _notificationEvent = new NotificationEvent();
-            _observableDict = new Dictionary<IrrigationConfiguration, ObservableIrrigation>();
+            ObservableDict = new Dictionary<IrrigationConfiguration, ObservableIrrigation>();
             _database = new DatabaseController();
-            _socketPicker = new SocketPicker(new FirebaseManager(), _observableDict);
+            _socketPicker = new SocketPicker(new FirebaseManager(), ObservableDict);
             _authenticationScreen = new AuthenticationScreen(client);
             _client = client;
             client.AuthStateChanged += ClientOnAuthStateChanged;
@@ -47,7 +47,7 @@ namespace Pump
             if (e.User == null)
             {
                 ScrollViewSite.Children.Clear();
-                _observableDict.Clear();
+                ObservableDict.Clear();
                 await Navigation.PushModalAsync(_authenticationScreen);
                 _authenticationScreen.IsDisplayed = true;
             }
@@ -86,7 +86,7 @@ namespace Pump
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(ScanBluetooth)))
                 return;
-            var connectionScreen = new ScanBluetooth(_observableDict.Keys.ToList(), _notificationEvent, _socketPicker.BluetoothManager(), _database, this);
+            var connectionScreen = new ScanBluetooth(ObservableDict.Keys.ToList(), _notificationEvent, _socketPicker.BluetoothManager(), _database, this);
             if (Navigation.ModalStack.All(x => x.GetType() != typeof(ScanBluetooth)))
                 Navigation.PushModalAsync(connectionScreen);
         }
@@ -95,14 +95,14 @@ namespace Pump
         {
             foreach (var configuration in irrigationConfigurationList)
             {
-                if (_observableDict.Keys.Any())
+                if (ObservableDict.Keys.Any())
                 {
-                    if (_observableDict.Keys.FirstOrDefault(x => x.Path == configuration.Path) == null)
-                        _observableDict.Add(configuration, new ObservableIrrigation());
+                    if (ObservableDict.Keys.FirstOrDefault(x => x.Path == configuration.Path) == null)
+                        ObservableDict.Add(configuration, new ObservableIrrigation());
                 }
                 else
                 {
-                    _observableDict.Add(configuration, new ObservableIrrigation());
+                    ObservableDict.Add(configuration, new ObservableIrrigation());
                 }
 
 
@@ -112,7 +112,7 @@ namespace Pump
                 if (viewSite == null)
                 {
                     var viewSiteSummary =
-                        new ViewIrrigationConfigurationSummary(_observableDict.First(x => x.Key.Id == configuration.Id),
+                        new ViewIrrigationConfigurationSummary(ObservableDict.First(x => x.Key.Id == configuration.Id),
                             _socketPicker);
                     viewSiteSummary.GetTapGestureRecognizerList().ForEach(x => x.Tapped += OnTapped_HomeScreen);
                     viewSiteSummary.GetTapGestureSettings().Tapped += OnTapped_Settings;

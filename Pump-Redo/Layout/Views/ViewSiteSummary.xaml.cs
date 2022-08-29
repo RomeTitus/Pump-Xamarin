@@ -58,7 +58,7 @@ namespace Pump.Layout.Views
                 }
 
                 StackLayoutSubController.Children.Add(subControllerSummary);
-                if (subControllerSummary.AutomationId != "MainController")
+                if (subControllerSummary.AutomationId != "MainController" && _socketPicker != null)
                     subControllerSummary.GetTapGestureRecognizer().Tapped += OnTapped_SubController;
             }
         }

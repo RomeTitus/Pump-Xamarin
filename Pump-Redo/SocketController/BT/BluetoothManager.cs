@@ -197,11 +197,11 @@ namespace Pump.SocketController.BT
                 if (_loadedCharacteristic == null)
                 {
                     var services = await BleDevice.GetServicesAsync();
-                    if (services == null || services.FirstOrDefault(x => x.Id == new Guid(IrrigationServiceGuid)) == null)
+                    if (services == null || services.FirstOrDefault(x => x.Id == Guid.Parse(IrrigationServiceGuid)) == null)
                         return null;
                     
-                    var characteristics = await services.First(x => x.Id == new Guid(IrrigationServiceGuid)).GetCharacteristicsAsync();
-                    _loadedCharacteristic = characteristics.First(x => x.Id == new Guid(IrrigationCharacteristicGuid));
+                    var characteristics = await services.First(x => x.Id == Guid.Parse(IrrigationServiceGuid)).GetCharacteristicsAsync();
+                    _loadedCharacteristic = characteristics.First(x => x.Id == Guid.Parse(IrrigationCharacteristicGuid) ||  x.Id == Guid.Parse(IrrigationServiceGuid)); //Sometimes it uses the Service ID as the Characteristic? 
                 }
 
                 var fullData = false;
