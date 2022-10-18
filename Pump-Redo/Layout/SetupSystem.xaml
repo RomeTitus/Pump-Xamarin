@@ -155,22 +155,16 @@
                                 CheckedChanged="SubControllerCheckbox_OnCheckedChanged"/>
                         </StackLayout>
 
-                        <StackLayout x:Name="PairSubMainStackLayout" IsVisible="False">
+                        <ScrollView x:Name="PairSubMainStackLayout" IsVisible="False">
                             <StackLayout
                                 VerticalOptions="EndAndExpand">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
                                 
-                                    <StackLayout Grid.Column="0">
-                                        
+                                    <StackLayout Orientation="Horizontal">
                                         <Label
                                             CharacterSpacing="1"
                                             FontSize="Large"
                                             HorizontalOptions="Center"
-                                            Text="Controller"
+                                            Text="Pair To:"
                                             TextColor="White"
                                             VerticalOptions="Center" />
                                         <Frame
@@ -178,7 +172,7 @@
                                             Padding="10,0,10,0"
                                             BackgroundColor="AliceBlue"
                                             CornerRadius="30"
-                                            HorizontalOptions="Fill">
+                                            HorizontalOptions="FillAndExpand">
                                             <StackLayout Orientation="Horizontal">
                                                 <Image HeightRequest="18"
                                                        Source="{embeddedImages:ImageResourceExtension Pump.Icons.SwitchController.png}" />
@@ -187,32 +181,12 @@
                                             </StackLayout>
                                         </Frame>    
                                     </StackLayout>
-                                    
-                                    
-                                    <Label
-                                        Grid.Column="1"
-                                        Margin="3,0,0,0"
-                                        CharacterSpacing="1"
-                                        FontSize="Medium"
-                                        HorizontalOptions="Start"
-                                        Text="Use LoRa"
-                                        TextColor="White"
-                                        VerticalOptions="End" />
-                                    <CheckBox
-                                        Grid.Column="1"
-                                        x:Name="UseLoRa"
-                                        Margin="15,0,0,0"
-                                        HorizontalOptions="End"
-                                        IsChecked="False"
-                                        VerticalOptions="End" />
-                                </Grid>
-                                
                                 <AbsoluteLayout HorizontalOptions="FillAndExpand">
                                     <Label
                                         AbsoluteLayout.LayoutBounds="0.5, -1, -1, -1"
                                         AbsoluteLayout.LayoutFlags="PositionProportional"
                                         Margin="0,20,0,0"
-                                        FontSize="Subtitle"
+                                        FontSize="Title"
                                         HorizontalOptions="CenterAndExpand"
                                         Text="Sites"
                                         TextColor="White"
@@ -233,7 +207,6 @@
                                         </Label.GestureRecognizers>
                                     </Label>
                                 </AbsoluteLayout>
-                                
                                 <Frame
                                     BackgroundColor="White"
                                     BorderColor="Black"
@@ -244,13 +217,25 @@
                                         <StackLayout x:Name="SiteLayout" />
                                     </ScrollView>
                                 </Frame>
+                                <StackLayout Orientation="Horizontal">
+                                    <Label TextColor="White" FontSize="Small" Text="Use LoRa" VerticalOptions="Center" HorizontalOptions="Start"/>
+                                    <CheckBox HorizontalOptions="Start"/>
+                                </StackLayout>
                             </StackLayout>
-                        </StackLayout>
+                        </ScrollView>
                     </StackLayout>
                 </StackLayout>
-
-                <StackLayout VerticalOptions="EndAndExpand">
-
+            <StackLayout VerticalOptions="EndAndExpand">
+                <StackLayout x:Name="StackLayoutLoRaConfig" HorizontalOptions="EndAndExpand" VerticalOptions="End" IsVisible="False">
+                    <StackLayout HorizontalOptions="End">
+                        <Label Text="More Connections" HorizontalOptions="Start" TextColor="White" TextDecorations="Underline">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTapped_MoreConnections"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </StackLayout>
+                
                     <Button
                         x:Name="ButtonCreate"
                         Clicked="ButtonCreate_OnClicked"

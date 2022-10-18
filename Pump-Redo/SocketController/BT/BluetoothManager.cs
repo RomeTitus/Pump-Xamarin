@@ -144,7 +144,7 @@ namespace Pump.SocketController.BT
                 var connected = true;
                 try
                 {
-                    device = await AdapterBle.ConnectToKnownDeviceAsync(id, ConnectParameters.None, cancellationToken);
+                    device = await AdapterBle.ConnectToKnownDeviceAsync(id, new ConnectParameters(true, true), cancellationToken);
                 }
                 catch (DeviceConnectionException deviceConnectionException)
                 {

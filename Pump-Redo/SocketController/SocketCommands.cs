@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
@@ -63,6 +64,18 @@ namespace Pump.SocketController
             return createSubControllerCommand;
         }
 
+        public static JObject GetLoRaConfig()
+        {
+            var config = new JObject { { "Task", "GetConfig" } };
+            return config;
+        }
+        
+        public static JObject SetLoRaConfig((int address, double freq, int power, int modem) loRaConfig)
+        {
+            var config = new JObject { { "Task", "SetConfig" + "," + loRaConfig.address + "," +  loRaConfig.freq.ToString("0.0",CultureInfo.InvariantCulture) + "," + loRaConfig.power + "," +  loRaConfig.modem} };
+            return config;
+        }
+        
         public static JObject AllTogether()
         {
             var collectAllTogether = new JObject { { "Task", new JObject { { "AllTogether", true } } } };

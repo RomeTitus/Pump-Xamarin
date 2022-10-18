@@ -136,5 +136,9 @@
           <DependentUpon>PopupControllerStatus.xaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Layout\PopupMoreConnection.xaml.cs">
+          <DependentUpon>PopupMoreConnectionScreen.xaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 </Project>

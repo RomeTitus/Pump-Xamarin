@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<pages:PopupPage
+    x:Class="Pump.Layout.PopupMoreConnection"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+    xmlns:customRender="clr-namespace:Pump.CustomRender;assembly=Pump">
+
+    <pages:PopupPage.Animation>
+        <animations:ScaleAnimation
+            DurationIn="200"
+            DurationOut="200"
+            EasingIn="Linear"
+            EasingOut="Linear"
+            HasBackgroundAnimation="True"
+            PositionIn="Center"
+            PositionOut="Center"
+            ScaleIn="0.7"
+            ScaleOut="1.5" />
+    </pages:PopupPage.Animation>
+
+    <Frame
+        Margin="20,60,20,60"
+        BackgroundColor="Azure"
+        CornerRadius="10"
+        BorderColor="Black"
+        VerticalOptions="FillAndExpand">
+
+        <StackLayout HeightRequest="400">
+            <StackLayout VerticalOptions="FillAndExpand">
+                <StackLayout HorizontalOptions="FillAndExpand">
+                    <Label
+                        CharacterSpacing="1"
+                        FontSize="Large"
+                        HorizontalOptions="CenterAndExpand"
+                        Text="More Connections"
+                        VerticalOptions="Center" />
+                </StackLayout>
+                <ScrollView>
+                    <StackLayout>
+                        <Label Text="Data Rate" FontSize="Large"/>
+                        <Frame
+                            Margin="0,0,10,0"
+                            Padding="10,0,10,0"
+                            BackgroundColor="AliceBlue"
+                            CornerRadius="30">
+                            <Picker x:Name="ModemConfigPicker" HorizontalOptions="FillAndExpand"
+                                    TextColor="DarkSlateBlue">
+                                <Picker.Items>
+                                    <x:String>Default medium range</x:String>
+                                    <x:String>Fast but short range</x:String>
+                                    <x:String>Slow but long range</x:String>
+                                    <x:String>Very slow but long range</x:String>
+                                    <x:String>Deathly slow but long range</x:String>
+                                </Picker.Items>
+                            </Picker>
+                        </Frame>
+
+                        <Label Text="Set Frequency" FontSize="Large"/>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                            <Slider x:Name="FreqSlider" Maximum="450" Minimum="420" HorizontalOptions="FillAndExpand"
+                                    ValueChanged="freq_OnValueChanged" />
+                            <Label x:Name = "FrequencyLabel" Text="Freq: " HorizontalOptions="End"/>
+                        </StackLayout>
+                        
+                        <Label Text="Transmission" FontSize="Large"/>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                            <Slider x:Name="TransmissionSlider" Maximum="23" Minimum="5" HorizontalOptions="FillAndExpand"
+                                    ValueChanged="TransmissionPower_OnValueChanged" />
+                            <Label x:Name = "TransmissionLabel" Text="00 dbm" HorizontalOptions="End"/>
+                        </StackLayout>
+                    </StackLayout>
+                </ScrollView>
+                <StackLayout VerticalOptions="EndAndExpand">
+                    <Button
+                        Clicked="ButtonLoRaConfigSave_OnClicked"
+                        Text="Save" />
+                    <Button
+                        Clicked="ButtonCancel_OnClicked"
+                        Text="Cancel" />
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </Frame>
+</pages:PopupPage>

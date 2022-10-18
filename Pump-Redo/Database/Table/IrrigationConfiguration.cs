@@ -15,7 +15,11 @@ namespace Pump.Database.Table
         public int? InternalPort { get; set; }
         public string ExternalPath { get; set; }
         public int? ExternalPort { get; set; }
-
+        public bool LoRaSet { get; set; }
+        public short Address { get; set; }
+        public double Freq { get; set; }
+        public int Modem { get; set; }
+        public int Power { get; set; }
         [Ignore] public Dictionary<string, List<string>> ControllerPairs { get; set; }
 
         //Needs to be public else it wont save :(

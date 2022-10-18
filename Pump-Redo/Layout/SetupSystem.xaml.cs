@@ -21,9 +21,9 @@ using Xamarin.Forms.Xaml;
 namespace Pump.Layout
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class SetupSystem : ContentPage
+    public partial class SetupSystem
     {
-        private readonly BluetoothManager _blueToothManage;
+        private readonly BluetoothManager _blueToothManager;
         private readonly List<DHCPConfig> _dhcpConfigList = new List<DHCPConfig>();
         private readonly NotificationEvent _notificationEvent;
         private readonly DatabaseController _database;
@@ -35,7 +35,7 @@ namespace Pump.Layout
         public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, MainPage mainPage, bool isSetup)
         {
             InitializeComponent();
-            _blueToothManage = blueToothManager;
+            _blueToothManager = blueToothManager;
             _mainPage = mainPage;
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
@@ -51,6 +51,7 @@ namespace Pump.Layout
         {
             StackLayoutControllerName.IsVisible = false;
             ButtonCreate.IsVisible = false;
+            StackLayoutLoRaConfig.IsVisible = true;
         }
 
         private void PopulateSubController()
@@ -76,7 +77,7 @@ namespace Pump.Layout
             {
                 GridNetworkDetail.IsVisible = false;
                 SetUpSystemActivityIndicator.IsVisible = true;
-                connection = await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.ConnectionInfo());
+                connection = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.ConnectionInfo());
                 SetUpSystemActivityIndicator.IsVisible = false;
                 GridNetworkDetail.IsVisible = true;
             }
@@ -203,7 +204,7 @@ namespace Pump.Layout
             var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
             await PopupNavigation.Instance.PushAsync(loadingScreen);
             var result =
-                await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.TempDhcpConfig(dhcpConfigSerialize),
+                await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.TempDhcpConfig(dhcpConfigSerialize),
                     8000);
             await PopupNavigation.Instance.PopAllAsync();
             GetConnectionInfo(result);
@@ -274,13 +275,13 @@ namespace Pump.Layout
 
         private async Task<string> ScanWiFi()
         {
-            return await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.WiFiScan());
+            return await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.WiFiScan());
         }
 
         private async Task<string> ConnectToWifi(WiFiContainer wiFiContainer)
         {
             var wiFiJson = JObject.FromObject(wiFiContainer);
-            return await _blueToothManage.SendAndReceiveToBleAsync(SocketCommands.WiFiConnect(wiFiJson), 8000);
+            return await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.WiFiConnect(wiFiJson), 8000);
         }
 
         private string Validation()
@@ -419,7 +420,7 @@ namespace Pump.Layout
             var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
             await PopupNavigation.Instance.PushAsync(loadingScreen);
             var result =
-                await _blueToothManage.SendAndReceiveToBleAsync(
+                await _blueToothManager.SendAndReceiveToBleAsync(
                     SocketCommands.SetupFirebaseController(controllerConfig), 8000);
             await PopupNavigation.Instance.PopAllAsync();
 
@@ -433,6 +434,30 @@ namespace Pump.Layout
             _notificationEvent.UpdateStatus();
             _mainPage?.PopulateSavedIrrigation(_database.GetIrrigationConfigurationList());
             _mainPage?.SubscribeToNewController(irrigationController);
+        }
+
+        private async void OnTapped_MoreConnections(object sender, EventArgs e)
+        {
+            if(PopupNavigation.Instance.PopupStack.FirstOrDefault(x => x.GetType() == typeof(PopupMoreConnection)) != null)
+                return;
+
+            try
+            {
+                var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
+                await PopupNavigation.Instance.PushAsync(loadingScreen);
+                var loRaConfig = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.GetLoRaConfig());
+                await PopupNavigation.Instance.PopAllAsync();
+                
+                
+                var popupMoreConnection = new PopupMoreConnection(loRaConfig, _blueToothManager);
+                await PopupNavigation.Instance.PushAsync(popupMoreConnection);
+                
+            }
+            catch (Exception exception)
+            {
+                await PopupNavigation.Instance.PopAllAsync();
+                await DisplayAlert("Exception", exception.ToString(), "Understood");
+            }
         }
     }
 }
