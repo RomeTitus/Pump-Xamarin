@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Pump.Database;
@@ -80,7 +81,7 @@ namespace Pump.SocketController.BT
                     if (BlueToothManager.BleDevice == null)
                     {
                         //new Thread(() => BlueToothManager.ConnectToKnownDevice(deviceId)).Start();
-                        await BlueToothManager.ConnectToKnownDevice(deviceId);
+                        await BlueToothManager.ConnectToKnownDevice(deviceId, CancellationToken.None);
                         RequestIrrigationTimer.Restart();
                         continue;
                     }
