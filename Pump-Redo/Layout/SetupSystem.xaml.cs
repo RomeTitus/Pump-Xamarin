@@ -111,7 +111,7 @@ namespace Pump.Layout
                     foreach (var dhcpConfig in connectionInfo.Value)
                     {
                         var config = JsonConvert.DeserializeObject<DHCPConfig>(dhcpConfig.First.ToString());
-                        config.DhcpInterface = dhcpConfig.Path.Replace("DHCP.", "");
+                        config.DHCPinterface = dhcpConfig.Path.Replace("DHCP.", "");
                         _dhcpConfigList.Add(config);
                     }
                 }
@@ -181,7 +181,7 @@ namespace Pump.Layout
             var networkLabel = (Label)sender;
             _popupDhcpConfig = new PopupDHCPConfig(
                 networkLabel.ClassId.Split('/').ToList(),
-                _dhcpConfigList.FirstOrDefault(x => x.DhcpInterface.Contains(networkLabel.ClassId.Split('/').First())));
+                _dhcpConfigList.FirstOrDefault(x => x.DHCPinterface.Contains(networkLabel.ClassId.Split('/').First())));
             await PopupNavigation.Instance.PushAsync(_popupDhcpConfig);
             _popupDhcpConfig.GetSaveButtonDhcpSaveButton().Pressed += OnPressed;
         }
@@ -447,7 +447,12 @@ namespace Pump.Layout
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
                 var loRaConfig = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.GetLoRaConfig());
                 await PopupNavigation.Instance.PopAllAsync();
-                
+
+                if (loRaConfig == "None")
+                {
+                    await DisplayAlert("LoRa", "Failed to communicate with LoRa module", "Understood");
+                    return;
+                }
                 
                 var popupMoreConnection = new PopupMoreConnection(loRaConfig, _blueToothManager);
                 await PopupNavigation.Instance.PushAsync(popupMoreConnection);

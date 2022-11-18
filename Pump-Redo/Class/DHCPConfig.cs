@@ -2,9 +2,9 @@
 {
     public class DHCPConfig
     {
-        public string DhcpInterface { get; set; }
-        public string IpAddress { get; set; }
-        public string Routers { get; set; }
-        public string DomainNameServers { get; set; }
+        public string DHCPinterface { get; set; }
+        public string ip_address { get; set; }
+        public string routers { get; set; }
+        public string domain_name_servers { get; set; }
     }
 }

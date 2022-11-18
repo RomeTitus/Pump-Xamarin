@@ -40,9 +40,9 @@ namespace Pump.Layout
             {
                 DhcpPicker.SelectedIndex = 1;
                 await SetFocus(true);
-                EntryIp.Text = _dhcpConfig.IpAddress;
-                EntryGateway.Text = _dhcpConfig.Routers;
-                EntryDns.Text = _dhcpConfig.DomainNameServers;
+                EntryIp.Text = _dhcpConfig.ip_address;
+                EntryGateway.Text = _dhcpConfig.routers;
+                EntryDns.Text = _dhcpConfig.domain_name_servers;
             }
             else
             {
@@ -140,13 +140,13 @@ namespace Pump.Layout
         {
             var dhcpConfig = new DHCPConfig
             {
-                DhcpInterface = _dhcpInterface[0]
+                DHCPinterface = _dhcpInterface[0]
             };
             if (DhcpPicker.SelectedIndex == 0)
                 return dhcpConfig;
-            dhcpConfig.IpAddress = EntryIp.Text;
-            dhcpConfig.Routers = EntryGateway.Text;
-            dhcpConfig.DomainNameServers = EntryDns.Text;
+            dhcpConfig.ip_address = EntryIp.Text;
+            dhcpConfig.routers = EntryGateway.Text;
+            dhcpConfig.domain_name_servers = EntryDns.Text;
 
             return dhcpConfig;
         }
