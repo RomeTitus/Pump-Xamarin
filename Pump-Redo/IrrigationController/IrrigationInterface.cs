@@ -15,7 +15,6 @@ namespace Pump.IrrigationController
     
     public interface ISubController: IEntity, IStatus
     {
-        string Key { get; set; }
     }
 
     public interface ISchedule: ISubController

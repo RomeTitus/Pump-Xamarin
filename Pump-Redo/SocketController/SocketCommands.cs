@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Pump.Class;
+using Pump.Database.Table;
 using Pump.IrrigationController;
 
 namespace Pump.SocketController
@@ -56,12 +58,36 @@ namespace Pump.SocketController
             return setupControllerCommand;
         }
 
-        public static JObject SetupSubController(SubController subController, string id)
+        private static JObject PairSubController(JObject pairSub , IrrigationConfiguration irrigationConfiguration, int key)
         {
-            var createSubControllerCommand = new JObject
-                { { "SubController", new JObject() }, { "Task", new JObject { { "IsMaster", false } } } };
-            createSubControllerCommand["SubController"] = new JObject { { id, JToken.FromObject(subController) } };
-            return createSubControllerCommand;
+            pairSub["Task"]["SubPair"]["LoRaConfig"] = "SetConfig" + "," + key + "," +
+                                                       irrigationConfiguration.Freq + "," +
+                                                       irrigationConfiguration.Power + "," +
+                                                       irrigationConfiguration.Modem;
+            
+            pairSub["Task"]["SubPair"]["UseLoRa"] = true;
+            return pairSub;
+        }
+        
+        public static JObject PairSubController(IrrigationConfiguration irrigationConfiguration, string name, List<int> keyPath, bool pairWithLoRa)
+        {
+            var pairSub =  new JObject { { "Task", new JObject() } };
+
+            pairSub["Task"]["SubPair"] = new JObject();
+                
+            pairSub["Task"]["SubPair"]["Name"] = name;
+            pairSub["Task"]["SubPair"]["KeyPath"] = JToken.FromObject(keyPath); //Its Address to Parent Address :) Will always have 2 or more keys Sub --> Main
+            pairSub["Task"]["SubPair"]["UseLoRa"] = false;
+
+            if (string.IsNullOrEmpty(irrigationConfiguration.InternalPath) == false)
+            {
+                pairSub["Task"]["SubPair"]["AddressPath"] = irrigationConfiguration.InternalPath;
+            }
+
+            if (pairWithLoRa)
+                PairSubController(pairSub,irrigationConfiguration, keyPath.First());
+            
+            return pairSub;
         }
 
         public static JObject GetLoRaConfig()

@@ -219,7 +219,7 @@
                                 </Frame>
                                 <StackLayout Orientation="Horizontal">
                                     <Label TextColor="White" FontSize="Small" Text="Use LoRa" VerticalOptions="Center" HorizontalOptions="Start"/>
-                                    <CheckBox HorizontalOptions="Start"/>
+                                    <CheckBox x:Name="CheckBoxLoRa" HorizontalOptions="Start" CheckedChanged="CheckBoxLoRa_OnCheckedChanged"/>
                                 </StackLayout>
                             </StackLayout>
                         </ScrollView>

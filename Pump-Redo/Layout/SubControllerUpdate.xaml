@@ -49,14 +49,6 @@
                         BorderColor="Black"
                         PlaceholderColor="Navy" />
 
-                    <customRender:EntryOutlined
-                        Margin="0,10,0,0"
-                        HorizontalOptions="FillAndExpand"
-                        x:Name="SubControllerPort"
-                        Placeholder="Port"
-                        BorderColor="Black"
-                        PlaceholderColor="Navy" />
-
                     <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                         <StackLayout.GestureRecognizers>
                             <TapGestureRecognizer Tapped="TapGestureLoRa_OnTapped" />

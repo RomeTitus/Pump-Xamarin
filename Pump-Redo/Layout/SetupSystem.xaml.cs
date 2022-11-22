@@ -32,7 +32,8 @@ namespace Pump.Layout
         private List<WiFiContainer> _wiFiContainers;
         private readonly MainPage _mainPage;
 
-        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, MainPage mainPage, bool isSetup)
+        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, MainPage mainPage,
+            bool isSetup)
         {
             InitializeComponent();
             _blueToothManager = blueToothManager;
@@ -58,7 +59,7 @@ namespace Pump.Layout
         {
             SubControllerStackLayout.IsVisible = true;
             if (!_mainPage.ObservableDict.Any()) return;
-            
+
             SubControllerCheckbox.IsEnabled = true;
             SubControllerCheckbox.Color = Color.Crimson;
 
@@ -295,12 +296,13 @@ namespace Pump.Layout
 
             if (SubControllerCheckbox.IsChecked == false)
                 return notification;
-            
+
             if (SiteLayout.Children.FirstOrDefault(x => x.BackgroundColor == Color.LightCyan) is null)
             {
                 notification += "\n\u2022 Controller Site is required to add the SubController";
-                SiteLayout.Children.ForEach(x => ((Frame)x).BorderColor = Color.Red );
+                SiteLayout.Children.ForEach(x => ((Frame)x).BorderColor = Color.Red);
             }
+
             return notification;
         }
 
@@ -320,16 +322,22 @@ namespace Pump.Layout
             PairSubMainStackLayout.IsVisible = checkBox.IsChecked;
 
             if (checkBox.IsChecked)
+            {
                 ControllerPicker.SelectedIndex = _mainPage.ObservableDict.Any() ? 0 : -1;
+                ButtonCreate.Text = "Pair";
+            }
             else
+            {
                 ControllerPicker.SelectedIndex = -1;
+                ButtonCreate.Text = "Create";
+            }
         }
 
         private void ControllerPicker_OnSelectedIndexChanged(object sender, EventArgs e)
         {
             SiteLayout.Children.Clear();
-            var picker = (Picker) sender;
-            if(picker.SelectedIndex == -1)
+            var picker = (Picker)sender;
+            if (picker.SelectedIndex == -1)
                 return;
             foreach (var siteName in _mainPage.ObservableDict.Keys.ToList()[picker.SelectedIndex]
                          .ControllerPairs.Keys)
@@ -348,11 +356,15 @@ namespace Pump.Layout
                 tapGestureRecognizer.Tapped += PairControllerToSiteTapGesture;
                 SiteLayout.Children.Add(frame);
             }
+            var mainControllerConfig =
+                _mainPage.ObservableDict.Keys.First(x => x.Path == ControllerPicker.SelectedItem.ToString());
+
+            CheckBoxLoRa.Color = mainControllerConfig.LoRaSet ? Color.Accent : Color.Gray;
         }
 
         private void PairControllerToSiteTapGesture(object sender, EventArgs e)
         {
-            var view = (Frame) sender;
+            var view = (Frame)sender;
             view.BackgroundColor = Color.LightCyan;
 
             foreach (var siteView in SiteLayout.Children.Where(x => x != view))
@@ -363,17 +375,16 @@ namespace Pump.Layout
 
         private async void AddNewSite_OnTapped(object sender, EventArgs e)
         {
-            
             var siteName = await DisplayPromptAsync("New Site",
                 "Enter the site name");
 
-            var existingTempView = (Frame) SiteLayout.Children.FirstOrDefault(x => x.AutomationId == "Temp");
+            var existingTempView = (Frame)SiteLayout.Children.FirstOrDefault(x => x.AutomationId == "Temp");
             if (existingTempView is not null)
             {
                 existingTempView.Content = new Label { Text = siteName, FontSize = 20 };
-                    return;
+                return;
             }
-            
+
             var tapGestureRecognizer = new TapGestureRecognizer();
             var frame = new Frame
             {
@@ -390,10 +401,9 @@ namespace Pump.Layout
             SiteLayout.Children.Add(frame);
             PairControllerToSiteTapGesture(frame, EventArgs.Empty);
             await Task.Delay(100);
-            await SiteScroll.ScrollToAsync(frame,  ScrollToPosition.MakeVisible, true);
-            
+            await SiteScroll.ScrollToAsync(frame, ScrollToPosition.MakeVisible, true);
         }
-        
+
         private async void ButtonCreate_OnClicked(object sender, EventArgs e)
         {
             var notification = Validation();
@@ -405,7 +415,7 @@ namespace Pump.Layout
 
             if (SubControllerCheckbox.IsChecked)
             {
-                
+                await PairToMainController();
             }
             else
                 await CreateMainController();
@@ -436,9 +446,51 @@ namespace Pump.Layout
             _mainPage?.SubscribeToNewController(irrigationController);
         }
 
+        private async Task PairToMainController()
+        {
+            //LoRaSet Bool field needs to be true
+            var mainControllerConfig =
+                _mainPage.ObservableDict.Keys.First(x => x.Path == ControllerPicker.SelectedItem.ToString());
+            var mainObservableIrrigation = _mainPage.ObservableDict[mainControllerConfig];
+            int subAddress = mainControllerConfig.Address + 1;
+
+            if (mainObservableIrrigation.SubControllerList.Any())
+            {
+                subAddress = mainObservableIrrigation.SubControllerList.Last().IncomingKey + 1;
+                if (subAddress > 254)
+                    subAddress = 0;
+            }
+
+            var loadingScreen = new PopupLoading("Pairing with " + mainControllerConfig.Path + "...");
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
+
+
+            var result =
+                await _blueToothManager.SendAndReceiveToBleAsync(
+                    SocketCommands.PairSubController(mainControllerConfig, TxtControllerName.Text,
+                        new List<int> { subAddress, mainControllerConfig.Address }, CheckBoxLoRa.IsChecked)
+                , 8000);
+            
+            await PopupNavigation.Instance.PopAllAsync();
+
+            /*
+            if (result == null)
+                return;
+
+            var irrigationController = JsonConvert.DeserializeObject<IrrigationConfiguration>(result);
+            _database.SaveIrrigationConfiguration(irrigationController);
+
+            if (result == "Already_Exist") return;
+            _notificationEvent.UpdateStatus();
+            _mainPage?.PopulateSavedIrrigation(_database.GetIrrigationConfigurationList());
+            _mainPage?.SubscribeToNewController(irrigationController);
+        */
+        }
+
         private async void OnTapped_MoreConnections(object sender, EventArgs e)
         {
-            if(PopupNavigation.Instance.PopupStack.FirstOrDefault(x => x.GetType() == typeof(PopupMoreConnection)) != null)
+            if (PopupNavigation.Instance.PopupStack.FirstOrDefault(x => x.GetType() == typeof(PopupMoreConnection)) !=
+                null)
                 return;
 
             try
@@ -453,16 +505,24 @@ namespace Pump.Layout
                     await DisplayAlert("LoRa", "Failed to communicate with LoRa module", "Understood");
                     return;
                 }
-                
+
                 var popupMoreConnection = new PopupMoreConnection(loRaConfig, _blueToothManager);
                 await PopupNavigation.Instance.PushAsync(popupMoreConnection);
-                
             }
             catch (Exception exception)
             {
                 await PopupNavigation.Instance.PopAllAsync();
                 await DisplayAlert("Exception", exception.ToString(), "Understood");
             }
+        }
+
+        private void CheckBoxLoRa_OnCheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if(CheckBoxLoRa.Color != Color.Gray)
+                return;
+            CheckBoxLoRa.IsChecked = false;
+            DisplayAlert("LoRa", "The LoRa module needs to first be setup on the main controller", "Understood");
+            
         }
     }
 }

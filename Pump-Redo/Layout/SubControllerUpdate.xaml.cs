@@ -37,8 +37,7 @@ namespace Pump.Layout
             LabelSubController.Text = _subController.Name;
             SubControllerName.Text = _subController.Name;
             SubControllerMac.Text = _subController.Mac;
-            SubControllerIp.Text = _subController.IpAddress;
-            SubControllerPort.Text = _subController.Port.ToString();
+            SubControllerIp.Text = _subController.AddressPath;
             SubControllerLoRa.IsChecked = _subController.UseLoRa;
             StackLayoutKeys.IsVisible = _subController.UseLoRa;
             IncomingKey.Text = _subController.IncomingKey.ToString();
@@ -57,10 +56,8 @@ namespace Pump.Layout
             SubControllerMac.TextBox_Focused(this, new FocusEventArgs(this, true));
             IncomingKey.TextBox_Focused(this, new FocusEventArgs(this, true));
             OutgoingKey.TextBox_Focused(this, new FocusEventArgs(this, true));
-            if (_subController.IpAddress != null)
+            if (_subController.AddressPath != null)
                 SubControllerIp.TextBox_Focused(this, new FocusEventArgs(this, true));
-            if (string.IsNullOrEmpty(_subController.Port.ToString()) == false)
-                SubControllerPort.TextBox_Focused(this, new FocusEventArgs(this, true));
 
             await Task.Delay(300);
         }
@@ -74,8 +71,7 @@ namespace Pump.Layout
         {
             _subController.Name = SubControllerName.Text;
             _subController.Mac = SubControllerMac.Text;
-            _subController.IpAddress = SubControllerIp.Text;
-            _subController.Port = int.Parse(SubControllerPort.Text);
+            _subController.AddressPath = SubControllerIp.Text;
             _subController.UseLoRa = SubControllerLoRa.IsChecked;
             _subController.IncomingKey = int.Parse(IncomingKey.Text);
             _subController.OutgoingKey = OutgoingKey.Text.Split(',').Select(int.Parse).ToList();
