@@ -28,10 +28,10 @@ namespace Pump.SocketController
             return wiFiScan;
         }
 
-        public static JObject ConnectionInfo()
+        public static JObject ControllerInfo()
         {
-            var wiFiScan = new JObject { { "Task", "ConnectionInfo" } };
-            return wiFiScan;
+            var controllerInfo = new JObject { { "Task", "ControllerInfo" } };
+            return controllerInfo;
         }
 
         public static JObject WiFiConnect(JObject wiFiConnect)
@@ -69,24 +69,27 @@ namespace Pump.SocketController
             return pairSub;
         }
         
-        public static JObject PairSubController(IrrigationConfiguration irrigationConfiguration, string name, List<int> keyPath, bool pairWithLoRa)
+        public static JObject PairSubController(IrrigationConfiguration irrigationConfiguration, JObject authConfig, string name, List<int> keyPath, bool pairWithLoRa, bool forcePair = false)
         {
             var pairSub =  new JObject { { "Task", new JObject() } };
-
             pairSub["Task"]["SubPair"] = new JObject();
-                
+            pairSub["Task"]["SubPair"]["Auth"] = authConfig;
+            pairSub["Task"]["SubPair"]["Auth"]["Path"] = name.Replace(" ", "_");
             pairSub["Task"]["SubPair"]["Name"] = name;
+            pairSub["Task"]["SubPair"]["Address"] = keyPath.First();
             pairSub["Task"]["SubPair"]["KeyPath"] = JToken.FromObject(keyPath); //Its Address to Parent Address :) Will always have 2 or more keys Sub --> Main
             pairSub["Task"]["SubPair"]["UseLoRa"] = false;
+            pairSub["Task"]["SubPair"]["ForcePair"] = forcePair;
 
             if (string.IsNullOrEmpty(irrigationConfiguration.InternalPath) == false)
             {
-                pairSub["Task"]["SubPair"]["AddressPath"] = irrigationConfiguration.InternalPath;
+                //TODO make this dynamic?
+                pairSub["Task"]["SubPair"]["AddressPath"] = irrigationConfiguration.InternalPath.Replace("8080", "20002");
             }
 
             if (pairWithLoRa)
                 PairSubController(pairSub,irrigationConfiguration, keyPath.First());
-            
+
             return pairSub;
         }
 

@@ -122,9 +122,7 @@ namespace Pump.Layout
                         if (!await DisplayAlert("Irrigation", "Not verified controller", "Continue", "Cancel"))
                             return;
 
-                    var existing = _irrigationConfiguration.Any(x => new Guid(x.DeviceGuid) == _bluetoothManager.BleDevice.Id);
-                    
-                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent, _mainPage, existing));
+                    await Navigation.PushModalAsync(new SetupSystem(_bluetoothManager, _notificationEvent, _mainPage));
                 }
 
                 catch (Exception exception)

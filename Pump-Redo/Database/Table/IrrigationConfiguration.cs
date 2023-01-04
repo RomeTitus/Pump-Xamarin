@@ -12,9 +12,7 @@ namespace Pump.Database.Table
         public string DeviceGuid { get; set; }
         public int ConnectionType { get; set; }
         public string InternalPath { get; set; }
-        public int? InternalPort { get; set; }
         public string ExternalPath { get; set; }
-        public int? ExternalPort { get; set; }
         public bool LoRaSet { get; set; }
         public short Address { get; set; }
         public double Freq { get; set; }

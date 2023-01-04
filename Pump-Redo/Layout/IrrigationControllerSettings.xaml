@@ -55,15 +55,6 @@
                                 BorderColor="Black"
                                 PlaceholderColor="Navy"
                                 TextChanged="IpEntry_OnTextChanged" />
-
-                            <customRender:EntryOutlined
-                                HorizontalOptions="FillAndExpand"
-                                Margin="0,7,0,0"
-                                x:Name="InternalPortEntry"
-                                Placeholder="Port"
-                                BorderColor="Black"
-                                PlaceholderColor="Navy"
-                                TextChanged="PortEntry_OnTextChanged" />
                         </StackLayout>
                         <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
                             <customRender:EntryOutlined
@@ -74,15 +65,6 @@
                                 BorderColor="Black"
                                 PlaceholderColor="Navy"
                                 TextChanged="IpEntry_OnTextChanged" />
-
-                            <customRender:EntryOutlined
-                                HorizontalOptions="FillAndExpand"
-                                Margin="0,7,0,0"
-                                x:Name="ExternalPortEntry"
-                                Placeholder="Port"
-                                BorderColor="Black"
-                                PlaceholderColor="Navy"
-                                TextChanged="PortEntry_OnTextChanged" />
                         </StackLayout>
                     </StackLayout>
                 </Frame>

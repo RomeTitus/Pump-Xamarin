@@ -71,8 +71,9 @@ namespace Pump.SocketController.Network
         private async Task<byte[]> WriteToNetwork(byte[] bytesToSend, IrrigationConfiguration connection,
             int timeout = 0)
         {
+            /*
             //Return nothing if there is no network path
-            if (connection.InternalPort == -1 && connection.ExternalPort == -1)
+            if (string.IsNullOrEmpty(connection.InternalPath) && string.IsNullOrEmpty(connection.ExternalPath))
                 return null;
 
             var sender = new Socket(AddressFamily.InterNetwork,
@@ -82,11 +83,13 @@ namespace Pump.SocketController.Network
             // Connect to Remote EndPoint
             try
             {
-                if (connection.InternalPort != -1)
+                if (string.IsNullOrEmpty(connection.InternalPath) == false)
                 {
-                    var profiles = Connectivity.ConnectionProfiles;
-                    if (profiles.Contains(ConnectionProfile.WiFi))
-                        sender.Connect(connection.InternalPath, connection.InternalPort.Value);
+                    if (Connectivity.ConnectionProfiles.Contains(ConnectionProfile.WiFi))
+                    {
+                        var connectionArray = connection.InternalPath.Split(':');
+                        sender.Connect(connectionArray[0], connectionArray[1]);
+                    }
                     else
                         throw new Exception();
                 }
@@ -115,7 +118,10 @@ namespace Pump.SocketController.Network
             if (Encoding.ASCII.GetString(result, 0, result.Length) ==
                 Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
                 throw new Exception("Controller did not reply back using Network \n reboot required");
+            
             return result;
+            */
+            return null;
         }
     }
 }

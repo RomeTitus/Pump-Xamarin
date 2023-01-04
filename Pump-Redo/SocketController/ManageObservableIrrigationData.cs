@@ -66,9 +66,7 @@ namespace Pump.SocketController
                     existingConfig.ConnectionType = config.ConnectionType;
                     existingConfig.ControllerPairs = config.ControllerPairs;
                     existingConfig.ExternalPath = config.ExternalPath;
-                    existingConfig.ExternalPort = config.ExternalPort;
                     existingConfig.InternalPath = config.InternalPath;
-                    existingConfig.InternalPort = config.InternalPort;
                     existingConfig.DeviceGuid = config.DeviceGuid;
                     existingConfig.LoRaSet = config.LoRaSet;
                     existingConfig.Address = config.Address;

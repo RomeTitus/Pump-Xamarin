@@ -40,16 +40,14 @@ namespace Pump.Layout
             ConnectionTypePicker.SelectedIndex = _keyValueIrrigation.Key.ConnectionType;
             await SetFocus();
             InternalIpEntry.Text = _keyValueIrrigation.Key.InternalPath;
-            InternalPortEntry.Text = _keyValueIrrigation.Key.InternalPort.ToString();
             ExternalIpEntry.Text = _keyValueIrrigation.Key.ExternalPath;
-            ExternalPortEntry.Text = _keyValueIrrigation.Key.ExternalPort.ToString();
             PopulateSites();
         }
 
         private void PopulateSites()
         {
             foreach (var keyControllerPair in _keyValueIrrigation.Key.ControllerPairs)
-                SiteLayout.Children.Add(new ViewSiteSummary(keyControllerPair, _keyValueIrrigation, _socketPicker));
+                SiteLayout.Children.Add(new ViewSiteSummary(keyControllerPair, _keyValueIrrigation, _socketPicker, _mainPage));
         }
 
         private async Task SetFocus()
@@ -61,20 +59,10 @@ namespace Pump.Layout
             else
                 InternalIpEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
 
-            if (_keyValueIrrigation.Key.InternalPort != null)
-                InternalPortEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
-            else
-                InternalPortEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
-
             if (_keyValueIrrigation.Key.ExternalPath != null)
                 ExternalIpEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
             else
                 ExternalIpEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
-
-            if (_keyValueIrrigation.Key.ExternalPort != null)
-                ExternalPortEntry.TextBox_Focused(this, new FocusEventArgs(this, true));
-            else
-                ExternalPortEntry.TextBox_Unfocused(this, new FocusEventArgs(this, true));
 
             await Task.Delay(300);
         }
@@ -97,28 +85,13 @@ namespace Pump.Layout
             notification += ValidateIpTextChange(InternalIpEntry, "Internal IP");
             notification += ValidateIpTextChange(ExternalIpEntry, "External IP");
 
-            notification += ValidatePortTextChange(InternalPortEntry, "Internal Port");
-            notification += ValidatePortTextChange(ExternalPortEntry, "External Port");
-
-            if (string.IsNullOrEmpty(InternalIpEntry.Text) == false && InternalIpEntry.Text.Any() && string.IsNullOrEmpty(InternalPortEntry.Text))
-            {
-                notification += "\n\u2022 Internal port cannot be empty when Internal IP is filled in";
-                SetPlaceholderColor(InternalPortEntry, Color.Red, Color.Red);
-            }
-
-            if (string.IsNullOrEmpty(ExternalIpEntry.Text) == false && ExternalIpEntry.Text.Any() && string.IsNullOrEmpty(ExternalPortEntry.Text))
-            {
-                notification += "\n\u2022 External port cannot be empty when External IP is filled in";
-                SetPlaceholderColor(ExternalPortEntry, Color.Red, Color.Red);
-            }
-
             return notification;
         }
 
 
         private string ValidateIpTextChange(EntryOutlined entry, string interfaceName = "")
         {
-            var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+            var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ':' };
 
             if (string.IsNullOrEmpty(entry.Text))
                 return string.Empty;
@@ -135,20 +108,27 @@ namespace Pump.Layout
                 return "\n\u2022" + interfaceName + " incorrect format";
             }
 
-            var ipArray = entry.Text.Split('.');
+            var IpAndPort = entry.Text.Split(':');
+            var ipArray = IpAndPort[0].Split('.');
             if (ipArray.Any(subIp => subIp.Length > 3))
             {
                 SetPlaceholderColor(entry, Color.Red, Color.Red);
                 return "\n\u2022" + interfaceName + " incorrect format";
             }
 
-            SetPlaceholderColor(entry, Color.Navy, Color.Black);
-            return string.Empty;
-        }
+            if (IpAndPort.Length == 1)
+            {
+                SetPlaceholderColor(entry, Color.Red, Color.Red);
+                return "\n\u2022" + interfaceName + " no port provided";
+            }
 
-        private string ValidatePortTextChange(EntryOutlined entry, string interfaceName = "")
-        {
-            if (!string.IsNullOrEmpty(entry.Text) && Convert.ToInt32(entry.Text) > 65535)
+            if (IpAndPort.Length > 2)
+            {
+                SetPlaceholderColor(entry, Color.Red, Color.Red);
+                return "\n\u2022" + interfaceName + " incorrect format";
+            }
+
+            if (IpAndPort.Length > 1 && (IpAndPort[1].Length == 0 || IpAndPort[1].Length > 5))
             {
                 SetPlaceholderColor(entry, Color.Red, Color.Red);
                 return "\n\u2022" + interfaceName + " incorrect format";
@@ -173,17 +153,6 @@ namespace Pump.Layout
             ValidateIpTextChange(entry, e.NewTextValue);
         }
 
-        private void PortEntry_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            var allowedCharacters = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-
-            var entryOutline = (EntryOutlined)sender;
-            var invalidChar = e.NewTextValue?.Where(charValue => !allowedCharacters.Contains(charValue));
-            if (invalidChar != null && invalidChar.Any())
-                entryOutline.Text = e.OldTextValue;
-            ValidatePortTextChange(entryOutline);
-        }
-
         private async void Button_OnPressed_Update(object sender, EventArgs e)
         {
             var notification = Validation();
@@ -199,14 +168,8 @@ namespace Pump.Layout
             if (InternalIpEntry.Text != irrigationConfiguration.InternalPath)
                 irrigationConfiguration.InternalPath = InternalIpEntry.Text;
 
-            if (InternalPortEntry.Text != irrigationConfiguration.InternalPort.ToString())
-                irrigationConfiguration.InternalPort = StringToInt(InternalPortEntry.Text);
-
             if (ExternalIpEntry.Text != irrigationConfiguration.ExternalPath)
                 irrigationConfiguration.ExternalPath = ExternalIpEntry.Text;
-
-            if (ExternalPortEntry.Text != irrigationConfiguration.ExternalPort.ToString())
-                irrigationConfiguration.ExternalPort = StringToInt(ExternalPortEntry.Text);
 
             foreach (var view in SiteLayout.Children)
             {
@@ -239,12 +202,6 @@ namespace Pump.Layout
             await Navigation.PopModalAsync();
         }
 
-        private static int? StringToInt(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return null;
-            return Convert.ToInt32(value);
-        }
 
         private async void Button_OnPressed_IrrigationConfig(object sender, EventArgs e)
         {
@@ -260,7 +217,7 @@ namespace Pump.Layout
                     await blueToothManager.IsValidController();
                     await PopupNavigation.Instance.PopAllAsync();
                     
-                    await Navigation.PushModalAsync(new SetupSystem(blueToothManager, new NotificationEvent(), null, true));
+                    await Navigation.PushModalAsync(new SetupSystem(blueToothManager, new NotificationEvent(), _mainPage));
                 }
                 catch(Exception exception)
                 {

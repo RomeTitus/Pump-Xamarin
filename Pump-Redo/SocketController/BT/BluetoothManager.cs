@@ -139,12 +139,13 @@ namespace Pump.SocketController.BT
             var tries = -1;
 
             IDevice device = null;
+            
             while (tries < retry)
             {
                 var connected = true;
                 try
                 {
-                    device = await AdapterBle.ConnectToKnownDeviceAsync(id, new ConnectParameters(true, true), cancellationToken);
+                    device = await AdapterBle.ConnectToKnownDeviceAsync(id, new ConnectParameters(forceBleTransport: true), cancellationToken);
                 }
                 catch (DeviceConnectionException deviceConnectionException)
                 {

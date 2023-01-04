@@ -19,15 +19,17 @@ namespace Pump.Layout.Views
         private readonly KeyValuePair<string, List<string>> _keyControllerPair;
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _observableKeyValuePair;
         private readonly SocketPicker _socketPicker;
+        private readonly MainPage _mainPage;
         private Timer _timer;
 
         public ViewSiteSummary(KeyValuePair<string, List<string>> keyControllerPair,
             KeyValuePair<IrrigationConfiguration, ObservableIrrigation> observableKeyValuePair,
-            SocketPicker socketPicker)
+            SocketPicker socketPicker, MainPage mainPage)
         {
             _keyControllerPair = keyControllerPair;
             _observableKeyValuePair = observableKeyValuePair;
             _socketPicker = socketPicker;
+            _mainPage = mainPage;
             InitializeComponent();
             StartEvent();
             Populate();
@@ -72,7 +74,7 @@ namespace Pump.Layout.Views
                 x.Id == ((ViewSubControllerSummary)stackLayout.Parent).AutomationId);
             
             await Navigation.PushModalAsync(new SubControllerUpdate(_socketPicker, subController,
-                _observableKeyValuePair, (ViewSubControllerSummary) stackLayout.Parent));
+                _observableKeyValuePair, (ViewSubControllerSummary) stackLayout.Parent, _mainPage));
         }
 
         private void UpdateExisting()

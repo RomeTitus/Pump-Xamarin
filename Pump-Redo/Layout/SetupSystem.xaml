@@ -192,6 +192,7 @@
                                         TextColor="White"
                                         VerticalOptions="Center" />
                                     <Label
+                                        x:Name="AddSiteLabel"
                                         AbsoluteLayout.LayoutBounds="1, -1, -1, -1"
                                         AbsoluteLayout.LayoutFlags="PositionProportional"
                                         Margin="0,20,5,0"

@@ -17,6 +17,7 @@ using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
+using JObject = Newtonsoft.Json.Linq.JObject;
 
 namespace Pump.Layout
 {
@@ -32,8 +33,7 @@ namespace Pump.Layout
         private List<WiFiContainer> _wiFiContainers;
         private readonly MainPage _mainPage;
 
-        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, MainPage mainPage,
-            bool isSetup)
+        public SetupSystem(BluetoothManager blueToothManager, NotificationEvent notificationEvent, MainPage mainPage)
         {
             InitializeComponent();
             _blueToothManager = blueToothManager;
@@ -41,11 +41,8 @@ namespace Pump.Layout
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
             _database = new DatabaseController();
-            if (isSetup)
-                SetControllerStatus();
-            else
-                PopulateSubController();
-            GetConnectionInfo();
+         
+            GetControllerInfo();
         }
 
         private void SetControllerStatus()
@@ -69,21 +66,22 @@ namespace Pump.Layout
             }
         }
 
-        private async void GetConnectionInfo(string connection = null)
+        private async void GetControllerInfo(string controllerInfo = null)
         {
             WiFiDhcp.IsVisible = false;
             LanDhcp.IsVisible = false;
 
-            if (string.IsNullOrEmpty(connection))
+            if (string.IsNullOrEmpty(controllerInfo))
             {
                 GridNetworkDetail.IsVisible = false;
                 SetUpSystemActivityIndicator.IsVisible = true;
-                connection = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.ConnectionInfo());
+                controllerInfo = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.ControllerInfo());
                 SetUpSystemActivityIndicator.IsVisible = false;
                 GridNetworkDetail.IsVisible = true;
             }
 
-            var connectionInfoJObject = JObject.Parse(connection);
+            var controllerInfoJObject = JObject.Parse(controllerInfo);
+            var connectionInfoJObject = (JObject) controllerInfoJObject["Connection"];
 
             foreach (var connectionInfo in connectionInfoJObject)
                 if (connectionInfo.Key.Contains("eth"))
@@ -116,6 +114,40 @@ namespace Pump.Layout
                         _dhcpConfigList.Add(config);
                     }
                 }
+
+            if (controllerInfoJObject.ContainsKey("Config"))
+            {
+
+                SetControllerStatus();
+                var controllerConf = (JObject)controllerInfoJObject["Config"];
+                if (controllerConf["IsMain"].Value<bool>() == false)
+                {
+                    foreach (var keyPairValue in _mainPage.ObservableDict)
+                    {
+                        var subFound = keyPairValue.Value.SubControllerList.FirstOrDefault(x => x.KeyPath.First() == controllerConf["Address"].Value<int>());
+                        if(subFound != null)
+                        {
+                            SubControllerStackLayout.IsVisible = true;
+                            SubControllerCheckbox.IsChecked= true;
+                            AddSiteLabel.IsVisible = false;
+
+                            ControllerPicker.Items.Add(keyPairValue.Key.Path);
+                            ControllerPicker.SelectedIndex = 0;
+
+                            SiteLayout.Children.ForEach(x => x.IsEnabled = false);
+                            SiteLayout.Children.First(x => ((Label)((Frame)x).Content).Text == keyPairValue.Key.ControllerPairs.First(x => x.Value.Contains(subFound.Id)).Key).BackgroundColor = Color.LightCyan;
+
+                            CheckBoxLoRa.IsChecked = subFound.UseLoRa;
+                            CheckBoxLoRa.IsEnabled = false;
+                            CheckBoxLoRa.Color = Color.Gray;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                PopulateSubController();
+            }
         }
 
         private static void SetSignalStrength(Image image, int dBm)
@@ -208,7 +240,7 @@ namespace Pump.Layout
                 await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.TempDhcpConfig(dhcpConfigSerialize),
                     8000);
             await PopupNavigation.Instance.PopAllAsync();
-            GetConnectionInfo(result);
+            GetControllerInfo(result);
         }
 
         private async void WiFiView_Tapped(object sender, EventArgs e)
@@ -246,7 +278,7 @@ namespace Pump.Layout
                     await PopupNavigation.Instance.PushAsync(loadingScreen);
                     var result = await ConnectToWifi(_selectedWiFiContainer);
                     await PopupNavigation.Instance.PopAllAsync();
-                    GetConnectionInfo(result);
+                    GetControllerInfo(result);
                 }
                 else
                 {
@@ -456,7 +488,7 @@ namespace Pump.Layout
 
             if (mainObservableIrrigation.SubControllerList.Any())
             {
-                subAddress = mainObservableIrrigation.SubControllerList.Last().IncomingKey + 1;
+                subAddress = mainObservableIrrigation.SubControllerList.Last().KeyPath.First() + 1;
                 if (subAddress > 254)
                     subAddress = 0;
             }
@@ -464,27 +496,92 @@ namespace Pump.Layout
             var loadingScreen = new PopupLoading("Pairing with " + mainControllerConfig.Path + "...");
             await PopupNavigation.Instance.PushAsync(loadingScreen);
 
-
-            var result =
-                await _blueToothManager.SendAndReceiveToBleAsync(
-                    SocketCommands.PairSubController(mainControllerConfig, TxtControllerName.Text,
+            var authConfig = new JObject
+            {
+                ["UID"] = JObject.Parse(_database.GetUserAuthentication().UserInfo)["Uid"].ToString(),
+                ["IsMain"] = false
+            };
+            
+            var result = await _blueToothManager.SendAndReceiveToBleAsync(
+                    SocketCommands.PairSubController(mainControllerConfig, authConfig, TxtControllerName.Text,
                         new List<int> { subAddress, mainControllerConfig.Address }, CheckBoxLoRa.IsChecked)
                 , 8000);
             
             await PopupNavigation.Instance.PopAllAsync();
 
-            /*
-            if (result == null)
-                return;
+            //Prompt to Force Pair
+            if (result != "ok")
+            {
+                var force = await DisplayAlert("Paring Failed",
+                    result +
+                    "\nWould you like to force pair? \n This will pair regardless if the controller can reach " +
+                    mainControllerConfig.Path, "Force Pair", "Cancel");
+                if(force == false)
+                    return;
+                
+                await PopupNavigation.Instance.PushAsync(loadingScreen);
+                
+                    await _blueToothManager.SendAndReceiveToBleAsync(
+                        SocketCommands.PairSubController(mainControllerConfig, authConfig, TxtControllerName.Text,
+                            new List<int> { subAddress, mainControllerConfig.Address }, CheckBoxLoRa.IsChecked, true)
+                        , 8000);
+                await PopupNavigation.Instance.PopAllAsync();
+            } 
+            
+            loadingScreen = new PopupLoading("Uploading to " + mainControllerConfig.Path + "..");
+            await PopupNavigation.Instance.PushAsync(loadingScreen);
 
-            var irrigationController = JsonConvert.DeserializeObject<IrrigationConfiguration>(result);
-            _database.SaveIrrigationConfiguration(irrigationController);
 
-            if (result == "Already_Exist") return;
+            var addressPath = string.Empty;
+            
+            var lanIp = LabelLanIp.Text.Split(new string[] { "IP: " }, StringSplitOptions.None); //Split(Convert.ToChar("IP: "));
+            if (lanIp.Length == 2)
+                addressPath = lanIp[1] + ":20002";
+            else
+            {
+                var wifiIp = LabelWiFiIp.Text.Split(new string[] { "IP: " }, StringSplitOptions.None);
+                if (wifiIp.Length == 2)
+                    addressPath = wifiIp[1] + ":20002";    
+            }
+            
+            //Create SubController
+            var newSubController = new SubController
+            {
+                Name = TxtControllerName.Text,
+                DeviceGuid = _blueToothManager.BleDevice.Id.ToString(),
+                KeyPath = new List<int> { subAddress, mainControllerConfig.Address },
+                UseLoRa = CheckBoxLoRa.IsChecked,
+                AddressPath = addressPath
+            };
+
+            var key = await _mainPage.SocketPicker.SendCommand(newSubController, mainControllerConfig); // "-NJ9RU7toGoJhpgO5ZGN";
+
+            await PopupNavigation.Instance.PopAllAsync();
+
+            var selectedFrame = (Label) ((Frame) SiteLayout.Children.First(x => ((Frame)x).BackgroundColor == Color.LightCyan)).Content;
+
+            var existingSite =
+                mainControllerConfig.ControllerPairs.Any(x => selectedFrame.Text == x.Key);
+
+
+            if(mainControllerConfig.ControllerPairs.TryGetValue(selectedFrame.Text, out List<string> subControllerIds))
+            {
+                subControllerIds.Add(key);
+            }
+            else
+            {
+                mainControllerConfig.ControllerPairs.Add(selectedFrame.Text, new List<string> { key });
+            }
+            //We need to save controller config 
+            
+            await _mainPage.SocketPicker.UpdateIrrigationConfig(mainControllerConfig);
+
+            _database.SaveIrrigationConfiguration(mainControllerConfig);
             _notificationEvent.UpdateStatus();
             _mainPage?.PopulateSavedIrrigation(_database.GetIrrigationConfigurationList());
-            _mainPage?.SubscribeToNewController(irrigationController);
-        */
+
+            _mainPage?.SubscribeToNewController(mainControllerConfig);
+            
         }
 
         private async void OnTapped_MoreConnections(object sender, EventArgs e)

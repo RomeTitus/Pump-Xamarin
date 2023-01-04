@@ -38,9 +38,7 @@ namespace Pump.Database
                 {
                     existingIrrigationConfiguration.ConnectionType = irrigationConfiguration.ConnectionType;
                     existingIrrigationConfiguration.ExternalPath = irrigationConfiguration.ExternalPath;
-                    existingIrrigationConfiguration.ExternalPort = irrigationConfiguration.ExternalPort;
                     existingIrrigationConfiguration.InternalPath = irrigationConfiguration.InternalPath;
-                    existingIrrigationConfiguration.InternalPort = irrigationConfiguration.InternalPort;
                     existingIrrigationConfiguration.ControllerPairs = irrigationConfiguration.ControllerPairs;
                     existingIrrigationConfiguration.DeviceGuid = irrigationConfiguration.DeviceGuid;
                     existingIrrigationConfiguration.LoRaSet = irrigationConfiguration.LoRaSet;

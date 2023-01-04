@@ -6,10 +6,9 @@ namespace Pump.IrrigationController
     public class SubController : ISubController
     {
         public string Name { get; set; }
-        public string Mac { get; set; }
+        public string DeviceGuid { get; set; }
+        public List<int> KeyPath { get; set; }
         public string AddressPath { get; set; }
-        public int IncomingKey { get; set; }
-        public List<int> OutgoingKey { get; set; }
         public bool UseLoRa { get; set; }
         [JsonIgnore] public string Id { get; set; }
         public ControllerStatus ControllerStatus { get; set; }
