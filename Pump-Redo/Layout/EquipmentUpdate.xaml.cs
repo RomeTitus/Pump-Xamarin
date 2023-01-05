@@ -69,14 +69,17 @@ namespace Pump.Layout
         private void PopulateCommon()
         {
             EquipmentName.Text = _equipment.NAME;
-            SystemPicker.Items.Add("Main");
-            SystemPicker.SelectedIndex = 0;
+            if(_observableFilterKeyValuePair.Value.SubControllerList.Any() == false)
+                SystemPicker.Items.Add("Main");
+            
             foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
             {
                 SystemPicker.Items.Add(subController.Name);
                 if (subController.Id == _equipment.AttachedSubController)
                     SystemPicker.SelectedItem = subController.Name;
             }
+            if (SystemPicker.SelectedIndex == -1)
+                SystemPicker.SelectedIndex = 0;
             if (_equipment.isPump)
                 IsPumpCheckBox.IsChecked = true;
             if (_equipment.DirectOnlineGPIO != null) 

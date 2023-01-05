@@ -81,16 +81,17 @@ namespace Pump.Layout
             
             
             SensorName.Text = _sensor.NAME;
+            if (_observableFilterKeyValuePair.Value.SubControllerList.Any() == false)
+                SystemPicker.Items.Add("Main");
 
-            SystemPicker.Items.Add("Main");
-            SystemPicker.SelectedIndex = 0;
             foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
             {
                 SystemPicker.Items.Add(subController.Name);
                 if (subController.Id == _sensor.AttachedSubController)
                     SystemPicker.SelectedItem = subController.Name;
             }
-            
+            if (SystemPicker.SelectedIndex == -1)
+                SystemPicker.SelectedIndex = 0;
             foreach (var equipment in _observableFilterKeyValuePair.Value.EquipmentList.OrderByDescending(x => x.isPump))
                 ScrollViewAttachedEquipment.Children.Add(new ViewAttachedEquipment(equipment, _sensor));
             
