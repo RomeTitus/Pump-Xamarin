@@ -63,6 +63,8 @@ namespace Pump.Layout
         {
             FrameSystemPicker.BackgroundColor = Color.Gray;
             SystemPicker.IsEnabled = false;
+            FrameSensorTypePicker.BackgroundColor = Color.Gray;
+            SensorTypePicker.IsEnabled = false;
             PopulateCommon();
         }
 

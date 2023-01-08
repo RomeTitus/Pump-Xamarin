@@ -48,12 +48,12 @@ namespace Pump.Layout
                 _equipmentList.Remove(equipment);
                 _equipment = equipment;
                 PopulateUpdate();
-            }
+             }
         }
 
         private void PopulateCreate()
         {
-            SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
+            
             PopulateCommon();
         }
 
@@ -68,6 +68,7 @@ namespace Pump.Layout
 
         private void PopulateCommon()
         {
+            SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
             EquipmentName.Text = _equipment.NAME;
             if(_observableFilterKeyValuePair.Value.SubControllerList.Any() == false)
                 SystemPicker.Items.Add("Main");
@@ -174,9 +175,7 @@ namespace Pump.Layout
                 if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
                     _equipment.DirectOnlineGPIO =
                         long.Parse(DirectOnlineGpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
-                _equipment.AttachedSubController = SystemPicker.SelectedIndex == 0
-                    ? null
-                    : _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex - 1].Id;
+                _equipment.AttachedSubController = SystemPicker.SelectedItem.ToString() == "Main" ? null : _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex].Id;
                 
                 
                 

@@ -83,6 +83,7 @@
                         Padding="10,0,10,0"
                         BackgroundColor="AliceBlue"
                         CornerRadius="30"
+                        x:Name="FrameSensorTypePicker"
                         HorizontalOptions="EndAndExpand">
                         <StackLayout Orientation="Horizontal" WidthRequest="160">
                             <Picker
