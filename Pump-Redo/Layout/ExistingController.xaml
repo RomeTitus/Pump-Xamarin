@@ -123,6 +123,7 @@
                     x:Name="TxtControllerCode"
                     HorizontalOptions="Fill"
                     TextColor="Black"
+                    BackgroundColor="BurlyWood"
                     VerticalOptions="Center" />
 
             </StackLayout>
