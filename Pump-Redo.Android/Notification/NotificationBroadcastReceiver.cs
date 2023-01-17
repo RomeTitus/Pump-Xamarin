@@ -1,4 +1,4 @@
-﻿/*
+﻿
 using Android.Content;
 namespace Pump.Droid.Notification
 {
@@ -20,5 +20,5 @@ namespace Pump.Droid.Notification
         }
     }
 }
-*/
+
 

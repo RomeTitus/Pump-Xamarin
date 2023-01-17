@@ -1,21 +1,16 @@
-﻿/*
-using System;
-using System.Collections.Generic;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
+using AndroidX.Core.App;
 using Plugin.FirebasePushNotification;
 using Pump.Class;
 using Pump.Database;
 using Pump.Droid.Notification;
 using Pump.Notification;
+using System;
+using System.Collections.Generic;
 using Xamarin.Forms;
-using Application = Android.App.Application;
-using NotificationPriority = Plugin.FirebasePushNotification.NotificationPriority;
-using String = Java.Lang.String;
-using Pump.Droid;
-using Android.Support.V4.App;
 
 [assembly: Dependency(typeof(AndroidNotificationManager))]
 
@@ -37,7 +32,7 @@ namespace Pump.Droid.Notification
 
         public AndroidNotificationManager()
         {
-            _mContext = Application.Context;
+            _mContext = Android.App.Application.Context;
             if (Instance == null)
             {
                 CreateNotificationChannel();
@@ -128,15 +123,13 @@ namespace Pump.Droid.Notification
             PendingIntent pendingIntent = PendingIntent.GetActivity(_mContext, _pendingIntentId++, intent,
                 PendingIntentFlags.UpdateCurrent);
 
-
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(_mContext, ChannelId)
                 .SetContentIntent(pendingIntent)
                 .SetContentTitle(title)
                 .SetSubText(controllerName)
                 .SetAutoCancel(true)
                 .SetChannelId(ChannelId)
-                .SetPriority((int)NotificationPriority.High)
+                .SetPriority((int)Android.App.NotificationPriority.High)
                 .SetVibrate(new long[0])
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetLargeIcon(BitmapFactory.DecodeResource(_mContext.Resources, Resource.Drawable.FieldSun))
@@ -207,7 +200,7 @@ namespace Pump.Droid.Notification
             {
                 Log.Error("PumpNotification", "Exception: " + ex.ToString());
             }
-            *0/
+            */
         }
 
         private long GetNotifyTime(DateTime notifyTime)
@@ -219,5 +212,5 @@ namespace Pump.Droid.Notification
         }
     }
 }
-*/
+
 

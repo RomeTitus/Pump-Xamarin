@@ -1,12 +1,15 @@
-﻿/*
-using System;
+﻿
+
 using Android.App;
-using Android.Provider;
+using Android.OS;
 using Android.Runtime;
 using Android.Util;
 using Newtonsoft.Json.Linq;
 using Plugin.FirebasePushNotification;
 using Pump.IrrigationController;
+using System;
+using System.Collections.Generic;
+using Android.Provider;
 using Pump.SocketController;
 
 namespace Pump.Droid.Notification
@@ -21,13 +24,13 @@ namespace Pump.Droid.Notification
         public override void OnCreate()
         {
             base.OnCreate();
-            /*
+            var test = new List<long>();
             FirebasePushNotificationManager.NotificationActivityType = typeof(MainActivity);
-            FirebasePushNotificationManager.NotificationActivityFlags =
-                ActivityFlags.ClearTop | ActivityFlags.SingleTop;
+
+            FirebasePushNotificationManager.NotificationActivityFlags = Android.Content.ActivityFlags.ClearTop | Android.Content.ActivityFlags.SingleTop;
 
             //Set the default notification channel for your app when running Android Oreo
-            if (Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
                 //Change for your default notification channel id here
                 FirebasePushNotificationManager.DefaultNotificationChannelId = "FirebasePushNotificationChannel";
@@ -67,7 +70,7 @@ namespace Pump.Droid.Notification
 
 		    },false);
 #endif
-*0/
+
 #if DEBUG
             FirebasePushNotificationManager.Initialize(this, new AndroidNotificationManager(), true, false);
 #else
@@ -121,5 +124,5 @@ namespace Pump.Droid.Notification
         }
     }
 }
-*/
+
 
