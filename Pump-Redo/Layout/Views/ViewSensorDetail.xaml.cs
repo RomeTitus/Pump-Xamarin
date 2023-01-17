@@ -37,29 +37,32 @@ namespace Pump.Layout.Views
 
         public void PopulateSensor()
         {
-            LabelSensorType.Text = Sensor.TYPE;
-            LabelSensorName.Text = Sensor.NAME;
-            if (Sensor.LastUpdated != null)
-                LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime()
-                    .ToString("dd/MM/yyyy HH:mm")
-                    .ToString(CultureInfo.InvariantCulture);
-            switch (Sensor.TYPE)
+            Device.BeginInvokeOnMainThread(() =>
             {
-                case "Pressure Sensor":
-                    PressureSensor();
-                    break;
-                case "Temperature Sensor":
-                    TemperatureSensor();
-                    break;
-            }
+                LabelSensorType.Text = Sensor.TYPE;
+                LabelSensorName.Text = Sensor.NAME;
+                if (Sensor.LastUpdated != null)
+                    LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime()
+                        .ToString("dd/MM/yyyy HH:mm")
+                        .ToString(CultureInfo.InvariantCulture);
+                switch (Sensor.TYPE)
+                {
+                    case "Pressure Sensor":
+                        PressureSensor();
+                        break;
+                    case "Temperature Sensor":
+                        TemperatureSensor();
+                        break;
+                }
 
-            if (_oldImage != _image)
-            {
-                _oldImage = _image;
-                ImageSensor.Source = ImageSource.FromResource(
-                    _image,
-                    typeof(ImageResourceExtension).GetTypeInfo().Assembly);
-            }
+                if (_oldImage != _image)
+                {
+                    _oldImage = _image;
+                    ImageSensor.Source = ImageSource.FromResource(
+                        _image,
+                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
+                }
+            });
         }
 
         private void PressureSensor()

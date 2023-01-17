@@ -576,13 +576,11 @@ namespace Pump.SocketController.Firebase
                             .Child(mac + "/NotificationToken")
                             .PostAsync(notificationToken);
                         notificationToken.ID = result.Key;
-                        return result.Key;
                     }
 
                     await FirebaseClient
                         .Child(mac + "/NotificationToken/" + notificationToken.ID)
                         .PutAsync(notificationToken);
-                    return notificationToken.ID;
                 }
             }
             catch (Exception e)
@@ -590,7 +588,7 @@ namespace Pump.SocketController.Firebase
                 Console.WriteLine(e);
             }
 
-            return null;
+            return string.Empty;
         }
 
         private async Task<string> DeleteNotificationToken(NotificationToken notificationToken)

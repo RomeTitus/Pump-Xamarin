@@ -121,7 +121,8 @@ namespace Pump.Droid.Notification
             intent.AddFlags(ActivityFlags.ClearTop);
 
             PendingIntent pendingIntent = PendingIntent.GetActivity(_mContext, _pendingIntentId++, intent,
-                PendingIntentFlags.UpdateCurrent);
+               (Build.VERSION.SdkInt >= BuildVersionCodes.S) ? PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable
+                : PendingIntentFlags.UpdateCurrent);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(_mContext, ChannelId)
                 .SetContentIntent(pendingIntent)

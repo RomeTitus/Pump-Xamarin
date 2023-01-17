@@ -39,38 +39,6 @@ namespace Pump.Droid.Notification
                 FirebasePushNotificationManager.DefaultNotificationChannelName = "General";
             }
 
-
-            //If debug you should reset the token each time.
-#if DEBUG
-            FirebasePushNotificationManager.Initialize(this, new NotificationUserCategory[]
-            {
-                new NotificationUserCategory("message",new List<NotificationUserAction> {
-                    new NotificationUserAction("Reply","Reply",NotificationActionType.Foreground),
-                    new NotificationUserAction("Forward","Forward",NotificationActionType.Foreground)
-
-                }),
-                new NotificationUserCategory("request",new List<NotificationUserAction> {
-                    new NotificationUserAction("Accept","Accept",NotificationActionType.Default,"check"),
-                    new NotificationUserAction("Reject","Reject",NotificationActionType.Default,"cancel")
-                })
-
-            }, true);
-#else
-	            FirebasePushNotificationManager.Initialize(this,new NotificationUserCategory[]
-		    {
-			new NotificationUserCategory("message",new List<NotificationUserAction> {
-			    new NotificationUserAction("Reply","Reply",NotificationActionType.Foreground),
-			    new NotificationUserAction("Forward","Forward",NotificationActionType.Foreground)
-
-			}),
-			new NotificationUserCategory("request",new List<NotificationUserAction> {
-			    new NotificationUserAction("Accept","Accept",NotificationActionType.Default,"check"),
-			    new NotificationUserAction("Reject","Reject",NotificationActionType.Default,"cancel")
-			})
-
-		    },false);
-#endif
-
 #if DEBUG
             FirebasePushNotificationManager.Initialize(this, new AndroidNotificationManager(), true, false);
 #else

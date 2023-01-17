@@ -1,8 +1,14 @@
 ﻿using Android;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
+using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
+using Android.Util;
+using Plugin.FirebasePushNotification;
+using Pump.Droid.Notification;
+using Pump.Notification;
 using Rg.Plugins.Popup;
 using Rg.Plugins.Popup.Services;
 using Xamarin.Forms;
@@ -32,6 +38,15 @@ namespace Pump.Droid
         {
             base.OnCreate(savedInstanceState);
 
+            if (Intent?.Extras != null)
+            {
+                foreach (var key in Intent?.Extras?.KeySet())
+                {
+                    var value = Intent.Extras.GetString(key);
+                    Log.Debug(TAG, "Key: {0} Value: {1}", key, value ?? string.Empty);
+                }
+            }
+
             Platform.Init(this, savedInstanceState);
             Forms.Init(this, savedInstanceState);
 
@@ -40,9 +55,10 @@ namespace Pump.Droid
             Forms.Init(this, savedInstanceState);
 
             CheckPermissions();
-            //IsPlayServicesAvailable();
+            IsPlayServicesAvailable();
 
             LoadApplication(new App());
+            FirebasePushNotificationManager.ProcessIntent(this, Intent);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
@@ -69,5 +85,44 @@ namespace Pump.Droid
         {
             if (Popup.SendBackPressed(base.OnBackPressed)) PopupNavigation.Instance.PopAsync();
         }
+
+        protected override void OnNewIntent(Intent intent)
+        {
+            base.OnNewIntent(intent);
+            FirebasePushNotificationManager.ProcessIntent(this, intent);
+            CreateNotificationFromIntent(intent);
+        }
+
+        void CreateNotificationFromIntent(Intent intent)
+        {
+            if (intent?.Extras != null)
+            {
+                string title = intent.GetStringExtra(AndroidNotificationManager.TitleKey);
+                string message = intent.GetStringExtra(AndroidNotificationManager.MessageKey);
+                string controllerName = intent.GetStringExtra(AndroidNotificationManager.ControllerNameKey);
+                DependencyService.Get<INotificationManager>().ReceiveNotification(title, message, controllerName);
+            }
+        }
+
+        private bool IsPlayServicesAvailable()
+        {
+            int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
+            if (resultCode != ConnectionResult.Success)
+            {
+                if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
+                    Log.Debug(TAG, GoogleApiAvailability.Instance.GetErrorString(resultCode));
+                else
+                {
+                    Log.Debug(TAG, "This device is not supported");
+                    Finish();
+                }
+
+                return false;
+            }
+
+            Log.Debug(TAG, "Google Play Services is available.");
+            return true;
+        }
+
     }
 }
