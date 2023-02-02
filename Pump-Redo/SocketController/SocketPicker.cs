@@ -89,6 +89,20 @@ namespace Pump.SocketController
             return result;
         }
 
+        public async Task<string> SendCommand<T>(T entity, List<IrrigationConfiguration> targetedIrrigationList) where T : IEntity
+        {
+            var notification = string.Empty;
+            foreach (var targetedIrrigation in targetedIrrigationList)
+            {
+                var result = await SendCommand(entity, targetedIrrigation);
+                if (result == null)
+                    notification += "Failed\n";
+                else
+                    notification += result + "\n";
+            }
+            return notification;
+        }
+
         public async Task<bool> UpdateIrrigationConfig(IrrigationConfiguration configuration)
         {
             return await _firebaseManager.UpdateIrrigationConfig(configuration);

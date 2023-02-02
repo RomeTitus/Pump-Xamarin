@@ -140,6 +140,9 @@
     <PackageReference Include="Plugin.BLE">
       <Version>2.2.0-pre5</Version>
     </PackageReference>
+    <PackageReference Include="Plugin.FirebasePushNotification">
+      <Version>3.4.35</Version>
+    </PackageReference>
     <PackageReference Include="Rg.Plugins.Popup">
       <Version>2.1.0</Version>
     </PackageReference>

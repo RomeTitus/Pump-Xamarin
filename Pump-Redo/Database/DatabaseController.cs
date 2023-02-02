@@ -28,6 +28,15 @@ namespace Pump.Database
             }
         }
 
+        public IrrigationConfiguration GetIrrigationConfigurationByGUID(string mac)
+        {
+            lock (Locker)
+            {
+                var config = _database.Table<IrrigationConfiguration>().FirstOrDefault(x => x.DeviceGuid.Contains(mac));
+                return config;
+            }
+        }
+
         public void SaveIrrigationConfiguration(IrrigationConfiguration irrigationConfiguration)
         {
             lock (Locker)

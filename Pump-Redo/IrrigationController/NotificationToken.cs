@@ -2,7 +2,7 @@
 
 namespace Pump.IrrigationController
 {
-    public class NotificationToken
+    public class NotificationToken : IEntity
     {
         [JsonIgnore] public string Id { get; set; }
 

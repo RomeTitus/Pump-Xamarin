@@ -1,5 +1,4 @@
-﻿/*
-using Android.Content;
+﻿using Android.Content;
 namespace Pump.Droid.Notification
 {
     [BroadcastReceiver(Enabled = true, Label = "Local Notifications Broadcast Receiver")]
@@ -20,5 +19,3 @@ namespace Pump.Droid.Notification
         }
     }
 }
-*/
-
