@@ -37,15 +37,16 @@ namespace Pump.Layout.Views
 
         public void Populate()
         {
-            LabelSensorType.Text = Sensor.TYPE;
-            LabelSensorName.Text = Sensor.NAME;
-            if (Sensor.LastUpdated != null)
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                LabelSensorType.Text = Sensor.TYPE;
+                LabelSensorName.Text = Sensor.NAME;
+                if (Sensor.LastUpdated != null)
                 LabelSensorLastUpdated.Text = ScheduleTime.FromUnixTimeStampUtc(Sensor.LastUpdated.Value).ToLocalTime()
                     .ToString("dd/MM/yyyy HH:mm")
                     .ToString(CultureInfo.InvariantCulture);
 
-            Device.BeginInvokeOnMainThread(() =>
-            {
+            
                 switch (Sensor.TYPE)
                 {
                     case "Pressure Sensor":
