@@ -13,19 +13,27 @@ using Pump.Database;
 using Pump.Database.Table;
 using System.Linq;
 using Firebase;
+using Firebase.Auth;
+using Pump.SocketController.Firebase;
+using Firebase.Auth.Providers;
+using Pump.Class;
+using static Android.Gms.Common.Apis.Api;
+using Pump.Layout;
 
 namespace Pump.Droid.Notification
 {
     [Application]
     public class NotificationHandler : Application
     {
+        private User _user;
+        private FirebaseAuthClient _firebaseAuthClient;
+
         public NotificationHandler(IntPtr handle, JniHandleOwnership transer) : base(handle, transer)
         {
         }
         public override void OnCreate()
         {
             base.OnCreate();
-
 //            var options = new FirebaseOptions.Builder()
 // .SetApplicationId("pump-25eee")
 // .SetApiKey("AIzaSyBEa4RbHafLQjVUMZHCfSxVmEnEmhoHHVg")
@@ -52,6 +60,7 @@ namespace Pump.Droid.Notification
 #else
 	            FirebasePushNotificationManager.Initialize(this, new AndroidNotificationManager(), false, false);
 #endif
+            
             //Handle notification when app is closed here
             CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
             {
@@ -82,6 +91,7 @@ namespace Pump.Droid.Notification
             {
                 if (string.IsNullOrEmpty(p.Token))
                     return;
+                AuthenticateUser();
                 var notification = new NotificationToken
                 {
                     Id = Settings.Secure.GetString(Context.ContentResolver,
@@ -92,10 +102,44 @@ namespace Pump.Droid.Notification
                 Log.Info("PumpNotification", $"NewToken: {p.Token}");
 
                 var observableDict = new Dictionary<IrrigationConfiguration, ObservableIrrigation>();
-                var IrrigationConfigurationList = new DatabaseController().GetIrrigationConfigurationList();
-                IrrigationConfigurationList.ForEach(x => observableDict.Add(x, new ObservableIrrigation()));
-                var result = await new SocketPicker(new SocketController.Firebase.FirebaseManager(), observableDict).SendCommand(notification, IrrigationConfigurationList);
+                DatabaseController databaseController = new DatabaseController();
+                var database = databaseController;
+                var irrigationConfigurationList = database.GetIrrigationConfigurationList();
+                var userAuthentication = database.GetUserAuthentication();
+                irrigationConfigurationList.ForEach(x => observableDict.Add(x, new ObservableIrrigation()));
+                
+                var socketPicker = new SocketPicker(new FirebaseManager(), observableDict);
+                socketPicker.SetFirebaseUser(_user);
+                var result = await socketPicker.SendCommand(notification, irrigationConfigurationList);
             };
         }
+
+
+        private void AuthenticateUser()
+        {
+            if (_firebaseAuthClient != null)
+                return;
+
+            _firebaseAuthClient = new FirebaseAuthClient(new FirebaseAuthConfig
+            {
+                ApiKey = "AIzaSyDxfc71frXHM-gtVgynCft8rokK_Bl6r0c",
+                AuthDomain = "pump-25eee.firebaseapp.com",
+                Providers = new FirebaseAuthProvider[]
+                {
+                    new EmailProvider()
+                },
+                UserRepository = new StorageRepository()
+            });
+
+            _firebaseAuthClient.AuthStateChanged += ClientOnAuthStateChanged;
+        }
+
+
+        private void ClientOnAuthStateChanged(object sender, UserEventArgs e)
+        {
+            _user = e.User;
+        }
+
+
     }
 }

@@ -49,7 +49,7 @@ namespace Pump.SocketController
                 if (configuration.ConnectionType == 0)
                 {
                     if (user != null)
-                        _firebaseManager.InitializeFirebase(user);
+                        SetFirebaseUser(user);
                     _initializeFirebase.SubscribeFirebase();
                 }
 
@@ -59,6 +59,11 @@ namespace Pump.SocketController
                 }
             //else if (IrrigationConfiguration.ConnectionType == 2) 
             //    await _initializeBlueTooth.SubscribeBle();
+        }
+
+        public void SetFirebaseUser(User user)
+        {
+            _firebaseManager.InitializeFirebase(user);
         }
 
         public async Task<string> SendCommand<T>(T entity, IrrigationConfiguration targetedIrrigation) where T : IEntity
