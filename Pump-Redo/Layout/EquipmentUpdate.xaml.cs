@@ -70,7 +70,8 @@ namespace Pump.Layout
         {
             SystemPicker.SelectedIndexChanged += SystemPicker_OnSelectedIndexChanged;
             EquipmentName.Text = _equipment.NAME;
-            if(_observableFilterKeyValuePair.Value.SubControllerList.Any() == false)
+
+            if (_observableFilterKeyValuePair.Value.SubControllerList.Any() == false || _observableFilterKeyValuePair.Key.ControllerPairs.FirstOrDefault(x => x.Value.Contains(_observableFilterKeyValuePair.Value.SubControllerList.First().Id)).Value.Contains("MainController"))
                 SystemPicker.Items.Add("Main");
             
             foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)
@@ -175,7 +176,8 @@ namespace Pump.Layout
                 if (IsDirectOnlineCheckBox.IsChecked && IsPumpCheckBox.IsChecked)
                     _equipment.DirectOnlineGPIO =
                         long.Parse(DirectOnlineGpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
-                _equipment.AttachedSubController = SystemPicker.SelectedItem.ToString() == "Main" ? null : _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.SelectedIndex].Id;
+
+                _equipment.AttachedSubController = SystemPicker.SelectedItem.ToString() == "Main" ? null : _observableFilterKeyValuePair.Value.SubControllerList[SystemPicker.Items.Contains("Main")? SystemPicker.SelectedIndex -1: SystemPicker.SelectedIndex].Id;
                 
                 
                 

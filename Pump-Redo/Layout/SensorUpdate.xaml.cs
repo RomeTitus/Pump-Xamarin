@@ -83,7 +83,7 @@ namespace Pump.Layout
             
             
             SensorName.Text = _sensor.NAME;
-            if (_observableFilterKeyValuePair.Value.SubControllerList.Any() == false)
+            if (_observableFilterKeyValuePair.Value.SubControllerList.Any() == false || _observableFilterKeyValuePair.Key.ControllerPairs.FirstOrDefault(x => x.Value.Contains(_observableFilterKeyValuePair.Value.SubControllerList.First().Id)).Value.Contains("MainController"))
                 SystemPicker.Items.Add("Main");
 
             foreach (var subController in _observableFilterKeyValuePair.Value.SubControllerList)

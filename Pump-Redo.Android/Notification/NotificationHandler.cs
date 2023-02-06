@@ -11,14 +11,10 @@ using Android.Provider;
 using Pump.SocketController;
 using Pump.Database;
 using Pump.Database.Table;
-using System.Linq;
-using Firebase;
 using Firebase.Auth;
 using Pump.SocketController.Firebase;
 using Firebase.Auth.Providers;
 using Pump.Class;
-using static Android.Gms.Common.Apis.Api;
-using Pump.Layout;
 
 namespace Pump.Droid.Notification
 {
@@ -34,16 +30,6 @@ namespace Pump.Droid.Notification
         public override void OnCreate()
         {
             base.OnCreate();
-//            var options = new FirebaseOptions.Builder()
-// .SetApplicationId("pump-25eee")
-// .SetApiKey("AIzaSyBEa4RbHafLQjVUMZHCfSxVmEnEmhoHHVg")
-// .SetDatabaseUrl("https://pump-25eee.firebaseio.com")
-// .SetStorageBucket("pump-25eee.appspot.com")
-//.SetGcmSenderId("pump-25eee.appspot.com")
-// .Build();
-//            var fapp = FirebaseApp.InitializeApp(this, options);
-
-
 
             FirebasePushNotificationManager.NotificationActivityType = typeof(MainActivity);
             FirebasePushNotificationManager.NotificationActivityFlags = Android.Content.ActivityFlags.ClearTop | Android.Content.ActivityFlags.SingleTop;
@@ -60,7 +46,7 @@ namespace Pump.Droid.Notification
 #else
 	            FirebasePushNotificationManager.Initialize(this, new AndroidNotificationManager(), false, false);
 #endif
-            
+
             //Handle notification when app is closed here
             CrossFirebasePushNotification.Current.OnNotificationReceived += (s, p) =>
             {
@@ -87,6 +73,10 @@ namespace Pump.Droid.Notification
                     Log.Info("PumpNotification", "Notification Failed! " + e);
                 }
             };
+            
+            //Push Notification when signing in?
+            //var test = CrossFirebasePushNotification.Current.Token;
+
             CrossFirebasePushNotification.Current.OnTokenRefresh += async (s, p) =>
             {
                 if (string.IsNullOrEmpty(p.Token))
@@ -109,8 +99,11 @@ namespace Pump.Droid.Notification
                 irrigationConfigurationList.ForEach(x => observableDict.Add(x, new ObservableIrrigation()));
                 
                 var socketPicker = new SocketPicker(new FirebaseManager(), observableDict);
-                socketPicker.SetFirebaseUser(_user);
-                var result = await socketPicker.SendCommand(notification, irrigationConfigurationList);
+                if(_user != null)
+                {
+                    socketPicker.SetFirebaseUser(_user);
+                    var result = await socketPicker.SendCommand(notification, irrigationConfigurationList);
+                }
             };
         }
 
