@@ -8,6 +8,7 @@ using Pump.IrrigationController;
 using Pump.SocketController;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using static SQLite.SQLite3;
 
 namespace Pump.Layout.Views
 {
@@ -16,12 +17,15 @@ namespace Pump.Layout.Views
     {
         private readonly KeyValuePair<IrrigationConfiguration, ObservableIrrigation> _keyValueIrrigation;
         private readonly SocketPicker _socketPicker;
-        
+        private readonly ControllerSignalEvent _controllerSignalEvent;
+        public ControllerSignalEvent GetControllerSignalEvent() => _controllerSignalEvent;
+
         public ViewIrrigationConfigurationSummary(KeyValuePair<IrrigationConfiguration, ObservableIrrigation> keyValueIrrigation, SocketPicker socketPicker)
         {
             InitializeComponent();
             _keyValueIrrigation = keyValueIrrigation;
             _socketPicker = socketPicker;
+            _controllerSignalEvent = new ControllerSignalEvent();
             AutomationId = keyValueIrrigation.Key.Path;
             Device.BeginInvokeOnMainThread(() =>
             {
@@ -39,7 +43,7 @@ namespace Pump.Layout.Views
             
             SetExistingSites();
         }
-
+        
         private void SetExistingSites()
         {
             foreach (var controllerPair in _keyValueIrrigation.Key.ControllerPairs
@@ -81,7 +85,8 @@ namespace Pump.Layout.Views
         private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
         {
             var result = await ConnectionSuccessful();
-            
+            _controllerSignalEvent.UpdateSignalStrength(result, result ? 5 : 0);
+
             Device.BeginInvokeOnMainThread(() =>
             {
                 FrameSiteSummary.BackgroundColor = result ? Color.DeepSkyBlue : Color.Crimson;
@@ -139,6 +144,7 @@ namespace Pump.Layout.Views
                 now = ScheduleTime.GetUnixTimeStampUtcNow();
                 await Task.Delay(400);
                 SetSignalStrength(signalStrength);
+                _controllerSignalEvent.UpdateSignalStrength(null, signalStrength);
                 signalStrength++;
                 if (signalStrength > 5)
                     signalStrength = 1;

@@ -5,10 +5,9 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    xmlns:extensions="http://xamarin.com/schemas/2020/toolkit"
     x:Name="TabPageMain"
     BackgroundColor="Coral">
-
-
     <ContentPage.Content>
         <StackLayout>
             <AbsoluteLayout HorizontalOptions="FillAndExpand">
@@ -23,6 +22,20 @@
                     Text="Unknown"
                     TextColor="Azure"
                     VerticalOptions="FillAndExpand" />
+
+                <RelativeLayout
+                    AbsoluteLayout.LayoutBounds="1, -1, -1, 1"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    HeightRequest="40"
+                    Margin="0,0,0,5"
+                    HorizontalOptions="EndAndExpand">
+                    <Image HeightRequest="40" x:Name="ImageSignalStrength1" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_1.png}" IsVisible="True"/>
+                    <Image HeightRequest="40" x:Name="ImageSignalStrength2" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_2.png}" IsVisible="False"/>
+                    <Image HeightRequest="40" x:Name="ImageSignalStrength3" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_3.png}" IsVisible="False"/>
+                    <Image HeightRequest="40" x:Name="ImageSignalStrength4" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_4.png}" IsVisible="False"/>
+                    <Image HeightRequest="40" x:Name="ImageSignalStrength5" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_5.png}" IsVisible="False"/>
+                    <Image HeightRequest="40" x:Name="ImageSignalStrengthNoSignal" Source="{extensions:ImageResourceExtension Pump.Icons.Signal_NoSignal.png}" IsVisible="False"/>
+                </RelativeLayout>
             </AbsoluteLayout>
             <xct:TabView
                 x:Name="TabViewHome"

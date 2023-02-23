@@ -169,7 +169,7 @@ namespace Pump
             if (configurationSummary.GetIrrigationFilterConfigAndObservable(siteSummary.ObservableFiltered).Value == null)
                 return;
             var homeScreen = new HomeScreen(configurationSummary.GetIrrigationFilterConfigAndObservable(siteSummary.ObservableFiltered),
-                SocketPicker);
+                SocketPicker, configurationSummary.GetControllerSignalEvent());
             Navigation.PushModalAsync(homeScreen);
         }
 

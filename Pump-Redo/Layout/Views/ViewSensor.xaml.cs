@@ -19,11 +19,17 @@ namespace Pump.Layout.Views
         public void Populate(Sensor sensor)
         {
             LabelSensorName.Text = sensor.NAME;
+            
             LabelPin.Text = "Pin: " + sensor.GPIO;
+
             if (sensor.TYPE == "Pressure Sensor")
+            {
+                LabelPin.Text = "Pin: " + (sensor.GPIO - 37) + "A";
                 SensorImage.Source = ImageSource.FromResource(
-                    "Pump.Icons.PressureHigh.png",
-                    typeof(ImageResourceExtension).GetTypeInfo().Assembly);
+                        "Pump.Icons.PressureHigh.png",
+                        typeof(ImageResourceExtension).GetTypeInfo().Assembly);
+
+            }
             StackLayoutStatus.AddUpdateRemoveStatus(sensor.ControllerStatus);
         }
 

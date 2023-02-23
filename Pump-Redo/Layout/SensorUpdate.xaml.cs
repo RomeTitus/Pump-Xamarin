@@ -20,18 +20,16 @@ namespace Pump.Layout
             _observableFilterKeyValuePair;
 
         private readonly Sensor _sensor;
-        private readonly EquipmentScreen _equipmentScreen;
         private readonly List<string> _sensorTypesList = new List<string> { "Pressure Sensor", "Temperature Sensor" };
         private readonly SocketPicker _socketPicker;
         private readonly List<Sensor> _sensorList;
 
         public SensorUpdate(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
-            SocketPicker socketPicker, EquipmentScreen equipmentScreen, Sensor sensor = null)
+            SocketPicker socketPicker, Sensor sensor = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
-            _equipmentScreen = equipmentScreen;
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
             _sensorList = new List<Sensor>();
             
@@ -153,12 +151,15 @@ namespace Pump.Layout
                 SensorTypePicker.SelectedItem.ToString() == "Temperature Sensor"
                     ? GpioPins.GetAnalogGpioList()
                     : GpioPins.GetDigitalGpioList();
+            
             foreach (var pin in gpioPins.Where(x => controllerSensor.Select(y => y.GPIO).Contains(x) == false))
             {
                 GpioPicker.Items.Add("Pin: " + pin);
             }
-            
-            GpioPicker.SelectedIndex = GpioPicker.Items.IndexOf("Pin: " + _sensor.GPIO);
+            if(SensorTypePicker.SelectedItem.ToString() == "Pressure Sensor")
+                GpioPicker.SelectedIndex = GpioPicker.Items.IndexOf("Pin: " + (_sensor.GPIO -37));
+            else
+                GpioPicker.SelectedIndex = GpioPicker.Items.IndexOf("Pin: " + _sensor.GPIO);
         }
 
         private async void ButtonUpdateSensor_OnClicked(object sender, EventArgs e)
@@ -172,7 +173,14 @@ namespace Pump.Layout
             else
             {
                 _sensor.NAME = SensorName.Text;
-                _sensor.GPIO = long.Parse(GpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
+
+
+                _sensor.GPIO =
+                    SensorTypePicker.SelectedItem.ToString() == "Pressure Sensor" ||
+                    SensorTypePicker.SelectedItem.ToString() == "Temperature Sensor"
+                        ? long.Parse(GpioPicker.SelectedItem.ToString().Replace("Pin: ", "")) + 37
+                        : long.Parse(GpioPicker.SelectedItem.ToString().Replace("Pin: ", ""));
+
 
                 _sensor.TYPE = _sensorTypesList[SensorTypePicker.SelectedIndex];
 
@@ -199,8 +207,6 @@ namespace Pump.Layout
                     _observableFilterKeyValuePair.Value.SensorList.Add(_sensor);
                 }
 
-                _equipmentScreen.AddLoadingSensorScreenFromId(_sensor.Id);   
-                
                 await Navigation.PopModalAsync();
             }
         }

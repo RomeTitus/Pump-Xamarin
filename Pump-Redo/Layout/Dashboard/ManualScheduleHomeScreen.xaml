@@ -80,8 +80,7 @@
                         CornerRadius="10"
                         HorizontalOptions="FillAndExpand">
 
-
-                        <ScrollView HeightRequest="100">
+                        <ScrollView HeightRequest="200">
 
                             <FlexLayout
                                 x:Name="ScrollViewManualZone"
@@ -135,21 +134,23 @@
                         VerticalOptions="Center" />
                 </StackLayout>
 
-                <StackLayout>
-                    <Button
-                        x:Name="ButtonStartManual"
-                        BackgroundColor="DeepSkyBlue"
-                        Clicked="ButtonStartManual_Clicked"
-                        CornerRadius="10"
-                        Text="Start"
-                        TextColor="White" />
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                     <Button
                         x:Name="ButtonStopManual"
                         BackgroundColor="DeepSkyBlue"
                         Clicked="ButtonStopManual_Clicked"
+                        HorizontalOptions="CenterAndExpand"
                         CornerRadius="10"
                         IsEnabled="False"
                         Text="Stop"
+                        TextColor="White" />
+                    <Button
+                        x:Name="ButtonStartManual"
+                        BackgroundColor="DeepSkyBlue"
+                        HorizontalOptions="CenterAndExpand"
+                        Clicked="ButtonStartManual_Clicked"
+                        CornerRadius="10"
+                        Text="Start"
                         TextColor="White" />
                 </StackLayout>
 

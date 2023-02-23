@@ -21,17 +21,15 @@ namespace Pump.Layout
         private readonly KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation>
             _observableFilterKeyValuePair;
 
-        private readonly EquipmentScreen _equipmentScreen;
         private readonly SocketPicker _socketPicker;
 
         public EquipmentUpdate(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
-            SocketPicker socketPicker, EquipmentScreen equipmentScreen, Equipment equipment = null)
+            SocketPicker socketPicker, Equipment equipment = null)
         {
             InitializeComponent();
             _socketPicker = socketPicker;
             _observableFilterKeyValuePair = observableFilterKeyValuePair;
-            _equipmentScreen = equipmentScreen;
             _equipmentList = new List<Equipment>();
             
             observableFilterKeyValuePair.Value.EquipmentList.ForEach(x => _equipmentList.Add(x));
@@ -197,7 +195,6 @@ namespace Pump.Layout
                     _observableFilterKeyValuePair.Value.EquipmentList.Add(_equipment);
                 }
 
-                _equipmentScreen.AddLoadingEquipmentScreenFromId(_equipment.Id);   
                 await Navigation.PopModalAsync();
             }
         }

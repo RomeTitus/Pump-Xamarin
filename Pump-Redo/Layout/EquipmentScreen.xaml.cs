@@ -158,8 +158,7 @@ namespace Pump.Layout
             {
                 if (Navigation.ModalStack.Any(x => x.GetType() == typeof(EquipmentUpdate)))
                     return;
-                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, this,
-                    equipment));
+                await Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, equipment));
             }
                 
             else if (action == "Delete")
@@ -203,7 +202,7 @@ namespace Pump.Layout
             {
                 if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SensorUpdate)))
                     return;
-                await Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, this, sensor));
+                await Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, sensor));
             }
             else
             {
@@ -215,13 +214,6 @@ namespace Pump.Layout
                     await _socketPicker.SendCommand(sensor, _observableFilterKeyValuePair.Key);
                 }
             }
-        }
-        
-        public void AddLoadingEquipmentScreenFromId(string id)
-        {
-            var viewCustomSchedule = (ViewEquipment)
-                ScrollViewEquipment.Children.FirstOrDefault(x => x.AutomationId == id);
-            viewCustomSchedule?.AddStatusActivityIndicator();
         }
         
         public void AddLoadingSensorScreenFromId(string id)
@@ -239,14 +231,14 @@ namespace Pump.Layout
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(EquipmentUpdate)))
                 return;
-            Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker, this));
+            Navigation.PushModalAsync(new EquipmentUpdate(_observableFilterKeyValuePair, _socketPicker));
         }
 
         private void BtnAddSensor_OnPressed(object sender, EventArgs e)
         {
             if (Navigation.ModalStack.Any(x => x.GetType() == typeof(SensorUpdate)))
                 return;
-            Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker, this));
+            Navigation.PushModalAsync(new SensorUpdate(_observableFilterKeyValuePair, _socketPicker));
         }
 
         private string EquipmentScheduleValidate(Equipment equipment)

@@ -380,9 +380,9 @@ namespace Pump.SocketController
             var existingRecord = filterObservableCollectionIrrigation.FirstOrDefault(x => x.Id == record.Id);
             if (existingRecord == null)
             {
-                var manualEquipmentIds = record.ManualDetails.Select(x => x.id_Equipment);
-                var matchIds = manualEquipmentIds.Intersect(filteredEquipmentIds, StringComparer.OrdinalIgnoreCase);
-                if (matchIds.Any())
+                var manualEquipmentIds = record.ManualDetails?.Select(x => x.id_Equipment);
+                var matchIds = manualEquipmentIds?.Intersect(filteredEquipmentIds, StringComparer.OrdinalIgnoreCase);
+                if (matchIds != null && matchIds.Any())
                     filterObservableCollectionIrrigation.Add(record);
             }
             else

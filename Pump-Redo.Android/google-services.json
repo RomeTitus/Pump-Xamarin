@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:750223897486:android:ee6c5a8ccec967482e6adf",
         "android_client_info": {
-          "package_name": "com.Varkensvlei.Pump"
+          "package_name": "com.Varkensvlei.Pump_new"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "750223897486-9ggujc6urbhgkel04e5m3i80anlp86dj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.Varkensvlei.Pump",
+            "package_name": "com.Varkensvlei.Pump_new",
             "certificate_hash": "7a4b765c8c3a3198f43e9a6d61d6f0f5cb2bbfbb"
           }
         },
@@ -43,7 +43,7 @@
               "client_id": "750223897486-6bg7j117e5bsm283mkvp4b7lh0qvgoba.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.Varkensvlei.Pump"
+                "bundle_id": "com.Varkensvlei.Pump_new"
               }
             }
           ]
@@ -87,7 +87,7 @@
               "client_id": "750223897486-6bg7j117e5bsm283mkvp4b7lh0qvgoba.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.Varkensvlei.Pump"
+                "bundle_id": "com.Varkensvlei.Pump_new"
               }
             }
           ]
