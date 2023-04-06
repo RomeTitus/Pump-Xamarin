@@ -1,0 +1,106 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\activePump.png" />
+    <None Remove="Icons\ConnectionDown.png" />
+    <None Remove="Icons\CustomSchedule.png" />
+    <None Remove="Icons\expandImage.png" />
+    <None Remove="Icons\Failed.png" />
+    <None Remove="Icons\FieldSun.png" />
+    <None Remove="Icons\gearSetting.png" />
+    <None Remove="Icons\Home.png" />
+    <None Remove="Icons\Logo.png" />
+    <None Remove="Icons\ManualSchedule.png" />
+    <None Remove="Icons\NoConnection.png" />
+    <None Remove="Icons\PressureError.png" />
+    <None Remove="Icons\PressureHigh.png" />
+    <None Remove="Icons\PressureLow.png" />
+    <None Remove="Icons\pump.jpg" />
+    <None Remove="Icons\rain.png" />
+    <None Remove="Icons\setting.png" />
+    <None Remove="Icons\Signal_1.png" />
+    <None Remove="Icons\Signal_2.png" />
+    <None Remove="Icons\Signal_3.png" />
+    <None Remove="Icons\Signal_4.png" />
+    <None Remove="Icons\Signal_5.png" />
+    <None Remove="Icons\Signal_NoSignal.png" />
+    <None Remove="Icons\sprinkler.jpg" />
+    <None Remove="Icons\SwitchController.png" />
+    <None Remove="Icons\Temp_High.png" />
+    <None Remove="Icons\Temp_Low.png" />
+    <None Remove="Icons\Temp_Unknown.png" />
+    <None Remove="Icons\Transceiver_1.png" />
+    <None Remove="Icons\Transceiver_2.png" />
+    <None Remove="Icons\Transceiver_Success.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\ManualSchedule.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\activePump.png" />
+    <EmbeddedResource Include="Icons\ConnectionDown.png" />
+    <EmbeddedResource Include="Icons\CustomSchedule.png" />
+    <EmbeddedResource Include="Icons\expandImage.png" />
+    <EmbeddedResource Include="Icons\Failed.png" />
+    <EmbeddedResource Include="Icons\FieldSun.png" />
+    <EmbeddedResource Include="Icons\gearSetting.png" />
+    <EmbeddedResource Include="Icons\Home.png" />
+    <EmbeddedResource Include="Icons\Logo.png" />
+    <EmbeddedResource Include="Icons\NoConnection.png" />
+    <EmbeddedResource Include="Icons\PressureError.png" />
+    <EmbeddedResource Include="Icons\PressureHigh.png" />
+    <EmbeddedResource Include="Icons\PressureLow.png" />
+    <EmbeddedResource Include="Icons\pump.jpg" />
+    <EmbeddedResource Include="Icons\rain.png" />
+    <EmbeddedResource Include="Icons\setting.png" />
+    <EmbeddedResource Include="Icons\Signal_1.png" />
+    <EmbeddedResource Include="Icons\Signal_2.png" />
+    <EmbeddedResource Include="Icons\Signal_3.png" />
+    <EmbeddedResource Include="Icons\Signal_4.png" />
+    <EmbeddedResource Include="Icons\Signal_5.png" />
+    <EmbeddedResource Include="Icons\Signal_NoSignal.png" />
+    <EmbeddedResource Include="Icons\sprinkler.jpg" />
+    <EmbeddedResource Include="Icons\SwitchController.png" />
+    <EmbeddedResource Include="Icons\Temp_High.png" />
+    <EmbeddedResource Include="Icons\Temp_Low.png" />
+    <EmbeddedResource Include="Icons\Temp_Unknown.png" />
+    <EmbeddedResource Include="Icons\Transceiver_1.png" />
+    <EmbeddedResource Include="Icons\Transceiver_2.png" />
+    <EmbeddedResource Include="Icons\Transceiver_Success.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FirebaseAuthentication.net" Version="4.0.2" />
+    <PackageReference Include="FirebaseDatabase.net" Version="4.2.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Plugin.BLE" Version="3.0.0-beta.2" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="2.1.0" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
+    <PackageReference Include="Xamarin.CommunityToolkit" Version="2.0.5" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+    <PackageReference Include="Xamarin.Forms.MaskedEntry" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Layout\Page1.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
