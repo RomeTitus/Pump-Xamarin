@@ -143,7 +143,10 @@ namespace Pump.Layout.Views
 
                 now = ScheduleTime.GetUnixTimeStampUtcNow();
                 await Task.Delay(400);
-                SetSignalStrength(signalStrength);
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    SetSignalStrength(signalStrength);
+                });
                 _controllerSignalEvent.UpdateSignalStrength(null, signalStrength);
                 signalStrength++;
                 if (signalStrength > 5)

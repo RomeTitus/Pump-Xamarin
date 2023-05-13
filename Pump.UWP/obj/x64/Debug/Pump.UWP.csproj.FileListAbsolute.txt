@@ -169,6 +169,11 @@ C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\Xamarin.Fo
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\Pump.UWP.exe
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\Pump.UWP.pdb
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\ResourceHandlingTask.state
+C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_Core.resw
+C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_Linq.resw
+C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_PlatformServices.resw
+C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_Providers.resw
+C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Platforms.Windows.Strings_WindowsThreading.resw
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\priconfig.xml
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\priconfig.xml.intermediate
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\unfiltered.layout.resfiles
@@ -187,8 +192,3 @@ C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\MultipleQu
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\ProjectArchitectures.txt
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\.winmd_cache\$Microsoft.Graphics.Canvas.winmd_636160715180000000.json
 C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\.winmd_cache\$Microsoft.UI.Xaml.Markup.winmd_637934950560000000.json
-C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_Core.resw
-C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_Linq.resw
-C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_PlatformServices.resw
-C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Strings_Providers.resw
-C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\obj\x64\Debug\System.Reactive\en-US\System.Reactive.Platforms.Windows.Strings_WindowsThreading.resw
