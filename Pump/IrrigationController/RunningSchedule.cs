@@ -15,99 +15,119 @@ namespace Pump.IrrigationController
             _equipmentList = equipmentList;
         }
 
-        public IEnumerable<ActiveSchedule> GetActiveSchedule()
+        private IEnumerable<ActiveSchedule> GetActiveSchedules(bool loadNextWeek = false)
         {
-            var activeScheduleList = new List<ActiveSchedule>();
             if (_scheduleList == null)
                 return new List<ActiveSchedule>();
 
+            var activeScheduleList = new List<ActiveSchedule>();
+            var today = DateTime.Today;
             foreach (var schedule in _scheduleList)
             {
                 if (schedule.isActive == "0")
                     continue;
-
-
-                var hour = schedule.TIME.Split(':').First();
-                var minute = schedule.TIME.Split(':').Last();
-                var weekCalc = WeekCalculator(schedule.WEEK);
-                foreach (var startTime in weekCalc)
+                var scheduleTimeSplit = schedule.TIME.Split(':');
+                
+                foreach (var weekDay in schedule.WEEK.Split(','))
                 {
-                    var startTimeDateTime = startTime;
-                    startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(hour)) +
-                                         TimeSpan.FromMinutes(Convert.ToInt32(minute));
-
-                    foreach (var scheduleDetails in schedule.ScheduleDetails)
-                    {
-                        var activeSchedule = new ActiveSchedule
-                        {
-                            Id = schedule.Id + scheduleDetails.id_Equipment, Name = schedule.NAME,
-                            IdEquipment = scheduleDetails.id_Equipment
-                        };
-                        activeSchedule.NameEquipment =
-                            _equipmentList.FirstOrDefault(x => x?.Id == activeSchedule.IdEquipment)?.NAME;
-                        activeSchedule.IdPump = schedule.id_Pump;
-                        activeSchedule.NamePump =
-                            _equipmentList.FirstOrDefault(x => x?.Id == activeSchedule.IdPump)?.NAME;
-                        activeSchedule.StartTime = startTimeDateTime;
-                        activeSchedule.Week = schedule.WEEK;
-                        var durationHour = scheduleDetails.DURATION.Split(':').First();
-                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
-                        startTimeDateTime += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
-                                             TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
-                        activeSchedule.EndTime = startTimeDateTime;
-                        activeScheduleList.Add(activeSchedule);
-                    }
+                    if(string.IsNullOrEmpty(weekDay))
+                        continue;
+                    var scheduleDate = LastDay(today, weekDay, loadNextWeek).AddHours(Convert.ToInt32(scheduleTimeSplit.First())).AddMinutes(Convert.ToInt32(scheduleTimeSplit.Last()));
+                    var endTime = scheduleDate;
+                    
+                    activeScheduleList.AddRange(CreateActiveScheduleList(schedule, endTime, weekDay));
                 }
             }
-
-            var sortedList = activeScheduleList.OrderBy(o => o.StartTime).ToList();
-            return sortedList;
+            return activeScheduleList;
         }
 
-        private static IEnumerable<DateTime> WeekCalculator(string week)
+        private List<ActiveSchedule> CreateActiveScheduleList(Schedule schedule, DateTime endTime, string weekDay)
         {
-            var startTimeList = new List<DateTime>();
-            var weekStringDayList = week.Split(',');
-            var weekIntDayList = new List<int>();
-            if (weekStringDayList.Contains("SUNDAY"))
-                weekIntDayList.Add(0);
-            if (weekStringDayList.Contains("MONDAY"))
-                weekIntDayList.Add(1);
-            if (weekStringDayList.Contains("TUESDAY"))
-                weekIntDayList.Add(2);
-            if (weekStringDayList.Contains("WEDNESDAY"))
-                weekIntDayList.Add(3);
-            if (weekStringDayList.Contains("THURSDAY"))
-                weekIntDayList.Add(4);
-            if (weekStringDayList.Contains("FRIDAY"))
-                weekIntDayList.Add(5);
-            if (weekStringDayList.Contains("SATURDAY"))
-                weekIntDayList.Add(6);
-            foreach (var weekInt in weekIntDayList)
-            {
-                var startWeek = Convert.ToInt32(DateTime.Today.DayOfWeek);
-                var daysAhead = weekInt - startWeek;
-                if (daysAhead < 0)
-                    daysAhead += 7;
+            var activeScheduleList = new List<ActiveSchedule>();
+            
+            int? timeAdjustment = null;
+            var timeAdjustmentDetail = schedule.TimeAdjustment.Split(',')
+                .FirstOrDefault(x => x.Contains(weekDay.ToUpper()));
 
-                startTimeList.Add(DateTime.Today + TimeSpan.FromDays(daysAhead));
+            if (timeAdjustmentDetail is not null)
+            {
+                timeAdjustment = Convert.ToInt32(timeAdjustmentDetail.Split('@')[1]);   
+                endTime = endTime.AddSeconds(timeAdjustment.Value);
             }
 
-            return startTimeList;
+            foreach (var detail in schedule.ScheduleDetails)
+            {
+                var scheduleDetail = new ActiveSchedule
+                {
+                    Id = weekDay + "@" + schedule.Id, Name = schedule.NAME,
+                    IdEquipment = detail.id_Equipment,
+                    IdPump = schedule.id_Pump,
+                    TimeAdjustment = timeAdjustment,
+                    Weekday = weekDay
+                };
+                        
+                scheduleDetail.NameEquipment =
+                    _equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.IdEquipment)?.NAME;
+                scheduleDetail.NamePump =
+                    _equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.IdPump)?.NAME;
+
+                scheduleDetail.StartTime = endTime;
+                        
+                var durationHour = detail.DURATION.Split(':').First();
+                var durationMinute = detail.DURATION.Split(':').Last();
+                        
+                endTime += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                           TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                scheduleDetail.EndTime = endTime;
+
+                activeScheduleList.Add(scheduleDetail);
+            }
+
+            return activeScheduleList;
+        }
+
+        private static DateTime LastDay(DateTime date, string dayName, bool loadNextWeek)
+        {
+            var daysOfWeek = new List<string>
+            {
+                "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"
+            };
+
+            var targetDay = daysOfWeek.IndexOf(dayName.ToUpper());
+            
+            var deltaDay = targetDay - (int) date.DayOfWeek; 
+            if (deltaDay == 0)
+                deltaDay = 7;
+
+            switch (deltaDay)
+            {
+                case -7:
+                    return date;
+                case > 0:
+                    deltaDay -= 7; // go back 7 days
+                    break;
+            }
+
+            if (loadNextWeek)
+            {
+                return date + TimeSpan.FromDays(deltaDay+7);
+            }
+                
+            return date + TimeSpan.FromDays(deltaDay);
         }
 
         public IEnumerable<ActiveSchedule> GetRunningSchedule()
         {
-            var activeScheduleList = GetActiveSchedule();
+            var activeScheduleList = GetActiveSchedules();
             return activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
         }
 
         public IEnumerable<ActiveSchedule> GetQueSchedule()
         {
-            var activeScheduleList = GetActiveSchedule();
+            var activeScheduleList = GetActiveSchedules(true);
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(1)).ToList();
+                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(2)).ToList();
         }
     }
 }

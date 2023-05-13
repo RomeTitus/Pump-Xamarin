@@ -13,6 +13,10 @@ namespace Pump.IrrigationController
         }
 
         public string NAME { get; set; }
+        public string TimeAdjustment { get; set; }
+        
+        public bool AdaptiveSchedule { get; set; }
+        
         public string Key { get; set; }
         public string TIME { get; set; }
         public string WEEK { get; set; }

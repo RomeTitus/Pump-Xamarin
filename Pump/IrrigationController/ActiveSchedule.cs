@@ -12,7 +12,8 @@ namespace Pump.IrrigationController
         public string NamePump { get; set; }
         public string IdEquipment { get; set; }
         public string NameEquipment { get; set; }
-        public string Week { get; set; }
+        public string Weekday { get; set; }
+        public int? TimeAdjustment { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
     }

@@ -47,6 +47,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Icons\ManualSchedule.png" />
+    <None Remove="Icons\timeWarning.png" />
+    <EmbeddedResource Include="Icons\TimeWarning.png" />
   </ItemGroup>
 
   <ItemGroup>

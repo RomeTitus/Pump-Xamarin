@@ -38,9 +38,7 @@ namespace Pump.Layout.Views
             });
             
             keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
-            subscribeToOnlineStatus(this,
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            
+
             SetExistingSites();
         }
         
@@ -84,7 +82,10 @@ namespace Pump.Layout.Views
 
         private async void subscribeToOnlineStatus(object sender, NotifyCollectionChangedEventArgs e)
         {
+            _keyValueIrrigation.Value.AliveList.CollectionChanged -= subscribeToOnlineStatus;
             var result = await ConnectionSuccessful();
+            _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
+            
             _controllerSignalEvent.UpdateSignalStrength(result, result ? 5 : 0);
 
             Device.BeginInvokeOnMainThread(() =>
@@ -108,7 +109,6 @@ namespace Pump.Layout.Views
         private async Task<bool> ConnectionSuccessful()
         {
             int signalStrength = 2;
-            _keyValueIrrigation.Value.AliveList.CollectionChanged -= subscribeToOnlineStatus;
             var oldTime = ScheduleTime.GetUnixTimeStampUtcNow();
             var now = ScheduleTime.GetUnixTimeStampUtcNow();
             var requestedOnlineStatus = false;
@@ -122,7 +122,6 @@ namespace Pump.Layout.Views
                 if (aliveStatus?.ResponseTime < aliveStatus?.RequestedTime - delay &&
                     aliveStatus.RequestedTime > now - delay && !requestedOnlineStatus)
                 {
-                    _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
                     return false;
                 }
 
@@ -137,7 +136,6 @@ namespace Pump.Layout.Views
                 }
                 else if (aliveStatus?.ResponseTime >= aliveStatus?.RequestedTime && aliveStatus.ResponseTime >= now - 599)
                 {
-                    _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
                     return true;
                 }
 
@@ -153,7 +151,6 @@ namespace Pump.Layout.Views
                     signalStrength = 1;
             }
 
-            _keyValueIrrigation.Value.AliveList.CollectionChanged += subscribeToOnlineStatus;
             return false;
         }
 

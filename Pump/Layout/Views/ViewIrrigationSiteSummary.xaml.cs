@@ -16,14 +16,6 @@ namespace Pump.Layout.Views
         public ViewIrrigationSiteSummary(ObservableIrrigation observableFiltered, KeyValuePair<string, List<string>> keyValueSites)
         {
             InitializeComponent();
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                if (Device.RuntimePlatform == Device.UWP)
-                    ActivityIndicatorUwpLoadingIndicator.IsVisible = true;
-                else
-                    ActivityIndicatorMobileLoadingIndicator.IsVisible = true;
-            });
-            
             _observableFiltered = new ObservableFilteredIrrigation(observableFiltered, GetSubControllerIds(keyValueSites.Value));
             LabelSiteName.Text = keyValueSites.Key;
             SetConfigurationSummary();
@@ -44,13 +36,6 @@ namespace Pump.Layout.Views
         {
             if (_observableFiltered.LoadedData == false)
                 return;
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                    ActivityIndicatorUwpLoadingIndicator.IsVisible = false;
-                    ActivityIndicatorMobileLoadingIndicator.IsVisible = false;
-            });
-            
 
             var scheduleRunning = RunningCustomSchedule
                 .GetCustomScheduleDetailRunningList(_observableFiltered.CustomScheduleList.ToList()).Any();

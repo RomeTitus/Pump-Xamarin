@@ -25,15 +25,6 @@
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer x:Name="StackLayoutViewSiteTapGesture" />
                     </StackLayout.GestureRecognizers>
-                    <ActivityIndicator
-                        x:Name="ActivityIndicatorUwpLoadingIndicator"
-                        AutomationId="ActivityIndicator"
-                        HorizontalOptions="Center"
-                        IsEnabled="True"
-                        IsRunning="True"
-                        IsVisible="False"
-                        VerticalOptions="Center"
-                        Color="Black" />
                     <StackLayout Orientation="Horizontal">
                         <StackLayout Orientation="Vertical">
                             <Label
@@ -56,15 +47,6 @@
                                 IsVisible="False"
                                 Text=""
                                 VerticalOptions="CenterAndExpand" />
-                            <ActivityIndicator
-                                x:Name="ActivityIndicatorMobileLoadingIndicator"
-                                AutomationId="ActivityIndicator"
-                                HorizontalOptions="EndAndExpand"
-                                IsEnabled="True"
-                                IsRunning="True"
-                                IsVisible="False"
-                                VerticalOptions="Center"
-                                Color="Black" />
                             <Frame
                                 x:Name="FrameSchedule"
                                 Margin="0"

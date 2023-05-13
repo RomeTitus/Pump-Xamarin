@@ -16,15 +16,15 @@ namespace Pump.Layout.Views
         {
             InitializeComponent();
             AutomationId = activeSchedule.Id;
-            ActiveSchedule = activeSchedule;
+            this.ActiveSchedule = activeSchedule;
             if (size != null)
             {
                 HeightRequest = 150 * size.Value * 0.7;
                 LabelScheduleName.FontSize *= size.Value;
-                LablePump.FontSize *= size.Value;
-                LableZone.FontSize *= size.Value;
-                LableStartTime.FontSize *= size.Value * 0.7;
-                LableEndTime.FontSize *= size.Value * 0.7;
+                LabelPump.FontSize *= size.Value;
+                LabelZone.FontSize *= size.Value;
+                LabelStartTime.FontSize *= size.Value * 0.7;
+                LabelEndTime.FontSize *= size.Value * 0.7;
             }
 
             PopulateSchedule();
@@ -32,13 +32,13 @@ namespace Pump.Layout.Views
 
         public void PopulateSchedule()
         {
-            LabelScheduleName.Text = ActiveSchedule.Name;
-            LablePump.Text = ActiveSchedule.NamePump;
-            LableZone.Text = ActiveSchedule.NameEquipment;
-
+            LabelScheduleName.Text = ActiveSchedule.Weekday.Substring(0,3) + ": " + ActiveSchedule.Name;
+            LabelPump.Text = ActiveSchedule.NamePump;
+            LabelZone.Text = ActiveSchedule.NameEquipment;
+            
             var startTime = ActiveSchedule.StartTime.TimeOfDay;
 
-            LableStartTime.Text = "Start Time: \n" + startTime;
+            LabelStartTime.Text = "Start Time: \n" + startTime;
             timer_Elapsed(null, null);
             StartEvent();
         }
@@ -52,22 +52,28 @@ namespace Pump.Layout.Views
 
         private void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            string duration;
-            if (DateTime.Now >= ActiveSchedule.StartTime)
+            Device.BeginInvokeOnMainThread(() =>
             {
-                Device.BeginInvokeOnMainThread(() =>
+                string duration;
+                if (DateTime.Now >= ActiveSchedule.StartTime)
                 {
                     var span = ActiveSchedule.EndTime - DateTime.Now;
+                    if (ActiveSchedule.TimeAdjustment is not null)
+                        ImageTimeWarning.IsVisible = true;
+
                     duration = $"Time left: \n{span:hh\\:mm\\:ss}";
-                    LableEndTime.Text = duration;
-                });
-            }
-            else
-            {
-                var span = ActiveSchedule.EndTime - ActiveSchedule.StartTime;
-                duration = $"Duration: \n{span:hh\\:mm\\:ss}";
-                LableEndTime.Text = duration;
-            }
+                    LabelEndTime.Text = duration;
+                }
+                else
+                {
+                    var span = ActiveSchedule.EndTime - ActiveSchedule.StartTime;
+                    if (ActiveSchedule.TimeAdjustment is not null)
+                        ImageTimeWarning.IsVisible = true;
+
+                    duration = $"Duration: \n{span:hh\\:mm\\:ss}";
+                    LabelEndTime.Text = duration;
+                }
+            });
         }
     }
 }
