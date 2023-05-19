@@ -112,7 +112,7 @@ namespace Pump
 
 
                 var viewSite = ScrollViewSite.Children.FirstOrDefault(x =>
-                    x.AutomationId == configuration.Path.ToString());
+                    x.AutomationId == configuration.Path);
 
                 if (viewSite == null)
                 {
