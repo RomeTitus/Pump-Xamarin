@@ -23,6 +23,7 @@ namespace Pump.IrrigationController
                             Name = schedule.NAME,
                             IdEquipment = scheduleDetails.id_Equipment
                         };
+                        
                         activeSchedule.NameEquipment =
                             equipmentList.FirstOrDefault(x => x?.Id == activeSchedule.IdEquipment)?.NAME;
                         activeSchedule.IdPump = schedule.id_Pump;

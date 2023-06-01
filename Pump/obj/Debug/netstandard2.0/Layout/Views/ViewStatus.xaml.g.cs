@@ -23,6 +23,9 @@ namespace Pump.Layout.Views {
         private global::Xamarin.Forms.Image Transceiver2;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "2.0.0.0")]
+        private global::Xamarin.Forms.Image TimeWarningFailed;
+        
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "2.0.0.0")]
         private global::Xamarin.Forms.Image ImageFailed;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "2.0.0.0")]
@@ -33,6 +36,7 @@ namespace Pump.Layout.Views {
             global::Xamarin.Forms.Xaml.Extensions.LoadFromXaml(this, typeof(ViewStatus));
             Transceiver1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Image>(this, "Transceiver1");
             Transceiver2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Image>(this, "Transceiver2");
+            TimeWarningFailed = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Image>(this, "TimeWarningFailed");
             ImageFailed = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Image>(this, "ImageFailed");
             TransceiverSuccess = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Image>(this, "TransceiverSuccess");
         }

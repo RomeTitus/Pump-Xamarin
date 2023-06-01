@@ -23,7 +23,7 @@ namespace Pump.Layout {
         private global::Xamarin.Forms.CheckBox CheckBoxCompleted;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "2.0.0.0")]
-        private global::Xamarin.Forms.CheckBox CheckBoxFailed;
+        private global::Xamarin.Forms.Label StatusLabel;
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Forms.Build.Tasks.XamlG", "2.0.0.0")]
         private global::Xamarin.Forms.Label LabelSteps;
@@ -33,7 +33,7 @@ namespace Pump.Layout {
             global::Xamarin.Forms.Xaml.Extensions.LoadFromXaml(this, typeof(PopupControllerStatus));
             LabelExecutionTime = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "LabelExecutionTime");
             CheckBoxCompleted = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.CheckBox>(this, "CheckBoxCompleted");
-            CheckBoxFailed = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.CheckBox>(this, "CheckBoxFailed");
+            StatusLabel = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "StatusLabel");
             LabelSteps = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "LabelSteps");
         }
     }

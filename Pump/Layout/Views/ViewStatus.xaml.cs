@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Pump.IrrigationController;
 using Xamarin.Forms;
@@ -14,12 +15,15 @@ namespace Pump.Layout.Views
         private ControllerStatus _status;
         private readonly Timer _timer;
         private readonly PopupControllerStatus _popupControllerStatus;
+        
+        private readonly List<Image> _imageList;
         public ViewStatus(ControllerStatus status)
         {
             InitializeComponent();
             _timer = new Timer(500);
             _timer.Elapsed += TimerOnElapsed;
             _popupControllerStatus = new PopupControllerStatus(status);
+            _imageList = new List<Image>{Transceiver1, Transceiver2, TimeWarningFailed, ImageFailed, TransceiverSuccess};
             UpdateView(status);
         }
 
@@ -30,19 +34,21 @@ namespace Pump.Layout.Views
 
             Device.BeginInvokeOnMainThread(() =>
             {
-                if (_status.Complete)
+                _imageList.ForEach(x => x.IsVisible = false);
+                if (!_status.Complete)
+                    return;
+
+                switch (_status.StatusType)
                 {
-                    Transceiver1.IsVisible = false;
-                        Transceiver2.IsVisible = false;
-                        ImageFailed.IsVisible = _status.Failed;
-                        TransceiverSuccess.IsVisible = !_status.Failed;
-                }
-                else
-                {
-                    Transceiver1.IsVisible = false;
-                    Transceiver2.IsVisible = false;
-                    ImageFailed.IsVisible = false;
-                    TransceiverSuccess.IsVisible = false;
+                    case StatusTypeEnum.Success:
+                        TransceiverSuccess.IsVisible = true;
+                        break;
+                    case StatusTypeEnum.ReachFail or StatusTypeEnum.UnknownFailure:
+                        ImageFailed.IsVisible = true;
+                        break;
+                    case StatusTypeEnum.TimeAdjusted:
+                        TimeWarningFailed.IsVisible = true;
+                        break;
                 }
             });
             _popupControllerStatus.Populate(status);

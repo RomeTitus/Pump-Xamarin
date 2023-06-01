@@ -30,7 +30,7 @@ namespace Pump.Layout
                     .ToString("dd/MM/yyyy HH:mm")
                     .ToString(CultureInfo.InvariantCulture);
             CheckBoxCompleted.IsChecked = status.Complete;
-            CheckBoxFailed.IsChecked = status.Failed;
+            StatusLabel.Text = status.StatusType?.ToString();
             var steps = "";
             status.Steps.ForEach(x => steps += x);
             LabelSteps.Text = steps;

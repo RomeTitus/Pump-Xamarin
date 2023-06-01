@@ -14,6 +14,7 @@
             </RelativeLayout.GestureRecognizers>
             <Image x:Name="Transceiver1" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_1.png}" VerticalOptions="Center" IsVisible="False"/>
             <Image x:Name="Transceiver2" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_2.png}" VerticalOptions="Center" IsVisible="False"/>
+            <Image x:Name="TimeWarningFailed" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.TimeWarning.png}" VerticalOptions="Center" IsVisible="False"/>
             <Image x:Name="ImageFailed" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Failed.png}" VerticalOptions="Center" IsVisible="False"/>
             <Image x:Name="TransceiverSuccess" HeightRequest="30" Source="{localImage:ImageResourceExtension Pump.Icons.Transceiver_Success.png}" VerticalOptions="Center" IsVisible="False"/>
         </RelativeLayout>
