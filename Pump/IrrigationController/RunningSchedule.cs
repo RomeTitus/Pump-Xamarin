@@ -1,28 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using Pump.Class;
 
 namespace Pump.IrrigationController
 {
-    internal class RunningSchedule
+    internal static class RunningSchedule
     {
-        private readonly IEnumerable<Equipment> _equipmentList;
-        private readonly IEnumerable<Schedule> _scheduleList;
-
-        public RunningSchedule(IEnumerable<Schedule> scheduleList, IEnumerable<Equipment> equipmentList)
+        
+        private static IEnumerable<ActiveSchedule> GetActiveSchedules(ObservableCollection<CustomSchedule> scheduleList, ObservableCollection<Equipment> equipmentList)
         {
-            _scheduleList = scheduleList;
-            _equipmentList = equipmentList;
+            if (scheduleList == null)
+                return new List<ActiveSchedule>();
+
+            var activeScheduleList = new List<ActiveSchedule>();
+            
+            foreach (var schedule in scheduleList)
+            {
+                if (schedule.StartTime == 0)
+                    continue;
+                activeScheduleList.AddRange(CreateActiveScheduleList(schedule, equipmentList));
+            }
+            return activeScheduleList;
+        }
+        
+        private static IEnumerable<ActiveSchedule> CreateActiveScheduleList(CustomSchedule schedule, ObservableCollection<Equipment> equipmentList)
+        {
+            var activeScheduleList = new List<ActiveSchedule>();
+            
+            var startTime = schedule.StartTime;
+            if (schedule.TimeAdjustment is not null)
+            {
+                startTime -= schedule.TimeAdjustment.Value;
+            }
+            
+            var customDateTimeStart =  ScheduleTime.FromUnixTimeStampUtc(startTime);
+                
+            for (int i = 0; i < schedule.Repeat; i++)
+            {
+                foreach (var scheduleDetail in schedule.ScheduleDetails)
+                {
+                    var activeSchedule = new ActiveSchedule
+                    {
+                        Id = schedule.Id + i,
+                        TimeAdjustment = schedule.TimeAdjustment,
+                        Name = schedule.NAME,
+                        Weekday = null,
+                        IdPump = schedule.id_Pump,
+                        NamePump = equipmentList.FirstOrDefault(x => x.Id == schedule.id_Pump)?.NAME,
+                        IdEquipment = scheduleDetail.id_Equipment,
+                        NameEquipment = equipmentList.FirstOrDefault(x => x.Id == scheduleDetail.id_Equipment)?.NAME,
+                        StartTime = customDateTimeStart
+                    };
+                        
+                    var durationHour = scheduleDetail.DURATION.Split(':').First();
+                    var durationMinute = scheduleDetail.DURATION.Split(':').Last();
+                    customDateTimeStart += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                           TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                    activeSchedule.EndTime = customDateTimeStart;
+                    activeScheduleList.Add(activeSchedule);
+                }
+            }
+
+            return activeScheduleList;
         }
 
-        private IEnumerable<ActiveSchedule> GetActiveSchedules(bool loadNextWeek = false)
+        private static IEnumerable<ActiveSchedule> GetActiveSchedules(ObservableCollection<Schedule> scheduleList, ObservableCollection<Equipment> equipmentList, bool loadNextWeek = false)
         {
-            if (_scheduleList == null)
+            if (scheduleList == null)
                 return new List<ActiveSchedule>();
 
             var activeScheduleList = new List<ActiveSchedule>();
             var today = DateTime.Today;
-            foreach (var schedule in _scheduleList)
+            foreach (var schedule in scheduleList)
             {
                 if (schedule.isActive == "0")
                     continue;
@@ -35,13 +86,13 @@ namespace Pump.IrrigationController
                     var scheduleDate = LastDay(today, weekDay, loadNextWeek).AddHours(Convert.ToInt32(scheduleTimeSplit.First())).AddMinutes(Convert.ToInt32(scheduleTimeSplit.Last()));
                     var endTime = scheduleDate;
                     
-                    activeScheduleList.AddRange(CreateActiveScheduleList(schedule, endTime, weekDay));
+                    activeScheduleList.AddRange(CreateActiveScheduleList(schedule, equipmentList, endTime, weekDay));
                 }
             }
             return activeScheduleList;
         }
 
-        private List<ActiveSchedule> CreateActiveScheduleList(Schedule schedule, DateTime endTime, string weekDay)
+        private static IEnumerable<ActiveSchedule> CreateActiveScheduleList(Schedule schedule, ObservableCollection<Equipment> equipmentList, DateTime endTime, string weekDay)
         {
             var activeScheduleList = new List<ActiveSchedule>();
             
@@ -65,11 +116,11 @@ namespace Pump.IrrigationController
                     TimeAdjustment = timeAdjustment,
                     Weekday = weekDay
                 };
-                        
+
                 scheduleDetail.NameEquipment =
-                    _equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.IdEquipment)?.NAME;
+                    equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.IdEquipment)?.NAME;
                 scheduleDetail.NamePump =
-                    _equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.IdPump)?.NAME;
+                    equipmentList.FirstOrDefault(x => x?.Id == scheduleDetail.IdPump)?.NAME;
 
                 scheduleDetail.StartTime = endTime;
                         
@@ -115,19 +166,127 @@ namespace Pump.IrrigationController
                 
             return date + TimeSpan.FromDays(deltaDay);
         }
-
-        public IEnumerable<ActiveSchedule> GetRunningSchedule()
+        
+        public static DateTime? GetScheduleRunningTimeForEquipment(this CustomSchedule schedule, int selectIndex)
         {
-            var activeScheduleList = GetActiveSchedules();
+            try
+            {
+                var startTimeDateTime = DateTime.UtcNow;
+                var index = 0;
+                for (var i = 0; i < schedule.Repeat + 1; i++)
+                    foreach (var scheduleDetails in schedule.ScheduleDetails)
+                    {
+                        if (index == selectIndex) return startTimeDateTime;
+                        //gets Next Schedule Start Time
+                        var durationHour = scheduleDetails.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                        var endTimeDateTime = startTimeDateTime - (TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                                                   TimeSpan.FromMinutes(Convert.ToInt32(durationMinute))
+                            );
+                        startTimeDateTime = endTimeDateTime;
+                        index++;
+                    }
+            }
+            catch
+            {
+                // ignored
+            }
+            return null;
+        }
+
+        public static DateTime? GetScheduleEndTime(this CustomSchedule schedule)
+        {
+            try
+            {
+                var startTime = schedule.StartTime;
+                if (schedule.TimeAdjustment is not null)
+                {
+                    startTime -= schedule.TimeAdjustment.Value;
+                }
+            
+                var customDateTimeStart =  ScheduleTime.FromUnixTimeStampUtc(startTime);
+                
+                for (var i = 0; i < schedule.Repeat + 1; i++)
+                    foreach (var scheduleDetails in schedule.ScheduleDetails)
+                    {
+                        //gets Next Schedule Start Time
+                        var durationHour = scheduleDetails.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                        var endTimeDateTime = customDateTimeStart + TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                              TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                        customDateTimeStart = endTimeDateTime;
+                    }
+                return customDateTimeStart;
+            }
+            catch
+            {
+                // ignored
+            }
+            return null;
+        }
+        
+        public static ScheduleDetail GetScheduleDetailRunning(this CustomSchedule schedule)
+        {
+            try
+            {
+                var startTime = schedule.StartTime;
+                if (schedule.TimeAdjustment is not null)
+                {
+                    startTime -= schedule.TimeAdjustment.Value;
+                }
+            
+                var customDateTimeStart =  ScheduleTime.FromUnixTimeStampUtc(startTime);
+                
+                var currentTime = DateTime.UtcNow;
+                var index = 0;
+                for (var i = 0; i < schedule.Repeat + 1; i++)
+                    foreach (var scheduleDetails in schedule.ScheduleDetails)
+                    {
+                        //gets Next Schedule Start Time
+                        scheduleDetails.ID = index.ToString();
+                        var durationHour = scheduleDetails.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetails.DURATION.Split(':').Last();
+                        var endTimeDateTime = customDateTimeStart + TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                              TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                        if (customDateTimeStart < currentTime && endTimeDateTime > currentTime)
+                            return scheduleDetails.Clone();
+                        customDateTimeStart = endTimeDateTime;
+                        index++;
+                    }
+            }
+            catch
+            {
+                // ignored
+            }
+            return null;
+        }
+        
+        public static IEnumerable<ActiveSchedule> GetRunningSchedule(this ObservableCollection<Schedule> scheduleList, ObservableCollection<Equipment> equipmentList)
+        {
+            var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
             return activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
         }
 
-        public IEnumerable<ActiveSchedule> GetQueSchedule()
+        public static IEnumerable<ActiveSchedule> GetQueSchedule(this ObservableCollection<Schedule> scheduleList, ObservableCollection<Equipment> equipmentList)
         {
-            var activeScheduleList = GetActiveSchedules(true);
+            var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList, true);
             return activeScheduleList.Where(activeSchedule =>
                 activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(2)).ToList();
+        }
+        
+        public static IEnumerable<ActiveSchedule> GetRunningSchedule(this ObservableCollection<CustomSchedule> scheduleList, ObservableCollection<Equipment> equipmentList)
+        {
+            var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
+            return activeScheduleList.Where(activeSchedule =>
+                activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
+        }
+        
+        public static IEnumerable<ActiveSchedule> GetQueSchedule(this ObservableCollection<CustomSchedule> scheduleList, ObservableCollection<Equipment> equipmentList)
+        {
+            var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
+            return activeScheduleList.Where(activeSchedule =>
+                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(7)).ToList();
         }
     }
 }

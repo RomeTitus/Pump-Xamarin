@@ -24,7 +24,7 @@ namespace Pump.Layout.Views
 
         public void Populate(CustomSchedule schedule)
         {
-            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(Schedule);
+            var endTime = Schedule.GetScheduleEndTime();
             
             SwitchScheduleIsActive.AutomationId ??= Schedule.Id;
             StackLayoutViewSchedule.AutomationId ??= Schedule.Id;
@@ -32,7 +32,7 @@ namespace Pump.Layout.Views
             LabelScheduleRepeat.Text = "Repeat: " + Schedule.Repeat;
             if (endTime != null)
             {
-                if (RunningCustomSchedule.GetCustomScheduleDetailRunning(Schedule) != null)
+                if (Schedule.GetScheduleDetailRunning() != null)
                 {
                     var timeLeft = (TimeSpan)(endTime - DateTime.UtcNow);
                     LabelScheduleTime.Text = "Time left: " + ScheduleTime.ConvertTimeSpanToString(timeLeft);

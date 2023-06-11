@@ -37,12 +37,11 @@ namespace Pump.Layout.Views
             if (_observableFiltered.LoadedData == false)
                 return;
 
-            var scheduleRunning = RunningCustomSchedule
-                .GetCustomScheduleDetailRunningList(_observableFiltered.CustomScheduleList.ToList()).Any();
-
+            var scheduleRunning = _observableFiltered.CustomScheduleList.Select(x => x.GetScheduleDetailRunning()).Any(result => result != null);
+            
             if (!scheduleRunning)
-                scheduleRunning = new RunningSchedule(_observableFiltered.ScheduleList.ToList(),
-                    _observableFiltered.EquipmentList.ToList()).GetRunningSchedule().Any();
+                scheduleRunning = _observableFiltered.ScheduleList
+                    .GetRunningSchedule(_observableFiltered.EquipmentList).Any();
 
             if (!scheduleRunning) scheduleRunning = _observableFiltered.ManualScheduleList.Any();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Timers;
 using Pump.Class;
 using Pump.Database.Table;
 using Pump.IrrigationController;
@@ -21,7 +22,7 @@ namespace Pump.Layout.Dashboard
 
         private readonly SocketPicker _socketPicker;
         private FloatingScreenScroll _floatingScreenScroll;
-
+        private Timer _timer;
         public ManualScheduleHomeScreen(
             KeyValuePair<IrrigationConfiguration, ObservableFilteredIrrigation> observableFilterKeyValuePair,
             SocketPicker socketPicker)
@@ -33,7 +34,7 @@ namespace Pump.Layout.Dashboard
             _observableFilterKeyValuePair.Value.EquipmentList.CollectionChanged += PopulateManualElementsEvent;
             PopulateManualElements();
         }
-
+        
         private void PopulateManualElementsEvent(object sender,
             NotifyCollectionChangedEventArgs e)
         {
@@ -59,7 +60,18 @@ namespace Pump.Layout.Dashboard
                     else
                         ((Button)existingButton).Text = equipment.NAME;
                 }
- 
+
+                //The buttons do not render unless we create a view, temp fix for UWP
+                if (Device.RuntimePlatform == Device.UWP && _timer == null)
+                {
+                    ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Pump Found Here", automationId:"-848"));
+                    ScrollViewManualZone.Children.Add(new ViewEmptySchedule("No Zone Found Here", automationId:"-848"));
+                    
+                    _timer = new Timer(300); // 0.3 seconds
+                    _timer.Elapsed += RemoveUnusedUwpView;
+                    _timer.Enabled = true;
+                }
+                
                 if (_observableFilterKeyValuePair.Value.EquipmentList.Count(x => x.isPump) == 0)
                     ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Pump Found Here"));
 
@@ -75,7 +87,6 @@ namespace Pump.Layout.Dashboard
             }
             StackLayoutStatus.AddUpdateRemoveStatus(_observableFilterKeyValuePair.Value.ManualScheduleList.FirstOrDefault()?.ControllerStatus);
         }
-
         private void DisplayActiveButtons()
         {
             //Sorts Out all the button color stuff
@@ -296,6 +307,14 @@ namespace Pump.Layout.Dashboard
             _floatingScreenScroll = new FloatingScreenScroll { IsStackLayout = false };
             _floatingScreenScroll.SetFloatingScreen(equipment);
             PopupNavigation.Instance.PushAsync(_floatingScreenScroll);
+        }
+        
+        private void RemoveUnusedUwpView(object sender, ElapsedEventArgs e)
+        {
+            var timer = (Timer)sender;
+            timer.Enabled = false;
+            Device.BeginInvokeOnMainThread(ScreenCleanupForManualScreen);
+            
         }
     }
 }

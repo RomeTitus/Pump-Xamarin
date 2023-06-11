@@ -17,6 +17,9 @@ namespace Pump.IrrigationController
         public string Key { get; set; }
         public long StartTime { get; set; }
         public long Repeat { get; set; }
+        public int? TimeAdjustment { get; set; }
+        
+        public bool AdaptiveSchedule { get; set; }
 
         [JsonIgnore] public string Id { get; set; }
         [JsonIgnore] public bool HasUpdated { get; set; }

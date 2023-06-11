@@ -10,10 +10,10 @@ namespace Pump.Layout
     {
         public bool IsStackLayout = true;
 
-        public FloatingScreenScroll(double hightRequest = 600)
+        public FloatingScreenScroll(double heightRequest = 600)
         {
             InitializeComponent();
-            FloatingScreenMainStackLayout.HeightRequest = hightRequest;
+            FloatingScreenMainStackLayout.HeightRequest = heightRequest;
         }
 
         public void SetFloatingScreen(IEnumerable<object> screens)

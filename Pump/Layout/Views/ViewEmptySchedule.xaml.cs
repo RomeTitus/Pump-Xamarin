@@ -6,7 +6,7 @@ namespace Pump.Layout.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ViewEmptySchedule : ContentView
     {
-        public ViewEmptySchedule(string text = "", double? size = null)
+        public ViewEmptySchedule(string text = "", double? size = null, string automationId = "-849")
         {
             InitializeComponent();
             if (size != null)
@@ -16,12 +16,7 @@ namespace Pump.Layout.Views
             }
 
             EmptyScheduleLabel.Text = text;
-            Populate();
-        }
-
-        private void Populate()
-        {
-            AutomationId = "-849";
+            AutomationId = automationId;
         }
     }
 }

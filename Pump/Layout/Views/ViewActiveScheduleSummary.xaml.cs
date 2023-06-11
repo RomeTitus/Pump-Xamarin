@@ -32,7 +32,11 @@ namespace Pump.Layout.Views
 
         public void PopulateSchedule()
         {
-            LabelScheduleName.Text = ActiveSchedule.Weekday.Substring(0,3) + ": " + ActiveSchedule.Name;
+            if(ActiveSchedule.Weekday is not null)
+                LabelScheduleName.Text = ActiveSchedule.Weekday.Substring(0,3) + ": " + ActiveSchedule.Name;
+            else
+                LabelScheduleName.Text = ActiveSchedule.Name;
+
             LabelPump.Text = ActiveSchedule.NamePump;
             LabelZone.Text = ActiveSchedule.NameEquipment;
             

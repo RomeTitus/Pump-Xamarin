@@ -25,8 +25,8 @@ namespace Pump.Layout.Views
 
         public void UpdateScheduleSummary()
         {
-            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(CustomSchedule);
-            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
+            var runningScheduleDetail = CustomSchedule.GetScheduleDetailRunning();
+            var endTime = CustomSchedule.GetScheduleEndTime();
             if (endTime != null)
             {
                 var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));
@@ -51,8 +51,8 @@ namespace Pump.Layout.Views
 
         private void SetScheduleSummary()
         {
-            var runningScheduleDetail = RunningCustomSchedule.GetCustomScheduleDetailRunning(CustomSchedule);
-            var endTime = new RunningCustomSchedule().getCustomScheduleEndTime(CustomSchedule);
+            var runningScheduleDetail = CustomSchedule.GetScheduleDetailRunning();
+            var endTime = CustomSchedule.GetScheduleEndTime();
             if (endTime != null)
             {
                 var timeLeft = (TimeSpan)(endTime - ScheduleTime.FromUnixTimeStampLocal(CustomSchedule.StartTime));

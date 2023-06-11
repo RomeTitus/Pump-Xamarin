@@ -8,7 +8,7 @@ namespace Pump.Layout;
 
 public static class LayoutHelper
 {
-    public static Layout<View> RemoveUnusedViews(this Layout<View> layoutView, List<string> itemsThatAreOnDisplay)
+    public static void RemoveUnusedViews(this Layout<View> layoutView, List<string> itemsThatAreOnDisplay)
     {
         for (var index = 0; index < layoutView.Children.Count; index++)
         {
@@ -18,7 +18,11 @@ public static class LayoutHelper
             layoutView.Children.RemoveAt(index);
             index--;
         }
-        return layoutView;
+    }
+    
+    public static void RemoveUnusedViews(this Layout<View> layoutView, string itemsThatAreOnDisplay)
+    {
+        RemoveUnusedViews(layoutView, new List<string> { itemsThatAreOnDisplay });
     }
     
     public static Layout<View> DisplayActivityLoading(this Layout<View> layoutView)

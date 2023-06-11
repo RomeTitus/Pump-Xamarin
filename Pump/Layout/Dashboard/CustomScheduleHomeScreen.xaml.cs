@@ -287,9 +287,7 @@ namespace Pump.Layout.Dashboard
                         .NAME + "\nConfirm to skip to this zone ?", "Confirm",
                     "cancel")) return;
             if (_viewSchedule == null) return;
-            var nullableStartTime =
-                RunningCustomSchedule.GetCustomScheduleRunningTimeForEquipment(_viewSchedule.CustomSchedule,
-                    selectIndex);
+            var nullableStartTime = _viewSchedule.CustomSchedule.GetScheduleRunningTimeForEquipment(selectIndex);
             if (nullableStartTime != null)
             {
                 var startTime = (DateTime)nullableStartTime;

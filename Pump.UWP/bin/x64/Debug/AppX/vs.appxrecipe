@@ -29,13 +29,13 @@
     <AppXManifest Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-30T16:51:37.731</Modified>
+      <Modified>2023-06-11T13:30:02.059</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\Pump.UWP.exe">
       <PackagePath>entrypoint\Pump.UWP.exe</PackagePath>
-      <Modified>2023-05-30T16:51:36.649</Modified>
+      <Modified>2023-06-11T13:30:01.125</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\.nuget\packages\firebaseauthentication.net\4.0.2\lib\netstandard2.0\Firebase.Auth.dll">
       <PackagePath>Firebase.Auth.dll</PackagePath>
@@ -139,7 +139,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump\bin\Debug\netstandard2.0\Pump.dll">
       <PackagePath>Pump.dll</PackagePath>
-      <Modified>2023-05-31T16:28:16.669</Modified>
+      <Modified>2023-06-11T13:33:28.234</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\.nuget\packages\win2d.uwp\1.20.0\lib\uap10.0\Microsoft.Graphics.Canvas.winmd">
       <PackagePath>Microsoft.Graphics.Canvas.winmd</PackagePath>
@@ -156,153 +156,153 @@
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\LargeTile.scale-100.png">
       <PackagePath>Assets\LargeTile.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.442</Modified>
+      <Modified>2023-06-07T17:33:45.033</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\LargeTile.scale-200.png">
       <PackagePath>Assets\LargeTile.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.443</Modified>
+      <Modified>2023-06-07T17:33:45.033</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\LargeTile.scale-400.png">
       <PackagePath>Assets\LargeTile.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.444</Modified>
+      <Modified>2023-06-07T17:33:45.033</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\SmallTile.scale-100.png">
       <PackagePath>Assets\SmallTile.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.444</Modified>
+      <Modified>2023-06-07T17:33:45.033</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\SmallTile.scale-200.png">
       <PackagePath>Assets\SmallTile.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.445</Modified>
+      <Modified>2023-06-07T17:33:45.042</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\SmallTile.scale-400.png">
       <PackagePath>Assets\SmallTile.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.445</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\SplashScreen.scale-100.png">
       <PackagePath>Assets\SplashScreen.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.446</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\SplashScreen.scale-200.png">
       <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.446</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\SplashScreen.scale-400.png">
       <PackagePath>Assets\SplashScreen.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.447</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square150x150Logo.scale-100.png">
       <PackagePath>Assets\Square150x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.447</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square150x150Logo.scale-200.png">
       <PackagePath>Assets\Square150x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.448</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square150x150Logo.scale-400.png">
       <PackagePath>Assets\Square150x150Logo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.448</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.altform-unplated_targetsize-16.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-16.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.448</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.altform-unplated_targetsize-256.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-256.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.449</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.altform-unplated_targetsize-48.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-48.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.449</Modified>
+      <Modified>2023-06-07T17:33:45.043</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.scale-100.png">
       <PackagePath>Assets\Square44x44Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.449</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.scale-200.png">
       <PackagePath>Assets\Square44x44Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.450</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.scale-400.png">
       <PackagePath>Assets\Square44x44Logo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.450</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.targetsize-16.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-16.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.451</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.targetsize-256.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-256.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.451</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Square44x44Logo.targetsize-48.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-48.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.452</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\StoreLogo.scale-100.png">
       <PackagePath>Assets\StoreLogo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.453</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\StoreLogo.scale-200.png">
       <PackagePath>Assets\StoreLogo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.453</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\StoreLogo.scale-400.png">
       <PackagePath>Assets\StoreLogo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.454</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Wide310x150Logo.scale-100.png">
       <PackagePath>Assets\Wide310x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.454</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Wide310x150Logo.scale-200.png">
       <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.455</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Assets\Wide310x150Logo.scale-400.png">
       <PackagePath>Assets\Wide310x150Logo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2023-05-08T06:27:18.455</Modified>
+      <Modified>2023-06-07T17:33:45.050</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Properties\Default.rd.xml">
       <PackagePath>Properties\Default.rd.xml</PackagePath>
-      <Modified>2023-05-08T06:27:18.459</Modified>
+      <Modified>2023-06-07T17:33:45.059</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\Pump.UWP.xr.xml">
       <PackagePath>Pump.UWP.xr.xml</PackagePath>
-      <Modified>2023-05-08T06:27:18.793</Modified>
+      <Modified>2023-06-07T17:33:45.570</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
-      <Modified>2023-05-30T16:51:36.577</Modified>
+      <Modified>2023-06-11T13:30:01.065</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\MainPage.xbf">
       <PackagePath>MainPage.xbf</PackagePath>
-      <Modified>2023-05-30T16:51:36.577</Modified>
+      <Modified>2023-06-11T13:30:01.065</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.UniversalCRT.Debug\10.0.22000.0\\redist\Debug\X64\ucrtbased.dll">
       <PackagePath>ucrtbased.dll</PackagePath>
@@ -318,11 +318,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2023-05-30T16:08:16.270</Modified>
+      <Modified>2023-06-09T15:48:26.954</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\bin\x64\Debug\Core\Pump.UWP.exe">
       <PackagePath>Pump.UWP.exe</PackagePath>
-      <Modified>2023-05-30T16:51:37.724</Modified>
+      <Modified>2023-06-11T13:30:02.055</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

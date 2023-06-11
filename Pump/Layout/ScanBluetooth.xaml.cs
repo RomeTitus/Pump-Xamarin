@@ -34,7 +34,7 @@ namespace Pump.Layout
             _timer.Elapsed += ScanTimerEvent;
             _bluetoothManager.AdapterBle.ScanTimeoutElapsed += AdapterBleOnScanTimeoutElapsed;
             StackLayoutBack.IsVisible = database.GetIrrigationConfigurationList().Any();
-            BtScan();
+            Device.BeginInvokeOnMainThread(BtScan);
             _notificationEvent = notificationEvent;
             _notificationEvent.OnUpdateStatus += NotificationEventOnNewNotification;
         }
@@ -43,27 +43,16 @@ namespace Pump.Layout
         {
             Device.BeginInvokeOnMainThread(() =>
             {
-                switch (_scanCounter % 6)
+                LabelBtScan.Text = (_scanCounter % 6) switch
                 {
-                    case 0:
-                        LabelBtScan.Text = "Scan.";
-                        break;
-                    case 1:
-                        LabelBtScan.Text = "Scan..";
-                        break;
-                    case 2:
-                        LabelBtScan.Text = "Scan...";
-                        break;
-                    case 3:
-                        LabelBtScan.Text = "Scan....";
-                        break;
-                    case 4:
-                        LabelBtScan.Text = "Scan.....";
-                        break;
-                    case 5:
-                        LabelBtScan.Text = "Scan......";
-                        break;
-                }
+                    0 => "Scan.",
+                    1 => "Scan..",
+                    2 => "Scan...",
+                    3 => "Scan....",
+                    4 => "Scan.....",
+                    5 => "Scan......",
+                    _ => LabelBtScan.Text
+                };
 
                 _scanCounter++;
             });
@@ -75,17 +64,20 @@ namespace Pump.Layout
             ScrollViewSetupSystem.Children.Clear();
             _bluetoothManager.IrrigationDeviceBt.CollectionChanged += (_, args) =>
             {
-                if (args.Action == NotifyCollectionChangedAction.Add)
-                    foreach (IDevice bluetoothDevice in args.NewItems)
-                    {
-                        var template = ScrollViewSetupSystem.Children.FirstOrDefault(x =>
-                            x.AutomationId == bluetoothDevice.Id.ToString());
-                        if (template != null)
-                            continue;
-                        var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
-                        blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
-                        ScrollViewSetupSystem.Children.Add(blueToothView);
-                    }
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    if (args.Action == NotifyCollectionChangedAction.Add)
+                        foreach (IDevice bluetoothDevice in args.NewItems)
+                        {
+                            var template = ScrollViewSetupSystem.Children.FirstOrDefault(x =>
+                                x.AutomationId == bluetoothDevice.Id.ToString());
+                            if (template != null)
+                                continue;
+                            var blueToothView = new ViewBluetoothSummary(bluetoothDevice);
+                            blueToothView.GetTapGestureRecognizer().Tapped += BlueToothDeviceTapped;
+                            ScrollViewSetupSystem.Children.Add(blueToothView);
+                        }
+                });
             };
             _scanCounter = 1;
             _timer.Enabled = true;
@@ -140,7 +132,7 @@ namespace Pump.Layout
         private void LabelBTScan_OnTapped(object sender, EventArgs e)
         {
             if (_timer.Enabled == false)
-                BtScan();
+                Device.BeginInvokeOnMainThread(BtScan);
         }
 
         private async void ButtonBack_OnPressed(object sender, EventArgs e)
