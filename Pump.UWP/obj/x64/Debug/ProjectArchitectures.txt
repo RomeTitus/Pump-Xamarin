@@ -1,1 +1,0 @@
-C:\Users\JamesM2\Documents\GitHub\Pump-Xamarin\Pump.UWP\Pump.UWP.csproj;x64
