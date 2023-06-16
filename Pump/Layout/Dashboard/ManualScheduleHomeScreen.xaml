@@ -79,16 +79,13 @@
                         BorderColor="Black"
                         CornerRadius="10"
                         HorizontalOptions="FillAndExpand">
-
                         <ScrollView HeightRequest="200">
-
                             <FlexLayout
                                 x:Name="ScrollViewManualZone"
                                 JustifyContent="SpaceBetween"
                                 Wrap="Wrap">
                                 <FlexLayout.GestureRecognizers>
-                                    <TapGestureRecognizer x:Name="ScrollViewManualZoneTap"
-                                                          Tapped="ScrollViewManualZoneTap_Tapped" />
+                                    <TapGestureRecognizer Tapped="ScrollViewManualZoneTap_Tapped" />
                                 </FlexLayout.GestureRecognizers>
 
                                 <ActivityIndicator
@@ -98,62 +95,56 @@
                                     IsRunning="True"
                                     IsVisible="True"
                                     VerticalOptions="Center" />
-
-
                             </FlexLayout>
                         </ScrollView>
                     </Frame>
                 </StackLayout>
 
-                <StackLayout
-                    HeightRequest="40"
-                    HorizontalOptions="EndAndExpand"
-                    Orientation="Horizontal">
+                <StackLayout>
+                    <AbsoluteLayout HorizontalOptions="FillAndExpand">
+                        <Label
+                            AbsoluteLayout.LayoutBounds="-1, 0, 0, 0"
+                            AbsoluteLayout.LayoutFlags="PositionProportional"
+                            FontSize="Subtitle"
+                            HorizontalOptions="StartAndExpand"
+                            Text="Duration"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        
+                        <control:MaskedEntry
+                            AbsoluteLayout.LayoutBounds="1, 0, -1, -1"
+                            AbsoluteLayout.LayoutFlags="PositionProportional"
+                            x:Name="MaskedEntryTime"
+                            HorizontalOptions="StartAndExpand"
+                            Keyboard="Numeric"
+                            Mask="XX:XX"
+                            Placeholder="HH:MM"
+                            VerticalOptions="Center" />
+                        
+                        <Button
+                            AbsoluteLayout.LayoutBounds="1, 0, -1, -1"
+                            AbsoluteLayout.LayoutFlags="PositionProportional"
+                            x:Name="ButtonStopManual"
+                            BackgroundColor="DeepSkyBlue"
+                            Clicked="ButtonStopManual_Clicked"
+                            HorizontalOptions="CenterAndExpand"
+                            CornerRadius="10"
+                            IsEnabled="False"
+                            Text="Stop"
+                            TextColor="White" />
+                        <Button
+                            AbsoluteLayout.LayoutBounds="1, 0, -1, -1"
+                            AbsoluteLayout.LayoutFlags="PositionProportional"
+                            x:Name="ButtonStartManual"
+                            BackgroundColor="DeepSkyBlue"
+                            HorizontalOptions="CenterAndExpand"
+                            Clicked="ButtonStartManual_Clicked"
+                            CornerRadius="10"
+                            Text="Start"
+                            TextColor="White" />
 
-                    <Label
-                        x:Name="LableTimeDuration"
-                        FontSize="Subtitle"
-                        HorizontalOptions="StartAndExpand"
-                        Text="Duration"
-                        TextColor="White"
-                        VerticalOptions="Center" />
-                    <control:MaskedEntry
-                        x:Name="MaskedEntryTime"
-                        HorizontalOptions="StartAndExpand"
-                        Keyboard="Numeric"
-                        Mask="XX:XX"
-                        Placeholder="HH:MM"
-                        VerticalOptions="Center" />
-
-                    <Label
-                        FontSize="Body"
-                        HorizontalOptions="Fill"
-                        IsVisible="false "
-                        Text="Run with Schedule"
-                        TextColor="White"
-                        VerticalOptions="Center" />
+                    </AbsoluteLayout>
                 </StackLayout>
-
-                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                    <Button
-                        x:Name="ButtonStopManual"
-                        BackgroundColor="DeepSkyBlue"
-                        Clicked="ButtonStopManual_Clicked"
-                        HorizontalOptions="CenterAndExpand"
-                        CornerRadius="10"
-                        IsEnabled="False"
-                        Text="Stop"
-                        TextColor="White" />
-                    <Button
-                        x:Name="ButtonStartManual"
-                        BackgroundColor="DeepSkyBlue"
-                        HorizontalOptions="CenterAndExpand"
-                        Clicked="ButtonStartManual_Clicked"
-                        CornerRadius="10"
-                        Text="Start"
-                        TextColor="White" />
-                </StackLayout>
-
             </FlexLayout>
         </ScrollView>
     </ContentView.Content>
