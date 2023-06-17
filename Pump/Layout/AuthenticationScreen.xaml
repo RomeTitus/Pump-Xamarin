@@ -37,7 +37,6 @@
 
 
             <StackLayout x:Name="SignInStackLayout" VerticalOptions="FillAndExpand">
-                <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" />
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black">
@@ -109,9 +108,9 @@
                         </Label.GestureRecognizers>
                     </Label>
                 </StackLayout>
+                <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" />
             </StackLayout>
             <StackLayout x:Name="SignUpStackLayout" VerticalOptions="FillAndExpand" IsVisible="false">
-                <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" HeightRequest="100" />
                 <Frame
                     BackgroundColor="White"
                     BorderColor="Black" VerticalOptions="CenterAndExpand">
@@ -193,6 +192,7 @@
                         </Label.GestureRecognizers>
                     </Label>
                 </StackLayout>
+                <Image Source="{embeddedImages:ImageResourceExtension Pump.Icons.FieldSun.png}" HeightRequest="100" />
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

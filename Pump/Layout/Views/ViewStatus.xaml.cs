@@ -20,7 +20,7 @@ namespace Pump.Layout.Views
         public ViewStatus(ControllerStatus status)
         {
             InitializeComponent();
-            VerticalOptions = LayoutOptions.EndAndExpand;
+            VerticalOptions = LayoutOptions.CenterAndExpand;
             HorizontalOptions = LayoutOptions.Center;
             _timer = new Timer(500);
             _timer.Elapsed += TimerOnElapsed;

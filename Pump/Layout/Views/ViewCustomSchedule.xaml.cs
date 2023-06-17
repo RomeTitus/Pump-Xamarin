@@ -73,5 +73,12 @@ namespace Pump.Layout.Views
         {
             SwitchScheduleIsActive.IsToggled = !SwitchScheduleIsActive.IsToggled;
         }
+        
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height); //must be called
+            if(width != -1)
+                RepeatAndPumpStackLayout.IsVisible = width > 580;
+        }
     }
 }

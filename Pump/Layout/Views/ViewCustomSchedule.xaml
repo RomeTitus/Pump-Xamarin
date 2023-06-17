@@ -8,8 +8,8 @@
     <ContentView.Content>
         <StackLayout
             x:Name="StackLayoutViewSchedule"
-            Margin="15"
-            Orientation="Horizontal">
+            Orientation="Horizontal"
+            VerticalOptions="FillAndExpand">
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer x:Name="StackLayoutViewScheduleTapGesture" />
             </StackLayout.GestureRecognizers>
@@ -20,22 +20,31 @@
                         <Label
                             x:Name="LabelScheduleName"
                             Text="Schedule Name"
-                            VerticalOptions="CenterAndExpand" />
+                            VerticalOptions="CenterAndExpand" 
+                            MaxLines="2" 
+                            LineBreakMode="TailTruncation"/>
                     </StackLayout>
                 </StackLayout>
                 <StackLayout>
                     <Label
-                        x:Name="LabelScheduleRepeat"
-                        Text="Repeat: 3"
-                        VerticalOptions="Center" />
-                </StackLayout>
-            </StackLayout>
-            <StackLayout HorizontalOptions="CenterAndExpand" Orientation="Vertical">
-                <StackLayout Orientation="Horizontal">
-                    <Label
                         x:Name="LabelScheduleTime"
                         Text="Duration ??:??"
-                        VerticalOptions="Center" />
+                        VerticalOptions="Center"  
+                        MaxLines="1" 
+                        LineBreakMode="TailTruncation"/>
+                </StackLayout>
+            </StackLayout>
+            
+            <StackLayout Orientation="Vertical" x:Name="RepeatAndPumpStackLayout" IsVisible="False" HorizontalOptions="EndAndExpand">
+                <StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Label
+                            x:Name="LabelScheduleRepeat"
+                            Text="Repeat: ?"
+                            VerticalOptions="CenterAndExpand" 
+                            MaxLines="1" 
+                            LineBreakMode="TailTruncation" />
+                    </StackLayout>
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Image HeightRequest="15"
@@ -45,13 +54,12 @@
                         Text="Unknown"
                         VerticalOptions="Center" />
                 </StackLayout>
-
             </StackLayout>
             <StackLayout x:Name="StackLayoutStatus"
                          HorizontalOptions="EndAndExpand" 
-                         VerticalOptions="CenterAndExpand" 
-                         WidthRequest="50" 
-                         HeightRequest="50"/>
+                         VerticalOptions="Start" 
+                         WidthRequest="50"
+                         HeightRequest="60"/>
 
             <StackLayout HorizontalOptions="EndAndExpand" Orientation="Horizontal">
                 <StackLayout.GestureRecognizers>
@@ -59,7 +67,6 @@
                 </StackLayout.GestureRecognizers>
                 <Switch
                     x:Name="SwitchScheduleIsActive"
-                    HorizontalOptions="Center"
                     VerticalOptions="Center" />
             </StackLayout>
         </StackLayout>
