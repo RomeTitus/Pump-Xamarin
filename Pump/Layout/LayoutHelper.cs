@@ -98,7 +98,7 @@ public static class LayoutHelper
                 IsEnabled = true,
                 IsRunning = true,
                 IsVisible = true,
-                VerticalOptions = LayoutOptions.Center
+                VerticalOptions = LayoutOptions.CenterAndExpand
             };
             layoutView.Children.Add(loadingIcon);
 

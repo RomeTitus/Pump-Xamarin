@@ -67,7 +67,7 @@ namespace Pump.Layout.Dashboard
                     ScrollViewManualPump.Children.Add(new ViewEmptySchedule("No Pump Found Here", automationId:"-848"));
                     ScrollViewManualZone.Children.Add(new ViewEmptySchedule("No Zone Found Here", automationId:"-848"));
                     
-                    _timer = new Timer(200); // 0.2 seconds
+                    _timer = new Timer(300); // 0.3 seconds
                     _timer.Elapsed += RemoveUnusedUwpView;
                     _timer.Enabled = true;
                 }
