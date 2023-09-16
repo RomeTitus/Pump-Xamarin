@@ -7,9 +7,11 @@ namespace Pump.IrrigationController
     {
         public string Name { get; set; }
         public string DeviceGuid { get; set; }
-        public List<int> KeyPath { get; set; }
+        public short Address { get; set; }
         public string AddressPath { get; set; }
         public bool UseLoRa { get; set; }
+        
+        public string TargetLoRaNodeId { get; set; }
         [JsonIgnore] public string Id { get; set; }
         public ControllerStatus ControllerStatus { get; set; }
         [JsonIgnore] public bool HasUpdated { get; set; }

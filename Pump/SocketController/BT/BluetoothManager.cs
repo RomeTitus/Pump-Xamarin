@@ -13,6 +13,7 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.EventArgs;
 using Plugin.BLE.Abstractions.Exceptions;
 using Xamarin.Forms;
+using Timer = System.Timers.Timer;
 
 namespace Pump.SocketController.BT
 {
@@ -191,7 +192,7 @@ namespace Pump.SocketController.BT
             return updated;
         }
 
-        public async Task<string> SendAndReceiveToBleAsync(JObject dataToSend, int timeout = 0)
+        public async Task<string> SendAndReceiveToBleAsync(JObject dataToSend, int timeout = 2000)
         {
             try
             {
@@ -214,8 +215,7 @@ namespace Pump.SocketController.BT
                     if (dataToSend.ContainsKey("Task"))
                         try
                         {
-                            if (dataToSend["Task"].Type != JTokenType.String)
-                                dataToSend["Task"]["Part"] = partNumber;
+                            dataToSend["Part"] = partNumber;
                         }
                         catch
                         {
@@ -253,12 +253,23 @@ namespace Pump.SocketController.BT
 
         private async Task<byte[]> WriteToBle(byte[] bytesToSend, int timeout = 0)
         {
-            await _loadedCharacteristic.WriteAsync(bytesToSend);
-            await Task.Delay(timeout);
-            var result = await _loadedCharacteristic.ReadAsync();
+            var writeAsyncResult = await _loadedCharacteristic.WriteAsync(bytesToSend);
+            if(writeAsyncResult == false)
+                throw new Exception("Could not write to Controller");
+            byte[] result;
+            var now = DateTime.Now + TimeSpan.FromMilliseconds(timeout);
+            
+            do
+            {
+                result = await _loadedCharacteristic.ReadAsync();
+                if (Encoding.ASCII.GetString(result, 0, result.Length) != Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
+                    break;
+            } while (DateTime.Now > now);
+            
+            
             if (Encoding.ASCII.GetString(result, 0, result.Length) ==
                 Encoding.ASCII.GetString(bytesToSend, 0, bytesToSend.Length))
-                throw new Exception("Controller did not reply back using BlueTooth");
+                throw new Exception("Controller did not reply back");
             return result;
         }
     }

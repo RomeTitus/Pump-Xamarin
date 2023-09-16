@@ -68,11 +68,8 @@ namespace Pump.SocketController
                     existingConfig.ExternalPath = config.ExternalPath;
                     existingConfig.InternalPath = config.InternalPath;
                     existingConfig.DeviceGuid = config.DeviceGuid;
-                    existingConfig.LoRaSet = config.LoRaSet;
+                    existingConfig.LoRaNode = config.LoRaNode;
                     existingConfig.Address = config.Address;
-                    existingConfig.Freq = config.Freq;
-                    existingConfig.Power = config.Power;
-                    existingConfig.Modem = config.Modem;
                     databaseController.SaveIrrigationConfiguration(existingConfig);
                 }
             }

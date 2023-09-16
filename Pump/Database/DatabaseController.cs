@@ -50,11 +50,8 @@ namespace Pump.Database
                     existingIrrigationConfiguration.InternalPath = irrigationConfiguration.InternalPath;
                     existingIrrigationConfiguration.ControllerPairs = irrigationConfiguration.ControllerPairs;
                     existingIrrigationConfiguration.DeviceGuid = irrigationConfiguration.DeviceGuid;
-                    existingIrrigationConfiguration.LoRaSet = irrigationConfiguration.LoRaSet;
+                    existingIrrigationConfiguration.LoRaNode = irrigationConfiguration.LoRaNode;
                     existingIrrigationConfiguration.Address = irrigationConfiguration.Address;
-                    existingIrrigationConfiguration.Freq = irrigationConfiguration.Freq;
-                    existingIrrigationConfiguration.Power = irrigationConfiguration.Power;
-                    existingIrrigationConfiguration.Modem = irrigationConfiguration.Modem;
                     existingIrrigationConfiguration.SerializedProperties();
                     _database.Update(existingIrrigationConfiguration);
                 }

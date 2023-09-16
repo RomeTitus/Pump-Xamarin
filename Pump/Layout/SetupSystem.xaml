@@ -6,7 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:embeddedImages="clr-namespace:EmbeddedImages;assembly=Pump"
     xmlns:localImage="clr-namespace:EmbeddedImages"
-    BackgroundColor="DeepSkyBlue">
+    BackgroundColor="LightBlue">
     <ContentPage.Content>
         <StackLayout>
                 <StackLayout>

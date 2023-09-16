@@ -25,7 +25,7 @@ namespace Pump.Layout
     public partial class SetupSystem
     {
         private readonly BluetoothManager _blueToothManager;
-        private readonly List<DHCPConfig> _dhcpConfigList = new List<DHCPConfig>();
+        private readonly List<DHCPConfig> _dhcpConfigList = new();
         private readonly NotificationEvent _notificationEvent;
         private readonly DatabaseController _database;
         private PopupDHCPConfig _popupDhcpConfig;
@@ -124,7 +124,7 @@ namespace Pump.Layout
                 {
                     foreach (var keyPairValue in _mainPage.ObservableDict)
                     {
-                        var subFound = keyPairValue.Value.SubControllerList.FirstOrDefault(x => x.KeyPath.First() == controllerConf["Address"].Value<int>());
+                        var subFound = keyPairValue.Value.SubControllerList.FirstOrDefault(x => x.Address == controllerConf["Address"].Value<byte>());
                         if(subFound != null)
                         {
                             SubControllerStackLayout.IsVisible = true;
@@ -391,7 +391,7 @@ namespace Pump.Layout
             var mainControllerConfig =
                 _mainPage.ObservableDict.Keys.First(x => x.Path == ControllerPicker.SelectedItem.ToString());
 
-            CheckBoxLoRa.Color = mainControllerConfig.LoRaSet ? Color.Accent : Color.Gray;
+            CheckBoxLoRa.Color = mainControllerConfig.LoRaNode != null ? Color.Accent : Color.Gray;
         }
 
         private void PairControllerToSiteTapGesture(object sender, EventArgs e)
@@ -480,18 +480,23 @@ namespace Pump.Layout
 
         private async Task PairToMainController()
         {
-            //LoRaSet Bool field needs to be true
             var mainControllerConfig =
                 _mainPage.ObservableDict.Keys.First(x => x.Path == ControllerPicker.SelectedItem.ToString());
             var mainObservableIrrigation = _mainPage.ObservableDict[mainControllerConfig];
-            int subAddress = mainControllerConfig.Address + 1;
+            
+            //Note, Will also use LoRa Id just like it uses IP for network con.
+            var loraNodeId = mainControllerConfig.LoRaNode?.id;
+            short subAddress = mainControllerConfig.Address;
 
             if (mainObservableIrrigation.SubControllerList.Any())
             {
-                subAddress = mainObservableIrrigation.SubControllerList.Last().KeyPath.First() + 1;
+                subAddress = (short)(mainObservableIrrigation.SubControllerList.Last().Address + 1);
                 if (subAddress > 254)
                     subAddress = 0;
             }
+            else
+                subAddress++;
+            
 
             var loadingScreen = new PopupLoading("Pairing with " + mainControllerConfig.Path + "...");
             await PopupNavigation.Instance.PushAsync(loadingScreen);
@@ -504,13 +509,13 @@ namespace Pump.Layout
             
             var result = await _blueToothManager.SendAndReceiveToBleAsync(
                     SocketCommands.PairSubController(mainControllerConfig, authConfig, TxtControllerName.Text,
-                        new List<int> { subAddress, mainControllerConfig.Address }, CheckBoxLoRa.IsChecked)
-                , 8000);
+                        subAddress, mainControllerConfig.Address , CheckBoxLoRa.IsChecked, loraNodeId)
+                , 120000);
             
             await PopupNavigation.Instance.PopAllAsync();
 
             //Prompt to Force Pair
-            if (result != "ok")
+            if (result.Contains("ok") == false)
             {
                 var force = await DisplayAlert("Paring Failed",
                     result +
@@ -520,20 +525,18 @@ namespace Pump.Layout
                     return;
                 
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
-                
-                    await _blueToothManager.SendAndReceiveToBleAsync(
-                        SocketCommands.PairSubController(mainControllerConfig, authConfig, TxtControllerName.Text,
-                            new List<int> { subAddress, mainControllerConfig.Address }, CheckBoxLoRa.IsChecked, true)
-                        , 8000);
+
+                result = await _blueToothManager.SendAndReceiveToBleAsync(
+                    SocketCommands.PairSubController(mainControllerConfig, authConfig, TxtControllerName.Text,
+                        subAddress, mainControllerConfig.Address, CheckBoxLoRa.IsChecked, loraNodeId, true))
+                    ;
                 await PopupNavigation.Instance.PopAllAsync();
             } 
             
             loadingScreen = new PopupLoading("Uploading to " + mainControllerConfig.Path + "..");
             await PopupNavigation.Instance.PushAsync(loadingScreen);
-
-
-            var addressPath = string.Empty;
             
+            var addressPath = string.Empty;
             var lanIp = LabelLanIp.Text.Split(new string[] { "IP: " }, StringSplitOptions.None); //Split(Convert.ToChar("IP: "));
             if (lanIp.Length == 2)
                 addressPath = lanIp[1] + ":20002";
@@ -549,28 +552,26 @@ namespace Pump.Layout
             {
                 Name = TxtControllerName.Text,
                 DeviceGuid = _blueToothManager.BleDevice.Id.ToString(),
-                KeyPath = new List<int> { subAddress, mainControllerConfig.Address },
+                Address = mainControllerConfig.Address,
                 UseLoRa = CheckBoxLoRa.IsChecked,
                 AddressPath = addressPath
             };
-
-            var key = await _mainPage.SocketPicker.SendCommand(newSubController, mainControllerConfig); // "-NJ9RU7toGoJhpgO5ZGN";
+            if (CheckBoxLoRa.IsChecked)
+                newSubController.TargetLoRaNodeId = result.Remove(0, 2);
+            //Look at entity's Id
+            await _mainPage.SocketPicker.SendCommand(newSubController, mainControllerConfig);
 
             await PopupNavigation.Instance.PopAllAsync();
 
             var selectedFrame = (Label) ((Frame) SiteLayout.Children.First(x => ((Frame)x).BackgroundColor == Color.LightCyan)).Content;
 
-            var existingSite =
-                mainControllerConfig.ControllerPairs.Any(x => selectedFrame.Text == x.Key);
-
-
             if(mainControllerConfig.ControllerPairs.TryGetValue(selectedFrame.Text, out List<string> subControllerIds))
             {
-                subControllerIds.Add(key);
+                subControllerIds.Add(newSubController.Id);
             }
             else
             {
-                mainControllerConfig.ControllerPairs.Add(selectedFrame.Text, new List<string> { key });
+                mainControllerConfig.ControllerPairs.Add(selectedFrame.Text, new List<string> { newSubController.Id });
             }
             //We need to save controller config 
             
@@ -594,16 +595,17 @@ namespace Pump.Layout
             {
                 var loadingScreen = new PopupLoading { CloseWhenBackgroundIsClicked = false };
                 await PopupNavigation.Instance.PushAsync(loadingScreen);
-                var loRaConfig = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.GetLoRaConfig());
+                var loRaConfigString = await _blueToothManager.SendAndReceiveToBleAsync(SocketCommands.GetLoRaConfig());
                 await PopupNavigation.Instance.PopAllAsync();
 
-                if (loRaConfig == "None")
+                if (loRaConfigString == "None")
                 {
                     await DisplayAlert("LoRa", "Failed to communicate with LoRa module", "Understood");
                     return;
                 }
-
-                var popupMoreConnection = new PopupMoreConnection(loRaConfig, _blueToothManager);
+                
+                var loraNode = JsonConvert.DeserializeObject<LoRaNodeInfo>(loRaConfigString);
+                var popupMoreConnection = new PopupMoreConnection(loraNode);
                 await PopupNavigation.Instance.PushAsync(popupMoreConnection);
             }
             catch (Exception exception)

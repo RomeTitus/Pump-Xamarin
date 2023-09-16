@@ -45,13 +45,14 @@ namespace Pump.Layout
             SubControllerLoRa.IsChecked = _subController.UseLoRa;
             StackLayoutKeys.IsVisible = _subController.UseLoRa;
 
-
+            /*
             for (var i = 0; i < _subController.KeyPath?.Count; i++)
             {
                 KeyPathEntery.Text += _subController.KeyPath[i].ToString();
                 if (i != _subController.KeyPath.Count - 1)
                     KeyPathEntery.Text += ">";
             }
+            */
         }
 
         private async Task SetFocus()
@@ -76,11 +77,13 @@ namespace Pump.Layout
             _subController.Name = SubControllerName.Text;
             _subController.AddressPath = SubControllerIp.Text;
             _subController.UseLoRa = SubControllerLoRa.IsChecked;
+            /*
             _subController.KeyPath = new List<int>();
             foreach (var key in KeyPathEntery.Text.Split('>'))
             {
                 _subController.KeyPath.Add(int.Parse(key));
             }
+            */
         }
 
         private string Validation()

@@ -40,43 +40,14 @@
                 </StackLayout>
                 <ScrollView>
                     <StackLayout>
-                        <Label Text="Data Rate" FontSize="Large"/>
-                        <Frame
-                            Margin="0,0,10,0"
-                            Padding="10,0,10,0"
-                            BackgroundColor="AliceBlue"
-                            CornerRadius="30">
-                            <Picker x:Name="ModemConfigPicker" HorizontalOptions="FillAndExpand"
-                                    TextColor="DarkSlateBlue">
-                                <Picker.Items>
-                                    <x:String>Default medium range</x:String>
-                                    <x:String>Fast but short range</x:String>
-                                    <x:String>Slow but long range</x:String>
-                                    <x:String>Very slow but long range</x:String>
-                                    <x:String>Deathly slow but long range</x:String>
-                                </Picker.Items>
-                            </Picker>
-                        </Frame>
-
-                        <Label Text="Set Frequency" FontSize="Large"/>
-                        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                            <Slider x:Name="FreqSlider" Maximum="450" Minimum="420" HorizontalOptions="FillAndExpand"
-                                    ValueChanged="freq_OnValueChanged" />
-                            <Label x:Name = "FrequencyLabel" Text="Freq: " HorizontalOptions="End"/>
-                        </StackLayout>
-                        
-                        <Label Text="Transmission" FontSize="Large"/>
-                        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                            <Slider x:Name="TransmissionSlider" Maximum="23" Minimum="5" HorizontalOptions="FillAndExpand"
-                                    ValueChanged="TransmissionPower_OnValueChanged" />
-                            <Label x:Name = "TransmissionLabel" Text="00 dbm" HorizontalOptions="End"/>
-                        </StackLayout>
+                        <Label Text="id" FontSize="Large" x:Name="LabelId"/>
+                        <Label Text="longName" FontSize="Large" x:Name="LabelLongName"/>
+                        <Label Text="shortName" FontSize="Large" x:Name="LabelShortName"/>
+                        <Label Text="macAddr" FontSize="Large" x:Name="LabelMacAddr"/>
+                        <Label Text="hwModel" FontSize="Large" x:Name="LabelHwModel"/>
                     </StackLayout>
                 </ScrollView>
                 <StackLayout VerticalOptions="EndAndExpand">
-                    <Button
-                        Clicked="ButtonLoRaConfigSave_OnClicked"
-                        Text="Save" />
                     <Button
                         Clicked="ButtonCancel_OnClicked"
                         Text="Cancel" />
