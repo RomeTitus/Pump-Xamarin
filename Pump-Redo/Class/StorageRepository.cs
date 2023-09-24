@@ -21,7 +21,7 @@ namespace Pump.Class
         {
             var userDetail = _database.GetUserAuthentication() ?? new UserAuthentication();
             var userInfo = JsonConvert.DeserializeObject<UserInfo>(userDetail.UserInfo);
-            var userAuth = JsonConvert.DeserializeObject<FirebaseCredential>(userDetail.UserInfo);
+            var userAuth = JsonConvert.DeserializeObject<FirebaseCredential>(userDetail.FirebaseCredential);
             return Task.FromResult((userInfo, userAuth));
         }
 

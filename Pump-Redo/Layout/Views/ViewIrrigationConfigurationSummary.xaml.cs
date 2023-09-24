@@ -97,12 +97,15 @@ namespace Pump.Layout.Views
 
         private void SetSignalStrength(int signal)
         {
+            Device.BeginInvokeOnMainThread(() =>
+            {
             ImageSignalStrengthNoSignal.IsVisible = signal == 0;
             ImageSignalStrength1.IsVisible = signal == 1;
             ImageSignalStrength2.IsVisible = signal == 2;
             ImageSignalStrength3.IsVisible = signal == 3;
             ImageSignalStrength4.IsVisible = signal == 4;
             ImageSignalStrength5.IsVisible = signal == 5;
+            });
         }
 
         private async Task<bool> ConnectionSuccessful()

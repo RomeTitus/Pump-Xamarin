@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using System.Timers;
 using Firebase.Auth;
@@ -53,9 +54,21 @@ namespace Pump
             }
             else
             {
+                try
+                {
+                    await e.User.GetIdTokenAsync();
+                }
+                catch (Exception ex) {
+                    await DisplayAlert("Incomplete", "Authentication Failed, Please re-login", "Understood");
+                    _database.DeleteAllIrrigationConfigurationConnection();
+                    await _client.SignOutAsync();
+                    return;
+                }
+
                 if (_authenticationScreen.IsDisplayed)
                     _authenticationScreen.ClosePage();
                 _authenticationScreen.IsDisplayed = false;
+                
                 var configList = _database.GetIrrigationConfigurationList();
                 if (!configList.Any())
                     configList = await GetIrrigationConfigFromFirebase(e.User);

@@ -17,7 +17,7 @@ using Xamarin.Forms.Platform.Android;
 using Platform = Xamarin.Essentials.Platform;
 namespace Pump.Droid
 {
-    [Activity(Label = "Pump", Theme = "@style/MainTheme", MainLauncher = true,
+    [Activity(Label = "Farm", Theme = "@style/MainTheme", MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode |
                                ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
     public class MainActivity : FormsAppCompatActivity

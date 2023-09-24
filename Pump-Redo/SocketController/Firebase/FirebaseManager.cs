@@ -16,7 +16,12 @@ namespace Pump.SocketController.Firebase
 
         public void InitializeFirebase(User user)
         {
-            FirebaseQuery = new FirebaseClient("https://pump-25eee.firebaseio.com/").Child(user.Uid);
+            FirebaseQuery = new FirebaseClient("https://pump-25eee.firebaseio.com/",
+            new FirebaseOptions
+            {
+                AuthTokenAsyncFactory = () => Task.FromResult(user.Credential.IdToken)
+            })
+            .Child(user.Uid);
         }
 
         public async Task<List<IrrigationConfiguration>> GetIrrigationConfigList()
