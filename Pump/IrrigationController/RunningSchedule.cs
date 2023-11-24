@@ -20,49 +20,71 @@ namespace Pump.IrrigationController
             {
                 if (schedule.StartTime == 0)
                     continue;
+
+                var test = GetScheduleDetailRunning(schedule);
+
                 activeScheduleList.AddRange(CreateActiveScheduleList(schedule, equipmentList));
             }
+
+
+            foreach (var activeSchedul in activeScheduleList)
+            {
+                activeSchedul.StartTime = activeSchedul.StartTime.ToLocalTime();
+                activeSchedul.EndTime = activeSchedul.EndTime.ToLocalTime();
+            }
+
             return activeScheduleList;
         }
         
         private static IEnumerable<ActiveSchedule> CreateActiveScheduleList(CustomSchedule schedule, ObservableCollection<Equipment> equipmentList)
         {
             var activeScheduleList = new List<ActiveSchedule>();
-            
-            var startTime = schedule.StartTime;
-            if (schedule.TimeAdjustment is not null)
-            {
-                startTime -= schedule.TimeAdjustment.Value;
-            }
-            
-            var customDateTimeStart =  ScheduleTime.FromUnixTimeStampUtc(startTime);
-                
-            for (int i = 0; i < schedule.Repeat; i++)
-            {
-                foreach (var scheduleDetail in schedule.ScheduleDetails)
-                {
-                    var activeSchedule = new ActiveSchedule
-                    {
-                        Id = schedule.Id + i,
-                        TimeAdjustment = schedule.TimeAdjustment,
-                        Name = schedule.NAME,
-                        Weekday = null,
-                        IdPump = schedule.id_Pump,
-                        NamePump = equipmentList.FirstOrDefault(x => x.Id == schedule.id_Pump)?.NAME,
-                        IdEquipment = scheduleDetail.id_Equipment,
-                        NameEquipment = equipmentList.FirstOrDefault(x => x.Id == scheduleDetail.id_Equipment)?.NAME,
-                        StartTime = customDateTimeStart
-                    };
-                        
-                    var durationHour = scheduleDetail.DURATION.Split(':').First();
-                    var durationMinute = scheduleDetail.DURATION.Split(':').Last();
-                    customDateTimeStart += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
-                                           TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
-                    activeSchedule.EndTime = customDateTimeStart;
-                    activeScheduleList.Add(activeSchedule);
-                }
-            }
 
+
+            try
+            {
+                var startTime = schedule.StartTime;
+                if (schedule.TimeAdjustment is not null)
+                {
+                    startTime -= schedule.TimeAdjustment.Value;
+                }
+
+                var customDateTimeStart = ScheduleTime.FromUnixTimeStampUtc(startTime);
+
+                var currentTime = DateTime.UtcNow;
+                var index = 0;
+                for (var i = 0; i < schedule.Repeat + 1; i++)
+                    foreach (var scheduleDetail in schedule.ScheduleDetails)
+                    {
+                        var activeSchedule = new ActiveSchedule
+                        {
+                            Id = schedule.Id + i,
+                            TimeAdjustment = schedule.TimeAdjustment,
+                            Name = schedule.NAME,
+                            Weekday = null,
+                            IdPump = schedule.id_Pump,
+                            NamePump = equipmentList.FirstOrDefault(x => x.Id == schedule.id_Pump)?.NAME,
+                            IdEquipment = scheduleDetail.id_Equipment,
+                            NameEquipment = equipmentList.FirstOrDefault(x => x.Id == scheduleDetail.id_Equipment)?.NAME,
+                            StartTime = customDateTimeStart
+                        };
+
+                        var durationHour = scheduleDetail.DURATION.Split(':').First();
+                        var durationMinute = scheduleDetail.DURATION.Split(':').Last();
+                        customDateTimeStart += TimeSpan.FromHours(Convert.ToInt32(durationHour)) +
+                                               TimeSpan.FromMinutes(Convert.ToInt32(durationMinute));
+                        activeSchedule.EndTime = customDateTimeStart;
+                        
+                        customDateTimeStart = activeSchedule.EndTime;
+                        index++;
+
+                        activeScheduleList.Add(activeSchedule);
+                    }
+            }
+            catch
+            {
+                // ignored
+            }
             return activeScheduleList;
         }
 
@@ -89,6 +111,13 @@ namespace Pump.IrrigationController
                     activeScheduleList.AddRange(CreateActiveScheduleList(schedule, equipmentList, endTime, weekDay));
                 }
             }
+
+            foreach (var activeSchedul in activeScheduleList)
+            {
+                activeSchedul.StartTime = activeSchedul.StartTime.ToLocalTime();
+                activeSchedul.EndTime = activeSchedul.EndTime.ToLocalTime();
+            }
+
             return activeScheduleList;
         }
 
@@ -97,14 +126,19 @@ namespace Pump.IrrigationController
             var activeScheduleList = new List<ActiveSchedule>();
             
             int? timeAdjustment = null;
-            var timeAdjustmentDetail = schedule.TimeAdjustment.Split(',')
+            /*
+            if(string.IsNullOrEmpty(schedule.TimeAdjustment) == false)
+            {
+                var timeAdjustmentDetail = schedule.TimeAdjustment.Split(',')
                 .FirstOrDefault(x => x.Contains(weekDay.ToUpper()));
 
-            if (timeAdjustmentDetail is not null)
-            {
-                timeAdjustment = Convert.ToInt32(timeAdjustmentDetail.Split('@')[1]);   
-                endTime = endTime.AddSeconds(timeAdjustment.Value);
+                if (timeAdjustmentDetail is not null)
+                {
+                    timeAdjustment = Convert.ToInt32(timeAdjustmentDetail.Split('@')[1]);
+                    endTime = endTime.AddSeconds(timeAdjustment.Value);
+                }
             }
+            */
 
             foreach (var detail in schedule.ScheduleDetails)
             {
@@ -113,7 +147,7 @@ namespace Pump.IrrigationController
                     Id = weekDay + "@" + schedule.Id, Name = schedule.NAME,
                     IdEquipment = detail.id_Equipment,
                     IdPump = schedule.id_Pump,
-                    TimeAdjustment = timeAdjustment,
+                    //TimeAdjustment = timeAdjustment,
                     Weekday = weekDay
                 };
 
