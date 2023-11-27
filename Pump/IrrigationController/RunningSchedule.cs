@@ -299,28 +299,28 @@ namespace Pump.IrrigationController
         {
             var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
+                activeSchedule.StartTime < DateTime.UtcNow && activeSchedule.EndTime > DateTime.Now).ToList();
         }
 
         public static IEnumerable<ActiveSchedule> GetQueSchedule(this ObservableCollection<Schedule> scheduleList, ObservableCollection<Equipment> equipmentList)
         {
             var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList, true);
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(2)).ToList();
+                activeSchedule.StartTime > DateTime.Now.ToLocalTime() && activeSchedule.StartTime < DateTime.Now.AddDays(2).ToLocalTime()).ToList();
         }
         
         public static IEnumerable<ActiveSchedule> GetRunningSchedule(this ObservableCollection<CustomSchedule> scheduleList, ObservableCollection<Equipment> equipmentList)
         {
             var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime < DateTime.Now && activeSchedule.EndTime > DateTime.Now).ToList();
+                activeSchedule.StartTime < DateTime.Now.ToLocalTime() && activeSchedule.EndTime > DateTime.Now.ToLocalTime()).ToList();
         }
         
         public static IEnumerable<ActiveSchedule> GetQueSchedule(this ObservableCollection<CustomSchedule> scheduleList, ObservableCollection<Equipment> equipmentList)
         {
             var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime > DateTime.Now && activeSchedule.StartTime < DateTime.Now.AddDays(7)).ToList();
+                activeSchedule.StartTime > DateTime.Now.ToLocalTime() && activeSchedule.StartTime < DateTime.Now.AddDays(7).ToLocalTime()).ToList();
         }
     }
 }
