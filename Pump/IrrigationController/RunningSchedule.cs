@@ -8,7 +8,6 @@ namespace Pump.IrrigationController
 {
     internal static class RunningSchedule
     {
-        
         private static IEnumerable<ActiveSchedule> GetActiveSchedules(ObservableCollection<CustomSchedule> scheduleList, ObservableCollection<Equipment> equipmentList)
         {
             if (scheduleList == null)
@@ -20,8 +19,6 @@ namespace Pump.IrrigationController
             {
                 if (schedule.StartTime == 0)
                     continue;
-
-                var test = GetScheduleDetailRunning(schedule);
 
                 activeScheduleList.AddRange(CreateActiveScheduleList(schedule, equipmentList));
             }
@@ -299,7 +296,7 @@ namespace Pump.IrrigationController
         {
             var activeScheduleList = GetActiveSchedules(scheduleList, equipmentList);
             return activeScheduleList.Where(activeSchedule =>
-                activeSchedule.StartTime < DateTime.UtcNow && activeSchedule.EndTime > DateTime.Now).ToList();
+                activeSchedule.StartTime < DateTime.Now.ToLocalTime() && activeSchedule.EndTime > DateTime.Now.ToLocalTime()).ToList();
         }
 
         public static IEnumerable<ActiveSchedule> GetQueSchedule(this ObservableCollection<Schedule> scheduleList, ObservableCollection<Equipment> equipmentList)

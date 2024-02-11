@@ -12,8 +12,6 @@
 
 
     <StackLayout HorizontalOptions="FillAndExpand">
-        
-        
         <AbsoluteLayout HorizontalOptions="FillAndExpand">
             <Label
                 x:Name="LabelScheduleName"
